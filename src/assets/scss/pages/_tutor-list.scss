@@ -1,0 +1,205 @@
+//hero section
+.tutor-list {
+  .hero-section {
+    overflow-x: hidden;
+    background-image: url("src/assets/images/deco/bg-6.png");
+    margin-top: -200px;
+    padding-top: 300px;
+    padding-bottom: 250px;
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    @include xl-pc {
+      margin-top: -100px;
+      margin-left: -250px;
+      padding-left: 250px;
+      padding-top: 250px;
+      padding-bottom: 150px;
+    }
+
+    @include pad {
+      background-color: $brand-05;
+      background-image: none;
+      margin-top: 0;
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    .cta-btn {
+      font-size: 20px;
+      @media (max-width: 368px) {
+        font-size: 15px;
+      }
+    }
+
+    .star-deco {
+      width: 450px;
+      @include lg-pc {
+        width: 300px;
+      }
+      @include pad {
+        display: none;
+      }
+    }
+
+    .question-text-wrapper {
+      position: relative;
+      width: fit-content;
+    }
+    .question-text:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: white;
+      border-left: 2px solid $brand-03;
+      animation: textType 3s steps(12) infinite;
+      @include pad {
+        background-color: $brand-05;
+      }
+    }
+  }
+
+  p.profile {
+    background-color: $brand-03;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -12px;
+  }
+
+  .profile {
+    width: 45px;
+    height: 45px;
+    border-radius: 50px;
+    border: 1px solid $gray-04;
+    background-color: white;
+    &:not(:first-of-type) {
+      margin-left: -12px;
+    }
+  }
+}
+
+@keyframes textType {
+  40%,
+  60% {
+    left: calc(100% + 4px);
+  }
+
+  100% {
+    left: 0%;
+  }
+}
+
+//service intro section
+.tutor-list {
+  .service-intro {
+    padding-bottom: 80px;
+    @include lg-pc {
+      padding-top: 20px;
+    }
+    @include pad {
+      padding-top: 32px;
+      padding-bottom: 32px;
+    }
+    @include mobile {
+      padding-top: 32px;
+    }
+    .description,
+    .cta {
+      @include pad {
+        text-align: center;
+      }
+    }
+    .cta {
+      display: inline-flex;
+      @include pad {
+        display: block;
+      }
+    }
+    .deco-img {
+      width: 400px;
+      @include lg-pc {
+        width: 250px;
+      }
+      @include pad {
+        display: none;
+      }
+    }
+  }
+}
+
+//category section
+.tutor-list {
+  .arrow {
+    @include pad {
+      display: none;
+    }
+  }
+
+  .category-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 36px;
+    @include pad {
+      display: block;
+      overflow: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar {
+        height: 0;
+      }
+    }
+  }
+}
+
+//tutor list
+.tutor-list {
+  .control-group {
+    display: flex;
+    justify-content: end;
+    @include pad {
+      justify-content: center;
+    }
+
+    @include mobile {
+      flex-direction: column;
+    }
+  }
+
+  .search-tutor {
+    @include mobile {
+      width: 100%;
+    }
+  }
+
+  .nav-search-desktop {
+    width: 200px;
+    @include mobile {
+      width: 100%;
+    }
+  }
+  .nav-search-desktop,
+  .nav-search-mobile {
+    padding-left: 44px;
+  }
+
+  .sort {
+    @include mobile {
+      margin-top: 16px;
+      .dropdown-menu {
+        width: calc(100% - 20px);
+      }
+    }
+    .dropdown-toggle {
+      width: 100%;
+    }
+  }
+}

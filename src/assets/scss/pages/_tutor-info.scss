@@ -1,0 +1,23 @@
+/* tutor-info-header-section */
+.tutor-info-header-section {
+  height: 480px;
+  background-image: url('src/assets/images/deco/bg-9.jpg');
+
+  @include pad {
+    height: 300px;
+  }
+}
+
+/* tutor-info-section */
+.tutor-info-section {
+  margin-top: -140px;
+
+  .tutor-img-wrap {
+    width: 280px;
+    height: 280px;
+    background: $white;
+    backdrop-filter: blur(5px);
+    border-radius: 200px;
+    padding: 12px;
+  }
+}

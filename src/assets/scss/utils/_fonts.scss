@@ -1,0 +1,63 @@
+$breakpoints: (
+  xxl: 1200px,
+  xl: 992px,
+  lg: 768px,
+  md: 576px,
+  sm: 0px,
+);
+
+$font-sizes: (
+  1: 40px,
+  2: 32px,
+  3: 28px,
+  4: 24px,
+  5: 20px,
+  6: 16px,
+  7: 14px,
+  8: 12px,
+);
+
+$font-weights: (
+  lighter: lighter,
+  light: 300,
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+  bolder: bolder,
+);
+
+@each $size, $value in $font-sizes {
+  .fs-#{$size} {
+    font-size: $value !important;
+  }
+}
+@each $size, $value in $font-sizes {
+  @each $breakpoint, $media in $breakpoints {
+    .fs-#{$breakpoint}-#{$size} {
+      @media (min-width: #{$media}) {
+        font-size: $value !important;
+      }
+    }
+  }
+}
+
+@each $name, $value in $font-weights {
+  .fw-#{$name} {
+    font-weight: $value !important;
+  }
+}
+@each $name, $value in $font-weights {
+  @each $breakpoint, $media in $breakpoints {
+    .fw-#{$breakpoint}-#{$name} {
+      @media (min-width: #{$media}) {
+        font-weight: $value !important;
+      }
+    }
+  }
+}
+
+.play-write-font {
+  font-family: "Playwrite DE Grund", cursive;
+  font-style: normal;
+}

@@ -1,0 +1,229 @@
+.tutor-booking {
+  .section {
+    padding: 24px;
+    background-color: $gray-04;
+    border-radius: 16px;
+    margin-bottom: 40px;
+
+    @include pad {
+      padding: 24px 12px;
+      margin-bottom: 16px;
+    }
+  }
+
+  .section-component {
+    margin-bottom: 24px;
+    @include pad {
+      margin-bottom: 16px;
+    }
+  }
+
+  .tutor-profile {
+    display: flex;
+    img {
+      width: 80px;
+      height: 80px;
+      @include pad {
+        width: 64px;
+        height: 64px;
+      }
+    }
+  }
+  .mobile-bottom-cta {
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+      rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+      rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  }
+}
+
+.tab-pane {
+  .tab-details {
+    &.text-hide {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 5; /* number of lines to show */
+      line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+  }
+}
+
+.schedule {
+  .week {
+    text-align: center;
+    @include lg-pc {
+      font-size: 18px;
+    }
+    @include mobile {
+      font-size: 16px;
+    }
+
+    @include mobile-sm {
+      font-size: 15px;
+    }
+  }
+
+  .prev,
+  .next {
+    @include lg-pc {
+      font-size: 18px;
+    }
+    @include mobile {
+      font-size: 16px;
+    }
+
+    @include mobile-sm {
+      font-size: 15px;
+    }
+  }
+}
+
+.available-date-time {
+  .date {
+    background-color: white;
+    padding: 20px 4px;
+    text-align: center;
+    @include lg-pc {
+      h6 {
+        font-size: 13px;
+      }
+      p {
+        font-size: 12px;
+      }
+    }
+    @include mobile {
+      h6 {
+        font-size: 12px;
+      }
+      p {
+        font-size: 11px;
+      }
+    }
+
+    @include mobile-sm {
+      h6 {
+        font-size: 11px;
+      }
+      p {
+        font-size: 10px;
+      }
+    }
+    &.disabled h6 {
+      color: $gray-03;
+    }
+
+    &.disabled p {
+      color: $gray-03;
+    }
+  }
+
+  .col:first-child .date {
+    border-radius: 16px 0px 0px 16px;
+  }
+
+  .col:last-child .date {
+    border-radius: 0px 16px 16px 0px;
+  }
+
+  .times {
+    margin-top: 20px;
+    @include lg-pc {
+      margin-top: 10px;
+    }
+    .time {
+      font-size: 14px;
+      background-color: $brand-02;
+      color: $brand-03;
+      text-align: center;
+      border-radius: 12px;
+      padding: 4px 12px;
+      margin: 8px 0px;
+      cursor: pointer;
+      @include lg-pc {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin: 6px 0px;
+      }
+      @include mobile {
+        font-size: 10px;
+        margin: 4px 0px;
+      }
+      @include mobile-sm {
+        font-size: 9px;
+        padding: 4px 6px;
+      }
+
+      &:hover {
+        background-color: $brand-03;
+        color: white;
+      }
+
+      &.disabled {
+        background-color: transparent;
+        color: $gray-03;
+        cursor: auto;
+      }
+    }
+  }
+}
+
+.student-comment,.student-comment-modal {
+  .progress {
+    --bs-progress-bg: none;
+  }
+  .progress-bar {
+    border-radius: 0.5rem;
+  }
+  .student-comment-card {
+    display: flex;
+    flex-direction: row;
+    img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+}
+
+
+.student-comment .comment-details {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* number of lines to show */
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+.tutor-booking {
+  .desktop-cta-card {
+    &.sticky-top {
+      top: 30px;
+    }
+  }
+}
+
+.service-selection-modal {
+  .modal-content {
+    padding: 20px 50px 50px 50px;
+    @include lg-pc {
+      padding: 20px;
+    }
+  }
+}
+
+.service-card {
+  img {
+    width: 100%;
+
+    @include lg-pc {
+      width: 250px;
+      height: 250px;
+    }
+
+    @include pad {
+      width: 200px;
+      height: 200px;
+    }
+  }
+}
+
+

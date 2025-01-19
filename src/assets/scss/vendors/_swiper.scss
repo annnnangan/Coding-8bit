@@ -1,0 +1,50 @@
+.swiper-pagination-brand-01 {
+  position: absolute;
+  margin-bottom: 40px;
+
+  @include pad {
+    margin-bottom: 0;
+  }
+
+  .swiper-pagination-bullet {
+    background-color: $gray-03;
+    width: 40px;
+    height: 8px;
+    border-radius: 4px;
+
+    @include pad {
+      height: 4px;
+    }
+  }
+  .swiper-pagination-bullet-active {
+    background-color: $brand-01;
+  }
+}
+
+/* swiper-circle-btn */
+.swiper-circle-btn-next,
+.swiper-circle-btn-prev {
+  position: static;
+  color: $brand-03;
+  width: 44px;
+  background-color: $brand-02;
+
+  &::after {
+    font-family: "Material Symbols Outlined";
+    border: none;
+    font-size: 24px;
+  }
+
+  &:hover {
+    color: $white;
+    background-color: $brand-03;
+    transition: 0.3s;
+  }
+}
+
+.swiper-circle-btn-next::after {
+  content: "\e5cc";
+}
+.swiper-circle-btn-prev::after {
+  content: "\e5cb";
+}
