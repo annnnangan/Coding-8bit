@@ -61,7 +61,7 @@ export default function Header() {
             <span
               id="menu-icon"
               className={`material-symbols-outlined icon-fill fs-4 ${
-                isMenuOpen ? "d-none" : ""
+                isMenuOpen && "d-none"
               }`}
             >
               menu
@@ -78,7 +78,7 @@ export default function Header() {
           <div
             id="navbarSupportedContent"
             className={`collapse navbar-collapse justify-content-end ${
-              isMenuOpen ? "show" : ""
+              isMenuOpen && "show"
             }`}
           >
             <ul className="navbar-nav align-items-lg-center">

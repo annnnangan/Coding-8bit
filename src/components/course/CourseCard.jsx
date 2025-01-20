@@ -20,11 +20,9 @@ export default function CourseCard({ courseList, cardsNum = 3 }) {
                   />
                 </div>
                 <span className="course-category-tag opacity-75 position-absolute">
-                  {course.category === "topicSeries" ? "主題式課程影片" : ""}
-                  {course.category === "customLearning"
-                    ? "客製化學習需求影片"
-                    : ""}
-                  {course.category === "freeTipShorts" ? "實用技術短影片" : ""}
+                  {course.category === "topicSeries" && "主題式課程影片"}
+                  {course.category === "customLearning" && "客製化學習需求影片"}
+                  {course.category === "freeTipShorts" && "實用技術短影片"}
                 </span>
                 <div className="card-body p-0 mt-3 mt-lg-4 f-column-between">
                   <div>
@@ -77,11 +75,9 @@ export default function CourseCard({ courseList, cardsNum = 3 }) {
             />
           </div>
           <span className="course-category-tag opacity-75 position-absolute">
-            {courseList.category === "topicSeries" ? "主題式課程影片" : ""}
-            {courseList.category === "customLearning"
-              ? "客製化學習需求影片"
-              : ""}
-            {courseList.category === "freeTipShorts" ? "實用技術短影片" : ""}
+            {courseList.category === "topicSeries" && "主題式課程影片"}
+            {courseList.category === "customLearning" && "客製化學習需求影片"}
+            {courseList.category === "freeTipShorts" && "實用技術短影片"}
           </span>
           <div className="card-body p-0 mt-3 mt-lg-4 f-column-between">
             <div>

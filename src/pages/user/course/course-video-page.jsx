@@ -4,7 +4,7 @@ import axios from "axios";
 import { otherVideos, relatedVideos } from "../../../data/videos";
 import CommentsSection from "../../../components/course/CommentsSection";
 
-const { VITE_API_BASE } = import.meta.env
+const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseVideoPage() {
   const [courseList, setCourseList] = useState({
@@ -86,7 +86,7 @@ export default function CourseVideoPage() {
                   >
                     <span
                       className={`fs-5 me-1 material-symbols-outlined ${
-                        courseList.isFavorite ? "icon-fill" : ""
+                        courseList.isFavorite && "icon-fill"
                       }`}
                     >
                       favorite
@@ -101,7 +101,7 @@ export default function CourseVideoPage() {
                   >
                     <span
                       className={`fs-5 me-1 material-symbols-outlined ${
-                        courseList.isReviewed ? "icon-fill" : ""
+                        courseList.isReviewed && "icon-fill"
                       }`}
                     >
                       kid_star

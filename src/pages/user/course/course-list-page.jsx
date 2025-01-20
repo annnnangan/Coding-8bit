@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import CourseCard from "../../../components/course/CourseCard";
 
-const { VITE_API_BASE } = import.meta.env
+const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseListPage() {
   const [courseList, setCourseList] = useState([]);
@@ -48,27 +48,24 @@ export default function CourseListPage() {
                 className="breadcrumb-item active fw-semibold"
                 aria-current="page"
               >
-                {category === "topicSeries" ? "主題式系列課程影片一覽" : ""}
-                {category === "customLearning" ? "客製化學習需求影片一覽" : ""}
-                {category === "freeTipShorts" ? "實用技術短影片一覽" : ""}
+                {category === "topicSeries" && "主題式系列課程影片一覽"}
+                {category === "customLearning" && "客製化學習需求影片一覽"}
+                {category === "freeTipShorts" && "實用技術短影片一覽"}
               </li>
             </ol>
           </nav>
           <h1 className="text-brand-03 fs-3 fs-lg-1 mt-8">
-            {category === "topicSeries" ? "主題式系列課程影片一覽" : ""}
-            {category === "customLearning" ? "客製化學習需求影片一覽" : ""}
-            {category === "freeTipShorts" ? "實用技術短影片一覽" : ""}
+            {category === "topicSeries" && "主題式系列課程影片一覽"}
+            {category === "customLearning" && "客製化學習需求影片一覽"}
+            {category === "freeTipShorts" && "實用技術短影片一覽"}
           </h1>
           <p className="fs-6 fs-lg-5 mt-3">
-            {category === "topicSeries"
-              ? "專業講師自編，單一主題的系列課程影片"
-              : ""}
-            {category === "customLearning"
-              ? "由講師專為解決學生需求而錄製，為成果導向的教學影片"
-              : ""}
-            {category === "freeTipShorts"
-              ? "由專業講師錄製，一支影片會進行一個小技術的教學"
-              : ""}
+            {category === "topicSeries" &&
+              "專業講師自編，單一主題的系列課程影片"}
+            {category === "customLearning" &&
+              "由講師專為解決學生需求而錄製，為成果導向的教學影片"}
+            {category === "freeTipShorts" &&
+              "由專業講師錄製，一支影片會進行一個小技術的教學"}
           </p>
           <div className="category-list f-center mt-10 mt-lg-13">
             <span

@@ -1,8 +1,15 @@
-import PropTypes from 'prop-types';
+import { NavLink, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 export default function SubscriptionCard({ duration }) {
-  SubscriptionCard.propTypes = {
-    duration: PropTypes.oneOf(['month', 'year']).isRequired,
+  // 傳遞訂閱方案(基本、高級)及繳費頻率(年繳、月繳)路由參數
+  const navigate = useNavigate();
+  const handleNavigate = (subscriptionPlan) => {
+    navigate(`/subscription/${subscriptionPlan}/${duration}`);
+  };
+  // 跳轉自下一頁按紐
+  const toNextPage = (subscriptionPlan) => {
+    handleNavigate(subscriptionPlan);
   };
 
   return (
@@ -19,7 +26,7 @@ export default function SubscriptionCard({ duration }) {
               NT$
               <span className="fs-2 fs-lg-1 fw-bold ms-2">0</span>
               <span className="fs-5 fs-lg-4 fw-normal ms-2">
-                {duration === "month" ? " / 月" : " / 年"}
+                {duration === "monthly" ? " / 月" : " / 年"}
               </span>
             </h4>
           </div>
@@ -48,12 +55,12 @@ export default function SubscriptionCard({ duration }) {
                 </p>
               </li>
             </ul>
-            <button className="btn btn-brand-03 slide-right-hover f-center w-100 mt-6 mt-lg-10">
+            <NavLink to="/signup" className="btn btn-brand-03 slide-right-hover f-center w-100 mt-6 mt-lg-10">
               立即註冊
               <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 ms-1">
                 arrow_forward
               </span>
-            </button>
+            </NavLink>
           </div>
         </div>
       </div>
@@ -68,10 +75,10 @@ export default function SubscriptionCard({ duration }) {
             <h4 className="fs-5 fs-lg-4 fw-medium fw-lg-bold f-align-center">
               NT$
               <span className="fs-2 fs-lg-1 fw-bold ms-2">
-                {duration === "month" ? "299" : "2,399"}
+                {duration === "monthly" ? "299" : "2,399"}
               </span>
               <span className="fs-5 fs-lg-4 fw-normal ms-2">
-                {duration === "month" ? " / 月" : " / 年"}
+                {duration === "monthly" ? " / 月" : " / 年"}
               </span>
             </h4>
           </div>
@@ -102,14 +109,15 @@ export default function SubscriptionCard({ duration }) {
                 </p>
               </li>
             </ul>
-            <a href="subscription-info-normal.html">
-              <button className="btn btn-brand-03 slide-right-hover f-center w-100 mt-6 mt-lg-10">
-                立即訂閱
-                <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 ms-1">
-                  arrow_forward
-                </span>
-              </button>
-            </a>
+            <button
+              className="btn btn-brand-03 slide-right-hover f-center w-100 mt-6 mt-lg-10"
+              onClick={() => toNextPage("normal")}
+            >
+              立即訂閱
+              <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 ms-1">
+                arrow_forward
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -124,10 +132,10 @@ export default function SubscriptionCard({ duration }) {
             <h4 className="fs-5 fs-lg-4 fw-medium fw-lg-bold f-align-center">
               NT$
               <span className="fs-2 fs-lg-1 fw-bold ms-2">
-                {duration === "month" ? "499" : "5,799"}
+                {duration === "monthly" ? "499" : "5,799"}
               </span>
               <span className="fs-5 fs-lg-4 fw-normal ms-2">
-                {duration === "month" ? " / 月" : " / 年"}
+                {duration === "monthly" ? " / 月" : " / 年"}
               </span>
             </h4>
           </div>
@@ -148,14 +156,15 @@ export default function SubscriptionCard({ duration }) {
                 <p className="fw-medium lh-sm ms-4">可發佈學習客製化需求</p>
               </li>
             </ul>
-            <a href="subscription-info-premium.html">
-              <button className="btn btn-brand-03 slide-right-hover f-center w-100 mt-6 mt-lg-10">
-                立即訂閱
-                <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 ms-1">
-                  arrow_forward
-                </span>
-              </button>
-            </a>
+            <button
+              className="btn btn-brand-03 slide-right-hover f-center w-100 mt-6 mt-lg-10"
+              onClick={() => toNextPage("premium")}
+            >
+              立即訂閱
+              <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 ms-1">
+                arrow_forward
+              </span>
+            </button>
             <span className="recommend-badge badge bg-brand-01 f-align-center position-absolute">
               <span className="material-symbols-outlined icon-fill text-white fs-5 fs-lg-6">
                 thumb_up
@@ -168,3 +177,6 @@ export default function SubscriptionCard({ duration }) {
     </>
   );
 }
+SubscriptionCard.propTypes = {
+  duration: PropTypes.oneOf(["monthly", "annually"]).isRequired,
+};

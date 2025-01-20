@@ -11,7 +11,7 @@ import CourseCard from "../../../components/course/CourseCard";
 import CommentsSection from "../../../components/tutor/CommentsSection";
 import * as bootstrap from "bootstrap";
 
-const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env
+const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
 
 export default function TutorBooking() {
   const [courses, setCourses] = useState([]);
@@ -40,18 +40,16 @@ export default function TutorBooking() {
   const handleNavigate = (type) => {
     navigate(`/tutor/${id}/booking-payment-step1/${type}`);
   };
-   // 跳轉自下一頁按紐
+  // 跳轉自下一頁按紐
   const toPaymentPage = (type) => {
     serviceSelectionModal.current.hide();
-    handleNavigate(type)
+    handleNavigate(type);
   };
 
   // 取得資料函式
   const getTutorsData = async () => {
     try {
-      const coursesResult = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses`
-      );
+      const coursesResult = await axios.get(`${VITE_API_BASE}/api/v1/courses`);
       const tutorResult = await axios.get(
         `${VITE_API_BASE_2}/api/v1/tutors/${id}`
       );
@@ -325,7 +323,7 @@ export default function TutorBooking() {
                       <div className="col" key={item.date}>
                         <div
                           className={`date f-center flex-column ${
-                            item.timeSlots.length === 0 ? "disabled" : ""
+                            item.timeSlots.length === 0 && "disabled"
                           }`}
                         >
                           <h6>{item.day}</h6>
@@ -337,7 +335,7 @@ export default function TutorBooking() {
                             {item.timeSlots.map((time, index) => (
                               <li
                                 className={`time ${
-                                  time.status === "booked" ? "disabled" : ""
+                                  time.status === "booked" && "disabled"
                                 }`}
                                 key={index}
                               >

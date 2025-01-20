@@ -6,8 +6,9 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import MainTitle from "../../components/MainTitle";
 import axios from "axios";
 import AOS from "aos";
+import { NavLink } from "react-router-dom";
 
-const { VITE_API_BASE } = import.meta.env
+const { VITE_API_BASE } = import.meta.env;
 
 export default function Home() {
   const [courseList, setCourseList] = useState([]);
@@ -131,15 +132,15 @@ export default function Home() {
             <CourseCard courseList={courseList} />
           </div>
           <div className="f-center">
-            <a
-              href="course-list.html"
+            <NavLink
+              to="/course-list"
               className="btn btn-outline-brand-03 slide-right-hover d-inline-flex f-align-center mt-6 mt-lg-8"
             >
               了解更多
               <span className="material-symbols-outlined icon-fill fs-5 ms-1">
                 arrow_forward
               </span>
-            </a>
+            </NavLink>
           </div>
         </div>
       </main>
@@ -339,15 +340,15 @@ export default function Home() {
                 </li>
               </ul>
               <div className="btn-wrap f-lg-align-center mt-6 mt-lg-10">
-                <a
-                  href="subscription.html"
+                <NavLink
+                  to="/subscription-list"
                   className="btn btn-brand-03 slide-right-hover d-inline-flex f-align-center"
                 >
                   立即訂閱
                   <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 ms-1">
                     arrow_forward
                   </span>
-                </a>
+                </NavLink>
                 <div>
                   <a
                     href="custom-course.html"
@@ -381,7 +382,18 @@ export default function Home() {
         >
           <MainTitle longTitle={false} beforeTitle="訂閱方案" afterTitle="" />
           <div className="row mt-6 mt-lg-8">
-            <SubscriptionCard duration="month" />
+            <SubscriptionCard duration="monthly" />
+            <div className="f-center">
+              <NavLink
+                to="/subscription-list"
+                className="btn btn-outline-brand-03 slide-right-hover d-inline-flex f-align-center mt-6 mt-lg-8"
+              >
+                查看更多方案
+                <span className="material-symbols-outlined icon-fill fs-5 ms-1">
+                  arrow_forward
+                </span>
+              </NavLink>
+            </div>
           </div>
         </div>
       </section>

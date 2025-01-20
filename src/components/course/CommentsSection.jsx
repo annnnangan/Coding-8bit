@@ -72,7 +72,7 @@ export default function CommentsSection({ comments }) {
                         {comment.replies.map((item, index) => (
                           <div
                             className={`tutor-content ${
-                              index !== comment.replies.length - 1 ? "mb-8" : ""
+                              index !== comment.replies.length - 1 && "mb-8"
                             }`}
                             key={item.replyId}
                           >

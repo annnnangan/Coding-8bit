@@ -7,7 +7,7 @@ import CourseCard from "../../../components/course/CourseCard";
 import MainTitle from "../../../components/MainTitle";
 import { categoryData, hotCoursesData } from "../../../data/courses";
 
-const { VITE_API_BASE } = import.meta.env
+const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseList() {
   const [topicSeriesCourseList, setTopicSeriesCourseList] = useState([]);
@@ -64,7 +64,7 @@ export default function CourseList() {
         type: "fraction",
       },
       breakpoints: {
-      1200: {
+        1200: {
           slidesPerView: 3,
           spaceBetween: 24,
         },
@@ -370,7 +370,7 @@ export default function CourseList() {
                     <a
                       href="#"
                       className={`list-group-item list-group-item-action border-0 fs-5 fw-bolder py-4 ${
-                        index === activeTab ? "active" : ""
+                        index === activeTab && "active"
                       }`}
                       onClick={(event) => handleTabClick(event, index)}
                       aria-current={index === activeTab ? "true" : "false"}
