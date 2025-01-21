@@ -1,11 +1,11 @@
 /* index-banner-section */
 .index-banner-section {
-  background-image: url("/images/deco/bg-1.png");
+  background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/bg-1.png");
   margin-top: -90px;
   padding-top: 170px;
 
   @include xl-pc {
-    background-image: url("/images/deco/bg-sm-1.png");
+    background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/bg-sm-1.png");
     padding-top: 112px;
   }
 
@@ -44,12 +44,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: url("/images/deco/unsplash.png") no-repeat center/cover;
+    background: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/unsplash.png") no-repeat center/cover;
     opacity: 0.3;
     z-index: -1;
 
     @include lg-pc {
-      background-image: url("/images/deco/unsplash-sm.png");
+      background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/unsplash-sm.png");
     }
   }
 }
@@ -161,10 +161,10 @@
 
 /* index-subscription-section */
 .index-subscription-section {
-  background-image: url("/images/deco/purple-deco-horizontal.png");
+  background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/purple-deco-horizontal.png");
 
   @include lg-pc {
-    background-image: url("/images/deco/purple-deco-vertical.png");
+    background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/purple-deco-vertical.png");
   }
 
   .row {
