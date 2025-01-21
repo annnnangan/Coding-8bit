@@ -27,10 +27,10 @@ export default function Header() {
             <NavLink to="/" className="navbar-brand me-10">
               <picture>
                 <source
-                  srcSet="src/assets/images/logo-sm.svg"
+                  srcSet="images/logo-sm.svg"
                   media="(max-width: 575.98px)"
                 />
-                <img src="src/assets/images/logo.svg" alt="logo-image" />
+                <img src="images/logo.svg" alt="logo-image" />
               </picture>
             </NavLink>
             <div className="position-relative f-align-center d-none d-xl-flex">

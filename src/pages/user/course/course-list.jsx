@@ -135,7 +135,7 @@ export default function CourseList() {
             </div>
             <div className="col text-center">
               <img
-                src="src/assets/images/deco/Illustration-10.png"
+                src="images/deco/Illustration-10.png"
                 alt="banner-illustration"
                 className="banner-illustration"
               />
@@ -188,22 +188,22 @@ export default function CourseList() {
               <div className="f-center justify-content-lg-start">
                 <picture>
                   <source
-                    srcSet="src/assets/images/icon/icon-infinite-sm.svg"
+                    srcSet="images/icon/icon-infinite-sm.svg"
                     media="(max-width: 575.98px)"
                   />
                   <img
-                    src="src/assets/images/icon/icon-infinite.svg"
+                    src="images/icon/icon-infinite.svg"
                     alt="icon-infinite"
                   />
                 </picture>
                 <h2 className="title ms-3 ms-lg-4">實用技術短影片</h2>
                 <picture>
                   <source
-                    srcSet="src/assets/images/icon/icon-infinite-sm.svg"
+                    srcSet="images/icon/icon-infinite-sm.svg"
                     media="(max-width: 575.98px)"
                   />
                   <img
-                    src="src/assets/images/icon/icon-infinite.svg"
+                    src="images/icon/icon-infinite.svg"
                     alt="icon-infinite"
                     className="ms-3 ms-lg-4"
                   />

@@ -5,13 +5,10 @@ export default function MainTitle({ longTitle, beforeTitle, afterTitle }) {
     <div className="f-center">
       <picture>
         <source
-          srcSet="src/assets/images/icon/icon-infinite-sm.svg"
+          srcSet="images/icon/icon-infinite-sm.svg"
           media="(max-width: 575.98px)"
         />
-        <img
-          src="src/assets/images/icon/icon-infinite.svg"
-          alt="icon-infinite"
-        />
+        <img src="images/icon/icon-infinite.svg" alt="icon-infinite" />
       </picture>
       {!longTitle ? (
         <h2 className="fs-4 fs-lg-1 text-brand-03 text-center ms-3 ms-lg-4">
@@ -26,11 +23,11 @@ export default function MainTitle({ longTitle, beforeTitle, afterTitle }) {
 
       <picture>
         <source
-          srcSet="src/assets/images/icon/icon-infinite-sm.svg"
+          srcSet="images/icon/icon-infinite-sm.svg"
           media="(max-width: 575.98px)"
         />
         <img
-          src="src/assets/images/icon/icon-infinite.svg"
+          src="images/icon/icon-infinite.svg"
           alt="icon-infinite"
           className="ms-3 ms-lg-4"
         />

@@ -81,7 +81,7 @@ export default function Home() {
                   </div>
                   <div className="col-xl-4">
                     <img
-                      src="src/assets/images/deco/Illustration-1.svg"
+                      src="images/deco/Illustration-1.svg"
                       alt="banner-illustration"
                       className="banner-illustration"
                     />
@@ -113,7 +113,7 @@ export default function Home() {
                   </div>
                   <div className="col-xl-4">
                     <img
-                      src="src/assets/images/deco/Illustration-2.svg"
+                      src="images/deco/Illustration-2.svg"
                       alt="banner-illustration-1"
                       className="banner-illustration"
                     />
@@ -175,7 +175,7 @@ export default function Home() {
             <div className="col-lg-4">
               <div className="text-center p-6">
                 <img
-                  src="src/assets/images/icon/teacher-fill-purple.svg"
+                  src="images/icon/teacher-fill-purple.svg"
                   alt="icon-teacher"
                 />
                 <div className="mt-4">
@@ -222,7 +222,7 @@ export default function Home() {
               <div className="step-item py-6">
                 <div className="step-img-wrap">
                   <img
-                    src="src/assets/images/deco/Illustration-5.svg"
+                    src="images/deco/Illustration-5.svg"
                     alt="Illustration"
                     className="step-img"
                   />
@@ -244,7 +244,7 @@ export default function Home() {
               <div className="step-item py-6">
                 <div className="step-img-wrap">
                   <img
-                    src="src/assets/images/deco/Illustration-3.svg"
+                    src="images/deco/Illustration-3.svg"
                     alt="Illustration"
                     className="step-img"
                   />
@@ -266,7 +266,7 @@ export default function Home() {
               <div className="step-item py-6">
                 <div className="step-img-wrap">
                   <img
-                    src="src/assets/images/deco/Illustration-4.svg"
+                    src="images/deco/Illustration-4.svg"
                     alt="Illustration"
                     className="step-img"
                   />
@@ -290,7 +290,7 @@ export default function Home() {
               <div className="step-item py-6">
                 <div className="step-img-wrap">
                   <img
-                    src="src/assets/images/deco/Illustration-6.svg"
+                    src="images/deco/Illustration-6.svg"
                     alt="Illustration"
                     className="step-img"
                   />
@@ -362,7 +362,7 @@ export default function Home() {
             <a href="#">
               <div className="video-wrap rounded-2 position-relative">
                 <img
-                  src="src/assets/images/course/course-lg-1.png"
+                  src="images/course/course-lg-1.png"
                   alt="video-image"
                   className="rounded-2"
                 />

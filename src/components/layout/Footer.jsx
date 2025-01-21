@@ -6,10 +6,10 @@ export default function Footer() {
           <a href="index.html" className="navbar-brand">
             <picture>
               <source
-                srcSet="src/assets/images/logo-sm.svg"
+                srcSet="images/logo-sm.svg"
                 media="(max-width: 575.98px)"
               />
-              <img src="src/assets/images/logo.svg" alt="logo-image" />
+              <img src="images/logo.svg" alt="logo-image" />
             </picture>
           </a>
           <ul className="mt-4">
@@ -82,26 +82,17 @@ export default function Footer() {
         <ul className="d-flex justify-content-lg-end flex-grow-1 mt-8 mt-lg-0 ms-lg-6">
           <li>
             <a href="#" className="icon-hover">
-              <img
-                src="src/assets/images/icon/icon-ins-purple.svg"
-                alt="icon-ins"
-              />
+              <img src="images/icon/icon-ins-purple.svg" alt="icon-ins" />
             </a>
           </li>
           <li className="ms-3">
             <a href="#" className="icon-hover">
-              <img
-                src="src/assets/images/icon/icon-facebook-purple.svg"
-                alt="icon-ins"
-              />
+              <img src="images/icon/icon-facebook-purple.svg" alt="icon-ins" />
             </a>
           </li>
           <li className="ms-3">
             <a href="#" className="icon-hover">
-              <img
-                src="src/assets/images/icon/icon-mail-purple.svg"
-                alt="icon-ins"
-              />
+              <img src="images/icon/icon-mail-purple.svg" alt="icon-ins" />
             </a>
           </li>
         </ul>

@@ -12,7 +12,7 @@ export default function ScrollToTopBtn() {
     <a href="#" onClick={scrollToTop}>
       <img
         className="scroll-to-top-btn"
-        src="src/assets/images/icon/icons-to-top.png"
+        src="images/icon/icons-to-top.png"
         alt="to-top-btn-image"
       />
     </a>

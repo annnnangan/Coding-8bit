@@ -121,7 +121,7 @@ export default function TutorBooking() {
         <div className="position-relative d-lg-none">
           <div className="img-wrapper img-hover-enlarge">
             <img
-              src="src/assets/images/course/course-2-high-res.jpg"
+              src="images/course/course-2-high-res.jpg"
               className="w-100"
               alt="tutor cover"
               style={{ maxHeight: "300px" }}
@@ -155,7 +155,7 @@ export default function TutorBooking() {
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
                     <img
-                      src="src/assets/images/user/user-1.png"
+                      src="images/user/user-1.png"
                       alt="profile"
                       className="object-fit-cover rounded-circle me-6"
                     />
@@ -389,7 +389,7 @@ export default function TutorBooking() {
                 <div className="position-relative mb-lg-5 mb-4">
                   <div className="img-wrapper img-hover-enlarge rounded-2">
                     <img
-                      src="src/assets/images/course/course-2.png"
+                      src="images/course/course-2.png"
                       className="card-img-top rounded-2 object-fit-cover"
                       alt="course-2"
                     />
@@ -465,7 +465,7 @@ export default function TutorBooking() {
                     <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
                       <h3 className="fs-4 fs-md-3">一對一教學</h3>
                       <img
-                        src="src/assets/images/deco/Illustration-7.png"
+                        src="images/deco/Illustration-7.png"
                         alt="one-on-one-illustration"
                       />
                       <p className="text-center mb-auto">
@@ -484,7 +484,7 @@ export default function TutorBooking() {
                     <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
                       <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
                       <img
-                        src="src/assets/images/deco/Illustration-8.png"
+                        src="images/deco/Illustration-8.png"
                         alt="code-review-illustration"
                       />
                       <p className="text-center mb-auto">

@@ -219,7 +219,7 @@ export default function HelpCenter() {
                       <li>
                         <a href="#" className="icon-hover">
                           <img
-                            src="src/assets/images/icon/icon-ins-purple.svg"
+                            src="images/icon/icon-ins-purple.svg"
                             alt="icon-ins"
                           />
                         </a>
@@ -227,7 +227,7 @@ export default function HelpCenter() {
                       <li className="ms-3">
                         <a href="#" className="icon-hover">
                           <img
-                            src="src/assets/images/icon/icon-facebook-purple.svg"
+                            src="images/icon/icon-facebook-purple.svg"
                             alt="icon-ins"
                           />
                         </a>

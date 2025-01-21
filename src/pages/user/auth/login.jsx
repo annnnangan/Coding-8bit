@@ -10,10 +10,10 @@ export default function Login() {
           <NavLink to="/" className="navbar-brand">
             <picture>
               <source
-                srcSet="src/assets/images/logo-sm.svg"
+                srcSet="images/logo-sm.svg"
                 media="(max-width: 575.98px)"
               />
-              <img src="src/assets/images/logo.svg" alt="logo-image" />
+              <img src="images/logo.svg" alt="logo-image" />
             </picture>
           </NavLink>
           <div className="row f-end-center mt-9 mt-lg-12">
@@ -95,7 +95,7 @@ export default function Login() {
                     className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt--lg-8"
                   >
                     <img
-                      src="src/assets/images/icon/icons-google.svg"
+                      src="images/icon/icons-google.svg"
                       alt="icon-google"
                       className="me-3"
                     />

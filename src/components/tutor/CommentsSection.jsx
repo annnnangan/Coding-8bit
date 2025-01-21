@@ -28,32 +28,32 @@ export default function CommentsSection({ comments, modal = false }) {
                   <h4 className="text-brand-03 mb-2">4.9</h4>
                   <div className="f-center mb-2">
                     <img
-                      src="src/assets/images/icon/kid_star.svg"
+                      src="images/icon/kid_star.svg"
                       className="text-brand-01"
                       alt=""
                       width="16"
                       height="16"
                     />
                     <img
-                      src="src/assets/images/icon/kid_star.svg"
+                      src="images/icon/kid_star.svg"
                       alt=""
                       width="16"
                       height="16"
                     />
                     <img
-                      src="src/assets/images/icon/kid_star.svg"
+                      src="images/icon/kid_star.svg"
                       alt=""
                       width="16"
                       height="16"
                     />
                     <img
-                      src="src/assets/images/icon/kid_star.svg"
+                      src="images/icon/kid_star.svg"
                       alt=""
                       width="16"
                       height="16"
                     />
                     <img
-                      src="src/assets/images/icon/kid_star_half_purple.svg"
+                      src="images/icon/kid_star_half_purple.svg"
                       alt=""
                       width="16"
                       height="16"
@@ -204,32 +204,32 @@ export default function CommentsSection({ comments, modal = false }) {
                         <h4 className="text-brand-03 mb-2">4.9</h4>
                         <div className="f-center mb-2">
                           <img
-                            src="src/assets/images/icon/kid_star.svg"
+                            src="images/icon/kid_star.svg"
                             className="text-brand-01"
                             alt=""
                             width="16"
                             height="16"
                           />
                           <img
-                            src="src/assets/images/icon/kid_star.svg"
+                            src="images/icon/kid_star.svg"
                             alt=""
                             width="16"
                             height="16"
                           />
                           <img
-                            src="src/assets/images/icon/kid_star.svg"
+                            src="images/icon/kid_star.svg"
                             alt=""
                             width="16"
                             height="16"
                           />
                           <img
-                            src="src/assets/images/icon/kid_star.svg"
+                            src="images/icon/kid_star.svg"
                             alt=""
                             width="16"
                             height="16"
                           />
                           <img
-                            src="src/assets/images/icon/kid_star_half_purple.svg"
+                            src="images/icon/kid_star_half_purple.svg"
                             alt=""
                             width="16"
                             height="16"
@@ -351,6 +351,9 @@ export default function CommentsSection({ comments, modal = false }) {
   }
 }
 CommentsSection.propTypes = {
-  comments: PropTypes.oneOfType([PropTypes.object.isRequired, PropTypes.array.isRequired]),
+  comments: PropTypes.oneOfType([
+    PropTypes.object.isRequired,
+    PropTypes.array.isRequired,
+  ]),
   modal: PropTypes.bool,
 };

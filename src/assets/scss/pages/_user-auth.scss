@@ -2,7 +2,7 @@
 .sign-up-section,
 .login-section,
 .forgot-password-section {
-  background-image: url('src/assets/images/deco/bg-7.jpg');
+  background-image: url("images/deco/bg-7.jpg");
   padding: 40px 0;
 
   @include lg-pc {
@@ -17,7 +17,7 @@
   border-bottom: 1px solid $gray-03;
   border-radius: 0;
   background-color: transparent;
-  padding: 4px 40px 12px; 
+  padding: 4px 40px 12px;
 
   &:focus {
     background-color: transparent;
@@ -29,6 +29,6 @@
 }
 
 .user-auth-card {
-  background-color: #FFFFFFE6;
+  background-color: #ffffffe6;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
 }

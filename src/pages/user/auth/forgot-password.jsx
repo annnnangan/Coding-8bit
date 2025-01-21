@@ -10,10 +10,10 @@ export default function ForgotPassword() {
           <NavLink to="/" className="navbar-brand">
             <picture>
               <source
-                srcSet="src/assets/images/logo-sm.svg"
+                srcSet="images/logo-sm.svg"
                 media="(max-width: 575.98px)"
               />
-              <img src="src/assets/images/logo.svg" alt="logo-image" />
+              <img src="images/logo.svg" alt="logo-image" />
             </picture>
           </NavLink>
           <div className="row f-end-center my-9 my-lg-13">

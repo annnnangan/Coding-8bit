@@ -4,7 +4,7 @@ import AOS from "aos";
 import MainTitle from "../../../components/MainTitle";
 import TutorsCard from "../../../components/tutor/TutorsCard";
 
-const { VITE_API_BASE_2 } = import.meta.env
+const { VITE_API_BASE_2 } = import.meta.env;
 
 export default function TutorList() {
   const [tutorsList, setTutorsList] = useState([]);
@@ -16,15 +16,13 @@ export default function TutorList() {
     if (tutorListRef.current) {
       tutorListRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   // 取得資料函式
   const getTutorsData = async () => {
     try {
-      const tutorResult = await axios.get(
-        `${VITE_API_BASE_2}/api/v1/tutors`
-      );
-      setTutorsList(tutorResult.data)
+      const tutorResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors`);
+      setTutorsList(tutorResult.data);
     } catch (error) {
       console.log("錯誤", error);
     }
@@ -41,7 +39,7 @@ export default function TutorList() {
         return newCalc;
       });
     }, 3000);
-  
+
     return () => clearInterval(interval);
   }, []);
 
@@ -58,14 +56,15 @@ export default function TutorList() {
   return (
     <>
       <main className="tutor-list">
-
         {/* hero-section */}
         <section className="hero-section">
           <div className="container">
             <div className="d-flex justify-content-md-around align-items-md-center">
               <div>
                 <div className="question-text-wrapper">
-                  <h2 className="fs-1 mb-2 question-text text-brand-03">{titleText}</h2>
+                  <h2 className="fs-1 mb-2 question-text text-brand-03">
+                    {titleText}
+                  </h2>
                 </div>
                 <h2 className="fs-md-1 fs-2 mb-12">找專業講師來場一對一課程</h2>
                 <a
@@ -79,37 +78,37 @@ export default function TutorList() {
                 </a>
                 <div className="d-flex align-items-center">
                   <img
-                    src="src/assets/images/user/user-1.png"
+                    src="images/user/user-1.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
                   <img
-                    src="src/assets/images/user/user-5.png"
+                    src="images/user/user-5.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
                   <img
-                    src="src/assets/images/user/user-6.png"
+                    src="images/user/user-6.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
                   <img
-                    src="src/assets/images/user/user-7.png"
+                    src="images/user/user-7.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
                   <img
-                    src="src/assets/images/user/user-10.png"
+                    src="images/user/user-10.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
                   <img
-                    src="src/assets/images/user/user-8.png"
+                    src="images/user/user-8.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
                   <img
-                    src="src/assets/images/user/user-9.png"
+                    src="images/user/user-9.png"
                     alt="tutor"
                     className="object-cover-fit profile"
                   />
@@ -117,7 +116,7 @@ export default function TutorList() {
                 </div>
               </div>
               <img
-                src="src/assets/images/deco/star3D.png"
+                src="images/deco/star3D.png"
                 className="star-deco"
                 alt="star-deco"
               />
@@ -196,7 +195,7 @@ export default function TutorList() {
               {/* image */}
               <div className="col-4">
                 <img
-                  src="src/assets/images/deco/Illustration-9.png"
+                  src="images/deco/Illustration-9.png"
                   alt="illustration"
                   className="deco-img"
                 />

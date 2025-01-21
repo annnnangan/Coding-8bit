@@ -1,6 +1,6 @@
 /* course-list-banner-section */
 .course-list-banner-section {
-  background-image: url('src/assets/images/deco/bg-8.png');
+  background-image: url("images/deco/bg-8.png");
   margin-top: -120px;
   padding-top: 120px;
 
@@ -81,13 +81,13 @@
 
     &:hover {
       background-color: $brand-04;
-      transition: background-color .3s ease-in-out;
+      transition: background-color 0.3s ease-in-out;
       animation: remove-overflow 2s forwards;
     }
     &:hover .card-info {
       animation: show-info 1s forwards;
       opacity: 1;
-      transition: opacity .3s;
+      transition: opacity 0.3s;
     }
     &:not(:hover) {
       animation: show-overflow 2s forwards;
@@ -109,11 +109,12 @@
   .card-info {
     width: 90%;
     border-radius: 16px;
-    box-shadow: 0 8px 24px hsla(0, 0%, 0%, .15);
+    box-shadow: 0 8px 24px hsla(0, 0%, 0%, 0.15);
     padding: 18px 24px;
     position: absolute;
     bottom: -144px;
-    left: 0; right: 0;
+    left: 0;
+    right: 0;
     margin-inline: auto;
     opacity: 0;
     transition: opacity 1s 1s;
@@ -129,7 +130,7 @@
       height: 100%;
     }
   }
-  
+
   /* card animation*/
   @keyframes show-info {
     50% {
@@ -172,7 +173,7 @@
 /* course-list-freeTipShorts-section */
 .course-list-freeTipShorts-section {
   position: relative;
-  background-image: url('src/assets/images/deco/bg-10.png');
+  background-image: url("images/deco/bg-10.png");
   background-position: center;
   background-size: 100% auto;
   background-repeat: no-repeat;
@@ -221,19 +222,24 @@
     align-items: center;
     padding: 12px;
     bottom: 0;
-    background: linear-gradient(359.16deg, #212529 10.73%, rgba(33, 37, 41, 0.05) 90.27%);
+    background: linear-gradient(
+      359.16deg,
+      #212529 10.73%,
+      rgba(33, 37, 41, 0.05) 90.27%
+    );
   }
 
   &::before {
-    content: '';
+    content: "";
     display: block;
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     opacity: 0;
     width: 100%;
     height: 100%;
-    background: rgba($color:#2a2f34, $alpha: 0.4);
-    transition: opacity .5s;
+    background: rgba($color: #2a2f34, $alpha: 0.4);
+    transition: opacity 0.5s;
     border-radius: 8px;
   }
   &:hover::before {
@@ -249,7 +255,8 @@
     align-items: center;
     padding: 4px;
     border-radius: 4px;
-    top: -20px; right: 8px;
+    top: -20px;
+    right: 8px;
   }
 }
 
@@ -283,8 +290,6 @@
   }
 }
 
-
-
 /* topicSeries & customLearning & freeTipShorts page*/
 .topicSeries-header-section,
 .customLearning-header-section,
@@ -301,7 +306,7 @@
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
       overflow-y: auto;
-  
+
       &::-webkit-scrollbar {
         height: 0;
       }
@@ -316,15 +321,17 @@
 
   &::before {
     position: absolute;
-    content: '';
-    top: 0; bottom: 0;
-    left: 0; right: 0;
-    background: url('src/assets/images/deco/unsplash.png') no-repeat center/cover;
+    content: "";
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: url("images/deco/unsplash.png") no-repeat center/cover;
     opacity: 0.2;
     z-index: -1;
 
     @include lg-pc {
-      background-image: url('src/assets/images/deco/unsplash-sm.png');
+      background-image: url("images/deco/unsplash-sm.png");
     }
   }
 
