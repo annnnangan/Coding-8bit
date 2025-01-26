@@ -1,8 +1,28 @@
-import { useReducer } from "react";
+import { useReducer, useState, useRef } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+import { PaymentForm } from "../../../components/subscription/paymentForm";
+import { BuyerForm } from "../../../components/subscription/BuyerForm";
+
 export default function SubscriptionPayment() {
+  // 表單資料來自兩個子元件表單
+  const [formData, setFormData] = useState({
+    buyerForm: null,
+    creditCardForm: null,
+  });
+
+  // 使用 useRef 來操作子元件的表單提交
+  const buyerFormRef = useRef(null);
+  const creditCardFormRef = useRef(null);
+
+  // 觸發兩個子元件表單的資料提交
+  const handleSubmit = () => {
+    buyerFormRef.current.submitForm();
+    creditCardFormRef.current.submitForm();
+    console.log(formData);
+  };
+
   // reducer - payment step
   const initialState = {
     step: 1,
@@ -212,162 +232,14 @@ export default function SubscriptionPayment() {
                 <div className="col-lg-7">
                   <div className="input-card card shadow rounded-2 p-6 p-lg-10 ">
                     <h2 className="fs-5 fs-lg-3">購買人資訊</h2>
-                    <form className="mt-6">
-                      <div>
-                        <label htmlFor="buyerEmail" className="form-label">
-                          <h3 className="fs-6 fw-medium">
-                            電子信箱<span className="text-danger ms-1">*</span>
-                          </h3>
-                        </label>
-                        <input
-                          type="email"
-                          className="form-control rounded-1 border-0 bg-light"
-                          id="buyerEmail"
-                          aria-describedby="emailHelp"
-                          placeholder="請輸入電子信箱"
-                        />
-                      </div>
-                      <div className="row mt-4">
-                        <div className="col-lg-6">
-                          <label htmlFor="buyerName" className="form-label">
-                            <h3 className="fs-6 fw-medium">
-                              姓名<span className="text-danger ms-1">*</span>
-                            </h3>
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control rounded-1 border-0 bg-light mt-1"
-                            id="buyerName"
-                            placeholder="請輸入姓名"
-                          />
-                        </div>
-                        <div className="col-lg-6">
-                          <label
-                            htmlFor="buyerPassword"
-                            className="form-label mt-4 mt-lg-0"
-                          >
-                            <h3 className="fs-6 fw-medium">
-                              密碼<span className="text-danger ms-1">*</span>
-                            </h3>
-                          </label>
-                          <input
-                            type="password"
-                            className="form-control rounded-1 border-0 bg-light mt-1"
-                            id="buyerPassword"
-                            placeholder="請輸入密碼"
-                          />
-                        </div>
-                      </div>
-                      <div className="form-check mt-6">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id="rememberMeCheckbox"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="rememberMeCheckbox"
-                        >
-                          記住我的資訊
-                        </label>
-                      </div>
-                    </form>
+                    <BuyerForm ref={buyerFormRef} setFormData={setFormData} />
                   </div>
                   <div className="input-card card shadow rounded-2 p-6 p-lg-10 mt-6">
                     <h2 className="fs-5 fs-lg-3">付款方式</h2>
-                    <form className="mt-6">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="pay-with"
-                          id="creditCard"
-                          defaultChecked
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="creditCard"
-                        >
-                          信用卡
-                        </label>
-                      </div>
-                      <div className="mt-6">
-                        <label
-                          htmlFor="userCreditCardNumber"
-                          className="form-label"
-                        >
-                          <h3 className="fs-6 fw-medium">
-                            信用卡號碼
-                            <span className="text-danger ms-1">*</span>
-                          </h3>
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          className="form-control rounded-1 border-0 bg-light mt-1"
-                          id="userCreditCardNumber"
-                          placeholder="**** **** **** ****"
-                          maxLength="19"
-                        />
-                      </div>
-                      <div className="row mt-4">
-                        <div className="col-6">
-                          <label
-                            htmlFor="credit-card-expiration"
-                            className="form-label"
-                          >
-                            <h3 className="fs-6 fw-medium">
-                              過期日<span className="text-danger ms-1">*</span>
-                            </h3>
-                          </label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            className="form-control rounded-1 border-0 bg-light mt-1"
-                            id="credit-card-expiration"
-                            name="credit-card-expiration"
-                            placeholder="MM / YY"
-                            maxLength="5"
-                            required=""
-                          />
-                        </div>
-                        <div className="col-6">
-                          <label
-                            htmlFor="credit-card-cvc"
-                            className="form-label"
-                          >
-                            <h3 className="fs-6 fw-medium">
-                              卡片背面後三碼
-                              <span className="text-danger ms-1">*</span>
-                            </h3>
-                          </label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            className="form-control rounded-1 border-0 bg-light mt-1"
-                            id="credit-card-cvc"
-                            name="credit-card-cvc"
-                            placeholder="CVC / CVV"
-                            pattern="\d{3,4}/"
-                            maxLength="3"
-                            required=""
-                          />
-                        </div>
-                      </div>
-                      <div className="form-check mt-6">
-                        <input
-                          type="checkbox"
-                          className="form-check-input"
-                          id="rememberCardCheckbox"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="rememberCardCheckbox"
-                        >
-                          記住卡片資訊
-                        </label>
-                      </div>
-                    </form>
+                    <PaymentForm
+                      ref={creditCardFormRef}
+                      setFormData={setFormData}
+                    />
                   </div>
                 </div>
 
@@ -409,7 +281,7 @@ export default function SubscriptionPayment() {
                     </table>
                     <button
                       className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100 mt-8"
-                      onClick={toNextStep}
+                      onClick={handleSubmit}
                     >
                       立即付款
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
@@ -437,7 +309,7 @@ export default function SubscriptionPayment() {
               </div>
               <button
                 className="btn btn-brand-03 slide-right-hover f-center rounded-2"
-                onClick={toNextStep}
+                onClick={handleSubmit}
               >
                 立即付款
                 <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">

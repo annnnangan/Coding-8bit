@@ -11,7 +11,7 @@ export default function TutorBookingPaymentStep1() {
   const handleNavigate = (type) => {
     navigate(`/tutor/${id}/booking-payment-step2/${type}`);
   };
-  // 跳轉自下一頁按紐
+  // 跳轉至下一頁
   const toNextPage = () => {
     handleNavigate(type);
   };

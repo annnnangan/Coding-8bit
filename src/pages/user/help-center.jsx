@@ -1,8 +1,8 @@
 import { NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 import MainTitle from "../../components/MainTitle";
-
-import { Helmet } from "react-helmet-async";
+import Form from "../../components/help-center/Form";
 
 import { faqData, contactInfo, socialLinks } from "../../data/help-center";
 
@@ -139,41 +139,7 @@ export default function HelpCenter() {
                     </div>
                   </div>
 
-                  <form className="row g-3 bg-brand-05 p-3 px-sm-6 py-sm-8 mt-8">
-                    <div className="col-md-6">
-                      <label htmlFor="name" className="form-label">
-                        姓名
-                      </label>
-                      <input type="text" className="form-control" id="name" />
-                    </div>
-                    <div className="col-md-6">
-                      <label htmlFor="phone" className="form-label">
-                        電話
-                      </label>
-                      <input type="tel" className="form-control" id="phone" />
-                    </div>
-                    <div className="col-12">
-                      <label htmlFor="Email" className="form-label">
-                        Email
-                      </label>
-                      <input type="email" className="form-control" id="Email" />
-                    </div>
-                    <div className="col-12">
-                      <label htmlFor="message" className="form-label">
-                        聯繫內容
-                      </label>
-                      <textarea
-                        className="form-control"
-                        id="message"
-                        rows="5"
-                      ></textarea>
-                    </div>
-                    <div className="col-12 text-end">
-                      <button className="btn btn-brand-03 rounded-1 slide-right-hover mt-4">
-                        送出表單
-                      </button>
-                    </div>
-                  </form>
+                  <Form />
                 </div>
               </div>
             </div>

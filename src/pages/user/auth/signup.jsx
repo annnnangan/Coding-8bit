@@ -1,6 +1,7 @@
-// import Swal from 'sweetalert2'
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+import SignupForm from "../../../components/auth/SignupForm";
 
 export default function Signup() {
   return (
@@ -27,73 +28,9 @@ export default function Signup() {
                   <h1 className="fs-4 fs-lg-3 text-brand-03">
                     立即加入 Coding∞bit
                   </h1>
-                  <form className="mt-6 mt-lg-11">
-                    <div className="position-relative">
-                      <input
-                        type="text"
-                        className="form-control underline-input"
-                        id="addUsername"
-                        placeholder="請輸入您的暱稱"
-                      />
-                      <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
-                        person
-                      </span>
-                    </div>
-                    <div className="position-relative mt-9">
-                      <input
-                        type="email"
-                        className="form-control underline-input"
-                        id="addEmail"
-                        aria-describedby="emailHelp"
-                        placeholder="請輸入您的電子信箱"
-                      />
-                      <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
-                        mail
-                      </span>
-                    </div>
-                    <div className="position-relative mt-9">
-                      <input
-                        type="password"
-                        className="form-control underline-input"
-                        id="addPassword"
-                        placeholder="請輸入您的密碼"
-                      />
-                      <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
-                        lock
-                      </span>
-                      <a href="#">
-                        <span className="material-symbols-outlined position-absolute top-0 end-0 text-gray-03 ms-1 mt-1">
-                          visibility_off
-                        </span>
-                      </a>
-                    </div>
-                    <div className="position-relative mt-9">
-                      <input
-                        type="password"
-                        className="form-control underline-input"
-                        id="addPasswordAgain"
-                        placeholder="請再次輸入您的密碼"
-                      />
-                      <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
-                        lock
-                      </span>
-                      <a href="#">
-                        <span className="material-symbols-outlined position-absolute top-0 end-0 text-gray-03 ms-1 mt-1">
-                          visibility_off
-                        </span>
-                      </a>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-brand-03 rounded-2 slide-right-hover w-100 f-center mt-6 mt-lg-10"
-                      id="signUpBtn"
-                    >
-                      註冊帳號
-                      <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
-                        arrow_forward
-                      </span>
-                    </button>
-                  </form>
+
+                  <SignupForm />
+
                   <div className="divider-label d-flex align-items-center mt-6 mt-lg-8">
                     <hr />
                     <span>OR</span>
