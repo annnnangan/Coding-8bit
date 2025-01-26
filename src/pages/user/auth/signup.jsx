@@ -1,9 +1,13 @@
 // import Swal from 'sweetalert2'
 import { NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function Signup() {
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 註冊</title>
+      </Helmet>
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="sign-up-section bg">
         <div className="container">

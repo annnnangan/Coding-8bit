@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+
 import axios from "axios";
+
 import CourseCard from "../../../components/course/CourseCard";
+import Pagination from "../../../components/layout/Pagination";
+import Loader from "../../../components/common/Loader";
 
 const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseListPage() {
-  const [courseList, setCourseList] = useState([]);
+  // loading
+  const [loadingState, setLoadingState] = useState(true);
+
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category");
 
   // 取得課程資料函式
+  const [courseList, setCourseList] = useState([]);
   const getCoursesData = async () => {
+    setLoadingState(true);
     try {
       const result = await axios.get(
         `${VITE_API_BASE}/api/v1/courses?category=${category}`
@@ -20,8 +28,22 @@ export default function CourseListPage() {
       setCourseList(result.data);
     } catch (error) {
       console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
     }
   };
+
+  // title 判斷
+  let pageTitle = "Coding∞bit ｜ ";
+  if (category === "topicSeries") {
+    pageTitle += "主題式系列課程影片一覽";
+  } else if (category === "customLearning") {
+    pageTitle += "客製化學習需求影片一覽";
+  } else if (category === "freeTipShorts") {
+    pageTitle += "實用技術短影片一覽";
+  } else {
+    pageTitle += "課程影片一覽";
+  }
 
   // 初始化取得資料
   useEffect(() => {
@@ -30,6 +52,10 @@ export default function CourseListPage() {
 
   return (
     <>
+      <Helmet>
+        <title>{pageTitle}</title>
+      </Helmet>
+      {loadingState && <Loader />}
       <header className="topicSeries-header-section bg-brand-05 wrap">
         <div className="container">
           <nav aria-label="breadcrumb">
@@ -171,43 +197,7 @@ export default function CourseListPage() {
             <CourseCard courseList={courseList} />
           </div>
           <nav className="mt-6 mt-lg-8" aria-label="navigation">
-            <ul className="pagination f-center">
-              <li className="page-item disabled">
-                <a className="page-link" href="#" aria-label="Previous">
-                  <span aria-hidden="true">
-                    <span className="material-symbols-outlined align-middle">
-                      {" "}
-                      arrow_left
-                    </span>
-                  </span>
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link active" href="#">
-                  1
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  2
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#">
-                  3
-                </a>
-              </li>
-              <li className="page-item">
-                <a className="page-link" href="#" aria-label="Next">
-                  <span aria-hidden="true">
-                    <span className="material-symbols-outlined align-middle">
-                      {" "}
-                      arrow_right
-                    </span>
-                  </span>
-                </a>
-              </li>
-            </ul>
+            <Pagination />
           </nav>
         </div>
       </main>

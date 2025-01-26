@@ -1,5 +1,6 @@
 import { useReducer } from "react";
 import { NavLink, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function SubscriptionPayment() {
   // reducer - payment step
@@ -9,17 +10,17 @@ export default function SubscriptionPayment() {
   };
   const reducer = (state, action) => {
     switch (action.type) {
-      case "next":
+      case "NEXT":
         return {
           ...state,
           step: state.step + 1,
         };
-      case "prev":
+      case "PREV":
         return {
           ...state,
           step: state.step - 1,
         };
-      case "update":
+      case "UPDATE":
         return {
           ...state,
           formData: { ...state.formData, ...action.payload },
@@ -30,8 +31,8 @@ export default function SubscriptionPayment() {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const toPrevStep = () => dispatch({ type: "prev" });
-  const toNextStep = () => dispatch({ type: "next" });
+  const toPrevStep = () => dispatch({ type: "PREV" });
+  const toNextStep = () => dispatch({ type: "NEXT" });
   // const handleUpdate = (key, value) => dispatch({ type: 'update', payload: { [key]: value } });
 
   // 訂閱方案及各方案價格
@@ -51,6 +52,9 @@ export default function SubscriptionPayment() {
 
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 訂閱付款</title>
+      </Helmet>
       {state.step === 1 && (
         <main className="subscription-info-section wrap">
           <div className="container">
@@ -143,7 +147,7 @@ export default function SubscriptionPayment() {
                 </NavLink>
                 <button
                   className="btn btn-brand-03 rounded-2 slide-right-hover f-align-center ms-4 px-md-13"
-                  onClick={() => toNextStep()}
+                  onClick={toNextStep}
                 >
                   前往付款
                   <span className="material-symbols-outlined icon-fill fs-4 ms-1">
@@ -179,7 +183,7 @@ export default function SubscriptionPayment() {
                       <button
                         type="button"
                         className="nav-link underline-hover"
-                        onClick={() => toPrevStep()}
+                        onClick={toPrevStep}
                       >
                         升級方案 - 基本會員
                       </button>
@@ -188,7 +192,7 @@ export default function SubscriptionPayment() {
                       <button
                         type="button"
                         className="nav-link underline-hover"
-                        onClick={() => toPrevStep()}
+                        onClick={toPrevStep}
                       >
                         升級方案 - 高級會員
                       </button>
@@ -405,7 +409,7 @@ export default function SubscriptionPayment() {
                     </table>
                     <button
                       className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100 mt-8"
-                      onClick={() => toNextStep()}
+                      onClick={toNextStep}
                     >
                       立即付款
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
@@ -433,7 +437,7 @@ export default function SubscriptionPayment() {
               </div>
               <button
                 className="btn btn-brand-03 slide-right-hover f-center rounded-2"
-                onClick={() => toNextStep()}
+                onClick={toNextStep}
               >
                 立即付款
                 <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">

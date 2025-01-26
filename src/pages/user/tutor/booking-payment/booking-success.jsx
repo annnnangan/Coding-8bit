@@ -1,12 +1,15 @@
 import { NavLink, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function TutorBookingSuccess() {
   // 取得路由中的值 (id 及 1on1 or code-review)
-  // const { id } = useParams();
   const { type } = useParams();
 
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 付款成功</title>
+      </Helmet>
       <main className="tutor-booking-success-section wrap">
         <div className="container">
           <div className="f-center">
@@ -34,7 +37,7 @@ export default function TutorBookingSuccess() {
                         type="text"
                         className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
                         id="tutor"
-                        value="卡斯伯 Casper"
+                        defaultValue="卡斯伯 Casper"
                         disabled
                       />
                     </div>
@@ -46,7 +49,9 @@ export default function TutorBookingSuccess() {
                         type="text"
                         className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
                         id="bookingType"
-                        value={type === "1on1" ? "一對一教學" : "程式碼檢視"}
+                        defaultValue={
+                          type === "1on1" ? "一對一教學" : "程式碼檢視"
+                        }
                         disabled
                       />
                     </div>
@@ -58,7 +63,7 @@ export default function TutorBookingSuccess() {
                         type="text"
                         className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
                         id="date"
-                        value="2024/08/11"
+                        defaultValue="2024/08/11"
                         disabled
                       />
                     </div>
@@ -70,7 +75,7 @@ export default function TutorBookingSuccess() {
                         type="text"
                         className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
                         id="timeSlot"
-                        value="10:00-11:00"
+                        defaultValue="10:00-11:00"
                         disabled
                       />
                     </div>
@@ -87,7 +92,7 @@ export default function TutorBookingSuccess() {
                           <input
                             className="form-control border-0 bg-white p-0 rounded-0 text-gray-02 h-100"
                             id="sourceCodeURL"
-                            value="https://github.com/masterchan/next-todo-list.git"
+                            defaultValue="https://github.com/masterchan/next-todo-list.git"
                             disabled
                           />
                         </div>
@@ -102,7 +107,7 @@ export default function TutorBookingSuccess() {
                             rows="5"
                             defaultValue="第一次寫NextJs的框架。感覺寫的東西都都堆在一齊，看起來很複雜，不知道要怎麼 factorize 我的程式碼，讓往後維護會更簡單，而且看起來會跟直接，更符合業界標準。希望得到老師的指導。"
                             disabled
-                          ></textarea>
+                          />
                         </div>
                       </>
                     ) : (
@@ -116,11 +121,9 @@ export default function TutorBookingSuccess() {
                             id="userInput"
                             style={{ resize: "none" }}
                             rows="5"
+                            defaultValue="想深入學習 TypeScript 的高級類型，如條件類型、映射類型等，以提高代碼的類型安全性和可讀性。同時也希望了解泛型在實際項目中的最佳實踐。"
                             disabled
-                          >
-                            想深入學習 TypeScript
-                            的高級類型，如條件類型、映射類型等，以提高代碼的類型安全性和可讀性。同時也希望了解泛型在實際項目中的最佳實踐。
-                          </textarea>
+                          />
                         </div>
                       </>
                     )}

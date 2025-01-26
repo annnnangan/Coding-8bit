@@ -107,7 +107,7 @@ export default function Header() {
               <li className="nav-item">
                 <NavLink
                   className="nav-link underline-hover d-inline-flex link-gray-02"
-                  to="/tutor"
+                  to="/tutor-list"
                 >
                   一對一教學
                 </NavLink>
@@ -115,7 +115,7 @@ export default function Header() {
               <li className="nav-item">
                 <NavLink
                   className="nav-link underline-hover d-inline-flex link-gray-02"
-                  href="custom-course.html"
+                  to="/custom-course-list"
                 >
                   課程客製化
                 </NavLink>

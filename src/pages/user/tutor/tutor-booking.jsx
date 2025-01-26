@@ -1,28 +1,28 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+
 import axios from "axios";
 import Swiper from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
-import { recommendTutorData, tutorStats } from "../../../data/tutors";
+import * as bootstrap from "bootstrap";
+
+import ShowMoreButton from "../../../components/common/ShowMoreButton";
 import TutorBookingResume from "../../../components/tutor/TutorBookingResume";
 import TutorsCard from "../../../components/tutor/TutorsCard";
-import ShowMoreButton from "../../../components/common/ShowMoreButton";
 import CourseCard from "../../../components/course/CourseCard";
 import CommentsSection from "../../../components/tutor/CommentsSection";
-import * as bootstrap from "bootstrap";
+import Loader from "../../../components/common/Loader";
+
+import { recommendTutorData, tutorStats } from "../../../data/tutors";
 
 const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
 
 export default function TutorBooking() {
-  const [courses, setCourses] = useState([]);
-  const [tutorList, setTutorList] = useState({
-    skills: [],
-    resume: { workExperience: [], education: [], certificates: [] },
-    statistics: {},
-  });
-  const [comments, setComments] = useState([]);
-  const [currentStartDate] = useState(20240801);
-  const [availableTime, setAvailableTime] = useState([]);
+  // loading
+  const [loadingState, setLoadingState] = useState(true);
+
+  // 抓取路由上的 id 來取得遠端特定 id 的資料
   const { id } = useParams();
 
   // modal
@@ -47,7 +47,17 @@ export default function TutorBooking() {
   };
 
   // 取得資料函式
-  const getTutorsData = async () => {
+  const [courses, setCourses] = useState([]);
+  const [tutorList, setTutorList] = useState({
+    skills: [],
+    resume: { workExperience: [], education: [], certificates: [] },
+    statistics: {},
+  });
+  const [comments, setComments] = useState([]);
+  const [currentStartDate] = useState(20240801);
+  const [availableTime, setAvailableTime] = useState([]);
+  const getData = async () => {
+    setLoadingState(true);
     try {
       const coursesResult = await axios.get(`${VITE_API_BASE}/api/v1/courses`);
       const tutorResult = await axios.get(
@@ -70,6 +80,8 @@ export default function TutorBooking() {
       setAvailableTime(availableTimeResult.data);
     } catch (error) {
       console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
     }
   };
 
@@ -111,11 +123,19 @@ export default function TutorBooking() {
 
   // 初始化 - 取得資料
   useEffect(() => {
-    getTutorsData();
+    getData();
   }, []);
 
   return (
     <>
+      <Helmet>
+        <title>
+          {tutorList?.name
+            ? `${tutorList.name} ｜ 講師詳細`
+            : "Coding∞bit ｜ 講師詳細"}
+        </title>
+      </Helmet>
+      {loadingState && <Loader />}
       <div className="tutor-booking">
         {/*  Mobile Top Cover */}
         <div className="position-relative d-lg-none">
@@ -155,7 +175,7 @@ export default function TutorBooking() {
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
                     <img
-                      src="images/user/user-1.png"
+                      src={tutorList.avatar}
                       alt="profile"
                       className="object-fit-cover rounded-circle me-6"
                     />
@@ -276,8 +296,8 @@ export default function TutorBooking() {
               <section className="section">
                 <div className="section-component f-between-center">
                   <h4>講師影片</h4>
-                  <a
-                    href="tutor-info.html"
+                  <NavLink
+                    to={`/tutor-info/${id}`}
                     className="text-brand-03 d-flex slide-right-hover"
                     data-show="false"
                   >
@@ -285,7 +305,7 @@ export default function TutorBooking() {
                     <span className="material-symbols-outlined icon-fill">
                       arrow_forward
                     </span>
-                  </a>
+                  </NavLink>
                 </div>
                 <div className="swiper freeTipShortsSwiper">
                   <div className="swiper-wrapper">
@@ -357,15 +377,15 @@ export default function TutorBooking() {
               <section className="section mb-0">
                 <div className="section-component f-between-center">
                   <h4>推薦講師</h4>
-                  <a
-                    href="tutor-list.html"
+                  <NavLink
+                    to="/tutor-list"
                     className="text-brand-03 d-flex slide-right-hover"
                   >
                     <p>更多</p>
                     <span className="material-symbols-outlined icon-fill">
                       arrow_forward
                     </span>
-                  </a>
+                  </NavLink>
                 </div>
 
                 {/* desktop */}

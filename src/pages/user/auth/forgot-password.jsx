@@ -1,9 +1,13 @@
 // import Swal from 'sweetalert2'
 import { NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function ForgotPassword() {
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 忘記密碼</title>
+      </Helmet>
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="forgot-password-section bg">
         <div className="container">

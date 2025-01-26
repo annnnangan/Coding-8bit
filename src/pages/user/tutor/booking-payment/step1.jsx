@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 export default function TutorBookingPaymentStep1() {
   // 取得路由中的值 (id 及 1on1 or code-review)
@@ -17,6 +18,9 @@ export default function TutorBookingPaymentStep1() {
 
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 確認預約資訊</title>
+      </Helmet>
       <main className="tutor-booking-section wrap-lg">
         <div className="container">
           {/* Step Tracking */}

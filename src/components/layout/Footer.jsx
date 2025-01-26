@@ -1,9 +1,11 @@
+import { NavLink } from "react-router-dom";
+
 export default function Footer() {
   return (
     <footer className="layout-footer-wrap wrap-lg bg-white">
       <div className="container f-xl-between">
         <div className="footer-info-wrap flex-grow-1">
-          <a href="index.html" className="navbar-brand">
+          <NavLink to="/" className="navbar-brand">
             <picture>
               <source
                 srcSet="images/logo-sm.svg"
@@ -11,16 +13,16 @@ export default function Footer() {
               />
               <img src="images/logo.svg" alt="logo-image" />
             </picture>
-          </a>
+          </NavLink>
           <ul className="mt-4">
             <li className="f-align-center">
               <span className="material-symbols-outlined fs-6">call</span>
-              <a
+              <NavLink
                 href="tel:+0212345678"
                 className="fs-7 underline-hover lh-sm ms-2"
               >
                 (02) 1234-5678
-              </a>
+              </NavLink>
             </li>
             <li className="f-align-center mt-2">
               <span className="material-symbols-outlined fs-6">schedule</span>
@@ -34,48 +36,48 @@ export default function Footer() {
         <div className="d-flex flex-grow-1 mt-8 mt-lg-0">
           <ul className="navbar-nav f-column w-50 px-4">
             <li className="nav-item">
-              <a
+              <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
                 aria-current="page"
-                href="course-list.html"
+                to="/course-list"
               >
                 精選課程
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a
+              <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
-                href="tutor-list.html"
+                to="/tutor-list"
               >
                 一對一教學
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a
+              <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
-                href="custom-course.html"
+                to="/custom-course-list"
               >
                 課程客製化
-              </a>
+              </NavLink>
             </li>
           </ul>
           <ul className="navbar-nav f-column w-50 px-4">
             <li className="nav-item">
-              <a
+              <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
                 aria-current="page"
-                href="help-center.html"
+                to="/help-center"
               >
                 幫助中心
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a
+              <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
-                href="subscription.html"
+                to="/subscription-list"
               >
                 訂閱方案選擇
-              </a>
+              </NavLink>
             </li>
           </ul>
         </div>

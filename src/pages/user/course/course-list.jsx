@@ -1,18 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+
 import Swiper from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import axios from "axios";
+
 import CourseCard from "../../../components/course/CourseCard";
 import MainTitle from "../../../components/MainTitle";
+import Loader from "../../../components/common/Loader";
+
 import { categoryData, hotCoursesData } from "../../../data/courses";
 
 const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseList() {
-  const [topicSeriesCourseList, setTopicSeriesCourseList] = useState([]);
-  const [customLearningCourseList, setCustomLearningCourseList] = useState([]);
-  const [freeTipShortsCourseList, setFreeTipShortsCourseList] = useState([]);
+  // loading
+  const [loadingState, setLoadingState] = useState(true);
 
   // 客製化課程區塊 Tab 切換邏輯
   const [activeTab, setActiveTab] = useState(0);
@@ -29,7 +33,11 @@ export default function CourseList() {
   };
 
   // 取得課程資料函式
+  const [topicSeriesCourseList, setTopicSeriesCourseList] = useState([]);
+  const [customLearningCourseList, setCustomLearningCourseList] = useState([]);
+  const [freeTipShortsCourseList, setFreeTipShortsCourseList] = useState([]);
   const getCoursesData = async () => {
+    setLoadingState(true);
     try {
       const topicSeries = await axios.get(
         `${VITE_API_BASE}/api/v1/courses?category=topicSeries`
@@ -45,6 +53,8 @@ export default function CourseList() {
       setFreeTipShortsCourseList(freeTipShorts.data);
     } catch (error) {
       console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
     }
   };
 
@@ -119,6 +129,12 @@ export default function CourseList() {
 
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 課程一覽</title>
+      </Helmet>
+      {loadingState && <Loader />}
+
+      {/* header */}
       <header className="course-list-banner-section bg">
         <div className="container-lg">
           <div className="row">
@@ -143,6 +159,8 @@ export default function CourseList() {
           </div>
         </div>
       </header>
+
+      {/* 三大類別 */}
       <section className="course-list-category-section wrap">
         <div className="container">
           <MainTitle
@@ -181,6 +199,8 @@ export default function CourseList() {
           </div>
         </div>
       </section>
+
+      {/* 實用技術短影片 */}
       <section className="course-list-freeTipShorts-section">
         <div className="container">
           <div className="row position-relative">
@@ -224,8 +244,8 @@ export default function CourseList() {
               <div className="swiper-wrapper">
                 {freeTipShortsCourseList.map((course) => (
                   <div className="swiper-slide" key={course.id}>
-                    <a
-                      href="video-details.html"
+                    <NavLink
+                      to={`/course/${course.id}`}
                       className="course-card card-column"
                     >
                       <div className="card gradient-border img-hover-enlarge p-lg-6 p-4 h-100">
@@ -276,7 +296,7 @@ export default function CourseList() {
                           </div>
                         </div>
                       </div>
-                    </a>
+                    </NavLink>
                   </div>
                 ))}
               </div>
@@ -284,6 +304,8 @@ export default function CourseList() {
           </div>
         </div>
       </section>
+
+      {/* 熱門課程 */}
       <section className="course-list-hot-section wrap">
         <div className="container">
           <MainTitle longTitle={false} beforeTitle="熱門課程" afterTitle="" />
@@ -328,6 +350,8 @@ export default function CourseList() {
           </div>
         </div>
       </section>
+
+      {/* 主題式系列課程 */}
       <section className="course-list-topicSeries-section wrap bg-brand-05">
         <div className="container">
           <MainTitle
@@ -339,18 +363,20 @@ export default function CourseList() {
             <CourseCard courseList={topicSeriesCourseList} />
           </div>
           <div className="f-center">
-            <a
-              href="course-list_topicSeries.html"
+            <NavLink
+              to="/course?category=topicSeries"
               className="btn btn-outline-brand-03 slide-right-hover d-inline-flex f-align-center mt-6 mt-lg-11"
             >
               查看所有主題式系列課程影片
               <span className="material-symbols-outlined icon-fill fs-5 ms-1">
                 arrow_forward
               </span>
-            </a>
+            </NavLink>
           </div>
         </div>
       </section>
+
+      {/* 客製化學習需求影片 */}
       <section className="course-list-customLearning-section wrap">
         <div className="container">
           <MainTitle

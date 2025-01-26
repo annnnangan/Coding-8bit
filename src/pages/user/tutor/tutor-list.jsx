@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef } from "react";
+import { NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+
 import axios from "axios";
 import AOS from "aos";
+
 import MainTitle from "../../../components/MainTitle";
 import TutorsCard from "../../../components/tutor/TutorsCard";
+import Pagination from "../../../components/layout/Pagination";
+import Loader from "../../../components/common/Loader";
 
 const { VITE_API_BASE_2 } = import.meta.env;
 
 export default function TutorList() {
-  const [tutorsList, setTutorsList] = useState([]);
+  // loading
+  const [loadingState, setLoadingState] = useState(true);
 
   // 找講師按鈕往下跳轉函式
   const tutorListRef = useRef(null);
@@ -19,12 +26,16 @@ export default function TutorList() {
   };
 
   // 取得資料函式
+  const [tutorsList, setTutorsList] = useState([]);
   const getTutorsData = async () => {
+    setLoadingState(true);
     try {
       const tutorResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors`);
       setTutorsList(tutorResult.data);
     } catch (error) {
       console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
     }
   };
 
@@ -55,6 +66,10 @@ export default function TutorList() {
 
   return (
     <>
+      <Helmet>
+        <title>Coding∞bit ｜ 可預約講師一覽</title>
+      </Helmet>
+      {loadingState && <Loader />}
       <main className="tutor-list">
         {/* hero-section */}
         <section className="hero-section">
@@ -181,8 +196,8 @@ export default function TutorList() {
                   </div>
                 </div>
 
-                <a
-                  href="subscription-info-normal.html"
+                <NavLink
+                  to="/subscription-list"
                   className="underline-hover text-brand-03 cta fs-md-5 fs-6"
                   data-aos="fade-right"
                   data-aos-easing="linear"
@@ -190,7 +205,7 @@ export default function TutorList() {
                   data-aos-delay="800"
                 >
                   還沒有訂閱嗎？點我前往訂閱
-                </a>
+                </NavLink>
               </div>
               {/* image */}
               <div className="col-4">
@@ -326,43 +341,7 @@ export default function TutorList() {
             </div>
 
             <nav aria-label="navigation">
-              <ul className="pagination f-center">
-                <li className="page-item disabled">
-                  <a className="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">
-                      <span className="material-symbols-outlined align-middle">
-                        {" "}
-                        arrow_left
-                      </span>
-                    </span>
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link active" href="#">
-                    1
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link" href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">
-                      <span className="material-symbols-outlined align-middle">
-                        {" "}
-                        arrow_right
-                      </span>
-                    </span>
-                  </a>
-                </li>
-              </ul>
+              <Pagination />
             </nav>
           </div>
         </section>

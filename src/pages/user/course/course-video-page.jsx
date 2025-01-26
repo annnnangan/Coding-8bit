@@ -1,12 +1,23 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, NavLink } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+
 import axios from "axios";
-import { otherVideos, relatedVideos } from "../../../data/videos";
+
 import CommentsSection from "../../../components/course/CommentsSection";
+import Loader from "../../../components/common/Loader";
+
+import { otherVideos, relatedVideos } from "../../../data/videos";
 
 const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseVideoPage() {
+  // loading
+  const [loadingState, setLoadingState] = useState(true);
+
+  const { id } = useParams();
+
+  // 取得課程資料函式
   const [courseList, setCourseList] = useState({
     tags: [],
     tutor: {},
@@ -14,10 +25,8 @@ export default function CourseVideoPage() {
   });
   const [comments, setComments] = useState([]);
   const [chapterVideos, setChapterVideos] = useState([]);
-  const { id } = useParams();
-
-  // 取得課程資料函式
   const getCoursesData = async () => {
+    setLoadingState(true);
     try {
       const videoDetailResult = await axios.get(
         `${VITE_API_BASE}/api/v1/videos/${id}`
@@ -33,6 +42,8 @@ export default function CourseVideoPage() {
       setChapterVideos(chapterVideosResult.data);
     } catch (error) {
       console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
     }
   };
 
@@ -43,6 +54,14 @@ export default function CourseVideoPage() {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {courseList?.title
+            ? `${courseList.title} ｜ 課程詳細`
+            : "Coding∞bit ｜ 課程詳細"}
+        </title>
+      </Helmet>
+      {loadingState && <Loader />}
       <main className="video-details container-lg py-lg-13 py-md-0">
         <div className="row">
           <section className="col-lg-7 col-xl-8">
@@ -259,15 +278,15 @@ export default function CourseVideoPage() {
                 style={{ marginBottom: "22px" }}
               >
                 <h4 className="tutor-other-video-title">講師其他影片</h4>
-                <a
-                  href="tutor-info.html"
+                <NavLink
+                  to={`/tutor-info/${courseList.tutor.id}`}
                   className="f-align-center show-more-button slide-right-hover"
                 >
                   <span className="me-1">更多</span>
                   <span className="material-symbols-outlined">
                     arrow_forward
                   </span>
-                </a>
+                </NavLink>
               </div>
               <ul className="other-videos-list">
                 {otherVideos.map((course, index) => (
