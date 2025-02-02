@@ -1,19 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import axios from "axios";
-
+import courseApi from "../../../api/courseApi";
 import CourseCard from "../../../components/course/CourseCard";
 import Pagination from "../../../components/layout/Pagination";
 import Loader from "../../../components/common/Loader";
-
-const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseListPage() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 
+  // 依路由決定此頁顯示分類
   const [searchParams] = useSearchParams();
   const category = searchParams.get("category");
 
@@ -22,16 +20,46 @@ export default function CourseListPage() {
   const getCoursesData = async () => {
     setLoadingState(true);
     try {
-      const result = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=${category}`
-      );
-      setCourseList(result.data);
+      const result = await courseApi.getCourses(category);
+      setCourseList(result);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
       setLoadingState(false);
     }
   };
+
+  // 搜尋功能
+  const [ascending] = useState(false);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("view_count");
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      setSearch(e.target.value);
+    }
+  };
+
+  const filterCourseList = useMemo(() => {
+    return [...courseList] // 需要淺拷貝，不然會影響到原陣列
+      .filter((course) => course.title.includes(search)) // 找出符合 search 的值 (只過濾符合 search 的內容)
+      .sort((a, b) => {
+        // 最熱門排序
+        if (sort === "view_count") {
+          return ascending
+            ? parseInt(a.view_count) - parseInt(b.view_count)
+            : parseInt(b.view_count) - parseInt(a.view_count);
+        }
+        // 評價排序
+        if (sort === "rating") {
+          return ascending
+            ? parseFloat(a.rating) - parseFloat(b.rating)
+            : parseFloat(b.rating) - parseFloat(a.rating);
+        } else {
+          return ascending ? a.sort - b.sort : b.sort - a.sort;
+        }
+      });
+  }, [courseList, ascending, search, sort]);
 
   // title 判斷
   let pageTitle = "Coding∞bit ｜ ";
@@ -149,6 +177,7 @@ export default function CourseListPage() {
                 type="search"
                 className="form-control nav-search-desktop border border-brand-03 border-3"
                 placeholder="搜尋課程"
+                onKeyPress={handleSearch}
               />
               <span
                 className="material-symbols-outlined text-gray-03 position-absolute ps-4"
@@ -166,35 +195,52 @@ export default function CourseListPage() {
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                排序方式
+                {sort === "view_count" && "排序方式(最熱門)"}
+                {sort === "rating" && "排序方式(最高評價)"}
               </button>
 
               <ul className="dropdown-menu dropdown-menu-end">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => setSort("view_count")}
+                  >
                     最熱門
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => setSort("rating")}
+                  >
                     最高評價
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => setSort()}
+                  >
                     依時間(最舊到最新)
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <button
+                    type="button"
+                    className="dropdown-item"
+                    onClick={() => setSort()}
+                  >
                     依時間(最新到最舊)
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
           </div>
           <div className="row topicSeriesCourse-card-wrap mt-6 mt-lg-8 g-5">
-            <CourseCard courseList={courseList} />
+            <CourseCard courseList={filterCourseList} />
           </div>
           <nav className="mt-6 mt-lg-8" aria-label="navigation">
             <Pagination />

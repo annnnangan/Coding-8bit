@@ -1,12 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import axios from "axios";
 
+import Card from "../../../components/custom-course/Card";
+import Timeline from "../../../components/custom-course/Timeline";
+import ScrollBtn from "../../../components/custom-course/ScrollBtn";
+
 const { VITE_API_BASE_3 } = import.meta.env;
 
 export default function CustomCourseList() {
+  const isMobile = window.innerWidth <= 576;
+
+  const containerRef = useRef(null);
+
   // 返回上一頁
   const navigate = useNavigate();
   const toPrevPage = () => {
@@ -30,6 +38,15 @@ export default function CustomCourseList() {
     getData();
   }, []);
 
+  // 初始化 - 背景圖片
+  useEffect(() => {
+    document.body.classList.add("bg-custom-course");
+
+    return () => {
+      document.body.classList.remove("bg-custom-course");
+    };
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -42,18 +59,7 @@ export default function CustomCourseList() {
             <div className="d-flex flex-column flex-lg-row align-items-lg-center flex-wrap position-relative pe-lg-10 row-gap-4">
               {/* 導覽 & 搜尋框 */}
               <div className="d-flex align-items-center">
-                <div className="navigationArrows d-none d-lg-flex">
-                  <div className="circle left-btn">
-                    <span className="material-symbols-outlined icon-fill">
-                      arrow_back
-                    </span>
-                  </div>
-                  <div className="circle right-btn">
-                    <span className="material-symbols-outlined icon-fill">
-                      arrow_forward
-                    </span>
-                  </div>
-                </div>
+                <ScrollBtn containerRef={containerRef} />
                 <div className="searchInput pe-10">
                   <input
                     type="search"
@@ -156,12 +162,38 @@ export default function CustomCourseList() {
       <main className="main-content">
         {/* wish-pool*/}
         <section className="custom-course-wishPool">
-          <div className="wishPool-container">
+          <div className="wishPool-container" ref={containerRef}>
             <div className="cards-container">
-              {/* 卡片將由 JavaScript 動態生成 */}
+              {/* 客製化需求卡片動態生成 */}
+              {isMobile ? (
+                customCourseList.map((customCourse) => (
+                  <Card key={customCourse.id} customCourse={customCourse} />
+                ))
+              ) : (
+                <>
+                  <div className="card_row">
+                    {customCourseList
+                      .filter((_, index) => index % 2 === 0)
+                      .map((customCourse) => (
+                        <Card
+                          key={customCourse.id}
+                          customCourse={customCourse}
+                        />
+                      ))}
+                  </div>
+                  <div className="card_row">
+                    {customCourseList
+                      .filter((_, index) => index % 2 !== 0)
+                      .map((customCourse) => (
+                        <Card key={customCourse.id} card={customCourse} />
+                      ))}
+                  </div>
+                </>
+              )}
             </div>
             <div className="timeline-container">
-              {/* 時間點將由 JavaScript 動態生成 */}
+              {/* 時間點動態生成 */}
+              <Timeline customCourseList={customCourseList} />
             </div>
           </div>
         </section>

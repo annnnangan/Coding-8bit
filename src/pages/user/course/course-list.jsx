@@ -4,15 +4,13 @@ import { Helmet } from "react-helmet-async";
 
 import Swiper from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import axios from "axios";
 
+import courseApi from "../../../api/courseApi";
 import CourseCard from "../../../components/course/CourseCard";
 import MainTitle from "../../../components/MainTitle";
 import Loader from "../../../components/common/Loader";
 
 import { categoryData, hotCoursesData } from "../../../data/courses";
-
-const { VITE_API_BASE } = import.meta.env;
 
 export default function CourseList() {
   // loading
@@ -39,18 +37,12 @@ export default function CourseList() {
   const getCoursesData = async () => {
     setLoadingState(true);
     try {
-      const topicSeries = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=topicSeries`
-      );
-      const customLearning = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=customLearning`
-      );
-      const freeTipShorts = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=freeTipShorts`
-      );
-      setTopicSeriesCourseList(topicSeries.data);
-      setCustomLearningCourseList(customLearning.data);
-      setFreeTipShortsCourseList(freeTipShorts.data);
+      const topicSeries = await courseApi.getCourses("topicSeries");
+      const customLearning = await courseApi.getCourses("customLearning");
+      const freeTipShorts = await courseApi.getCourses("freeTipShorts");
+      setTopicSeriesCourseList(topicSeries);
+      setCustomLearningCourseList(customLearning);
+      setFreeTipShortsCourseList(freeTipShorts);
     } catch (error) {
       console.log("錯誤", error);
     } finally {

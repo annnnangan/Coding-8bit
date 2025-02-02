@@ -1,5 +1,6 @@
-import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
+
+import PropTypes from "prop-types";
 
 export default function CourseCard({ courseList, cardsNum = 3 }) {
   if (cardsNum === 2 || cardsNum === 3) {

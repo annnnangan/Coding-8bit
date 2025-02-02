@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import axios from "axios";
-
 import CommentsSection from "../../../components/course/CommentsSection";
 import Loader from "../../../components/common/Loader";
 
-import { otherVideos, relatedVideos } from "../../../data/videos";
+import courseApi from "../../../api/courseApi";
 
-const { VITE_API_BASE } = import.meta.env;
+import { otherVideos, relatedVideos } from "../../../data/videos";
 
 export default function CourseVideoPage() {
   // loading
@@ -28,18 +26,12 @@ export default function CourseVideoPage() {
   const getCoursesData = async () => {
     setLoadingState(true);
     try {
-      const videoDetailResult = await axios.get(
-        `${VITE_API_BASE}/api/v1/videos/${id}`
-      );
-      const commentsResult = await axios.get(
-        `${VITE_API_BASE}/api/v1/videos/${id}/comments`
-      );
-      const chapterVideosResult = await axios.get(
-        `${VITE_API_BASE}/api/v1/videos/${id}/chapters`
-      );
-      setCourseList(videoDetailResult.data);
-      setComments(commentsResult.data);
-      setChapterVideos(chapterVideosResult.data);
+      const videoDetailResult = await courseApi.getCourseDetail(id);
+      const commentsResult = await courseApi.getCourseComments(id);
+      const chapterVideosResult = await courseApi.getCourseChapters(id);
+      setCourseList(videoDetailResult);
+      setComments(commentsResult);
+      setChapterVideos(chapterVideosResult);
     } catch (error) {
       console.log("錯誤", error);
     } finally {

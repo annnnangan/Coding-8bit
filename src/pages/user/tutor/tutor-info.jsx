@@ -3,12 +3,13 @@ import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import axios from "axios";
-import CourseCard from "../../../components/course/CourseCard";
 
+import courseApi from "../../../api/courseApi";
+import CourseCard from "../../../components/course/CourseCard";
 import ShowMoreButton from "../../../components/common/ShowMoreButton";
 import Loader from "../../../components/common/Loader";
 
-const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
+const { VITE_API_BASE_2 } = import.meta.env;
 
 export default function TutorInfo() {
   // loading
@@ -40,7 +41,7 @@ export default function TutorInfo() {
 
   // 篩選出跟當前講師同名的課程函式
   const filteredCourses = (courses, tutorResult) =>
-    courses.data.filter((course) => {
+    courses.filter((course) => {
       return course.tutor === tutorResult.data.name;
     });
 
@@ -61,15 +62,9 @@ export default function TutorInfo() {
       const tutorResult = await axios.get(
         `${VITE_API_BASE_2}/api/v1/tutors/${id}`
       );
-      const topicSeriesCourses = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=topicSeries`
-      );
-      const customLearningCourses = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=customLearning`
-      );
-      const freeTipShortsCourses = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=freeTipShorts`
-      );
+      const topicSeriesCourses = await courseApi.getCourses("topicSeries");
+      const customLearningCourses = await courseApi.getCourses("customLearning");
+      const freeTipShortsCourses = await courseApi.getCourses("freeTipShorts");
 
       setTutorList(tutorResult.data);
 

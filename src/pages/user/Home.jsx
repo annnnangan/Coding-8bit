@@ -4,17 +4,15 @@ import { Helmet } from "react-helmet-async";
 
 import Swiper from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import axios from "axios";
 import AOS from "aos";
 
+import courseApi from "../../api/courseApi";
 import MainTitle from "../../components/MainTitle";
 import CourseCard from "../../components/course/CourseCard";
 import SubscriptionCard from "../../components/subscription/SubscriptionCard";
 import Loader from "../../components/common/Loader";
 
 import { bannerData, featureData, stepsData } from "../../data/home";
-
-const { VITE_API_BASE } = import.meta.env;
 
 export default function Home() {
   // loading
@@ -25,10 +23,8 @@ export default function Home() {
   const getCoursesData = async () => {
     setLoadingState(true);
     try {
-      const result = await axios.get(
-        `${VITE_API_BASE}/api/v1/courses?category=topicSeries`
-      );
-      setCourseList(result.data);
+      const result = await courseApi.getCourses("topicSeries");
+      setCourseList(result);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
