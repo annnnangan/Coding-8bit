@@ -1,17 +1,23 @@
+// React 相關方法
 import { useState, useEffect, Fragment } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+// 第三方套件
 import Swiper from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import AOS from "aos";
 
+// Api 
 import courseApi from "../../api/courseApi";
+
+// 元件
 import MainTitle from "../../components/MainTitle";
 import CourseCard from "../../components/course/CourseCard";
 import SubscriptionCard from "../../components/subscription/SubscriptionCard";
 import Loader from "../../components/common/Loader";
 
+// 內建資料引入
 import { bannerData, featureData, stepsData } from "../../data/home";
 
 export default function Home() {
