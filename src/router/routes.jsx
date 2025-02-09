@@ -24,6 +24,7 @@ import TutorInfo from "../pages/user/tutor/tutor-info";
 
 import HelpCenter from "../pages/user/help-center";
 import NotFound from "../pages/NotFound";
+import TutorManageBooking from "../pages/tutor/tutor-manage-bookings";
 
 export const routes = [
   { path: "/", element: <Home /> },
@@ -51,6 +52,8 @@ export const routes = [
   { path: "/tutor-info/:id", element: <TutorInfo /> },
 
   { path: "/help-center", element: <HelpCenter /> },
-  
+
+  { path: "/tutor-panel/booking", element: <TutorManageBooking /> },
+
   { path: "*", element: <NotFound /> },
 ];
