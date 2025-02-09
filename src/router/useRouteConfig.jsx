@@ -10,6 +10,7 @@ export const useRouteConfig = () => {
     "/forgot-password",
     "/reset-password",
     "/custom-course-list",
+    "/add-learning-need",
   ];
 
   // 不需要右下角往上跳轉按鈕的頁面
@@ -19,9 +20,12 @@ export const useRouteConfig = () => {
     "/forgot-password",
     "/reset-password",
     "/custom-course-list",
+    "/add-learning-need",
   ];
 
-  const shouldShowHeaderFooter = !noHeaderFooterRoutes.includes(location.pathname);
+  const shouldShowHeaderFooter = !noHeaderFooterRoutes.includes(
+    location.pathname
+  );
   const shouldShowToTopBtn = !noToTopBtnRoutes.includes(location.pathname);
 
   return { shouldShowHeaderFooter, shouldShowToTopBtn };

@@ -1,4 +1,4 @@
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -19,6 +19,11 @@ export default function CustomCourseList() {
   const navigate = useNavigate();
   const toPrevPage = () => {
     navigate(-1);
+  };
+
+  // 前往新增需求頁面按鈕
+  const toAddLearningNeedPage = () => {
+    navigate("/add-learning-need");
   };
 
   // 取得課程資料函式
@@ -219,14 +224,18 @@ export default function CustomCourseList() {
               <p className="subtitle text-brand-03">大膽提出你的學習需求</p>
             </div>
             <div className="d-flex flex-column align-items-center">
-              <button className="add-button" aria-label="提學習需求">
+              <button
+                className="add-button"
+                aria-label="提出學習需求"
+                onClick={toAddLearningNeedPage}
+              >
                 <span className="add-icon material-symbols-outlined icon-fill">
                   {" "}
                   add{" "}
                 </span>
               </button>
               <span className="fs-md-5 fs-6 text-gray-02 d-block mt-2">
-                提學習需求
+                提出學習需求
               </span>
             </div>
           </div>

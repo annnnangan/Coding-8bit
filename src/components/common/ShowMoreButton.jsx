@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import PropTypes from "prop-types";
 
 export default function ShowMoreBtn({ text, initialShow = false }) {
@@ -10,9 +11,7 @@ export default function ShowMoreBtn({ text, initialShow = false }) {
 
   return (
     <>
-      <p className={`tab-details ${isShow ? "" : "text-hide"}`}>
-        {text}
-      </p>
+      <p className={`tab-details ${isShow ? "" : "text-hide"}`}>{text}</p>
       <div
         className="d-flex align-items-center py-3 show-more"
         role="button"

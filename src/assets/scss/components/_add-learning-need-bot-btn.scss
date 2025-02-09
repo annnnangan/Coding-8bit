@@ -1,0 +1,47 @@
+.add-learning-need-bot-wrap {
+  position: fixed;
+  bottom: 116px;
+  right: 112px;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  @include pad {
+    bottom: 164px;
+    right: 24px;
+  }
+}
+.add-learning-need-bot-btn {
+  width: 80px;
+  height: 80px;
+  border: none;
+  margin-right: 20px;
+  transition: transform 0.3s ease;
+
+  @include pad {
+    width: 64px;
+    height: 64px;
+  }
+
+  &:hover {
+    transform: scale(1.1); 
+    background-color: rgba(255, 255, 255, 0.3); 
+  }
+}
+
+.bot-greeting {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+
+  @include lg-pc {
+    display: none;
+  }
+}
+
+.add-learning-need-bot-wrap:hover img:first-child {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}

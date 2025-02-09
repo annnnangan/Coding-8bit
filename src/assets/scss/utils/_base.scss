@@ -45,6 +45,25 @@ a {
   } 
 }
 
+.divider-label-brand-02 {
+  color: $brand-02;
+
+  hr {
+    flex-grow: 1;
+    border: none;
+    height: 2px;
+    background-color: $brand-02;
+    opacity: 1;
+  } 
+}
+
+/* list-style */
+.disc-list-style {
+  li{
+    list-style: disc;
+  }
+}
+
 /* background */
 .bg {
   background-repeat: no-repeat;
