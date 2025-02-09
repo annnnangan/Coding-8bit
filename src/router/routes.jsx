@@ -10,6 +10,7 @@ import CourseListPage from "../pages/user/course/course-list-page";
 import CourseVideoPage from "../pages/user/course/course-video-page";
 
 import CustomCourseList from "../pages/user/custom-course/custom-course-list";
+import AddLearningNeedPage from "../pages/user/custom-course/add-learning-need-page";
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";
@@ -37,6 +38,7 @@ export const routes = [
   { path: "/course/:id", element: <CourseVideoPage /> },
 
   { path: "/custom-course-list", element: <CustomCourseList /> },
+  { path: "/add-learning-need", element: <AddLearningNeedPage /> },
 
   { path: "/subscription-list", element: <SubscriptionList /> },
   { path: "/subscription/:subscriptionPlan/:duration", element: <SubscriptionPayment /> },

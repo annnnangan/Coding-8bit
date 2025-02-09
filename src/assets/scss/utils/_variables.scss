@@ -1735,15 +1735,15 @@ $btn-close-white-filter: invert(1) grayscale(100%) brightness(200%) !default;
 
 // scss-docs-start offcanvas-variables
 $offcanvas-padding-y: $modal-inner-padding !default;
-$offcanvas-padding-x: $modal-inner-padding !default;
-$offcanvas-horizontal-width: 400px !default;
+$offcanvas-padding-x: 2rem !default; // $modal-inner-padding !default; custom
+$offcanvas-horizontal-width: 526px !default; // 400px !default; custom
 $offcanvas-vertical-height: 30vh !default;
 $offcanvas-transition-duration: 0.3s !default;
 $offcanvas-border-color: $modal-content-border-color !default;
 $offcanvas-border-width: $modal-content-border-width !default;
 $offcanvas-title-line-height: $modal-title-line-height !default;
-$offcanvas-bg-color: var(--#{$prefix}body-bg) !default;
-$offcanvas-color: var(--#{$prefix}body-color) !default;
+$offcanvas-bg-color: rgba(248, 248, 248, 1) !default; // var(--#{$prefix}body-bg) !default; custom
+$offcanvas-color: rgba(30, 30, 30, 1)!default; // var(--#{$prefix}body-color) !default; custom
 $offcanvas-box-shadow: $modal-content-box-shadow-xs !default;
 $offcanvas-backdrop-bg: $modal-backdrop-bg !default;
 $offcanvas-backdrop-opacity: $modal-backdrop-opacity !default;

@@ -22,7 +22,7 @@ import { bannerData, featureData, stepsData } from "../../data/home";
 
 export default function Home() {
   // loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [loadingState, setLoadingState] = useState(false);
 
   // 取得課程資料函式
   const [courseList, setCourseList] = useState([]);
