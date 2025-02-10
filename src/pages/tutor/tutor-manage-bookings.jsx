@@ -54,7 +54,7 @@ export default function TutorManageBooking() {
             </li>
           </ul>
 
-          <div className="bg-gray-04 p-8 rounded-bottom-3">{activeTab === "allBookings" && <AllBookings />}</div>
+          <div className="bg-gray-04 p-8 rounded-bottom-3 min-vh-100">{activeTab === "allBookings" && <AllBookings />}</div>
         </div>
       </BackendPanelMenu>
     </>
