@@ -42,7 +42,7 @@ a {
     height: 1px;
     background-color: $gray-02;
     margin: 0 12px;
-  } 
+  }
 }
 
 .divider-label-brand-02 {
@@ -54,12 +54,12 @@ a {
     height: 2px;
     background-color: $brand-02;
     opacity: 1;
-  } 
+  }
 }
 
 /* list-style */
 .disc-list-style {
-  li{
+  li {
     list-style: disc;
   }
 }
@@ -99,4 +99,13 @@ a {
   @include lg-pc {
     padding: 24px 0;
   }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+//React Day Picker Color
+.rdp-root {
+  --rdp-accent-color: var(--bs-brand-03); /* Correct usage of the CSS variable */
 }

@@ -7,7 +7,7 @@ export const useRouteConfig = () => {
   const noHeaderFooterRoutes = ["/login", "/signup", "/forgot-password", "/reset-password", "/custom-course-list", "/add-learning-need", "/tutor-panel/booking"];
 
   // 不需要右下角往上跳轉按鈕的頁面
-  const noToTopBtnRoutes = ["/login", "/signup", "/forgot-password", "/reset-password", "/custom-course-list", "/add-learning-need"];
+  const noToTopBtnRoutes = ["/login", "/signup", "/forgot-password", "/reset-password", "/custom-course-list", "/add-learning-need", "/tutor-panel/booking"];
 
   const shouldShowHeaderFooter = !noHeaderFooterRoutes.includes(location.pathname);
   const shouldShowToTopBtn = !noToTopBtnRoutes.includes(location.pathname);
