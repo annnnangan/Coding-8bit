@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useLocation, NavLink } from "react-router-dom";
 import clsx from "clsx";
 import { useIsMobile } from "../../hooks/use-mobile";
+import { useState } from "react";
 
 // Styled components
 const Container = styled.nav`
@@ -16,6 +17,7 @@ const Container = styled.nav`
 
 const ListItem = styled.li`
   padding: 12px 20px;
+  cursor: pointer;
 
   &.active {
     background-color: ${(props) => (props.type === "student" ? "var(--bs-brand-02)" : "#645CAA33")};
@@ -51,59 +53,80 @@ const RightContentWrapper = styled.div`
 export default function BackendPanelMenu({ children, type, menuItems, user }) {
   const location = useLocation();
   const isMobile = useIsMobile();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const handleTogglerClick = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
 
   if (isMobile) {
     return (
-      <div type={type}>
-        <nav className={`navbar fixed-top ${type === "student" ? "bg-white" : "bg-gray-01"}`}>
-          <div className="container-fluid">
-            <NavLink className="navbar-brand" to="/">
-              <img src="images/logo.svg" alt="logo-image" />
-            </NavLink>
-            <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas" aria-controls="offcanvas" aria-label="Toggle navigation">
-              <span className={`material-symbols-outlined ${type === "student" ? "text-gray-01" : "text-white"}`} data-bs-dismiss="offcanvas" aria-label="Close">
+      <>
+        {isMenuOpen && <style>{`body { overflow: hidden; }`}</style>}
+        <nav className={`layout-nav-wrap navbar navbar-expand-lg ${type === "student" ? "bg-white" : "bg-gray-01"}`}>
+          <div className="container-lg">
+            <div className="d-flex">
+              <NavLink to="/" className="navbar-brand me-10">
+                <picture>
+                  <source srcSet="images/logo-sm.svg" media="(max-width: 575.98px)" />
+                  <img src="images/logo.svg" alt="logo-image" />
+                </picture>
+              </NavLink>
+            </div>
+            <button
+              id="layout-navbar-toggler"
+              className="navbar-toggler border-0 p-2"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+              onClick={handleTogglerClick}
+            >
+              <span id="menu-icon" className={`material-symbols-outlined icon-fill fs-4 ${type === "student" ? "text-gray-01" : "text-white"} ${isMenuOpen && "d-none"}`}>
                 menu
               </span>
+              <span id="close-icon" className={`material-symbols-outlined icon-fill fs-4 ${type === "student" ? "text-gray-01" : "text-white"} ${isMenuOpen ? "" : "d-none"}`}>
+                close
+              </span>
             </button>
-            <div className={`offcanvas offcanvas-end ${type === "student" ? "bg-white" : "bg-gray-01"}`} tabIndex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
-              <div className="offcanvas-header d-flex ms-auto mt-2">
-                <span className={`material-symbols-outlined ${type === "student" ? "text-gray-01" : "text-white"}`} data-bs-dismiss="offcanvas" aria-label="Close">
-                  close
-                </span>
-              </div>
-              <div className="offcanvas-body d-flex flex-column px-3">
-                <ul>
-                  {menuItems.map((item) => (
-                    <ListItem key={item.name} type={type} className={location.pathname === item.href ? "active" : ""}>
-                      <Link to={item.href}>
-                        <span className="material-symbols-outlined icon-fill">{item.icon}</span>
-                        <span>{item.name}</span>
-                      </Link>
-                    </ListItem>
-                  ))}
-                </ul>
-                <div className="d-flex flex-row align-items-center mt-auto">
-                  <div className="flex-shrink-0">
-                    <img src={user.avatar} alt="profile" className="object-fit-cover rounded-circle me-4" style={{ height: "48px", width: "48px" }} />
+            <div id="navbarSupportedContent" className={`collapse navbar-collapse justify-content-end ${isMenuOpen && "show"} ${type === "student" ? "bg-white" : "bg-gray-01"}`}>
+              <ul className="navbar-nav align-items-lg-center">
+                {menuItems.map((item) => (
+                  <ListItem key={item.name} type={type} className={location.pathname === item.href ? "active" : ""}>
+                    <Link to={item.href}>
+                      <span className="material-symbols-outlined icon-fill">{item.icon}</span>
+                      <span>{item.name}</span>
+                    </Link>
+                  </ListItem>
+                ))}
+                <li className="nav-item nav-bottom-btn">
+                  <div className="d-flex align-items-center">
+                    <div className="flex-shrink-0">
+                      <img src={user.avatar} alt="profile" className="object-fit-cover rounded-circle me-4" style={{ height: "48px", width: "48px" }} />
+                    </div>
+                    <div className="flex-grow-1">
+                      <p className={clsx("fs-6", { "text-gray-01": type === "student", "text-white": type === "tutor" })}>{user.name}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className={clsx("fs-6", { "text-gray-01": type === "student", "text-white": type === "tutor" })}>{user.name}</p>
-                  </div>
-                </div>
-              </div>
+                </li>
+              </ul>
             </div>
           </div>
         </nav>
-        <div style={{ marginTop: "100px" }}>{children}</div>
-      </div>
+        <div className="mt-6">{children}</div>
+      </>
     );
   }
 
   return (
     <div className="d-flex">
       <Container type={type}>
-        <NavLink className="navbar-brand" to="/">
-          <img src="images/logo.svg" alt="logo-image" className="mb-8" />
+        <NavLink className="navbar-brand mb-8" to="/">
+          <picture>
+            <source srcSet="images/logo-sm.svg" media="(max-width: 575.98px)" />
+            <img src="images/logo.svg" alt="logo-image" />
+          </picture>
         </NavLink>
         <ul>
           {menuItems.map((item) => (
