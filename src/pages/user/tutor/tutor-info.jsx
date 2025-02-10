@@ -63,7 +63,9 @@ export default function TutorInfo() {
         `${VITE_API_BASE_2}/api/v1/tutors/${id}`
       );
       const topicSeriesCourses = await courseApi.getCourses("topicSeries");
-      const customLearningCourses = await courseApi.getCourses("customLearning");
+      const customLearningCourses = await courseApi.getCourses(
+        "customLearning"
+      );
       const freeTipShortsCourses = await courseApi.getCourses("freeTipShorts");
 
       setTutorList(tutorResult.data);

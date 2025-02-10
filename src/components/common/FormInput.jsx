@@ -33,7 +33,7 @@ export default function FormInput({
         } ${style === "payInput" && "rounded-1 border-0 bg-light"}`}
         id={id}
         placeholder={
-          id === "addPasswordAgain"
+          id === "checkPassword"
             ? "請再次輸入您的密碼"
             : `請輸入您的${labelText}`
         }

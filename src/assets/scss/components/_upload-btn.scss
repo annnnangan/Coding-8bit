@@ -1,0 +1,71 @@
+/* upload-button */
+.image-upload-wrapper,
+.video-upload-wrapper {
+  position: relative;
+  display: inline-block;
+
+  .img-wrapper {
+    position: absolute;
+    top: 0;bottom: 0;left: 0;right: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    z-index: 3;
+  }
+  .img-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+  img {
+    border-radius: 16px;
+  }
+  .delete-icon {
+    color: $white;
+    font-size: 28px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+}
+.image-upload-wrapper input[type="file"],
+.video-upload-wrapper input[type="file"] {
+  position: absolute;
+  top: 0;bottom: 0;left: 0;right: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.image-upload-label,
+.video-upload-label {
+  color: $gray-03;
+  font-size: 14px;
+  font-weight: 400;
+  border: 1px dashed $gray-03;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  text-align: center;
+}
+.image-upload-label {
+  width: 213px;
+  height: 120px;
+}
+.video-upload-label {
+  height: 280px;
+}
+.image-upload-label.active
+.video-upload-label.active {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
