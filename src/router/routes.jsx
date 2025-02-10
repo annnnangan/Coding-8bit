@@ -23,8 +23,13 @@ import TutorBookingSuccess from "../pages/user/tutor/booking-payment/booking-suc
 import TutorInfo from "../pages/user/tutor/tutor-info";
 
 import HelpCenter from "../pages/user/help-center";
-import NotFound from "../pages/NotFound";
+
 import TutorManageBooking from "../pages/tutor/tutor-manage-bookings";
+import TutorManageCourses from "../pages/tutor/courses/tutor-manage-courses";
+import TutorAddTopicSeriesCourses from "../pages/tutor/courses/tutor-add-topicSeriesCourses";
+
+import NotFound from "../pages/NotFound";
+
 
 export const routes = [
   { path: "/", element: <Home /> },
@@ -54,6 +59,9 @@ export const routes = [
   { path: "/help-center", element: <HelpCenter /> },
 
   { path: "/tutor-panel/booking", element: <TutorManageBooking /> },
+
+  { path: "/tutor-panel/course", element: <TutorManageCourses /> },
+  { path: "/tutor-panel/course/topicSeries/add", element: <TutorAddTopicSeriesCourses/> },
 
   { path: "*", element: <NotFound /> },
 ];
