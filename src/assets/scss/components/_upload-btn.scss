@@ -1,5 +1,6 @@
-/* image-upload-button */
-.image-upload-wrapper {
+/* upload-button */
+.image-upload-wrapper,
+.video-upload-wrapper {
   position: relative;
   display: inline-block;
 
@@ -34,18 +35,18 @@
     z-index: 2;
   }
 }
-.image-upload-wrapper input[type="file"] {
+.image-upload-wrapper input[type="file"],
+.video-upload-wrapper input[type="file"] {
   position: absolute;
   top: 0;bottom: 0;left: 0;right: 0;
   opacity: 0;
   cursor: pointer;
 }
-.image-upload-label {
+.image-upload-label,
+.video-upload-label {
   color: $gray-03;
   font-size: 14px;
   font-weight: 400;
-  width: 213px;
-  height: 120px;
   border: 1px dashed $gray-03;
   border-radius: 16px;
   cursor: pointer;
@@ -56,7 +57,15 @@
   padding: 12px 16px;
   text-align: center;
 }
-.image-upload-label.active {
+.image-upload-label {
+  width: 213px;
+  height: 120px;
+}
+.video-upload-label {
+  height: 280px;
+}
+.image-upload-label.active
+.video-upload-label.active {
   background-color: #e0e0e0;
   border-color: #999;
 }

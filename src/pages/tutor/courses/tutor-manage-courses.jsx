@@ -129,12 +129,8 @@ export default function TutorManageCourses() {
       </Helmet>
       {loadingState && <Loader />}
 
-      <div className="d-flex">
-        <BackendPanelMenu menuItems={menuItems} type="tutor" user={user}>
-          {""}
-        </BackendPanelMenu>
-
-        <main className="tutor-manage-course-list-wrap container-fluid p-9 position-relative">
+      <BackendPanelMenu menuItems={menuItems} type="tutor" user={user}>
+        <main className="tutor-manage-course-list-wrap container-fluid">
           <div className="f-between">
             <div className="title">
               <h1 className="fs-4 fs-lg-2">課程影片管理</h1>
@@ -162,10 +158,10 @@ export default function TutorManageCourses() {
                   </Link>
                 </li>
                 <li>
-                  <Link className="dropdown-item">建立客製化需求影片</Link>
+                  <Link to="/tutor-panel/course/video/customLearning/add" className="dropdown-item">建立客製化需求影片</Link>
                 </li>
                 <li>
-                  <Link className="dropdown-item">建立實用技術短影片</Link>
+                  <Link to="/tutor-panel/course/video/freeTipShorts/add" className="dropdown-item">建立實用技術短影片</Link>
                 </li>
               </ul>
             </div>
@@ -176,7 +172,7 @@ export default function TutorManageCourses() {
             <div className="dropdown">
               <button
                 type="button"
-                className="btn btn-outline-gray-03 border-1 dropdown-toggle pe-11"
+                className="btn btn-outline-gray-03 border-1 dropdown-toggle px-11"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
@@ -185,7 +181,7 @@ export default function TutorManageCourses() {
                   keyboard_arrow_down
                 </span>
               </button>
-              <ul className="dropdown-menu dropdown-menu-end w-100 mt-1">
+              <ul className="dropdown-menu dropdown-menu-end mt-1">
                 <li>
                   <button type="button" className="dropdown-item">
                     名稱
@@ -393,13 +389,13 @@ export default function TutorManageCourses() {
               </div>
             ))}
           </div>
-
-          {/* 頁碼 */}
-          <div className="position-absolute end-0 bottom-0 pe-6 pb-6">
-            <Pagination />
-          </div>
         </main>
-      </div>
+
+        {/* 頁碼 */}
+        <div className="position-absolute end-0 bottom-0 pe-6 pb-6">
+          <Pagination />
+        </div>
+      </BackendPanelMenu>
     </>
   );
 }

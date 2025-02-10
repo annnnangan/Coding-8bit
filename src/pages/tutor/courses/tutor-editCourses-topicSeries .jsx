@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useParams, useNavigate, NavLink, Link } from "react-router-dom";
 
 import ReactQuill from "react-quill-new";
+
+import courseApi from "../../../api/courseApi";
 
 import BackendPanelMenu from "../../../components/layout/BackendPanelMenu";
 import Loader from "../../../components/common/Loader";
 
-export default function TutorAddTopicSeriesCourses() {
+export default function TutorManageEditTopicSeries() {
   // loading
   const [loadingState, setLoadingState] = useState(false);
 
@@ -75,20 +77,44 @@ export default function TutorAddTopicSeriesCourses() {
     ],
   };
 
+  const { id } = useParams();
+
+  // 取得課程資料函式
+  const [courseList, setCourseList] = useState({
+    tags: [],
+    tutor: {},
+    descriptionList: [],
+  });
+  const [chapterVideos, setChapterVideos] = useState([]);
+  const getCoursesData = async () => {
+    setLoadingState(true);
+    try {
+      const videoDetailResult = await courseApi.getCourseDetail(id);
+      const chapterVideosResult = await courseApi.getCourseChapters(id);
+      setCourseList(videoDetailResult);
+      setChapterVideos(chapterVideosResult);
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // 初始化 - 取得資料
+  useEffect(() => {
+    getCoursesData();
+  }, []);
+
   return (
     <>
       <Helmet>
-        <title>Coding∞bit ｜ 新增課程影片</title>
+        <title>Coding∞bit ｜ 編輯課程影片</title>
       </Helmet>
       {loadingState && <Loader />}
 
-      <div className="d-flex">
-        <BackendPanelMenu menuItems={menuItems} type="tutor" user={user}>
-          {""}
-        </BackendPanelMenu>
-
-        <main className="tutor-add-TopicSeriesCourses-wrap container-fluid p-9">
-          <h1 className="fs-4 fs-lg-2">新增課程影片 - 課程基本資料</h1>
+      <BackendPanelMenu menuItems={menuItems} type="tutor" user={user}>
+        <main className="tutor-edit-TopicSeriesCourses-wrap container-fluid">
+          <h1 className="fs-4 fs-lg-2">編輯課程影片 - 課程基本資料</h1>
 
           <div className="row">
             <div className="col-lg-6">
@@ -96,12 +122,14 @@ export default function TutorAddTopicSeriesCourses() {
                 <form className="mt-6 mt-lg-8">
                   <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
                   <div className="image-upload-wrapper mt-1">
-                    <input
-                      type="file"
-                      accept=".jpg,.jpeg,.png"
-                      className="form-control p-0"
-                      id="image"
-                    />
+                    {!courseList.thumbnail && (
+                      <input
+                        type="file"
+                        accept=".jpg,.jpeg,.png"
+                        className="form-control p-0"
+                        id="image"
+                      />
+                    )}
                     <label
                       htmlFor="image"
                       className="form-label image-upload-label mb-0"
@@ -113,19 +141,21 @@ export default function TutorAddTopicSeriesCourses() {
                     </label>
 
                     {/* 上傳圖片後的樣子 */}
-                    <button
-                      type="button"
-                      className="img-wrapper border-0 p-0 d-none"
-                    >
-                      <img
-                        src="images/course/course-4.png"
-                        alt="learning-need-image"
-                        className="w-100 object-fit"
-                      />
-                      <span className="material-symbols-outlined delete-icon">
-                        delete
-                      </span>
-                    </button>
+                    {courseList.thumbnail && (
+                      <button
+                        type="button"
+                        className="img-wrapper border-0 p-0"
+                      >
+                        <img
+                          src={courseList.thumbnail}
+                          alt="course-thumbnail"
+                          className="w-100 object-fit"
+                        />
+                        <span className="material-symbols-outlined delete-icon">
+                          delete
+                        </span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="mt-6 mt-lg-8">
@@ -151,7 +181,7 @@ export default function TutorAddTopicSeriesCourses() {
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                           >
-                            請選擇瀏覽權限
+                            {courseList.isPublic ? "公開" : "不公開"}
                             <span className="material-symbols-outlined position-absolute end-0 pe-3">
                               keyboard_arrow_down
                             </span>
@@ -182,7 +212,7 @@ export default function TutorAddTopicSeriesCourses() {
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                           >
-                            請選擇類別
+                            {courseList.tech_stack}
                             <span className="material-symbols-outlined position-absolute end-0 pe-3">
                               keyboard_arrow_down
                             </span>
@@ -254,7 +284,10 @@ export default function TutorAddTopicSeriesCourses() {
                   <li className="f-between-center bg-brand-02 p-4">
                     <p>課程介紹</p>
                     <div className="f-align-center">
-                      <img src="images/course/course-4.png" alt="course-image" />
+                      <img
+                        src="images/course/course-4.png"
+                        alt="course-image"
+                      />
                       <p className="ms-4">React Hooks 深入解析</p>
                     </div>
                     <div className="pe-3 ps-10">
@@ -280,15 +313,15 @@ export default function TutorAddTopicSeriesCourses() {
                   </li>
                   <li className="f-align-center dashed-border p-4 mt-2">
                     <p>第一章</p>
-                    <button
-                      type="button"
+                    <Link
+                      to="/tutor-panel/course/video/topicSeries/add"
                       className="btn btn-brand-03 f-align-center rounded-2 border-2 px-3 py-2 ms-auto"
                     >
                       <span className="material-symbols-outlined me-1">
                         add
                       </span>
                       新增章節影片
-                    </button>
+                    </Link>
                   </li>
                 </ul>
                 <button
@@ -313,11 +346,11 @@ export default function TutorAddTopicSeriesCourses() {
               取消
             </button>
             <button type="submit" className="btn btn-brand-03 rounded-2 ms-4">
-              確認新增
+              確認修改
             </button>
           </div>
         </main>
-      </div>
+      </BackendPanelMenu>
     </>
   );
 }

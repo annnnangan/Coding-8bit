@@ -1,15 +1,16 @@
 .tutor-manage-course-list-wrap,
-.tutor-add-TopicSeriesCourses-wrap {
-  height: 100vh;
-  overflow-y: scroll;
-
+.tutor-add-TopicSeriesCourses-wrap,
+.tutor-chapter-topicSeries-wrap,
+.tutor-edit-TopicSeriesCourses-wrap,
+.tutor-add-video-wrap {
   .dropdown-toggle::after {
     display: none;
   }
 }
 
-/* tutor-manage-course-list */
-.tutor-manage-course-list-wrap {
+/* tutor-manage-course-list & tutor-chapter-topicSeries-wrap */
+.tutor-manage-course-list-wrap,
+.tutor-chapter-topicSeries-wrap {
   /* course-list-table */
   .table thead tr th {
     font-weight: 500;
@@ -25,7 +26,9 @@
 }
 
 /* tutor-add-TopicSeriesCourses-wrap */
-.tutor-add-TopicSeriesCourses-wrap {
+.tutor-add-TopicSeriesCourses-wrap,
+.tutor-edit-TopicSeriesCourses-wrap,
+.tutor-add-video-wrap {
   /* form */
   .form-label {
     font-size: 14px;
