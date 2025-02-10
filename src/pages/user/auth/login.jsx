@@ -1,13 +1,79 @@
-// import Swal from 'sweetalert2'
-import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+import Swal from "sweetalert2";
+import axios from "axios";
+
+import Loader from "../../../components/common/Loader";
+
 export default function Login() {
+  const navigate = useNavigate();
+
+  // loading
+  const [loadingState, setLoadingState] = useState(false);
+
+  // 登入邏輯
+  const [formData, setFormData] = useState({});
+  const loginFn = async () => {
+    try {
+      setLoadingState(true);
+      const result = await axios.post(
+        `https://coding-bit-backend.onrender.com/api/v1/auth/login`,
+        formData
+      );
+      const { token, expired } = result.data;
+      document.cookie = `accessToken=${token}; expires=${new Date(
+        expired
+      )}; path=/`;
+      axios.defaults.headers.common.Authorization = token;
+      Swal.fire({
+        title: "登入成功",
+        icon: "success",
+      });
+      navigate("/");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "登入失敗",
+        text: error.response.data.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((state) => ({ ...state, [name]: value }));
+  };
+
+  // 隱碼按鈕邏輯
+  const [showPasswordList, setShowPasswordList] = useState([false, false]);
+
+  const handleShowPassword = (index) => {
+    setShowPasswordList((prevState) =>
+      prevState.map((show, i) => (i === index ? !show : show))
+    );
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+
+    if (token) {
+      localStorage.setItem("accessToken", token);
+      navigate("/tutor-info/1");
+    }
+  }, []);
+
   return (
     <>
       <Helmet>
         <title>Coding∞bit ｜ 登入</title>
       </Helmet>
+      {loadingState && <Loader />}
+
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="login-section bg">
         <div className="container">
@@ -32,9 +98,11 @@ export default function Login() {
                       <input
                         type="email"
                         className="form-control underline-input"
-                        id="addEmail"
+                        id="email"
+                        name="email"
                         aria-describedby="emailHelp"
                         placeholder="請輸入電子信箱"
+                        onChange={handleInputChange}
                       />
                       <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
                         mail
@@ -42,17 +110,27 @@ export default function Login() {
                     </div>
                     <div className="position-relative mt-9">
                       <input
-                        type="password"
+                        type={showPasswordList[0] ? "text" : "password"}
                         className="form-control underline-input"
-                        id="addPassword"
+                        id="password"
+                        name="password"
                         placeholder="請輸入密碼"
+                        onChange={handleInputChange}
                       />
                       <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
                         lock
                       </span>
-                      <a href="#">
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleShowPassword(0);
+                        }}
+                      >
                         <span className="material-symbols-outlined position-absolute top-0 end-0 text-gray-03 ms-1 mt-1">
-                          visibility_off
+                          {showPasswordList[0]
+                            ? "visibility"
+                            : "visibility_off"}
                         </span>
                       </a>
                     </div>
@@ -82,6 +160,7 @@ export default function Login() {
                       type="button"
                       className="btn btn-brand-03 rounded-2 slide-right-hover w-100 f-center mt-4 mt-lg-6"
                       id="loginBtn"
+                      onClick={loginFn}
                     >
                       立即登入
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
@@ -94,7 +173,8 @@ export default function Login() {
                     <span>OR</span>
                     <hr />
                   </div>
-                  <button
+                  <a
+                    href="https://coding-bit-backend.onrender.com/api/v1/auth/google"
                     type="button"
                     className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt--lg-8"
                   >
@@ -104,7 +184,7 @@ export default function Login() {
                       className="me-3"
                     />
                     使用 Google 登入
-                  </button>
+                  </a>
                   <div className="f-end-center mt-6 mt-lg-8">
                     <p className="text-center">還不是會員？</p>
                     <NavLink

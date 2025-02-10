@@ -275,7 +275,7 @@ export default function CourseList() {
                                   group
                                 </span>
                                 <p className="fs-7 fs-lg-6">
-                                  {course.view_count}
+                                  {Number(course.view_count).toLocaleString()}
                                 </p>
                               </div>
                             </div>

@@ -44,7 +44,9 @@ export default function CourseCard({ courseList, cardsNum = 3 }) {
                         <span className="material-symbols-outlined fs-5 me-1">
                           group
                         </span>
-                        <p className="fs-7 fs-lg-6">{course.view_count}</p>
+                        <p className="fs-7 fs-lg-6">
+                          {Number(course.view_count).toLocaleString()}
+                        </p>
                       </div>
                     </div>
                     <p className="f-center text-brand-03 fs-7 fs-lg-6">
@@ -99,7 +101,9 @@ export default function CourseCard({ courseList, cardsNum = 3 }) {
                   <span className="material-symbols-outlined fs-5 me-1">
                     group
                   </span>
-                  <p className="fs-7 fs-lg-6">{courseList.view_count}</p>
+                  <p className="fs-7 fs-lg-6">
+                    {Number(courseList.view_count).toLocaleString()}
+                  </p>
                 </div>
               </div>
               <p className="f-center text-brand-03 fs-7 fs-lg-6">

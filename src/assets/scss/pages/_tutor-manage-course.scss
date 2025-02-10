@@ -1,0 +1,51 @@
+.tutor-manage-course-list-wrap,
+.tutor-add-TopicSeriesCourses-wrap,
+.tutor-chapter-topicSeries-wrap,
+.tutor-edit-TopicSeriesCourses-wrap,
+.tutor-add-video-wrap {
+  .dropdown-toggle::after {
+    display: none;
+  }
+}
+
+/* tutor-manage-course-list & tutor-chapter-topicSeries-wrap */
+.tutor-manage-course-list-wrap,
+.tutor-chapter-topicSeries-wrap {
+  /* course-list-table */
+  .table thead tr th {
+    font-weight: 500;
+    padding-bottom: 12px;
+  }
+  .table tbody tr td {
+    padding: 12px 0;
+
+    img {
+      width: 148px;
+    }
+  }
+}
+
+/* tutor-add-TopicSeriesCourses-wrap */
+.tutor-add-TopicSeriesCourses-wrap,
+.tutor-edit-TopicSeriesCourses-wrap,
+.tutor-add-video-wrap {
+  /* form */
+  .form-label {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+
+  /* chapter-wrap */
+  .chapter-wrap {
+    .dashed-border {
+      border: 2px dashed $gray-03;
+    }
+
+    img {
+      width: 120px;
+    }
+  }
+}
+
+
