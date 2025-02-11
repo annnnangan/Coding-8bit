@@ -33,7 +33,7 @@ export default function SignupForm({ setIsVerifying }) {
     setLoadingState(true);
     try {
       await axios.post(
-        "https://coding-bit-backend.onrender.com/api/v1/auth/register",
+        "https://service.coding-8bit.site/api/v1/docs/auth/register",
         { email, password, username }
       );
 

@@ -19,7 +19,7 @@ export default function Login() {
     try {
       setLoadingState(true);
       const result = await axios.post(
-        `https://coding-bit-backend.onrender.com/api/v1/auth/login`,
+        `https://service.coding-8bit.site/api/v1/docs/auth/login`,
         formData
       );
       const { token, expired } = result.data;

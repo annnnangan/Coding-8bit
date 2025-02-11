@@ -5,6 +5,12 @@
   background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/bg-7.jpg");
   padding: 40px 0;
 
+  // 去除 BS5 錯誤訊息跑出的驚嘆號
+  .form-control.is-invalid, 
+  .was-validated .form-control:invalid {
+    background-image: none !important;
+  }
+
   @include lg-pc {
     background-image: none;
   }
