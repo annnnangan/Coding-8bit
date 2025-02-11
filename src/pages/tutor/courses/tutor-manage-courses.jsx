@@ -6,7 +6,7 @@ import axios from "axios";
 
 import courseApi from "../../../api/courseApi";
 
-import BackendPanelMenu from "../../../components/layout/BackendPanelMenu";
+import TutorPanelMenu from "../../../components/layout/TutorPanelMenu";
 import Loader from "../../../components/common/Loader";
 import Pagination from "../../../components/layout/Pagination";
 
@@ -15,50 +15,6 @@ const { VITE_API_BASE_2 } = import.meta.env;
 export default function TutorManageCourses() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
-
-  const menuItems = [
-    {
-      icon: "video_settings",
-      name: "課程影片管理",
-      href: "/tutor-panel/course",
-    },
-    {
-      icon: "event",
-      name: "預約管理",
-      href: "/tutor-panel/booking",
-    },
-    {
-      icon: "auto_stories",
-      name: "學習需求管理",
-      href: "/tutor-panel/learning",
-    },
-    {
-      icon: "equalizer",
-      name: "數據與趨勢",
-      href: "/tutor-panel/statistics",
-    },
-    {
-      icon: "notifications_active",
-      name: "個人化通知",
-      href: "/tutor-panel/notification",
-    },
-    {
-      icon: "person",
-      name: "個人資料管理",
-      href: "/tutor-panel/profile",
-    },
-    {
-      icon: "paid",
-      name: "財務管理",
-      href: "/tutor-panel/finance",
-    },
-  ];
-
-  const user = {
-    avatar:
-      "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2187&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    name: "卡斯伯Casper",
-  };
 
   const courseCategory = [
     {
@@ -99,9 +55,7 @@ export default function TutorManageCourses() {
     try {
       const tutorResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/1`);
       const topicSeriesCourses = await courseApi.getCourses("topicSeries");
-      const customLearningCourses = await courseApi.getCourses(
-        "customLearning"
-      );
+      const customLearningCourses = await courseApi.getCourses("customLearning");
       const freeTipShortsCourses = await courseApi.getCourses("freeTipShorts");
 
       setCourses((prevCourses) => ({
@@ -129,39 +83,31 @@ export default function TutorManageCourses() {
       </Helmet>
       {loadingState && <Loader />}
 
-      <BackendPanelMenu menuItems={menuItems} type="tutor" user={user}>
+      <TutorPanelMenu>
         <main className="tutor-manage-course-list-wrap container-fluid">
           <div className="f-between">
             <div className="title">
               <h1 className="fs-4 fs-lg-2">課程影片管理</h1>
             </div>
             <div className="dropdown">
-              <button
-                className="btn btn btn-brand-03 rounded-2 dropdown-toggle"
-                type="button"
-                id="dropdownMenuButton1"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+              <button className="btn btn btn-brand-03 rounded-2 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                 建立新的影片
               </button>
-              <ul
-                className="dropdown-menu dropdown-menu-end mt-2"
-                aria-labelledby="dropdownMenuButton1"
-              >
+              <ul className="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="dropdownMenuButton1">
                 <li>
-                  <Link
-                    to="/tutor-panel/course/topicSeries/add"
-                    className="dropdown-item"
-                  >
+                  <Link to="/tutor-panel/course/topicSeries/add" className="dropdown-item">
                     建立主題式課程影片
                   </Link>
                 </li>
                 <li>
-                  <Link to="/tutor-panel/course/video/customLearning/add" className="dropdown-item">建立客製化需求影片</Link>
+                  <Link to="/tutor-panel/course/video/customLearning/add" className="dropdown-item">
+                    建立客製化需求影片
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/tutor-panel/course/video/freeTipShorts/add" className="dropdown-item">建立實用技術短影片</Link>
+                  <Link to="/tutor-panel/course/video/freeTipShorts/add" className="dropdown-item">
+                    建立實用技術短影片
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -170,16 +116,9 @@ export default function TutorManageCourses() {
           {/* 篩選與搜尋 */}
           <div className="f-end-center mt-10">
             <div className="dropdown">
-              <button
-                type="button"
-                className="btn btn-outline-gray-03 border-1 dropdown-toggle px-11"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+              <button type="button" className="btn btn-outline-gray-03 border-1 dropdown-toggle px-11" data-bs-toggle="dropdown" aria-expanded="false">
                 排序方式
-                <span className="material-symbols-outlined position-absolute end-0 pe-3">
-                  keyboard_arrow_down
-                </span>
+                <span className="material-symbols-outlined position-absolute end-0 pe-3">keyboard_arrow_down</span>
               </button>
               <ul className="dropdown-menu dropdown-menu-end mt-1">
                 <li>
@@ -195,32 +134,19 @@ export default function TutorManageCourses() {
               </ul>
             </div>
             <div className="position-relative f-align-center ms-2">
-              <input
-                type="text"
-                className="form-control ps-11"
-                placeholder="搜尋課程"
-              />
-              <span
-                className="material-symbols-outlined text-gray-03 position-absolute ps-4"
-                style={{ width: "20px", height: "20px" }}
-              >
+              <input type="text" className="form-control ps-11" placeholder="搜尋課程" />
+              <span className="material-symbols-outlined text-gray-03 position-absolute ps-4" style={{ width: "20px", height: "20px" }}>
                 search
               </span>
             </div>
           </div>
 
           {/* 影片列表 */}
-          <ul
-            className="nav nav-tabs border-bottom border-gray-03 mt-4"
-            id="courseCategoryTab"
-            role="tablist"
-          >
+          <ul className="nav nav-tabs border-bottom border-gray-03 mt-4" id="courseCategoryTab" role="tablist">
             {courseCategory.map((item, index) => (
               <li className="nav-item" role="presentation" key={index}>
                 <button
-                  className={`nav-link fs-7 fs-lg-6 p-2 py-lg-3 px-lg-4 ${
-                    index === activeTab && "active"
-                  }`}
+                  className={`nav-link fs-7 fs-lg-6 p-2 py-lg-3 px-lg-4 ${index === activeTab && "active"}`}
                   id={`${item.category}-tab`}
                   data-bs-toggle="tab"
                   data-bs-target={`#${item.category}`}
@@ -237,25 +163,13 @@ export default function TutorManageCourses() {
           </ul>
           <div className="tab-content" id="courseCategoryTab">
             {courseCategory.map((item, index) => (
-              <div
-                className={`tab-pane ${
-                  index === activeTab ? "active show" : "fade"
-                }`}
-                id={item.category}
-                role="tabpanel"
-                aria-labelledby={`${item.category}-tab`}
-                key={index}
-              >
+              <div className={`tab-pane ${index === activeTab ? "active show" : "fade"}`} id={item.category} role="tabpanel" aria-labelledby={`${item.category}-tab`} key={index}>
                 <div className="mt-6 mt-lg-8">
                   <table className="table">
                     <thead>
                       <tr>
                         <th></th>
-                        <th>
-                          {item.category === "topicSeries"
-                            ? "課程名稱"
-                            : "影片名稱"}
-                        </th>
+                        <th>{item.category === "topicSeries" ? "課程名稱" : "影片名稱"}</th>
                         <th>類別</th>
                         <th>瀏覽權限</th>
                         <th>上傳日期</th>
@@ -275,28 +189,16 @@ export default function TutorManageCourses() {
                             <td>{course.tag}</td>
                             <td>{course.isPublic ? "公開" : "未公開"}</td>
                             <td>2024年12月1日</td>
-                            <td>
-                              {Number(course.view_count).toLocaleString()}
-                            </td>
+                            <td>{Number(course.view_count).toLocaleString()}</td>
                             <td>{course.rating}</td>
                             <td>
                               <div>
-                                <NavLink
-                                  to={`/tutor-panel/course/topicSeries/${course.id}/chapter`}
-                                  className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                                >
-                                  <span className="material-symbols-outlined me-1">
-                                    dataset
-                                  </span>
+                                <NavLink to={`/tutor-panel/course/topicSeries/${course.id}/chapter`} className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0">
+                                  <span className="material-symbols-outlined me-1">dataset</span>
                                   詳細
                                 </NavLink>
-                                <button
-                                  type="button"
-                                  className="btn link-danger border-0 f-align-center p-0 mt-1"
-                                >
-                                  <span className="material-symbols-outlined me-1">
-                                    delete
-                                  </span>
+                                <button type="button" className="btn link-danger border-0 f-align-center p-0 mt-1">
+                                  <span className="material-symbols-outlined me-1">delete</span>
                                   刪除
                                 </button>
                               </div>
@@ -315,28 +217,16 @@ export default function TutorManageCourses() {
                             <td>{course.tag}</td>
                             <td>{course.isPublic ? "公開" : "未公開"}</td>
                             <td>2024年12月1日</td>
-                            <td>
-                              {Number(course.view_count).toLocaleString()}
-                            </td>
+                            <td>{Number(course.view_count).toLocaleString()}</td>
                             <td>{course.rating}</td>
                             <td>
                               <div>
-                                <NavLink
-                                  to={`/tutor-panel/course/${course.id}/edit`}
-                                  className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                                >
-                                  <span className="material-symbols-outlined me-1">
-                                    edit
-                                  </span>
+                                <NavLink to={`/tutor-panel/course/${course.id}/edit`} className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0">
+                                  <span className="material-symbols-outlined me-1">edit</span>
                                   編輯
                                 </NavLink>
-                                <button
-                                  type="button"
-                                  className="btn link-danger border-0 f-align-center p-0 mt-1"
-                                >
-                                  <span className="material-symbols-outlined me-1">
-                                    delete
-                                  </span>
+                                <button type="button" className="btn link-danger border-0 f-align-center p-0 mt-1">
+                                  <span className="material-symbols-outlined me-1">delete</span>
                                   刪除
                                 </button>
                               </div>
@@ -355,28 +245,16 @@ export default function TutorManageCourses() {
                             <td>{course.tag}</td>
                             <td>{course.isPublic ? "公開" : "未公開"}</td>
                             <td>2024年12月1日</td>
-                            <td>
-                              {Number(course.view_count).toLocaleString()}
-                            </td>
+                            <td>{Number(course.view_count).toLocaleString()}</td>
                             <td>{course.rating}</td>
                             <td>
                               <div>
-                                <NavLink
-                                  to={`/tutor-panel/course/${course.id}/edit`}
-                                  className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                                >
-                                  <span className="material-symbols-outlined me-1">
-                                    edit
-                                  </span>
+                                <NavLink to={`/tutor-panel/course/${course.id}/edit`} className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0">
+                                  <span className="material-symbols-outlined me-1">edit</span>
                                   編輯
                                 </NavLink>
-                                <button
-                                  type="button"
-                                  className="btn link-danger border-0 f-align-center p-0 mt-1"
-                                >
-                                  <span className="material-symbols-outlined me-1">
-                                    delete
-                                  </span>
+                                <button type="button" className="btn link-danger border-0 f-align-center p-0 mt-1">
+                                  <span className="material-symbols-outlined me-1">delete</span>
                                   刪除
                                 </button>
                               </div>
@@ -395,7 +273,7 @@ export default function TutorManageCourses() {
         <div className="position-absolute end-0 bottom-0 pe-6 pb-6">
           <Pagination />
         </div>
-      </BackendPanelMenu>
+      </TutorPanelMenu>
     </>
   );
 }
