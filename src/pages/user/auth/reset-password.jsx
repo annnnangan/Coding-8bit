@@ -5,6 +5,8 @@ import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 import axios from "axios";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormInput from "../../..//components/common/FormInput";
 import Loader from "../../../components/common/Loader";
@@ -19,19 +21,36 @@ export default function ResetPassword() {
 
   const navigate = useNavigate();
 
+  // Zod 驗證規則
+  const schema = z
+    .object({
+      newPassword: z
+        .string()
+        .regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?~-])/,
+          "密碼必須包含 1 個特殊符號、1 個大寫英文字母、1 個小寫英文字母與 1 個數字"
+        )
+        .min(9, "密碼必須至少超過 8 碼"),
+
+      checkPassword: z.string(),
+    })
+    .superRefine(({ newPassword, checkPassword }, ctx) => {
+      if (newPassword !== checkPassword) {
+        ctx.addIssue({
+          path: ["checkPassword"],
+          message: "兩次密碼輸入不一致",
+          code: "custom",
+        });
+      }
+    });
+
   // 驗證
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isValid },
   } = useForm({
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      checkPassword: "",
-    },
+    resolver: zodResolver(schema),
     mode: "onTouched",
   });
 
@@ -117,20 +136,8 @@ export default function ResetPassword() {
                         register={register}
                         errors={errors}
                         id="newPassword"
-                        labelText="新的密碼"
+                        labelText="密碼"
                         type={showPasswordList[0] ? "text" : "password"}
-                        rules={{
-                          required: {
-                            value: true,
-                            message: "新的密碼為必填",
-                          },
-                          pattern: {
-                            value:
-                              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?~-]).{9,}$/,
-                            message:
-                              "密碼必須至少超過 8 碼，且包含 1 個特殊符號、1 個大寫英文字母、1 個小寫英文字母與 1 個數字",
-                          },
-                        }}
                       />
                       <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
                         lock
@@ -158,15 +165,6 @@ export default function ResetPassword() {
                         id="checkPassword"
                         labelText="密碼"
                         type={showPasswordList[1] ? "text" : "password"}
-                        rules={{
-                          required: {
-                            value: true,
-                            message: "再次輸入新的密碼為必填",
-                          },
-                          validate: (value) =>
-                            value === watch("newPassword") ||
-                            "兩次密碼輸入不一致",
-                        }}
                       />
                       <a
                         href="#"

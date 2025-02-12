@@ -2,21 +2,26 @@ import { forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 
 import PropTypes from "prop-types";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormInput from "../common/FormInput";
 
 export const BuyerForm = forwardRef(({ setFormData }, ref) => {
+  // Zod 驗證規則
+  const schema = z.object({
+    buyerEmail: z.string().min(1, "信箱為必填").email("請輸入有效的 Email"),
+    buyerName: z.string().min(1, "姓名為必填"),
+    buyerTel: z.string().min(1, "電話號碼為必填").min(8, "電話不少於 8 碼").max(12, "電話不多於 12 碼"),
+  });
+
   {
     const {
       register,
       handleSubmit,
       formState: { errors },
     } = useForm({
-      defaultValues: {
-        buyerEmail: "",
-        buyerName: "",
-        buyerTel: "",
-      },
+      resolver: zodResolver(schema),
       mode: "onTouched",
     });
 
@@ -24,7 +29,7 @@ export const BuyerForm = forwardRef(({ setFormData }, ref) => {
     useImperativeHandle(ref, () => ({
       submitForm: handleSubmit(onSubmit),
     }));
-    
+
     const onSubmit = (data) => {
       if (Object.keys(errors).length === 0) {
         setFormData((prevData) => ({
@@ -46,16 +51,6 @@ export const BuyerForm = forwardRef(({ setFormData }, ref) => {
             id="buyerEmail"
             labelText="電子信箱"
             type="email"
-            rules={{
-              required: {
-                value: true,
-                message: "電子信箱為必填",
-              },
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: "Email 格式不正確",
-              },
-            }}
           />
         </div>
         <div className="row mt-4">
@@ -67,12 +62,6 @@ export const BuyerForm = forwardRef(({ setFormData }, ref) => {
               id="buyerName"
               labelText="姓名"
               type="text"
-              rules={{
-                required: {
-                  value: true,
-                  message: "姓名為必填",
-                },
-              }}
             />
           </div>
           <div className="col-lg-6">
@@ -83,20 +72,6 @@ export const BuyerForm = forwardRef(({ setFormData }, ref) => {
               id="buyerTel"
               labelText="電話"
               type="tel"
-              rules={{
-                required: {
-                  value: true,
-                  message: "電話為必填",
-                },
-                minLength: {
-                  value: 8,
-                  message: "電話不少於 8 碼",
-                },
-                maxLength: {
-                  value: 12,
-                  message: "電話不多於 12 碼",
-                },
-              }}
             />
           </div>
         </div>

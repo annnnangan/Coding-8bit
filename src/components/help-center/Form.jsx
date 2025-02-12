@@ -1,20 +1,30 @@
 import { useForm } from "react-hook-form";
 
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import FormInput from "../common/FormInput";
 
 export default function Form() {
+  // Zod 驗證規則
+  const schema = z.object({
+    name: z.string().min(1, "姓名為必填"),
+    tel: z
+      .string()
+      .min(1, "電話號碼為必填")
+      .min(8, "電話不少於 8 碼")
+      .max(12, "電話不多於 12 碼"),
+    email: z.string().min(1, "信箱為必填").email("請輸入有效的 Email"),
+    message: z.string().min(10, "內容為必填，最少須十個字以上"),
+  });
+
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    defaultValues: {
-      name: "",
-      tel: "",
-      email: "",
-      message: "",
-    },
-    mode: 'onTouched'
+    resolver: zodResolver(schema),
+    mode: "onTouched",
   });
 
   const onSubmit = (data) => {
@@ -33,12 +43,6 @@ export default function Form() {
           id="name"
           labelText="姓名"
           type="text"
-          rules={{
-            required: {
-              value: true,
-              message: "姓名為必填",
-            },
-          }}
         />
       </div>
       <div className="col-md-6">
@@ -48,20 +52,6 @@ export default function Form() {
           id="tel"
           labelText="電話"
           type="tel"
-          rules={{
-            required: {
-              value: true,
-              message: "電話為必填",
-            },
-            minLength: {
-              value: 8,
-              message: "電話不少於 8 碼",
-            },
-            maxLength: {
-              value: 12,
-              message: "電話不多於 12 碼",
-            },
-          }}
         />
       </div>
       <div className="col-12">
@@ -71,16 +61,6 @@ export default function Form() {
           id="email"
           labelText="信箱"
           type="email"
-          rules={{
-            required: {
-              value: true,
-              message: "信箱為必填",
-            },
-            pattern: {
-              value: /^\S+@\S+$/i,
-              message: "信箱格式不正確",
-            },
-          }}
         />
       </div>
       <div className="col-12">
@@ -88,16 +68,11 @@ export default function Form() {
           聯繫內容
         </label>
         <textarea
-          className={`form-control ${errors.email && "is-invalid"}`}
+          className={`form-control ${errors.message && "is-invalid"}`}
           id="message"
           rows="5"
           placeholder="請輸入想聯繫我們的內容"
-          {...register("message", {
-            required: {
-              value: true,
-              message: "內容為必填",
-            },
-          })}
+          {...register("message")}
         ></textarea>
         {errors.message && (
           <div className="invalid-feedback">{errors?.message?.message}</div>

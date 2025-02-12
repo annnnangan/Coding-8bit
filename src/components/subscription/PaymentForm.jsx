@@ -2,18 +2,34 @@ import { forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 
 import PropTypes from "prop-types";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const PaymentForm = forwardRef(({ setFormData }, ref) => {
+  // Zod 驗證規則
+  const creditCardSchema = z.object({
+    userCreditCardNumber: z
+      .string()
+      .min(19, "信用卡號碼應為 16 位數（含空格）")
+      .max(19, "信用卡號碼應為 16 位數（含空格）")
+      .regex(/^\d{4} \d{4} \d{4} \d{4}$/, "信用卡號碼格式錯誤")
+      .refine((num) => luhnCheck(num), {
+        message: "無效的信用卡號碼",
+      }),
+
+    creditCardExpiration: z
+      .string()
+      .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "過期日格式錯誤 (MM / YY)"),
+
+    creditCardCvc: z.string().regex(/^\d{3,4}$/, "CVC / CVV 格式錯誤"),
+  });
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      userCreditCardNumber: "",
-      creditCardExpiration: "",
-      creditCardCvc: "",
-    },
+    resolver: zodResolver(creditCardSchema),
     mode: "onTouched",
   });
 
@@ -79,15 +95,7 @@ export const PaymentForm = forwardRef(({ setFormData }, ref) => {
           id="userCreditCardNumber"
           placeholder="**** **** **** ****"
           maxLength="19"
-          {...register("userCreditCardNumber", {
-            required: {
-              value: true,
-              message: "信用卡號碼為必填",
-            },
-            validate: {
-              luhnCheck: (value) => luhnCheck(value) || "無效的信用卡號碼",
-            },
-          })}
+          {...register("userCreditCardNumber")}
           onChange={(e) => {
             const value = e.target.value.replace(/\D/g, ""); // 移除所有非數字字符
             e.target.value = value.replace(/(\d{4})(?=\d)/g, "$1 "); // 每4位數添加空格
@@ -116,16 +124,7 @@ export const PaymentForm = forwardRef(({ setFormData }, ref) => {
             placeholder="MM / YY"
             maxLength="5"
             required=""
-            {...register("creditCardExpiration", {
-              required: {
-                value: true,
-                message: "過期日為必填",
-              },
-              pattern: {
-                value: /^(0[1-9]|1[0-2])\/\d{2}$/,
-                message: "過期日格式錯誤 (MM / YY)",
-              },
-            })}
+            {...register("creditCardExpiration")}
           />
           {errors.creditCardExpiration && (
             <div className="invalid-feedback">
@@ -151,16 +150,7 @@ export const PaymentForm = forwardRef(({ setFormData }, ref) => {
             pattern="\d{3,4}/"
             maxLength="3"
             required=""
-            {...register("creditCardCvc", {
-              required: {
-                value: true,
-                message: "卡片背面後三碼為必填",
-              },
-              pattern: {
-                value: /^\d{3,4}$/,
-                message: "CVC / CVV 格式錯誤",
-              },
-            })}
+            {...register("creditCardCvc")}
           />
           {errors.creditCardCvc && (
             <div className="invalid-feedback">

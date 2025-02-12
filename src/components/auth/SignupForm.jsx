@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormInput from "../common/FormInput";
 
@@ -13,18 +15,37 @@ export default function SignupForm({ setIsVerifying }) {
   // loading
   const [loadingState, setLoadingState] = useState(false);
 
+  // Zod 驗證規則
+  const schema = z
+    .object({
+      username: z.string().min(3, "用戶名至少要 3 個字元"),
+      email: z.string().email("請輸入有效的 Email"),
+      password: z
+        .string()
+        .regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?~-])/,
+          "密碼必須包含 1 個特殊符號、1 個大寫英文字母、1 個小寫英文字母與 1 個數字"
+        )
+        .min(9, "密碼必須至少超過 8 碼"),
+
+      checkPassword: z.string(),
+    })
+    .superRefine(({ password, checkPassword }, ctx) => {
+      if (password !== checkPassword) {
+        ctx.addIssue({
+          path: ["checkPassword"],
+          message: "兩次密碼輸入不一致",
+          code: "custom",
+        });
+      }
+    });
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors, isValid },
   } = useForm({
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      checkPassword: "",
-    },
+    resolver: zodResolver(schema),
     mode: "onTouched",
   });
 
@@ -77,12 +98,6 @@ export default function SignupForm({ setIsVerifying }) {
             id="username"
             labelText=" ID "
             type="text"
-            rules={{
-              required: {
-                value: true,
-                message: "ID 為必填",
-              },
-            }}
           />
         </div>
         <div className="position-relative mt-9">
@@ -94,16 +109,6 @@ export default function SignupForm({ setIsVerifying }) {
             id="email"
             labelText="電子信箱"
             type="email"
-            rules={{
-              required: {
-                value: true,
-                message: "電子信箱為必填",
-              },
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: "Email 格式不正確",
-              },
-            }}
           />
         </div>
         <div className="position-relative mt-9">
@@ -115,18 +120,6 @@ export default function SignupForm({ setIsVerifying }) {
             id="password"
             labelText="密碼"
             type={showPasswordList[0] ? "text" : "password"}
-            rules={{
-              required: {
-                value: true,
-                message: "密碼為必填",
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?~-]).{9,}$/,
-                message:
-                  "密碼必須至少超過 8 碼，且包含 1 個特殊符號、1 個大寫英文字母、1 個小寫英文字母與 1 個數字",
-              },
-            }}
           />
           <a
             href="#"
@@ -149,14 +142,6 @@ export default function SignupForm({ setIsVerifying }) {
             id="checkPassword"
             labelText="密碼"
             type={showPasswordList[1] ? "text" : "password"}
-            rules={{
-              required: {
-                value: true,
-                message: "再次輸入密碼為必填",
-              },
-              validate: (value) =>
-                value === watch("password") || "兩次密碼輸入不一致",
-            }}
           />
           <a
             href="#"
