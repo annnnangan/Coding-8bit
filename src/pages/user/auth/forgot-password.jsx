@@ -1,13 +1,60 @@
-// import Swal from 'sweetalert2'
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+import Swal from "sweetalert2";
+import axios from "axios";
+
+import Loader from "../../../components/common/Loader";
+
 export default function ForgotPassword() {
+  // loading
+  const [loadingState, setLoadingState] = useState(false);
+
+  const [isClick, setIsClick] = useState(true);
+
+  // 傳送忘記密碼郵件函式
+  const [email, setEmail] = useState("");
+  const sendEmail = async () => {
+    try {
+      setLoadingState(true);
+      await axios.post(
+        `https://service.coding-8bit.site/api/v1/docs/auth/forgot-password`,
+        email
+      );
+      Swal.fire({
+        icon: "success",
+        title: "已傳送重設密碼的連結至您的電子信箱",
+        text: "請至信箱確認信件",
+      });
+
+      // 防止用戶不斷點擊
+      setIsClick(false);
+      setTimeout(() => {
+        setIsClick(true);
+      }, 10000);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "傳送電子信件失敗",
+        text: error.data.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
   return (
     <>
       <Helmet>
         <title>Coding∞bit ｜ 忘記密碼</title>
       </Helmet>
+      {loadingState && <Loader />}
+
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="forgot-password-section bg">
         <div className="container">
@@ -34,6 +81,7 @@ export default function ForgotPassword() {
                         id="addEmail"
                         aria-describedby="emailHelp"
                         placeholder="請輸入電子信箱"
+                        onChange={handleEmail}
                       />
                       <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
                         mail
@@ -43,6 +91,8 @@ export default function ForgotPassword() {
                       type="button"
                       className="btn btn-brand-03 rounded-2 slide-right-hover w-100 f-center mt-6 mt-lg-10"
                       id="sendResetPasswordBtn"
+                      onClick={sendEmail}
+                      disabled={!isClick}
                     >
                       發送驗證信
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
@@ -50,15 +100,6 @@ export default function ForgotPassword() {
                       </span>
                     </button>
                   </form>
-                  <div className="f-end-center mt-6 mt-lg-8">
-                    <p className="text-center">沒有收到嗎？</p>
-                    <a
-                      href="#"
-                      className="link-brand-03 fw-medium underline-hover ms-1"
-                    >
-                      45秒後再發送一次
-                    </a>
-                  </div>
                 </div>
               </div>
             </div>

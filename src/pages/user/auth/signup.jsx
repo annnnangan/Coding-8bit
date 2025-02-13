@@ -12,6 +12,7 @@ export default function Signup() {
       <Helmet>
         <title>Coding∞bit ｜ 註冊</title>
       </Helmet>
+      
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="sign-up-section bg">
         <div className="container">

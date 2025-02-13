@@ -3,12 +3,11 @@ import PropTypes from "prop-types";
 export default function FormInput({
   style = "",
   inputIcon = "",
-  register,
   errors,
+  register,
   id,
   labelText,
   type,
-  rules,
 }) {
   return (
     <>
@@ -37,7 +36,7 @@ export default function FormInput({
             ? "請再次輸入您的密碼"
             : `請輸入您的${labelText}`
         }
-        {...register(id, rules)}
+        {...register(id)}
       />
 
       {style === "underline" && (
@@ -61,5 +60,4 @@ FormInput.propTypes = {
   id: PropTypes.string.isRequired,
   labelText: PropTypes.string.isRequired,
   type: PropTypes.string,
-  rules: PropTypes.object,
 };

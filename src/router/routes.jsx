@@ -2,6 +2,7 @@ import Home from "../pages/user/Home";
 
 import Login from "../pages/user/auth/login";
 import Signup from "../pages/user/auth/signup";
+import ActivateSuccess from "../pages/user/auth/activate-success";
 import ForgotPassword from "../pages/user/auth/forgot-password";
 import ResetPassword from "../pages/user/auth/reset-password";
 
@@ -39,6 +40,7 @@ export const routes = [
 
   { path: "/login", element: <Login /> },
   { path: "/signup", element: <Signup /> },
+  { path: "/activate-success", element: <ActivateSuccess /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
   { path: "/reset-password", element: <ResetPassword /> },
 

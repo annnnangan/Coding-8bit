@@ -7,6 +7,7 @@ export const useRouteConfig = () => {
   const noHeaderFooterRoutes = [
     "/login",
     "/signup",
+    "/activate-success",
     "/forgot-password",
     "/reset-password",
     "/custom-course-list",
@@ -23,6 +24,7 @@ export const useRouteConfig = () => {
   const noToTopBtnRoutes = [
     "/login",
     "/signup",
+    "/activate-success",
     "/forgot-password",
     "/reset-password",
     "/custom-course-list",
