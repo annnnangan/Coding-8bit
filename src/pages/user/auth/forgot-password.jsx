@@ -19,7 +19,7 @@ export default function ForgotPassword() {
     try {
       setLoadingState(true);
       await axios.post(
-        `https://service.coding-8bit.site/api/v1/docs/auth/forgot-password`,
+        `https://service.coding-8bit.site/api/v1/auth/forgot-password`,
         email
       );
       Swal.fire({

@@ -60,7 +60,7 @@ export default function ResetPassword() {
     setLoadingState(true);
     try {
       await axios.post(
-        "https://service.coding-8bit.site/api/v1/docs/auth/reset-password",
+        "https://service.coding-8bit.site/api/v1/auth/reset-password",
         { token, newPassword }
       );
 
