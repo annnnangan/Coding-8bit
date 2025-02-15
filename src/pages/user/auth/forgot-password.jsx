@@ -20,7 +20,9 @@ export default function ForgotPassword() {
     try {
       await axios.post(
         `https://service.coding-8bit.site/api/v1/password/forgot-password`,
-        { email: email }
+        {
+          email: email,
+        }
       );
       Swal.fire({
         icon: "success",
@@ -32,7 +34,7 @@ export default function ForgotPassword() {
       setIsClick(false);
       setTimeout(() => {
         setIsClick(true);
-      }, 10000);
+      }, 60000);
     } catch (error) {
       Swal.fire({
         icon: "error",
