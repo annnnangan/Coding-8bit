@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
-import { utils } from "../custom-course/utils";
+import { utils } from "../../../custom-course/utils";
 
 import BookingStatusBadge from "./BookingStatusBadge";
-import { determineMeetingLinkMessage } from "../../utils/booking-record-utils";
+import { determineMeetingLinkMessage } from "../../../../utils/booking-record-utils";
 
 export default function BookingCard({ booking, handleClick }) {
   return (

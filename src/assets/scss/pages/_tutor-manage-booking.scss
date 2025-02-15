@@ -1,0 +1,28 @@
+.tutor-booking {
+  // 去除 BS5 錯誤訊息跑出的驚嘆號
+  select.is-invalid,
+  input.is-invalid {
+    background-image: none !important;
+  }
+
+  .dropdown-toggle::after {
+    display: none;
+  }
+
+  .sub-section:first-child {
+    border-right: solid 1px var(--bs-gray-03);
+
+    @include xxl-pc {
+      border-right: solid 0px;
+      border-bottom: solid 1px var(--bs-gray-03);
+    }
+  }
+
+  .add-btn {
+    transition: transform 0.3s ease;
+    &:hover {
+      background-color: #ede4ff;
+      transition: transform 0.3s ease;
+    }
+  }
+}
