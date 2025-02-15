@@ -3,7 +3,7 @@ import BackendPanelMenu from "../../components/layout/BackendPanelMenu";
 
 export default function StudentPanelMenu({ children }) {
   return (
-    <BackendPanelMenu menuItems={menuItems} type="student" user={user}>
+    <BackendPanelMenu menuItems={menuItems} type="student">
       {children}
     </BackendPanelMenu>
   );
@@ -13,7 +13,7 @@ const menuItems = [
   {
     icon: "dashboard",
     name: "儀表板",
-    href: "/student-panel/dashboard",
+    href: "/student-panel",
   },
   {
     icon: "event",
@@ -46,11 +46,6 @@ const menuItems = [
     href: "/student-panel/finance",
   },
 ];
-
-const user = {
-  avatar: "https://plus.unsplash.com/premium_photo-1671656349218-5218444643d8?q=80&w=2187&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  name: "卡斯伯Casper",
-};
 
 StudentPanelMenu.propTypes = {
   children: PropTypes.node.isRequired,

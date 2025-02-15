@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
@@ -41,6 +41,25 @@ export default function Login() {
     }
   };
 
+  // 驗證身分
+  const loginCheck = async (token) => {
+    setLoadingState(true);
+    try {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      await axios.get(`https://service.coding-8bit.site/api/v1/auth/check`);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "驗證錯誤",
+        text: error?.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((state) => ({ ...state, [name]: value }));
@@ -55,16 +74,26 @@ export default function Login() {
     );
   };
 
+  // 初始化 - 確認是否有 token
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-
+    const token =
+      document.cookie.replace(
+        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
+      ) || null;
     if (token) {
-      localStorage.setItem("accessToken", token);
-      navigate("/tutor-info/1");
+      loginCheck(token);
     }
   }, []);
 
+  // 初始化 - 第三方登入確認身分
+  const [searchParams] = useSearchParams();
+  const paramToken = searchParams.get("token");
+  useEffect(() => {
+    if (paramToken) {
+      loginCheck(paramToken);
+    }
+  }, []);
   return (
     <>
       <Helmet>

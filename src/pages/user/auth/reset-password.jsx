@@ -60,9 +60,9 @@ export default function ResetPassword() {
     setLoadingState(true);
     try {
       await axios.post(
-        "https://service.coding-8bit.site/api/v1/auth/reset-password",
-        { token, newPassword }
-      );
+        "https://service.coding-8bit.site/api/v1/password/reset-password",
+        { token: token, newPassword: newPassword }
+      )
 
       Swal.fire({
         title: "密碼重設成功",
