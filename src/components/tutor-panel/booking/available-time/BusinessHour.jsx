@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
-export default function BusinessHour({ day }) {
+export default function BusinessHour({ type, day }) {
   const [isEdit, setEdit] = useState(false);
 
   const {
@@ -38,28 +38,28 @@ export default function BusinessHour({ day }) {
     );
   };
 
-  const onSubmit = (data, dayOfWeek) => {
-    console.log(dayOfWeek, data);
+  const onSubmit = (data) => {
+    console.log(day.value || day, data);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="tutor-booking">
       <div key={day.value} className="accordion" id={`accordion${day.value}`}>
         <div className="accordion-item border-0 rounded-5">
           {/* Header */}
           <h2 className="accordion-header">
             <button
-              className="accordion-button collapsed"
+              className="accordion-button collapsed ps-2"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target={`#collapse${day.value}`}
+              data-bs-target={`#collapse${type === "week" ? day.value : day}`}
               aria-expanded={isEdit || isOpenWatch ? "true" : "false"}
-              aria-controls={`collapse${day.value}`}
+              aria-controls={`collapse${type === "week" ? day.value : day}`}
               style={{ backgroundColor: "transparent", boxShadow: "none" }}
             >
               <div className="w-100 d-flex align-items-center justify-content-between mx-4">
                 <div className="d-flex align-items-center">
-                  <p className="fs-6 fs-md-5 me-4 me-md-10"> {day.label}</p>
+                  <p className="fs-6 fs-md-5 me-4 me-lg-5 me-xxl-10"> {type === "week" ? day.label : day}</p>
 
                   {!isOpenWatch && <p className="text-gray-03 fs-7">沒有可預約時間</p>}
                 </div>
@@ -71,7 +71,11 @@ export default function BusinessHour({ day }) {
             </button>
           </h2>
           {/* body */}
-          <div id={`collapse${day.value}`} className={`accordion-collapse collapse ${isEdit || isOpenWatch ? "show" : ""}`} data-bs-parent={`#accordion${day.value}`}>
+          <div
+            id={`collapse${type === "week" ? day.value : day}`}
+            className={`accordion-collapse collapse ${isEdit || isOpenWatch ? "show" : ""}`}
+            data-bs-parent={`#accordion${type === "week" ? day.value : day}`}
+          >
             <div className="accordion-body pt-0">
               <Controller
                 name={`isOpen`}
@@ -82,7 +86,7 @@ export default function BusinessHour({ day }) {
                       className="form-check-input"
                       type="checkbox"
                       role="switch"
-                      id={`flexSwitchCheck${day.value}`}
+                      id={`flexSwitchCheck${type === "week" ? day.value : day}`}
                       checked={field.value ?? false}
                       disabled={!isEdit}
                       onChange={(e) => {
@@ -94,7 +98,7 @@ export default function BusinessHour({ day }) {
                         }
                       }}
                     />
-                    <label className="form-check-label" htmlFor={`flexSwitchCheck${day.value}`}>
+                    <label className="form-check-label" htmlFor={`flexSwitchCheck${type === "week" ? day.value : day}`}>
                       是否開放預約？
                     </label>
                   </div>
@@ -174,20 +178,22 @@ export default function BusinessHour({ day }) {
                       )}
                     />
 
-                    <span
-                      className="material-symbols-outlined cursor-pointer"
-                      onClick={() => handleRemoveTimeslot(index)}
-                      style={{
-                        transform:
-                          errors?.timeslots?.[index]?.startTime || errors?.timeslots?.[index]?.endTime
-                            ? errors?.timeslots?.[index]?.startTime && errors?.timeslots?.[index]?.endTime
-                              ? "translateY(-20px)"
-                              : "translateY(-10px)"
-                            : "translateY(0)",
-                      }}
-                    >
-                      delete
-                    </span>
+                    {isEdit && (
+                      <span
+                        className="material-symbols-outlined cursor-pointer"
+                        onClick={() => handleRemoveTimeslot(index)}
+                        style={{
+                          transform:
+                            errors?.timeslots?.[index]?.startTime || errors?.timeslots?.[index]?.endTime
+                              ? errors?.timeslots?.[index]?.startTime && errors?.timeslots?.[index]?.endTime
+                                ? "translateY(-20px)"
+                                : "translateY(-10px)"
+                              : "translateY(0)",
+                        }}
+                      >
+                        delete
+                      </span>
+                    )}
                   </div>
                 ))}
 
@@ -208,8 +214,12 @@ export default function BusinessHour({ day }) {
 }
 
 BusinessHour.propTypes = {
-  day: PropTypes.shape({
-    value: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-  }).isRequired,
+  type: PropTypes.oneOf(["week", "specific"]).isRequired,
+  day: PropTypes.oneOfType([
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+    }), // For week-based scheduling
+    PropTypes.string, // For specific date scheduling
+  ]).isRequired,
 };

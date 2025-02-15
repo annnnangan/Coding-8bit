@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import BookingCard from "./BookingCard";
 import BookingDetailsModal from "./BookingDetailsModal";
