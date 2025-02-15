@@ -13,7 +13,7 @@ const menuItems = [
   {
     icon: "dashboard",
     name: "儀表板",
-    href: "/tutor-panel/dashboard",
+    href: "/tutor-panel",
   },
   {
     icon: "video_settings",
