@@ -23,7 +23,7 @@ export default function ActivateSuccess() {
     try {
       setLoadingState(true);
       await axios.get(
-        "https://service.coding-8bit.site/api/v1/docs/auth/activate"
+        "https://service.coding-8bit.site/api/v1/auth/activate"
       );
       setIsActive(true);
     } catch (error) {

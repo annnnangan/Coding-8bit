@@ -54,7 +54,7 @@ export default function SignupForm({ setIsVerifying }) {
     setLoadingState(true);
     try {
       await axios.post(
-        "https://service.coding-8bit.site/api/v1/docs/auth/register",
+        "https://service.coding-8bit.site/api/v1/auth/register",
         { email, password, username }
       );
 

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 
 import Loader from "../../../components/common/Loader";
-import TutorPanelMenu from "../../../components/layout/TutorPanelMenu";
 import AllBookings from "../../../components/tutor-panel/AllBookings";
 
 const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
@@ -33,26 +32,41 @@ export default function TutorManageBooking() {
         <title>Coding∞bit ｜ 講師預約管理</title>
       </Helmet>
       {loadingState && <Loader />}
-      <TutorPanelMenu>
-        <div className="overflow-y-auto">
-          <h2 className="mb-6 ps-5 ps-lg-0">預約管理</h2>
-          <ul className="nav nav-tabs">
-            <li className="nav-item cursor-pointer">
-              <p className={`nav-link ${activeTab === "allBookings" ? "active bg-gray-04 rounded-top-3" : ""} border-bottom-0`} onClick={() => handleTabClick("allBookings")}>
-                所有預約
-              </p>
-            </li>
 
-            <li className="nav-item cursor-pointer">
-              <p className={`nav-link ${activeTab === "availableTime" ? "active bg-gray-04 rounded-top-3" : ""} border-bottom-0`} onClick={() => handleTabClick("availableTime")}>
-                設定可預約時間
-              </p>
-            </li>
-          </ul>
+      <div className="overflow-y-auto">
+        <h2 className="mb-6 ps-5 ps-lg-0">預約管理</h2>
+        <ul className="nav nav-tabs">
+          <li className="nav-item cursor-pointer">
+            <p
+              className={`nav-link ${
+                activeTab === "allBookings"
+                  ? "active bg-gray-04 rounded-top-3"
+                  : ""
+              } border-bottom-0`}
+              onClick={() => handleTabClick("allBookings")}
+            >
+              所有預約
+            </p>
+          </li>
 
-          <div className="bg-gray-04 p-8 rounded-bottom-3 min-vh-100">{activeTab === "allBookings" && <AllBookings />}</div>
+          <li className="nav-item cursor-pointer">
+            <p
+              className={`nav-link ${
+                activeTab === "availableTime"
+                  ? "active bg-gray-04 rounded-top-3"
+                  : ""
+              } border-bottom-0`}
+              onClick={() => handleTabClick("availableTime")}
+            >
+              設定可預約時間
+            </p>
+          </li>
+        </ul>
+
+        <div className="bg-gray-04 p-8 rounded-bottom-3 min-vh-100">
+          {activeTab === "allBookings" && <AllBookings />}
         </div>
-      </TutorPanelMenu>
+      </div>
     </>
   );
 }

@@ -16,16 +16,14 @@ export default function Login() {
   // 登入邏輯
   const [formData, setFormData] = useState({});
   const loginFn = async () => {
+    setLoadingState(true);
     try {
-      setLoadingState(true);
       const result = await axios.post(
-        `https://service.coding-8bit.site/api/v1/docs/auth/login`,
+        `https://service.coding-8bit.site/api/v1/auth/login`,
         formData
       );
-      const { token, expired } = result.data;
-      document.cookie = `accessToken=${token}; expires=${new Date(
-        expired
-      )}; path=/`;
+      const { token } = result.data;
+      document.cookie = `authToken=${token}; path=/`;
       axios.defaults.headers.common.Authorization = token;
       Swal.fire({
         title: "登入成功",
@@ -176,7 +174,7 @@ export default function Login() {
                   <a
                     href="https://coding-bit-backend.onrender.com/api/v1/auth/google"
                     type="button"
-                    className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt--lg-8"
+                    className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt-lg-8"
                   >
                     <img
                       src="images/icon/icons-google.svg"
