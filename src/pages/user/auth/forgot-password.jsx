@@ -16,11 +16,13 @@ export default function ForgotPassword() {
   // 傳送忘記密碼郵件函式
   const [email, setEmail] = useState("");
   const sendEmail = async () => {
+    setLoadingState(true);
     try {
-      setLoadingState(true);
       await axios.post(
-        `https://service.coding-8bit.site/api/v1/auth/forgot-password`,
-        email
+        `https://service.coding-8bit.site/api/v1/password/forgot-password`,
+        {
+          email: email,
+        }
       );
       Swal.fire({
         icon: "success",
@@ -32,12 +34,12 @@ export default function ForgotPassword() {
       setIsClick(false);
       setTimeout(() => {
         setIsClick(true);
-      }, 10000);
+      }, 60000);
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "傳送電子信件失敗",
-        text: error.data.message,
+        text: error?.data,
       });
     } finally {
       setLoadingState(false);

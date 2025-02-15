@@ -10,12 +10,12 @@ import "swiper/css/pagination";
 import "sweetalert2/src/sweetalert2.scss";
 import "aos/dist/aos.css";
 import "./assets/scss/all.scss";
-import 'react-quill/dist/quill.snow.css';
+import "react-quill/dist/quill.snow.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
   </StrictMode>
 );

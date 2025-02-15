@@ -33,7 +33,7 @@ import TutorInfo from "../pages/user/tutor/tutor-info";
 
 import HelpCenter from "../pages/user/help-center";
 
-// 講師後台
+// 使用者後台 - 講師
 import TutorPanel from "../pages/tutor/tutor-panel";
 
 import TutorManageBooking from "../pages/tutor/bookings/tutor-manage-bookings";
@@ -44,8 +44,14 @@ import TutorManageEditTopicSeries from "../pages/tutor/courses/tutor-editCourses
 import TutorManageTopicSeriesChapter from "../pages/tutor/courses/tutor-chapter-topicSeries";
 import TutorManageAddVideo from "../pages/tutor/courses/tutor-addVideo";
 
+// 使用者後台 - 學生
+import StudentLayout from "./StudentLayout";
+import StudentPanel from "../pages/student/student-panel";
+import StudentProfile from "../pages/student/student-profile";
+
 export const router = createHashRouter([
   {
+    // 前台
     path: "/",
     element: <UserLayout />,
     children: [
@@ -78,6 +84,7 @@ export const router = createHashRouter([
     ],
   },
   {
+    // 使用者後台 - 講師
     path: "/tutor-panel",
     element: <TutorLayout />,
     children: [
@@ -90,6 +97,15 @@ export const router = createHashRouter([
       { path: "course/topicSeries/:id/chapter", element: <TutorManageTopicSeriesChapter /> },
       { path: "course/video/:type/add", element: <TutorManageAddVideo /> },
     ],
+  },
+  { // 使用者後台 - 學生
+    path: "/student-panel",
+    element: <StudentLayout />,
+    children: [
+      { index: true, element: <StudentPanel /> },
+
+      { path: "profile", element: <StudentProfile /> },
+    ]
   },
   { path: "*", element: <NotFound /> },
 ]);

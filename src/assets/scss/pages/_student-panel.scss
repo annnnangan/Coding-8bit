@@ -1,0 +1,8 @@
+/* student-profile */
+.reset-password-form {
+  // 去除 BS5 錯誤訊息跑出的驚嘆號
+  .form-control.is-invalid, 
+  .was-validated .form-control:invalid {
+    background-image: none !important;
+  }
+}
