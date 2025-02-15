@@ -20,12 +20,14 @@ export default function ActivateSuccess() {
   // 啟用帳號函式
   const [isActive, setIsActive] = useState(false);
   const activateAccount = async () => {
+    setLoadingState(true);
     try {
-      setLoadingState(true);
+      axios.defaults.headers.common.Authorization = token;
       await axios.get(
-        "https://service.coding-8bit.site/api/v1/auth/activate"
+        `https://service.coding-8bit.site/api/v1/auth/activate?token=${token}`
       );
       setIsActive(true);
+      navigate("/login");
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -48,14 +50,14 @@ export default function ActivateSuccess() {
       });
       navigate(-1);
     } else {
-      axios.defaults.headers.common.Authorization = token;
       activateAccount();
     }
   }, []);
+
   return (
     <>
       <Helmet>
-        <title>Coding∞bit ｜ 帳號啟用成功</title>
+        <title>Coding∞bit ｜ 帳號啟用結果</title>
       </Helmet>
       {loadingState && <Loader />}
 
