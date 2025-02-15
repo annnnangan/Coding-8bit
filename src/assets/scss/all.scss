@@ -1,5 +1,5 @@
 @import "bootstrap/scss/functions";
-@import 'swiper/swiper-bundle.css';
+@import "swiper/swiper-bundle.css";
 @import "./utils/variables";
 @import "./utils/custom-colors.scss";
 @import "bootstrap/scss/bootstrap";
@@ -44,4 +44,4 @@
 @import "./pages/not-found.scss";
 @import "./pages/add-learning-need.scss";
 @import "./pages/tutor-manage-course.scss";
-
+@import "./pages/tutor-manage-booking.scss";

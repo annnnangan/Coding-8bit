@@ -1,0 +1,5 @@
+// 去除 BS5 錯誤訊息跑出的驚嘆號
+select.is-invalid,
+input.is-invalid {
+  background-image: none !important;
+}

@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import BookingCard from "./BookingCard";
 import BookingDetailsModal from "./BookingDetailsModal";
 
-import { tutorInProgressBookingData, tutorCompletedBookingData, tutorCanceledBookingData } from "../../data/bookings";
+import { tutorInProgressBookingData, tutorCompletedBookingData, tutorCanceledBookingData } from "../../../../data/bookings";
 
 const bookingTypeList = [
   { name: "所有種類", value: "all" },
@@ -14,7 +14,7 @@ const bookingTypeList = [
   { name: "程式碼檢視", value: "code-review" },
 ];
 
-export default function AllBookings() {
+export default function AllBookingsSection() {
   const [bookingType, setBookingType] = useState("all");
   const [dateRange, setDateRange] = useState(null);
   const [activeTab, setActiveTab] = useState("in_progress");
