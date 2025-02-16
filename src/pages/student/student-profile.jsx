@@ -11,15 +11,16 @@ export default function StudentProfile() {
   // loading
   const [loadingState, setLoadingState] = useState(false);
 
-  const [temProfile, setTemProfile] = useState({});
-  const handleProfile = (e) => {
-    setTemProfile((preData) => {
-      return { ...preData, username: e.target.value };
-    });
-  };
+  const [temProfile, setTemProfile] = useState({
+    username: "",
+    avatar_url: "",
+  });
+
   // 上傳圖片函式
   const imgUpload = async (e) => {
     const file = e.target.files?.[0];
+
+    // 如果沒有選擇圖片檔案
     if (!file) {
       Swal.fire({
         icon: "warning",
@@ -28,20 +29,53 @@ export default function StudentProfile() {
       return;
     }
 
-    const payload = {
-      fileName: file.name,
-      fileType: file.type,
-    };
+    // 如果檔案大小大於 50MB
+    const MAX_FILE_SIZE_MB = 50;
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      Swal.fire({
+        icon: "error",
+        title: `檔案過大，請選擇小於 ${MAX_FILE_SIZE_MB}MB 的檔案`,
+      });
+      return;
+    }
 
+    setLoadingState(true);
     try {
-      setLoadingState(true);
-      const result = await axios.post(
-        `https://service.coding-8bit.site/api/v1/upload/get-upload-url`,
-        payload
+      const token =
+        document.cookie.replace(
+          /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+          "$1"
+        ) || null;
+
+      // 1. 取得上傳用的預簽名 url
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      const uploadData = await axios.post(
+        "https://coding-bit-backend.onrender.com/api/v1/upload/get-upload-url",
+        { fileName: file.name, fileType: file.type }
       );
-      const url = result.data?.uploadUrl;
-      setTemProfile((preData) => {
-        return { ...preData, avatarUrl: url };
+
+      if (!uploadData.data.uploadUrl) {
+        throw new Error("無法取得上傳 URL");
+      }
+
+      const { uploadUrl, filePath, downloadUrl } = uploadData.data;
+
+      // 2. 將檔案上傳到取得的預簽名
+      await axios.put(uploadUrl, file, {
+        headers: { "Content-Type": file.type },
+      });
+
+      // 3. 更新狀態顯示圖片
+      setTemProfile((prevData) => {
+        return {
+          ...prevData,
+          avatar_url: downloadUrl || filePath,
+        };
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "上傳成功！",
       });
     } catch (error) {
       Swal.fire({
@@ -66,12 +100,12 @@ export default function StudentProfile() {
         title: "更新成功",
         icon: "success",
       });
-      getUserData();
+      navigator(0);
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "更新失敗",
-        text: error.response.data.message,
+        text: error,
       });
     } finally {
       setLoadingState(false);
@@ -95,10 +129,26 @@ export default function StudentProfile() {
     }
   };
 
+  // 更新個人資料狀態
+  const handleProfile = (e) => {
+    setTemProfile((prevData) => {
+      return { ...prevData, username: e.target.value };
+    });
+  };
+
   // 切換個人資料編輯狀態
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const handleEditProfile = () => {
     setIsEditingProfile((prev) => (prev = !prev));
+  };
+
+  // 取消個人資料編輯狀態
+  const resetTemProfile = () => {
+    handleEditProfile();
+    setTemProfile({
+      username: userData.username,
+      avatar_url: userData.avatar_url,
+    });
   };
 
   // 初始化 - 確認是否已登入
@@ -141,7 +191,7 @@ export default function StudentProfile() {
                     style={{ width: "200px", height: "200px" }}
                   >
                     {/* 正在編輯的樣子 */}
-                    {isEditingProfile && !temProfile.avatarUrl && (
+                    {isEditingProfile && !temProfile.avatar_url && (
                       <>
                         <input
                           type="file"
@@ -163,10 +213,10 @@ export default function StudentProfile() {
                     )}
 
                     {/* 預覽圖片 */}
-                    {temProfile.avatarUrl && (
+                    {temProfile.avatar_url && (
                       <img
-                        src={temProfile.avatarUrl}
-                        alt="profile-avatarUrl"
+                        src={temProfile.avatar_url}
+                        alt="profile-avatar_url"
                         className="w-100 object-fit"
                       />
                     )}
@@ -174,18 +224,19 @@ export default function StudentProfile() {
                     {/* 未編輯的樣子 */}
                     {!isEditingProfile && (
                       <>
-                        {userData.avatar_url && (
+                        {userData.avatar_url ? (
                           <img
                             src={userData.avatar_url}
-                            alt="profile-avatarUrl"
+                            alt="profile-avatar_url"
+                            className="w-100 object-fit"
+                          />
+                        ) : (
+                          <img
+                            src="images/icon/user.png"
+                            alt="profile-avatar_url"
                             className="w-100 object-fit"
                           />
                         )}
-                        <img
-                          src="images/icon/user.png"
-                          alt="profile-avatarUrl"
-                          className="w-100 object-fit"
-                        />
                       </>
                     )}
                   </div>
@@ -222,7 +273,7 @@ export default function StudentProfile() {
                     className={`btn btn-brand-03 rounded-2 mt-md-4 ${
                       !isEditingProfile && "d-none"
                     }`}
-                    type="submit"
+                    type="button"
                     onClick={updateProfile}
                   >
                     更新個人資料
@@ -232,7 +283,7 @@ export default function StudentProfile() {
                     className={`btn btn-outline-none rounded-2 mt-2 mt-md-4 ms-2 ${
                       !isEditingProfile && "d-none"
                     }`}
-                    onClick={handleEditProfile}
+                    onClick={resetTemProfile}
                   >
                     取消
                   </button>

@@ -3,7 +3,7 @@ import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import axios from "axios";
-import Swiper from "swiper";
+import { Swiper } from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import * as bootstrap from "bootstrap";
 
