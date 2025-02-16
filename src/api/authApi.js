@@ -17,7 +17,7 @@ const signup = async (userData) => {
 // 登入
 const login = async (formData) => {
   const response = await apiClient.post(`/auth/login`, formData);
-  const { token } = response .data;
+  const { token } = response.data;
   document.cookie = `authToken=${token}; path=/`;
   axios.defaults.headers.common.Authorization = token;
   return ;
