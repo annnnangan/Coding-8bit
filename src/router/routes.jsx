@@ -43,6 +43,7 @@ import TutorManageAddTopicSeries from "../pages/tutor/courses/tutor-addCourses-t
 import TutorManageEditTopicSeries from "../pages/tutor/courses/tutor-editCourses-topicSeries ";
 import TutorManageTopicSeriesChapter from "../pages/tutor/courses/tutor-chapter-topicSeries";
 import TutorManageAddVideo from "../pages/tutor/courses/tutor-addVideo";
+import TutorProfile from "../pages/tutor/profile/tutor-profile";
 
 // 使用者後台 - 學生
 import StudentLayout from "./StudentLayout";
@@ -56,7 +57,7 @@ export const router = createHashRouter([
     element: <UserLayout />,
     children: [
       { index: true, element: <Home /> },
-      
+
       { path: "login", element: <Login /> },
       { path: "signup", element: <Signup /> },
       { path: "activate-success", element: <ActivateSuccess /> },
@@ -71,13 +72,25 @@ export const router = createHashRouter([
       { path: "add-learning-need", element: <AddLearningNeedPage /> },
 
       { path: "subscription-list", element: <SubscriptionList /> },
-      { path: "subscription/:subscriptionPlan/:duration", element: <SubscriptionPayment /> },
+      {
+        path: "subscription/:subscriptionPlan/:duration",
+        element: <SubscriptionPayment />,
+      },
 
       { path: "tutor-list", element: <TutorList /> },
       { path: "tutor/:id", element: <TutorBooking /> },
-      { path: "tutor/:id/booking-payment-step1/:type", element: <TutorBookingPaymentStep1 /> },
-      { path: "tutor/:id/booking-payment-step2/:type", element: <TutorBookingPaymentStep2 /> },
-      { path: "tutor/:id/booking-payment-success/:type", element: <TutorBookingSuccess /> },
+      {
+        path: "tutor/:id/booking-payment-step1/:type",
+        element: <TutorBookingPaymentStep1 />,
+      },
+      {
+        path: "tutor/:id/booking-payment-step2/:type",
+        element: <TutorBookingPaymentStep2 />,
+      },
+      {
+        path: "tutor/:id/booking-payment-success/:type",
+        element: <TutorBookingSuccess />,
+      },
       { path: "tutor-info/:id", element: <TutorInfo /> },
 
       { path: "help-center", element: <HelpCenter /> },
@@ -92,20 +105,31 @@ export const router = createHashRouter([
 
       { path: "booking", element: <TutorManageBooking /> },
       { path: "course", element: <TutorManageCourses /> },
-      { path: "course/topicSeries/add", element: <TutorManageAddTopicSeries /> },
-      { path: "course/topicSeries/:id/edit", element: <TutorManageEditTopicSeries /> },
-      { path: "course/topicSeries/:id/chapter", element: <TutorManageTopicSeriesChapter /> },
+      {
+        path: "course/topicSeries/add",
+        element: <TutorManageAddTopicSeries />,
+      },
+      {
+        path: "course/topicSeries/:id/edit",
+        element: <TutorManageEditTopicSeries />,
+      },
+      {
+        path: "course/topicSeries/:id/chapter",
+        element: <TutorManageTopicSeriesChapter />,
+      },
       { path: "course/video/:type/add", element: <TutorManageAddVideo /> },
+      { path: "profile", element: <TutorProfile /> },
     ],
   },
-  { // 使用者後台 - 學生
+  {
+    // 使用者後台 - 學生
     path: "/student-panel",
     element: <StudentLayout />,
     children: [
       { index: true, element: <StudentPanel /> },
 
       { path: "profile", element: <StudentProfile /> },
-    ]
+    ],
   },
   { path: "*", element: <NotFound /> },
 ]);

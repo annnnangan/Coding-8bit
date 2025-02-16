@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import FormInput from "../../../components/common/FormInput";
+import FormInput from "../FormInput";
 
 export default function ResetPassword({ userData, setLoadingState }) {
   // Zod 驗證規則
@@ -73,7 +73,11 @@ export default function ResetPassword({ userData, setLoadingState }) {
   };
 
   // 隱碼按鈕邏輯
-  const [showPasswordList, setShowPasswordList] = useState([false, false, false]);
+  const [showPasswordList, setShowPasswordList] = useState([
+    false,
+    false,
+    false,
+  ]);
 
   const handleShowPassword = (index) => {
     setShowPasswordList((prevState) =>
