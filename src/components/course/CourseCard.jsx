@@ -79,6 +79,6 @@ CourseCard.propTypes = {
     duration: PropTypes.string.isRequired,
     view_count: PropTypes.number.isRequired,
     rating: PropTypes.number.isRequired,
-    learning_progress_in_percent: PropTypes.string,
+    learning_progress_in_percent: PropTypes.number,
   }),
 };

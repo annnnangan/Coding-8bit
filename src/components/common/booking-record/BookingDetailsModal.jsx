@@ -7,7 +7,7 @@ import { utils } from "../../../custom-course/utils";
 import { determineMeetingLinkMessage } from "../../../../utils/booking-record-utils";
 
 import AvatarWithFallback from "../../../../components/common/AvatarWithFallback";
-import BookingStatusBadge from "./BookingStatusBadge";
+import BookingStatusBadge from "../../../common/booking-record/BookingStatusBadge";
 import CancelConfirmationModal from "./CancelConfirmationModal";
 
 export default function BookingDetailsModal({ booking, isOpen, setOpenModal }) {

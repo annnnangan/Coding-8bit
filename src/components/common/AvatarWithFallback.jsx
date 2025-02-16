@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-export default function AvatarWithFallback({ image, name, fontSize = "fs-6" }) {
+export default function AvatarWithFallback({ image, name, fontSize = "fs-6", children }) {
   return (
     <div className="d-flex align-items-center mt-auto">
       <div className="flex-shrink-0">
@@ -17,6 +17,7 @@ export default function AvatarWithFallback({ image, name, fontSize = "fs-6" }) {
       </div>
       <div className="flex-grow-1">
         <p className={fontSize}>{name}</p>
+        {children}
       </div>
     </div>
   );
@@ -25,6 +26,7 @@ export default function AvatarWithFallback({ image, name, fontSize = "fs-6" }) {
 // Define PropTypes
 AvatarWithFallback.propTypes = {
   image: PropTypes.string, // Optional, can be undefined
+  children: PropTypes.node,
   name: PropTypes.string.isRequired,
   fontSize: PropTypes.string,
 };
