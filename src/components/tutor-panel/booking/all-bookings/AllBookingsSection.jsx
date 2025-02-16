@@ -3,7 +3,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
 import BookingCard from "../../../common/booking-record/BookingCard";
-import BookingDetailsModal from "./BookingDetailsModal";
+import BookingDetailsModal from "../../../common/booking-record/BookingDetailsModal";
 
 import { tutorInProgressBookingData, tutorCompletedBookingData, tutorCanceledBookingData } from "../../../../data/bookings";
 
