@@ -118,3 +118,24 @@ export const tutorCanceledBookingData = {
     },
   ],
 };
+
+export const userBookingData = [
+  {
+    id: 1,
+    tutor: "卡斯伯Casper",
+    status: "in_progress",
+    start_time: "2025-02-16 10:00",
+    end_time: "2025-02-16 11:00",
+    type: "一對一教學",
+    meeting_link: null,
+  },
+  {
+    id: 2,
+    tutor: "咪妃",
+    status: "in_progress",
+    start_time: "2025-02-20 12:00",
+    end_time: "2025-02-20 13:00",
+    type: "程式碼檢視",
+    meeting_link: null,
+  },
+];
