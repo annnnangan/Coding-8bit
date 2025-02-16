@@ -43,6 +43,7 @@ import TutorManageAddTopicSeries from "../pages/tutor/courses/tutor-addCourses-t
 import TutorManageEditTopicSeries from "../pages/tutor/courses/tutor-editCourses-topicSeries ";
 import TutorManageTopicSeriesChapter from "../pages/tutor/courses/tutor-chapter-topicSeries";
 import TutorManageAddVideo from "../pages/tutor/courses/tutor-addVideo";
+import TutorProfile from "../pages/tutor/tutor-profile";
 
 // 使用者後台 - 學生
 import StudentLayout from "./StudentLayout";
@@ -96,6 +97,7 @@ export const router = createHashRouter([
       { path: "course/topicSeries/:id/edit", element: <TutorManageEditTopicSeries /> },
       { path: "course/topicSeries/:id/chapter", element: <TutorManageTopicSeriesChapter /> },
       { path: "course/video/:type/add", element: <TutorManageAddVideo /> },
+      { path: "profile", element: <TutorProfile /> },
     ],
   },
   { // 使用者後台 - 學生
