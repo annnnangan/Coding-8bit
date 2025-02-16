@@ -8,7 +8,7 @@ import PropTypes from "prop-types";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import FormInput from "./FormInput";
+import FormInput from "../FormInput";
 
 export default function ResetPassword({ userData, setLoadingState }) {
   // Zod 驗證規則
