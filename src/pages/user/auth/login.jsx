@@ -3,8 +3,8 @@ import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
-import axios from "axios";
 
+import authApi from "../../../api/authApi";
 import Loader from "../../../components/common/Loader";
 
 export default function Login() {
@@ -18,13 +18,7 @@ export default function Login() {
   const loginFn = async () => {
     setLoadingState(true);
     try {
-      const result = await axios.post(
-        `https://service.coding-8bit.site/api/v1/auth/login`,
-        formData
-      );
-      const { token } = result.data;
-      document.cookie = `authToken=${token}; path=/`;
-      axios.defaults.headers.common.Authorization = token;
+      await authApi.login(formData)
       Swal.fire({
         title: "登入成功",
         icon: "success",
@@ -42,14 +36,12 @@ export default function Login() {
   };
 
   // 驗證身分
-  const loginCheck = async (token) => {
+  const loginCheck = async () => {
     setLoadingState(true);
     try {
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-      await axios.get(`https://service.coding-8bit.site/api/v1/auth/check`);
+      await authApi.loginCheck;
       navigate("/");
     } catch (error) {
-      console.log(error);
       Swal.fire({
         icon: "error",
         title: "驗證錯誤",
@@ -67,7 +59,6 @@ export default function Login() {
 
   // 隱碼按鈕邏輯
   const [showPasswordList, setShowPasswordList] = useState([false, false]);
-
   const handleShowPassword = (index) => {
     setShowPasswordList((prevState) =>
       prevState.map((show, i) => (i === index ? !show : show))
@@ -82,7 +73,7 @@ export default function Login() {
         "$1"
       ) || null;
     if (token) {
-      loginCheck(token);
+      loginCheck();
     }
   }, []);
 

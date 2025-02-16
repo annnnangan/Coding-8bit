@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
-import axios from "axios";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormInput from "../../..//components/common/FormInput";
 import Loader from "../../../components/common/Loader";
+import authApi from "../../../api/authApi";
 
 export default function ResetPassword() {
   // loading
@@ -59,11 +59,7 @@ export default function ResetPassword() {
     const { newPassword } = data;
     setLoadingState(true);
     try {
-      await axios.post(
-        "https://service.coding-8bit.site/api/v1/password/reset-password",
-        { token: token, newPassword: newPassword }
-      )
-
+      await authApi.resetPassword({ token: token, newPassword: newPassword });
       Swal.fire({
         title: "密碼重設成功",
         icon: "success",

@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import clsx from "clsx";
 
+import authApi from "../../api/authApi";
 import Loader from "../../components/common/Loader";
 
 // Styled components
@@ -102,11 +103,10 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
   };
 
   // 驗證身分
-  const loginCheck = async (token) => {
+  const loginCheck = async () => {
     setLoadingState(true);
     try {
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-      await axios.get(`https://service.coding-8bit.site/api/v1/auth/check`);
+      await authApi.loginCheck;;
       getUserData();
     } catch (error) {
       console.log(error);
@@ -129,7 +129,7 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
         "$1"
       ) || null;
     if (token) {
-      loginCheck(token);
+      loginCheck();
     } else {
       Swal.fire({
         icon: "warning",

@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Swal from "sweetalert2";
-import axios from "axios";
 import PropTypes from "prop-types";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import authApi from "../../api/authApi";
 import FormInput from "../common/FormInput";
-
 import Loader from "../common/Loader";
+
 
 export default function SignupForm({ setIsVerifying }) {
   // loading
@@ -53,10 +53,7 @@ export default function SignupForm({ setIsVerifying }) {
     const { email, password, username } = data;
     setLoadingState(true);
     try {
-      await axios.post(
-        "https://service.coding-8bit.site/api/v1/auth/register",
-        { email, password, username }
-      );
+      await authApi.signup({ email, password, username });
 
       Swal.fire({
         title: "已傳送確認信件至您的電子信箱",
