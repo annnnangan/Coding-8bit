@@ -220,7 +220,7 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
                       <div className="d-flex align-items-center">
                         <div className="flex-shrink-0">
                           <img
-                            src={userData.avatar}
+                            src={userData.avatar_url}
                             alt="profile"
                             className="object-fit-cover rounded-circle me-4"
                             style={{ height: "48px", width: "48px" }}
@@ -273,7 +273,7 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
             </ul>
             <div className="d-flex align-items-center mt-auto">
               <div className="flex-shrink-0">
-                {!userData.avatar ? (
+                {!userData.avatar_url ? (
                   <img
                     src="images/icon/user.png"
                     alt="profile"
@@ -282,7 +282,7 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
                   />
                 ) : (
                   <img
-                    src={userData.avatar}
+                    src={userData.avatar_url}
                     alt="profile"
                     className="object-fit-cover rounded-circle me-4"
                     style={{ height: "48px", width: "48px" }}

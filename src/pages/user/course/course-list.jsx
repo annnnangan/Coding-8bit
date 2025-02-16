@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import Swiper from "swiper";
+import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 
 import courseApi from "../../../api/courseApi";

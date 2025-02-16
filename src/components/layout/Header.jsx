@@ -210,7 +210,7 @@ export default function Header() {
                 <div className="d-lg-none">
                   <div className="f-align-center ps-4 mt-2">
                     <div className="flex-shrink-0">
-                      {!userData.name ? (
+                      {!userData.avatar_url ? (
                         <img
                           src="images/icon/user.png"
                           alt="profile"
@@ -219,7 +219,7 @@ export default function Header() {
                         />
                       ) : (
                         <img
-                          src={userData.avatar}
+                          src={userData.avatar_url}
                           alt="profile"
                           className="object-fit-cover rounded-circle me-4"
                           style={{ height: "32px", width: "32px" }}
@@ -257,7 +257,11 @@ export default function Header() {
                   <li className="nav-item">
                     <NavLink
                       className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                      to="/"
+                      to={
+                        userData.last_active_role === "student"
+                          ? "/student-panel/profile"
+                          : "/tutor-panel/profile"
+                      }
                     >
                       個人資料
                     </NavLink>
@@ -293,7 +297,7 @@ export default function Header() {
                       aria-expanded="false"
                     >
                       <div className="flex-shrink-0">
-                        {!userData.name ? (
+                        {!userData.avatar_url ? (
                           <img
                             src="images/icon/user.png"
                             alt="profile"
@@ -302,7 +306,7 @@ export default function Header() {
                           />
                         ) : (
                           <img
-                            src={userData.avatar}
+                            src={userData.avatar_url}
                             alt="profile"
                             className="object-fit-cover rounded-circle me-4"
                             style={{ height: "32px", width: "32px" }}
@@ -341,7 +345,16 @@ export default function Header() {
                         </Link>
                       </li>
                       <li>
-                        <Link className="dropdown-item">個人資料</Link>
+                        <Link
+                          className="dropdown-item"
+                          to={
+                            userData.last_active_role === "student"
+                              ? "/student-panel/profile"
+                              : "/tutor-panel/profile"
+                          }
+                        >
+                          個人資料
+                        </Link>
                       </li>
                       <li>
                         <button

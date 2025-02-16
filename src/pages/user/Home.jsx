@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 // 第三方套件
-import Swiper from "swiper";
+import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import AOS from "aos";
 
