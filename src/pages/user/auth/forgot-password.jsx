@@ -3,8 +3,8 @@ import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
-import axios from "axios";
 
+import authApi from "../../../api/authApi";
 import Loader from "../../../components/common/Loader";
 
 export default function ForgotPassword() {
@@ -18,12 +18,9 @@ export default function ForgotPassword() {
   const sendEmail = async () => {
     setLoadingState(true);
     try {
-      await axios.post(
-        `https://service.coding-8bit.site/api/v1/password/forgot-password`,
-        {
-          email: email,
-        }
-      );
+      await authApi.sendForgotPasswordEmail({
+        email: email,
+      });
       Swal.fire({
         icon: "success",
         title: "已傳送重設密碼的連結至您的電子信箱",

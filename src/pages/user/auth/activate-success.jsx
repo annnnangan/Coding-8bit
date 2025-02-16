@@ -3,8 +3,8 @@ import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
-import axios from "axios";
 
+import authApi from "../../../api/authApi";
 import Loader from "../../../components/common/Loader";
 
 export default function ActivateSuccess() {
@@ -22,11 +22,12 @@ export default function ActivateSuccess() {
   const activateAccount = async () => {
     setLoadingState(true);
     try {
-      axios.defaults.headers.common.Authorization = token;
-      await axios.get(
-        `https://service.coding-8bit.site/api/v1/auth/activate?token=${token}`
-      );
+      await authApi.activateAccount(token);
       setIsActive(true);
+      Swal.fire({
+        icon: "success",
+        title: "啟用成功",
+      });
       navigate("/login");
     } catch (error) {
       Swal.fire({
