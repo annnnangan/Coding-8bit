@@ -14,7 +14,7 @@ export default function CourseCard({ course }) {
       <div className="card gradient-border img-hover-enlarge p-lg-6 p-4 h-100">
         <div className="overflow-hidden img-wrapper rounded position-relative">
           <img
-            src={course.thumbnail}
+            src={course.cover_image}
             className="card-img-top cover-img rounded"
             alt="course-image"
             style={{
@@ -71,14 +71,14 @@ export default function CourseCard({ course }) {
 
 CourseCard.propTypes = {
   course: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    thumbnail: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    cover_image: PropTypes.string.isRequired,
     category: PropTypes.oneOf(["topicSeries", "customLearning", "freeTipShorts"]).isRequired,
     title: PropTypes.string.isRequired,
     tutor: PropTypes.string.isRequired,
     duration: PropTypes.string.isRequired,
     view_count: PropTypes.number.isRequired,
     rating: PropTypes.number.isRequired,
-    learning_progress_in_percent: PropTypes.string,
+    learning_progress_in_percent: PropTypes.number,
   }),
 };

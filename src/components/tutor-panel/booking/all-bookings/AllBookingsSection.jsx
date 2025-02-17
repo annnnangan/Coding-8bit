@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
-import BookingCard from "./BookingCard";
-import BookingDetailsModal from "./BookingDetailsModal";
+import BookingCard from "../../../common/booking-record/BookingCard";
+import BookingDetailsModal from "../../../common/booking-record/BookingDetailsModal";
 
 import { tutorInProgressBookingData, tutorCompletedBookingData, tutorCanceledBookingData } from "../../../../data/bookings";
 
@@ -124,7 +124,9 @@ export default function AllBookingsSection() {
               <h4 className="mb-6">{month.replace("-", "年")}月</h4>
               <div className="row flex-wrap g-2 row">
                 {bookings.map((booking) => (
-                  <BookingCard key={booking.id} booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
+                  <div className="col-12 col-lg-6 col-xl-4" key={booking.id}>
+                    <BookingCard booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
+                  </div>
                 ))}
               </div>
             </div>

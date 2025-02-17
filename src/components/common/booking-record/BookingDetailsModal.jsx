@@ -3,10 +3,10 @@ import * as bootstrap from "bootstrap";
 import PropTypes from "prop-types";
 import ReactQuill from "react-quill-new";
 
-import { utils } from "../../../custom-course/utils";
-import { determineMeetingLinkMessage } from "../../../../utils/booking-record-utils";
+import { utils } from "../../custom-course/utils";
+import { determineMeetingLinkMessage } from "../../../utils/booking-record-utils";
 
-import AvatarWithFallback from "../../../../components/common/AvatarWithFallback";
+import AvatarWithFallback from "../AvatarWithFallback";
 import BookingStatusBadge from "./BookingStatusBadge";
 import CancelConfirmationModal from "./CancelConfirmationModal";
 

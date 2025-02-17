@@ -7,6 +7,8 @@ import Swal from "sweetalert2";
 import authApi from "../../../api/authApi";
 import Loader from "../../../components/common/Loader";
 
+const { VITE_API_BASE } = import.meta.env;
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -18,7 +20,7 @@ export default function Login() {
   const loginFn = async () => {
     setLoadingState(true);
     try {
-      await authApi.login(formData)
+      await authApi.login(formData);
       Swal.fire({
         title: "登入成功",
         icon: "success",
@@ -82,9 +84,23 @@ export default function Login() {
   const paramToken = searchParams.get("token");
   useEffect(() => {
     if (paramToken) {
-      loginCheck(paramToken);
+      document.cookie = `authToken=${paramToken}; path=/; SameSite=Lax`;
+
+      // 等待瀏覽器設置 Cookie
+      setTimeout(() => {
+        const token =
+          document.cookie.replace(
+            /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+            "$1"
+          ) || null;
+
+        if (token) {
+          loginCheck(token);
+        }
+      }, 100);
     }
   }, []);
+
   return (
     <>
       <Helmet>
@@ -192,7 +208,7 @@ export default function Login() {
                     <hr />
                   </div>
                   <a
-                    href="https://coding-bit-backend.onrender.com/api/v1/auth/google"
+                    href={`${VITE_API_BASE}/auth/google`}
                     type="button"
                     className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt-lg-8"
                   >
