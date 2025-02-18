@@ -79,7 +79,7 @@ export default function TutorProfile() {
         >
           <li className="nav-item" role="presentation">
             <button
-              className="nav-link active"
+              className="nav-link"
               id="profile-tab"
               data-bs-toggle="tab"
               data-bs-target="#profile"
@@ -94,7 +94,7 @@ export default function TutorProfile() {
           </li>
           <li className="nav-item" role="presentation">
             <button
-              className="nav-link"
+              className="nav-link active"
               id="aboutMe-tab"
               data-bs-toggle="tab"
               data-bs-target="#aboutMe"
@@ -112,7 +112,7 @@ export default function TutorProfile() {
           <div className="col">
             <div className="tab-content" id="tutorProfileTabContent">
               <div
-                className="tab-pane fade show active"
+                className="tab-pane fade"
                 id="profile"
                 role="tabpanel"
                 aria-labelledby="profile-tab"
@@ -133,7 +133,7 @@ export default function TutorProfile() {
                 </div>
               </div>
               <div
-                className="tab-pane fade"
+                className="tab-pane fade show active"
                 id="aboutMe"
                 role="tabpanel"
                 aria-labelledby="aboutMe-tab"
