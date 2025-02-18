@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
+import { store } from "./utils/store.js";
+import { Provider } from "react-redux";
 
 import App from "./App.jsx";
 
@@ -14,8 +16,10 @@ import "react-quill-new/dist/quill.snow.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
+    <Provider store={store}>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </Provider>
   </StrictMode>
 );
