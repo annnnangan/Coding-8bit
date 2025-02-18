@@ -43,15 +43,20 @@ export default function Header() {
   const roleToggle = async () => {
     setLoadingState(true);
     try {
-      const role =
-        userData.last_active_role === "student"
-          ? { role: "tutor" }
-          : { role: "student" };
+      const newRole =
+        userData.last_active_role === "student" ? "tutor" : "student";
+
       const res = await axios.put(
         `https://service.coding-8bit.site/api/v1/user/users/me/role`,
-        role
+        { role: newRole }
       );
-      navigate(0);
+      if (res.status === 200) {
+        setUserData((prev) => ({
+          ...prev,
+          last_active_role: newRole,
+        }));
+        setIsAuth(true);
+      }
       if (res.status === 200) {
         setIsAuth(true);
       }

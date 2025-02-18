@@ -29,7 +29,7 @@ export default function CourseCard({ course }) {
         <div className="card-body p-0 mt-3 mt-lg-4 f-column-between">
           <div>
             <h3 className="card-title fs-6 fs-lg-5">{course.title}</h3>
-            <p className="card-text fs-7 fs-lg-6 mt-1 mt-lg-2">{course.tutor}</p>
+            <p className="card-text fs-7 fs-lg-6 mt-1 mt-lg-2">{course.Tutor.User.username}</p>
           </div>
           <div className="f-between-center">
             <div className="f-align-center mt-1 mt-lg-2">
@@ -75,10 +75,14 @@ CourseCard.propTypes = {
     cover_image: PropTypes.string.isRequired,
     category: PropTypes.oneOf(["topicSeries", "customLearning", "freeTipShorts"]).isRequired,
     title: PropTypes.string.isRequired,
-    tutor: PropTypes.string.isRequired,
-    duration: PropTypes.string.isRequired,
+    Tutor: PropTypes.shape({
+      User: PropTypes.shape({
+        username: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+    duration: PropTypes.number.isRequired,
     view_count: PropTypes.number.isRequired,
-    rating: PropTypes.number.isRequired,
+    rating: PropTypes.string.isRequired,
     learning_progress_in_percent: PropTypes.number,
-  }),
+  }).isRequired,
 };
