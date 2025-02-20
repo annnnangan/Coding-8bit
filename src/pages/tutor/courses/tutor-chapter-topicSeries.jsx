@@ -128,7 +128,7 @@ export default function TutorManageTopicSeriesChapter() {
                   </td>
                   <td>{course.chapterTitle}</td>
                   <td>2024年12月5日</td>
-                  <td>{Number(course.viewCount).toLocaleString()}</td>
+                  <td>{course.viewCount.toLocaleString()}</td>
                   <td>
                     <div>
                       <Link

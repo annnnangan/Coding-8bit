@@ -1,16 +1,16 @@
 import { NavLink } from "react-router-dom";
 
+import PropTypes from "prop-types";
+
 const courseCategoryMap = {
   topicSeries: "主題式課程影片",
   customLearning: "客製化學習需求影片",
   freeTipShorts: "實用技術短影片",
 };
 
-import PropTypes from "prop-types";
-
-export default function CourseCard({ course }) {
+export default function CourseCard({ course, type = "courseDetail" }) {
   return (
-    <NavLink to={`/course/${course.id}`} className="course-card card-column">
+    <NavLink to={type === 'courseDetail' ? `/course/${course.id}` : `/video/${course.id}`} className="course-card card-column">
       <div className="card gradient-border img-hover-enlarge p-lg-6 p-4 h-100">
         <div className="overflow-hidden img-wrapper rounded position-relative">
           <img
@@ -24,26 +24,38 @@ export default function CourseCard({ course }) {
             }}
           />
         </div>
-        <span className="course-category-tag bg-brand-02 text-brand-03 position-absolute start-0">{courseCategoryMap[course.category]}</span>
+        <span className="course-category-tag bg-brand-02 text-brand-03 position-absolute start-0">
+          {courseCategoryMap[course.video_type]}
+        </span>
 
         <div className="card-body p-0 mt-3 mt-lg-4 f-column-between">
           <div>
             <h3 className="card-title fs-6 fs-lg-5">{course.title}</h3>
-            <p className="card-text fs-7 fs-lg-6 mt-1 mt-lg-2">{course.Tutor.User.username}</p>
+            <p className="card-text fs-7 fs-lg-6 mt-1 mt-lg-2">
+              {course.Tutor.User.username}
+            </p>
           </div>
           <div className="f-between-center">
             <div className="f-align-center mt-1 mt-lg-2">
               <div className="f-center">
-                <span className="material-symbols-outlined fs-5 me-1">schedule</span>
+                <span className="material-symbols-outlined fs-5 me-1">
+                  schedule
+                </span>
                 <p className="fs-7 fs-lg-6">{course.duration}</p>
               </div>
               <div className="f-center ms-2">
-                <span className="material-symbols-outlined fs-5 me-1">group</span>
-                <p className="fs-7 fs-lg-6">{Number(course.view_count).toLocaleString()}</p>
+                <span className="material-symbols-outlined fs-5 me-1">
+                  group
+                </span>
+                <p className="fs-7 fs-lg-6">
+                  {course.view_count.toLocaleString()}
+                </p>
               </div>
             </div>
             <p className="f-center text-brand-03 fs-7 fs-lg-6">
-              <span className="material-symbols-outlined icon-fill text-brand-01 fs-6 fs-lg-5 me-1">kid_star</span>
+              <span className="material-symbols-outlined icon-fill text-brand-01 fs-6 fs-lg-5 me-1">
+                kid_star
+              </span>
               {course.rating}
             </p>
           </div>
@@ -58,9 +70,14 @@ export default function CourseCard({ course }) {
                 aria-valuemax="100"
                 style={{ height: `8px`, width: "100%" }}
               >
-                <div className="progress-bar" style={{ width: `${course.learning_progress_in_percent}%` }}></div>
+                <div
+                  className="progress-bar"
+                  style={{ width: `${course.learning_progress_in_percent}%` }}
+                ></div>
               </div>
-              <p className="ms-3 fs-7 text-gray-02">{course.learning_progress_in_percent}%</p>
+              <p className="ms-3 fs-7 text-gray-02">
+                {course.learning_progress_in_percent}%
+              </p>
             </div>
           )}
         </div>
@@ -73,7 +90,11 @@ CourseCard.propTypes = {
   course: PropTypes.shape({
     id: PropTypes.string.isRequired,
     cover_image: PropTypes.string.isRequired,
-    category: PropTypes.oneOf(["topicSeries", "customLearning", "freeTipShorts"]).isRequired,
+    video_type: PropTypes.oneOf([
+      "topicSeries",
+      "customLearning",
+      "freeTipShorts",
+    ]).isRequired,
     title: PropTypes.string.isRequired,
     Tutor: PropTypes.shape({
       User: PropTypes.shape({
@@ -85,4 +106,5 @@ CourseCard.propTypes = {
     rating: PropTypes.string.isRequired,
     learning_progress_in_percent: PropTypes.number,
   }).isRequired,
+  type: PropTypes.oneOf(["courseDetail", "singleVideo"]),
 };

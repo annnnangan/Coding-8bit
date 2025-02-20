@@ -72,56 +72,32 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
   // loading
   const [loadingState, setLoadingState] = useState(false);
 
-  const location = useLocation();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
   const handleTogglerClick = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
   // 取得使用者資料
   const [userData, setUserData] = useState({});
-  const getUserData = async () => {
+  const getUserData = async (token) => {
     setLoadingState(true);
     try {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       const res = await axios.get(
         `https://service.coding-8bit.site/api/v1/user/users/me`
       );
       setUserData(res.data);
     } catch (error) {
       console.log(error);
-      Swal.fire({
-        icon: "error",
-        title: "使用者資料取得錯誤",
-        text: error?.response?.data?.message,
-      });
-      navigate("/login");
     } finally {
       setLoadingState(false);
     }
   };
 
-  // 驗證身分
-  const loginCheck = async () => {
-    setLoadingState(true);
-    try {
-      await authApi.loginCheck;;
-      getUserData();
-    } catch (error) {
-      console.log(error);
-      Swal.fire({
-        icon: "error",
-        title: "驗證錯誤",
-        text: error?.response?.data?.message,
-      });
-      navigate("/login");
-    } finally {
-      setLoadingState(false);
-    }
-  };
-
-  // 初始化 - 確認有無 token 
+  // 初始化 - 確認是否已登入
   useEffect(() => {
     const token =
       document.cookie.replace(
@@ -129,16 +105,14 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
         "$1"
       ) || null;
     if (token) {
-      loginCheck();
-    } else {
-      Swal.fire({
-        icon: "warning",
-        title: "未登入",
-        text: "請先登入。",
-      });
-      navigate("/login");
+      getUserData(token);
     }
   }, []);
+
+  // 初始化 - 監聽路由變化，有切換路由則隱藏 Menu
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location]);
 
   return (
     <>
