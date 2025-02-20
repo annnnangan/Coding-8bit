@@ -6,7 +6,7 @@ const getAllTutor = async () => {
   return response.data;
 };
 
-// 取得單一講師
+// 取得單一講師資料
 const getTutorDetail = async (tutorId) => {
   const response = await apiClient.get(`/tutor/${tutorId}`);
   return response.data;

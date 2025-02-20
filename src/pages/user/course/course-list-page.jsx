@@ -33,7 +33,7 @@ export default function CourseListPage() {
       try {
         const result = await courseApi.getAllCourses(dataPage, sortBy, order);
         setPage(dataPage)
-        setCourseList(result);
+        setCourseList(result.courses);
       } catch (error) {
         console.log("錯誤", error);
       } finally {

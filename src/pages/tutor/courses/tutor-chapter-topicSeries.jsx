@@ -69,7 +69,7 @@ export default function TutorManageTopicSeriesChapter() {
           <div className="dropdown">
             <button
               type="button"
-              className="btn btn-outline-gray-03 border-1 dropdown-toggle px-11"
+              className="btn btn-outline-gray-03 border-1 dropdown-toggle ps-9 pe-11"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >

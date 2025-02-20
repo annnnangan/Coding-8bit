@@ -4,7 +4,7 @@ import apiClient from './apiClient';
 const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", limit = 9) => {
   const response = await apiClient
   .get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 取得特定類別所有影片列表
@@ -16,7 +16,7 @@ const getAllVideos = async (video_type, page = 1, limit = 9 ) => {
 // 取得單一課程
 const getCourseDetail = async (id) => {
   const response = await apiClient.get(`/course/${id}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 取得課程所有章節
@@ -37,9 +37,17 @@ const getCourseComments = async (id) => {
   return response.data;
 };
 
-// 取得單一課程的章節
-const getCourseChapters = async (id) => {
-  const response = await apiClient.get(`/videos/${id}/chapters`);
+// 後台 - 取得單一講師所有課程
+const getTutorCourses = async (tutorId = "" , page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
+  const response = await apiClient
+  .get(`/course?tutor_id=${tutorId}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+  return response.data.data;
+};
+
+// 後台 - 取得單一講師所有影片
+const getTutorVideos = async (tutorId = "" , video_type = "" , page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
+  const response = await apiClient
+  .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
   return response.data;
 };
 
@@ -50,5 +58,6 @@ export default {
   getCourseChapter,
   getVideoDetail, 
   getCourseComments,
-  getCourseChapters
+  getTutorCourses,
+  getTutorVideos
 };

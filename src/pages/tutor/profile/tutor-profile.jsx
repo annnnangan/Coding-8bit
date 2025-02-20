@@ -6,9 +6,9 @@ import axios from "axios";
 import ResetPassword from "../../../components/common/profile/ResetPassword";
 import ProfileContent from "../../../components/common/profile/ProfileContent";
 
-import WorkExperienceSection from "../../../components/tutor-panel/booking/profile/WorkExperienceSection";
-import EducationSection from "../../../components/tutor-panel/booking/profile/EducationSection";
-import CertificatesSection from "../../../components/tutor-panel/booking/profile/CertificatesSection";
+import WorkExperienceSection from "../../../components/tutor-panel/profile/WorkExperienceSection";
+import EducationSection from "../../../components/tutor-panel/profile/EducationSection";
+import CertificatesSection from "../../../components/tutor-panel/profile/CertificatesSection";
 
 import Loader from "../../../components/common/Loader";
 

@@ -28,8 +28,6 @@ export default function CourseDetailPage() {
       const chapterResult = await courseApi.getCourseChapter(id);
       setCourseList(courseResult);
       setChapter(chapterResult);
-      console.log(courseResult);
-      console.log(chapterResult);
     } catch (error) {
       console.log("錯誤", error);
     } finally {

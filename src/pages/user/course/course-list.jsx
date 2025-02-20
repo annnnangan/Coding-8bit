@@ -40,7 +40,7 @@ export default function CourseList() {
       const topicSeries = await courseApi.getAllCourses();
       const customLearning = await courseApi.getAllVideos("customLearning");
       const freeTipShorts = await courseApi.getAllVideos("freeTipShorts");
-      setTopicSeriesCourseList(topicSeries);
+      setTopicSeriesCourseList(topicSeries.courses);
       setCustomLearningCourseList(customLearning);
       setFreeTipShortsCourseList(freeTipShorts);
     } catch (error) {

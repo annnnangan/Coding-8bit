@@ -12,16 +12,28 @@
 .tutor-manage-course-list-wrap,
 .tutor-chapter-topicSeries-wrap {
   /* course-list-table */
+  .table {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
   .table thead tr th {
     font-weight: 500;
     padding-bottom: 12px;
   }
   .table tbody tr td {
-    padding: 12px 0;
+    padding: 8px 0;
 
-    img {
-      width: 148px;
+    .cover_image-wrap {
+      width: 120px;
     }
+  }
+
+  .related-video-duration {
+    right: 0;
+    bottom: 0;
+    color: $gray-04;
+    line-height: 1.2;
+    background-color: #1e1e1e4d;
   }
 }
 
