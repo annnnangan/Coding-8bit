@@ -2,14 +2,12 @@ import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import axios from "axios";
-
+import userApi from "../../../api/userApi";
 import courseApi from "../../../api/courseApi";
 
+import TopicSeriesList from "../../../components/tutor-panel/course/course-list/TopicSeriesLis";
 import Loader from "../../../components/common/Loader";
 import Pagination from "../../../components/layout/Pagination";
-
-const { VITE_API_BASE_2 } = import.meta.env;
 
 export default function TutorManageCourses() {
   // loading
@@ -37,33 +35,32 @@ export default function TutorManageCourses() {
     setActiveTab(index);
   };
 
-  // 篩選出跟當前講師同名的課程函式
-  const filteredCourses = (courses, tutorResult) =>
-    courses.filter((course) => {
-      return course.tutor === tutorResult.data.name;
-    });
-
   // 取得資料函式
   const [courses, setCourses] = useState({
     topicSeries: [],
     customLearning: [],
     freeTipShorts: [],
   });
+  const [page, setPage] = useState(1);
   const getData = async () => {
     setLoadingState(true);
     try {
-      const tutorResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/1`);
-      const topicSeriesCourses = await courseApi.getCourses("topicSeries");
-      const customLearningCourses = await courseApi.getCourses(
+      const { tutor_id } = await userApi.getUserData();
+      const topicSeriesCourses = await courseApi.getTutorCourses(tutor_id);
+      const customLearningCourses = await courseApi.getTutorVideos(
+        tutor_id,
         "customLearning"
       );
-      const freeTipShortsCourses = await courseApi.getCourses("freeTipShorts");
+      const freeTipShortsCourses = await courseApi.getTutorVideos(
+        tutor_id,
+        "freeTipShorts"
+      );
 
       setCourses((prevCourses) => ({
         ...prevCourses,
-        topicSeries: filteredCourses(topicSeriesCourses, tutorResult),
-        customLearning: filteredCourses(customLearningCourses, tutorResult),
-        freeTipShorts: filteredCourses(freeTipShortsCourses, tutorResult),
+        topicSeries: topicSeriesCourses,
+        customLearning: customLearningCourses,
+        freeTipShorts: freeTipShortsCourses,
       }));
     } catch (error) {
       console.log("錯誤", error);
@@ -132,11 +129,11 @@ export default function TutorManageCourses() {
         </div>
 
         {/* 篩選與搜尋 */}
-        <div className="f-end-center mt-10">
+        <div className="f-end-center mt-4 mt-lg-6">
           <div className="dropdown">
             <button
               type="button"
-              className="btn btn-outline-gray-03 border-1 dropdown-toggle px-11"
+              className="btn btn-outline-gray-03 border-1 dropdown-toggle ps-9 pe-11"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
@@ -175,7 +172,7 @@ export default function TutorManageCourses() {
 
         {/* 影片列表 */}
         <ul
-          className="nav nav-tabs border-bottom border-gray-03 mt-4"
+          className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-0"
           id="courseCategoryTab"
           role="tablist"
         >
@@ -230,51 +227,17 @@ export default function TutorManageCourses() {
                   </thead>
                   {item.category === "topicSeries" &&
                     courses.topicSeries.map((course) => (
-                      <tbody key={course.id}>
-                        <tr className="align-middle">
-                          <td>
-                            <img src={course.thumbnail} alt="course-image" />
-                          </td>
-                          <td>{course.title}</td>
-                          <td>{course.tag}</td>
-                          <td>{course.isPublic ? "公開" : "未公開"}</td>
-                          <td>2024年12月1日</td>
-                          <td>{Number(course.view_count).toLocaleString()}</td>
-                          <td>{course.rating}</td>
-                          <td>
-                            <div>
-                              <NavLink
-                                to={`/tutor-panel/course/topicSeries/${course.id}/chapter`}
-                                className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  dataset
-                                </span>
-                                詳細
-                              </NavLink>
-                              <button
-                                type="button"
-                                className="btn link-danger border-0 f-align-center p-0 mt-1"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  delete
-                                </span>
-                                刪除
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
+                      <TopicSeriesList course={course} key={course.id} />
                     ))}
                   {item.category === "customLearning" &&
                     courses.customLearning.map((course) => (
                       <tbody key={course.id}>
                         <tr className="align-middle">
                           <td>
-                            <img src={course.thumbnail} alt="course-image" />
+                            <img src={course.cover_image} alt="course-image" />
                           </td>
                           <td>{course.title}</td>
-                          <td>{course.tag}</td>
+                          <td>{course.category}</td>
                           <td>{course.isPublic ? "公開" : "未公開"}</td>
                           <td>2024年12月1日</td>
                           <td>{Number(course.view_count).toLocaleString()}</td>
@@ -309,10 +272,10 @@ export default function TutorManageCourses() {
                       <tbody key={course.id}>
                         <tr className="align-middle">
                           <td>
-                            <img src={course.thumbnail} alt="course-image" />
+                            <img src={course.cover_image} alt="course-image" />
                           </td>
                           <td>{course.title}</td>
-                          <td>{course.tag}</td>
+                          <td>{course.category}</td>
                           <td>{course.isPublic ? "公開" : "未公開"}</td>
                           <td>2024年12月1日</td>
                           <td>{Number(course.view_count).toLocaleString()}</td>
@@ -351,7 +314,7 @@ export default function TutorManageCourses() {
 
       {/* 頁碼 */}
       <div className="position-absolute end-0 bottom-0 pe-6 pb-6">
-        <Pagination />
+        <Pagination page={page} setPage={setPage} getData={getData} />
       </div>
     </>
   );

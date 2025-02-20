@@ -4,7 +4,7 @@ import * as bootstrap from "bootstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-import Loader from "../../../../components/common/Loader";
+import Loader from "../../common/Loader";
 
 const { VITE_API_BASE } = import.meta.env;
 
@@ -17,23 +17,23 @@ export default function WorkExperienceSection() {
   //     id: 11258,
   //     company: "High School",
   //     position: "Math Teacher",
-  //     start_data: "2019",
-  //     end_data: "2021",
+  //     start_year: "2019",
+  //     end_year: "2021",
   //   },
   //   {
   //     id: 22258,
   //     company: "High School",
   //     position: "Math Teacher",
-  //     start_data: "2016",
-  //     end_data: "2020",
+  //     start_year: "2016",
+  //     end_year: "2020",
   //   },
   // ];
   const [workExperiences, setWorkExperiences] = useState([]);
   const [temExperience, setTemExperience] = useState({
     company: "",
     position: "",
-    start_data: "",
-    end_data: "",
+    start_year: "",
+    end_year: "",
   });
 
   // modal
@@ -50,8 +50,8 @@ export default function WorkExperienceSection() {
       setTemExperience({
         company: "",
         position: "",
-        start_data: "",
-        end_data: "",
+        start_year: 0,
+        end_year: 0,
       });
     }
     myModal.current.show();
@@ -66,7 +66,7 @@ export default function WorkExperienceSection() {
   const handleExpChange = (e, field) => {
     let value = e.target.value;
 
-    if (field === "start_data" || field === "end_data") {
+    if (field === "start_year" || field === "end_year") {
       value = value ? parseInt(value, 10) : "";
     }
 
@@ -83,6 +83,7 @@ export default function WorkExperienceSection() {
     try {
       const { data } = await axios.get(`${VITE_API_BASE}/user/users/me`);
       setTutorId(data.id);
+      console.log(data)
       const result = await axios.get(
         `${VITE_API_BASE}/tutor/${data.id}/experiences`
       );
@@ -103,12 +104,12 @@ export default function WorkExperienceSection() {
     setLoadingState(true);
     try {
       console.log({
-        tutor_id: tutorId,
         ...temExperience,
+        tutor_id: tutorId,
       });
       await axios.post(`${VITE_API_BASE}/tutor/${tutorId}/experiences`, {
-        tutor_id: tutorId,
         ...temExperience,
+        tutor_id: tutorId,
       });
       setTemExperience({});
       Swal.fire({
@@ -187,8 +188,8 @@ export default function WorkExperienceSection() {
               <tr key={experience.id}>
                 <td>{experience.company}</td>
                 <td>{experience.position}</td>
-                <td>{experience.start_data}</td>
-                <td>{experience.end_data}</td>
+                <td>{experience.start_year}</td>
+                <td>{experience.end_year}</td>
                 <td>
                   <button
                     className="btn btn-sm btn-brand-03"
@@ -260,29 +261,29 @@ export default function WorkExperienceSection() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="start_data" className="form-label">
+                    <label htmlFor="start_year" className="form-label">
                       在職年份
                     </label>
                     <input
                       type="number"
                       className="form-control"
                       placeholder="2017"
-                      id="start_data"
-                      value={temExperience.start_data}
-                      onChange={(e) => handleExpChange(e, "start_data")}
+                      id="start_year"
+                      value={temExperience.start_year}
+                      onChange={(e) => handleExpChange(e, "start_year")}
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="end_data" className="form-label">
+                    <label htmlFor="end_year" className="form-label">
                       離職年份
                     </label>
                     <input
                       type="number"
                       className="form-control"
                       placeholder="2020"
-                      id="end_data"
-                      value={temExperience.end_data}
-                      onChange={(e) => handleExpChange(e, "end_data")}
+                      id="end_year"
+                      value={temExperience.end_year}
+                      onChange={(e) => handleExpChange(e, "end_year")}
                     />
                   </div>
                 </form>
