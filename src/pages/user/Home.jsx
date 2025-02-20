@@ -30,7 +30,7 @@ export default function Home() {
     setLoadingState(true);
     try {
       const result = await courseApi.getAllCourses();
-      setCourseList(result);
+      setCourseList(result.courses);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
