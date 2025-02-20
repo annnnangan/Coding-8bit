@@ -36,11 +36,6 @@ export default function CourseVideoPage() {
         Tutor: { ...tutorResult, User: { ...tutorUserDataResult } },
         ...videoResult,
       });
-      console.log(videoResult);
-      console.log({
-        Tutor: { ...tutorResult, User: { ...tutorUserDataResult } },
-        ...videoResult,
-      });
     } catch (error) {
       console.log("錯誤", error);
     } finally {

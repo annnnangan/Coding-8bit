@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-export default function Pagination({ page, setPage, getData }) {
+export default function Pagination({ page, getData }) {
   // 切換頁碼
   const changePage = (page) => {
     getData(page);
@@ -68,6 +68,5 @@ export default function Pagination({ page, setPage, getData }) {
 }
 Pagination.propTypes = {
   page: PropTypes.number.isRequired,
-  setPage: PropTypes.func.isRequired,
   getData: PropTypes.func.isRequired,
 };
