@@ -16,7 +16,9 @@ import ResetPassword from "../pages/user/auth/reset-password";
 
 import CourseList from "../pages/user/course/course-list";
 import CourseListPage from "../pages/user/course/course-list-page";
-import CourseVideoPage from "../pages/user/course/course-video-page";
+import CourseDetailPage from "../pages/user/course/detail-page/course-detail-page";
+import CourseVideoPage from "../pages/user/course/detail-page/course-video-page";
+import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
 import CustomCourseList from "../pages/user/custom-course/custom-course-list";
 import AddLearningNeedPage from "../pages/user/custom-course/add-learning-need-page";
@@ -66,7 +68,9 @@ export const router = createHashRouter([
 
       { path: "course-list", element: <CourseList /> },
       { path: "course", element: <CourseListPage /> },
-      { path: "course/:id", element: <CourseVideoPage /> },
+      { path: "course/:id", element: <CourseDetailPage /> },
+      { path: "course/:id/chapter/:videoId", element: <CourseVideoPage /> },
+      { path: "video/:videoId", element: <SingleVideoPage /> },
 
       { path: "custom-course-list", element: <CustomCourseList /> },
       { path: "add-learning-need", element: <AddLearningNeedPage /> },

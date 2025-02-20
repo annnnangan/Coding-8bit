@@ -1,41 +1,73 @@
-export default function Pagination() {
+import PropTypes from "prop-types";
+
+export default function Pagination({ page, setPage, getData }) {
+  // 切換頁碼
+  const changePage = (page) => {
+    getData(page);
+  };
+
   return (
     <ul className="pagination f-center">
-      <li className="page-item disabled">
-        <a className="page-link" href="#" aria-label="Previous">
+      <li className="page-item">
+        <button
+          className="page-link"
+          aria-label="Previous"
+          disabled={page === 1}
+          onClick={() => changePage(page - 1)}
+        >
           <span aria-hidden="true">
             <span className="material-symbols-outlined align-middle">
-              {" "}
               arrow_left
             </span>
           </span>
-        </a>
+        </button>
       </li>
       <li className="page-item">
-        <a className="page-link active" href="#">
+        <button
+          type="button"
+          className={`page-link ${page === 1 && "active"}`}
+          onClick={() => changePage(1)}
+        >
           1
-        </a>
+        </button>
       </li>
       <li className="page-item">
-        <a className="page-link" href="#">
+        <button
+          type="button"
+          className={`page-link ${page === 2 && "active"}`}
+          onClick={() => changePage(2)}
+        >
           2
-        </a>
+        </button>
       </li>
       <li className="page-item">
-        <a className="page-link" href="#">
+        <button
+          type="button"
+          className={`page-link ${page === 3 && "active"}`}
+          onClick={() => changePage(3)}
+        >
           3
-        </a>
+        </button>
       </li>
       <li className="page-item">
-        <a className="page-link" href="#" aria-label="Next">
+        <button
+          type="button"
+          className="page-link"
+          aria-label="Next"
+          onClick={() => changePage(page + 1)}
+        >
           <span aria-hidden="true">
             <span className="material-symbols-outlined align-middle">
-              {" "}
               arrow_right
             </span>
           </span>
-        </a>
+        </button>
       </li>
     </ul>
   );
 }
+Pagination.propTypes = {
+  page: PropTypes.number.isRequired,
+  setPage: PropTypes.func.isRequired,
+  getData: PropTypes.func.isRequired,
+};
