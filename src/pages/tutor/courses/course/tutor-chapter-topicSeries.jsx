@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams, useNavigate, Link } from "react-router-dom";
 
-import courseApi from "../../../api/courseApi";
+import courseApi from "../../../../api/courseApi";
 
-import Loader from "../../../components/common/Loader";
-import Pagination from "../../../components/layout/Pagination";
+import Loader from "../../../../components/common/Loader";
+import Pagination from "../../../../components/layout/Pagination";
 
 export default function TutorManageTopicSeriesChapter() {
   const { id } = useParams();
@@ -23,7 +23,9 @@ export default function TutorManageTopicSeriesChapter() {
   const getData = async () => {
     setLoadingState(true);
     try {
-      const result = await courseApi.getCourseChapters(id);
+      const result = await courseApi.getCourseChapter(
+        "27d89489-7dbb-4d38-b51c-9b27d4942e88"
+      );
       setCourseList(result);
     } catch (error) {
       console.log("錯誤", error);
@@ -44,7 +46,7 @@ export default function TutorManageTopicSeriesChapter() {
       </Helmet>
       {loadingState && <Loader />}
 
-      <main className="tutor-chapter-topicSeries-wrap container-fluid pb-11">
+      {/* <main className="tutor-chapter-topicSeries-wrap container-fluid pb-11">
         <div className="f-between">
           <div className="title f-align-center">
             <button
@@ -119,48 +121,61 @@ export default function TutorManageTopicSeriesChapter() {
                 <th>操作</th>
               </tr>
             </thead>
-            {courseList.map((course) => (
-              <tbody key={course.chapterId}>
-                <tr className="align-middle">
-                  <td>{course.chapterNumber}</td>
+            {courseList ? (
+              <>
+                {courseList.map((course, index) => (
+                  <tbody key={course.chapter_id}>
+                    <tr className="align-middle">
+                      <td>{course.chapterNumber}</td>
+                      <td>
+                        <img src={course.cover_image} alt="course-image" />
+                      </td>
+                      <td>{course.title}</td>
+                      <td>2024年12月5日</td>
+                      <td>{Number(course.view_count).toLocaleString()}</td>
+                      <td>
+                        <div>
+                          <Link
+                            to={`/tutor-panel/course/topicSeries/${course.chapter_id}/chapter`}
+                            className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
+                          >
+                            <span className="material-symbols-outlined me-1">
+                              edit
+                            </span>
+                            編輯
+                          </Link>
+                          <button
+                            type="button"
+                            className="btn link-danger border-0 f-align-center p-0 mt-1"
+                          >
+                            <span className="material-symbols-outlined me-1">
+                              delete
+                            </span>
+                            刪除
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                ))}
+              </>
+            ) : (
+              <tbody>
+                <tr>
                   <td>
-                    <img src={course.thumbnail} alt="course-image" />
-                  </td>
-                  <td>{course.chapterTitle}</td>
-                  <td>2024年12月5日</td>
-                  <td>{course.viewCount.toLocaleString()}</td>
-                  <td>
-                    <div>
-                      <Link
-                        to={`/tutor-panel/course/topicSeries/${course.chapterId}/chapter`}
-                        className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                      >
-                        <span className="material-symbols-outlined me-1">
-                          edit
-                        </span>
-                        編輯
-                      </Link>
-                      <button
-                        type="button"
-                        className="btn link-danger border-0 f-align-center p-0 mt-1"
-                      >
-                        <span className="material-symbols-outlined me-1">
-                          delete
-                        </span>
-                        刪除
-                      </button>
-                    </div>
+                    <p>目前無章節影片</p>
                   </td>
                 </tr>
               </tbody>
-            ))}
+            )}
           </table>
           {/* 頁碼 */}
           <div className="f-end-center mt-6">
             <Pagination />
           </div>
         </div>
-      </main>
+      {/* </main> */} 
+      <></>
     </>
   );
 }

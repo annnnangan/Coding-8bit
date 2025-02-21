@@ -10,7 +10,7 @@ const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", limit 
 // 取得特定類別所有影片列表
 const getAllVideos = async (video_type, page = 1, limit = 9 ) => {
   const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&limit=${limit}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 取得單一課程
@@ -28,13 +28,13 @@ const getCourseChapter = async (id) => {
 // 取得單一影片
 const getVideoDetail = async (id) => {
   const response = await apiClient.get(`/video/${id}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
   const response = await apiClient.get(`/videos/${id}/comments`);
-  return response.data;
+  return response.data.data;
 };
 
 // 後台 - 取得單一講師所有課程
@@ -48,7 +48,44 @@ const getTutorCourses = async (tutorId = "" , page = 1, sortBy = "rating", order
 const getTutorVideos = async (tutorId = "" , video_type = "" , page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
   const response = await apiClient
   .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
-  return response.data;
+  return response.data.data;
+};
+
+// 後台 - 新增課程
+const addCourse = async (courseData) => {
+  const response = await apiClient.post(`/course/`, courseData);
+  return response;
+};
+
+// 後台 - 修改課程
+const updateCourse = async (courseId, courseData) => {
+  const response = await apiClient.put(`/course/${courseId}`, courseData);
+  return response;
+};
+
+
+// 後台 - 刪除課程
+const deleteCourse = async (courseId) => {
+  const response = await apiClient.delete(`/course/${courseId}`);
+  return response;
+};
+
+// 後台 - 建立章節
+const addChapter = async (courseId, data) => {
+  const response = await apiClient.post(`/course/${courseId}/chapters`, data);
+  return response;
+}
+
+// 後台 - 刪除章節
+const deleteChapter = async (courseId, chapterId) => {
+  const response = await apiClient.delete(`/course/${courseId}/chapters/${chapterId}`);
+  return response;
+}
+
+// 後台 - 新增影片
+const addVideo = async (videoData) => {
+  const response = await apiClient.post(`/video/`, videoData);
+  return response;
 };
 
 export default {
@@ -59,5 +96,11 @@ export default {
   getVideoDetail, 
   getCourseComments,
   getTutorCourses,
-  getTutorVideos
+  getTutorVideos,
+  addCourse,
+  updateCourse,
+  deleteCourse,
+  addChapter,
+  addVideo,
+  deleteChapter
 };
