@@ -1,9 +1,31 @@
 import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 
-// import CommentsSection from "./CommentsSection"
+import courseApi from "../../../api/courseApi";
 
-export default function VideoContent({ videoUrl, courseList }) {
-  // const [comments, setComments] = useState([]);
+import CommentsSection from "./CommentsSection";
+
+export default function VideoContent({
+  videoUrl,
+  courseList,
+  introductionVideoId,
+}) {
+  const [comments, setComments] = useState([]);
+  useEffect(() => {
+    if (introductionVideoId) {
+      const getCourseCommentsHandle = async () => {
+        try {
+          const commentsResult = await courseApi.getCourseComments(
+            introductionVideoId
+          );
+          setComments(commentsResult);
+        } catch (error) {
+          console.error("錯誤!!! 請聯繫系統管理員");
+        }
+      };
+      getCourseCommentsHandle();
+    }
+  }, [introductionVideoId]);
 
   return (
     <section className="col-lg-7 col-xl-8">
@@ -11,7 +33,9 @@ export default function VideoContent({ videoUrl, courseList }) {
         poster={courseList.cover_image}
         className="mb-6 w-100 video-show mouse-pointer-style"
         src={videoUrl}
-        style={{ height: "500px" }}
+        style={{
+          maxHeight: "480px",
+        }}
         controls
       ></video>
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
@@ -138,6 +162,7 @@ export default function VideoContent({ videoUrl, courseList }) {
               aria-labelledby="profile-tab"
             >
               {/* <CommentsSection/> */}
+              <CommentsSection comments={comments}/>
             </div>
           </div>
         </nav>
@@ -165,4 +190,5 @@ VideoContent.propTypes = {
     is_reviewed: PropTypes.string,
   }).isRequired,
   videoUrl: PropTypes.string,
+  introductionVideoId: PropTypes.string,
 };

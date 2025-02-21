@@ -50,12 +50,12 @@ export default function CourseDetailPage() {
         </title>
       </Helmet>
       {loadingState && <Loader />}
-
       <main className="video-details container-lg py-lg-13 py-md-0">
         <div className="row">
           <VideoContent
             videoUrl={chapter[0]?.Videos[0]?.video_url}
             courseList={courseList}
+            introductionVideoId={chapter[0]?.Videos[0]?.id} //章節第0張為課程介紹影片
           />
 
           <aside className="col-lg-5 col-xl-4">

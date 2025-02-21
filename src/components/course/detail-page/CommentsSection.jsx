@@ -1,9 +1,11 @@
 import PropTypes from "prop-types";
 
 export default function CommentsSection({ comments }) {
+  console.log(comments);
+  
   return (
     <>
-      <section className="video-comments pt-6">
+      {/* <section className="video-comments pt-6">
         <div className="d-flex py-4 mb-6">
           <img
             className="user-comment-picture me-3"
@@ -112,7 +114,7 @@ export default function CommentsSection({ comments }) {
             </li>
           ))}
         </ul>
-      </section>
+      </section> */}
     </>
   );
 }

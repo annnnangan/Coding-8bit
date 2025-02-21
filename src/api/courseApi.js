@@ -33,7 +33,7 @@ const getVideoDetail = async (id) => {
 
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
-  const response = await apiClient.get(`/videos/${id}/comments`);
+  const response = await apiClient.get(`/video/${id}/comments`);
   return response.data;
 };
 
