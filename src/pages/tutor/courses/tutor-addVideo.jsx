@@ -1,39 +1,113 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-import ReactQuill from "react-quill-new";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 import Loader from "../../../components/common/Loader";
+import AddCourseVideoContent from "../../../components/tutor-panel/course/add/AddCourseVideoContent";
 
 export default function TutorManageAddVideo() {
   // loading
   const [loadingState, setLoadingState] = useState(false);
 
-  // 返回上一頁
-  const navigate = useNavigate();
-  const toPrevPage = () => {
-    navigate(-1);
-  };
-
-  // ReactQuill 文字編輯器
-  const [value, setValue] = useState("");
-  const modules = {
-    toolbar: [
-      [{ font: [] }],
-      ["bold", "italic", "underline"],
-      ["link", "image", "video"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ align: [] }],
-      ["blockquote", "code-block"],
-      ["clean"],
-    ],
-  };
-
   // 依路由決定此頁顯示分類
   const { type } = useParams();
 
-  const [videoSrc, setVideoSrc] = useState("");
+  const [temVideoData, setTemVideoData] = useState("");
+  const videoUpload = async (e) => {
+    const file = e.target.files?.[0];
+
+    // 如果沒有選擇圖片檔案
+    if (!file) {
+      Swal.fire({
+        icon: "warning",
+        title: "請選擇檔案",
+      });
+      return;
+    }
+
+    // 如果檔案大小大於 50MB
+    const MAX_FILE_SIZE_MB = 50;
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      Swal.fire({
+        icon: "error",
+        title: `檔案過大，請選擇小於 ${MAX_FILE_SIZE_MB}MB 的檔案`,
+      });
+      return;
+    }
+
+    setLoadingState(true);
+    try {
+      const token =
+        document.cookie.replace(
+          /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+          "$1"
+        ) || null;
+
+      // 1. 取得上傳用的預簽名 url
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      const uploadData = await axios.post(
+        "https://coding-bit-backend.onrender.com/api/v1/upload/get-upload-url",
+        { fileName: file.name, fileType: file.type }
+      );
+
+      if (!uploadData.data.uploadUrl) {
+        throw new Error("無法取得上傳 URL");
+      }
+
+      const { filePath } = uploadData.data;
+
+      // 2. 將檔案上傳到取得的預簽名
+      const res = await axios.post(
+        "https://coding-bit-backend.onrender.com/api/v1/upload/get-video-url",
+        { filePath: filePath }
+      );
+
+      // 3. 更新狀態顯示圖片
+      if (res.data.videoUrl) {
+        setTemVideoData((prevData) => {
+          return {
+            ...prevData,
+            video_url: res.data.videoUrl,
+          };
+        });
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "上傳成功",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: error.response?.data?.message || "圖片上傳失敗，請稍後再試",
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  const submitApiRequest = async (apiFunc, data) => {
+    setLoadingState(true);
+    try {
+      const result = await apiFunc(data);
+      Swal.fire({
+        icon: "success",
+        title: "課程新增成功",
+      });
+      return result;
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: error.response?.message || "發生錯誤，請稍後再試",
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
 
   return (
     <>
@@ -59,10 +133,11 @@ export default function TutorManageAddVideo() {
                   accept="video/mp4,video/webm,video/ogg"
                   className="form-control w-100 p-0"
                   id="video"
+                  onChange={videoUpload}
                 />
 
                 {/* 未上傳時的提示 */}
-                {!videoSrc && (
+                {!temVideoData.video_url && (
                   <label
                     htmlFor="video"
                     className="form-label video-upload-label w-100 mb-0"
@@ -75,15 +150,35 @@ export default function TutorManageAddVideo() {
                 )}
 
                 {/* 預覽上傳的影片 */}
-                {videoSrc && (
+                {temVideoData.video_url && (
                   <div className="video-preview">
-                    <video src="" controls className="w-100"></video>
-                    <button type="button" className="delete-icon">
-                      <span className="material-symbols-outlined">delete</span>
-                    </button>
+                    <video
+                      src={temVideoData.video_url}
+                      controls
+                      className="w-100"
+                    ></video>
                   </div>
                 )}
               </div>
+              {temVideoData.video_url && (
+                <div>
+                  <button
+                    type="button"
+                    className="btn btn-none link-danger f-align-center ms-auto"
+                    onClick={() => {
+                      setTemVideoData((prevData) => ({
+                        ...prevData,
+                        video_url: "",
+                      }));
+                      document.getElementById("video").value = "";
+                    }}
+                  >
+                    移除影片
+                    <span className="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              )}
+
               <div className="bg-brand-05 rounded-4 mt-8 mt-lg-10 p-6 p-lg-8">
                 <h2 className="fs-5 fs-lg-4 text-brand-03">影片上傳注意事項</h2>
                 <ul className="py-4">
@@ -108,169 +203,17 @@ export default function TutorManageAddVideo() {
               </div>
             </div>
           </div>
-          <div className="col-xxl-6">
-            <div className="course-content-wrap card-column pe-lg-10">
-              <form className="mt-6 mt-lg-8">
-                <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
-                <div className="image-upload-wrapper mt-1">
-                  <input
-                    type="file"
-                    accept=".jpg,.jpeg,.png"
-                    className="form-control p-0"
-                    id="image"
-                  />
-                  <label
-                    htmlFor="image"
-                    className="form-label image-upload-label mb-0"
-                  >
-                    <span className="material-symbols-outlined mb-2">
-                      imagesmode
-                    </span>
-                    上傳影片縮圖
-                  </label>
 
-                  {/* 上傳圖片後的樣子 */}
-                  <button
-                    type="button"
-                    className="img-wrapper border-0 p-0 d-none"
-                  >
-                    <img
-                      src="images/course/course-4.png"
-                      alt="course-thumbnail"
-                      className="w-100 object-fit"
-                    />
-                    <span className="material-symbols-outlined delete-icon">
-                      delete
-                    </span>
-                  </button>
-                </div>
-
-                <div className="mt-6 mt-lg-8">
-                  <label htmlFor="title" className="form-label">
-                    影片標題
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="title"
-                    placeholder="ex. React 進階開發技巧"
-                  />
-                </div>
-
-                {type === "topicSeries" ? (
-                  ""
-                ) : (
-                  <>
-                    <div className="mt-6 mt-lg-8">
-                      <div className="row">
-                        <div className="col">
-                          <label className="form-label">瀏覽權限</label>
-                          <div className="dropdown">
-                            <button
-                              type="button"
-                              className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4"
-                              data-bs-toggle="dropdown"
-                              aria-expanded="false"
-                            >
-                              請選擇瀏覽權限
-                              <span className="material-symbols-outlined position-absolute end-0 pe-3">
-                                keyboard_arrow_down
-                              </span>
-                            </button>
-                            <ul className="dropdown-menu w-100 mt-1">
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  公開
-                                </button>
-                              </li>
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  不公開
-                                </button>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-
-                        <div className="col">
-                          <label className="form-label" htmlFor="tech_stack">
-                            開發工具與語言
-                          </label>
-                          <div className="dropdown">
-                            <button
-                              type="button"
-                              className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4 position-relative"
-                              data-bs-toggle="dropdown"
-                              aria-expanded="false"
-                            >
-                              請選擇類別
-                              <span className="material-symbols-outlined position-absolute end-0 pe-3">
-                                keyboard_arrow_down
-                              </span>
-                            </button>
-                            <ul className="dropdown-menu w-100 mt-1">
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  Html
-                                </button>
-                              </li>
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  CSS
-                                </button>
-                              </li>
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  JavaScript
-                                </button>
-                              </li>
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  React
-                                </button>
-                              </li>
-                              <li>
-                                <button type="button" className="dropdown-item">
-                                  Vue
-                                </button>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 mt-lg-8">
-                      <label htmlFor="searchKeywords" className="form-label">
-                        關鍵字 (請用半型逗號隔開)
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="searchKeywords"
-                        placeholder="ex. React, 前端開發, 效能優化, Hooks"
-                      />
-                    </div>
-                  </>
-                )}
-
-                <div className="pb-8 mt-6 mt-lg-8">
-                  <label htmlFor="content" className="form-label">
-                    影片描述
-                  </label>
-                  <ReactQuill
-                    value={value}
-                    onChange={setValue}
-                    placeholder="請描述影片教學內容，幫助學習者快速了解。"
-                    modules={modules}
-                  />
-                </div>
-              </form>
-            </div>
-          </div>
+          {type === "topicSeries" && (
+            <AddCourseVideoContent
+              submitApiRequest={submitApiRequest}
+              setLoadingState={setLoadingState}
+              video_url={temVideoData.video_url}
+            />
+          )}
         </div>
 
-        {/*web button wrap */}
+        {/* web button wrap
         <div className="btn-container text-end mt-auto">
           <button
             type="submit"
@@ -283,7 +226,7 @@ export default function TutorManageAddVideo() {
           <button type="submit" className="btn btn-brand-03 rounded-2 ms-4">
             確認新增
           </button>
-        </div>
+        </div> */}
       </main>
     </>
   );

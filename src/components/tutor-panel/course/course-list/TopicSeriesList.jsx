@@ -7,7 +7,7 @@ import {
   formatDate,
 } from "../../../../utils/timeFormatted-utils";
 
-export default function CustomLearningList({ course }) {
+export default function TopicSeriesList({ course, deleteCourse }) {
   return (
     <tbody>
       <tr className="align-middle">
@@ -32,15 +32,16 @@ export default function CustomLearningList({ course }) {
         <td>
           <div>
             <NavLink
-              to={`/tutor-panel/course/${course.id}/edit`}
+              to={`/tutor-panel/course/topicSeries/${course.id}/edit`}
               className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
             >
-              <span className="material-symbols-outlined me-1">edit</span>
-              編輯
+              <span className="material-symbols-outlined me-1">dataset</span>
+              詳細
             </NavLink>
             <button
               type="button"
               className="btn link-danger border-0 f-align-center p-0 mt-1"
+              onClick={()=>deleteCourse(course.id)}
             >
               <span className="material-symbols-outlined me-1">delete</span>
               刪除
@@ -51,7 +52,7 @@ export default function CustomLearningList({ course }) {
     </tbody>
   );
 }
-CustomLearningList.propTypes = {
+TopicSeriesList.propTypes = {
   course: PropTypes.shape({
     id: PropTypes.string.isRequired,
     cover_image: PropTypes.string.isRequired,
@@ -63,4 +64,5 @@ CustomLearningList.propTypes = {
     rating: PropTypes.string.isRequired,
     is_public: PropTypes.bool.isRequired,
   }).isRequired,
+  deleteCourse: PropTypes.func.isRequired,
 };

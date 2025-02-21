@@ -41,9 +41,9 @@ import TutorPanel from "../pages/tutor/tutor-panel";
 import TutorManageBooking from "../pages/tutor/bookings/tutor-manage-bookings";
 
 import TutorManageCourses from "../pages/tutor/courses/tutor-manage-courses";
-import TutorManageAddTopicSeries from "../pages/tutor/courses/tutor-addCourses-topicSeries";
-import TutorManageEditTopicSeries from "../pages/tutor/courses/tutor-editCourses-topicSeries ";
-import TutorManageTopicSeriesChapter from "../pages/tutor/courses/tutor-chapter-topicSeries";
+import TutorManageAddTopicSeries from "../pages/tutor/courses/Course/tutor-addCourses-topicSeries";
+import TutorManageEditTopicSeries from "../pages/tutor/courses/Course/tutor-editCourses-topicSeries ";
+import TutorManageTopicSeriesChapter from "../pages/tutor/courses/Course/tutor-chapter-topicSeries";
 import TutorManageAddVideo from "../pages/tutor/courses/tutor-addVideo";
 import TutorProfile from "../pages/tutor/profile/tutor-profile";
 
@@ -121,7 +121,8 @@ export const router = createHashRouter([
         path: "course/topicSeries/:id/chapter",
         element: <TutorManageTopicSeriesChapter />,
       },
-      { path: "course/video/:type/add", element: <TutorManageAddVideo /> },
+      { path: "video/:type/add/:courseId/:id", element: <TutorManageAddVideo /> },
+      { path: "video/:type/add", element: <TutorManageAddVideo /> },
       { path: "profile", element: <TutorProfile /> },
     ],
   },

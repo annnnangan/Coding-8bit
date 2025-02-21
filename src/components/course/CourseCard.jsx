@@ -2,6 +2,8 @@ import { NavLink } from "react-router-dom";
 
 import PropTypes from "prop-types";
 
+import { convertSecondsToTime } from "../../utils/timeFormatted-utils";
+
 const courseCategoryMap = {
   topicSeries: "主題式課程影片",
   customLearning: "客製化學習需求影片",
@@ -41,7 +43,7 @@ export default function CourseCard({ course, type = "courseDetail" }) {
                 <span className="material-symbols-outlined fs-5 me-1">
                   schedule
                 </span>
-                <p className="fs-7 fs-lg-6">{course.duration}</p>
+                <p className="fs-7 fs-lg-6">{convertSecondsToTime(course.duration)}</p>
               </div>
               <div className="f-center ms-2">
                 <span className="material-symbols-outlined fs-5 me-1">
@@ -56,7 +58,7 @@ export default function CourseCard({ course, type = "courseDetail" }) {
               <span className="material-symbols-outlined icon-fill text-brand-01 fs-6 fs-lg-5 me-1">
                 kid_star
               </span>
-              {course.rating}
+              {Number(course.rating).toFixed(1)}
             </p>
           </div>
           {course.learning_progress_in_percent && (

@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+import Swal from "sweetalert2";
 
 import userApi from "../../../api/userApi";
 import courseApi from "../../../api/courseApi";
 
-import TopicSeriesList from "../../../components/tutor-panel/course/course-list/TopicSeriesLis";
+import TopicSeriesList from "../../../components/tutor-panel/course/course-list/TopicSeriesList";
+import CustomLearningList from "../../../components/tutor-panel/course/course-list/CustomLearningList";
+import FreeTipShortsList from "../../../components/tutor-panel/course/course-list/FreeTipShortsList";
 import Loader from "../../../components/common/Loader";
 import Pagination from "../../../components/layout/Pagination";
 
@@ -55,10 +59,9 @@ export default function TutorManageCourses() {
         tutor_id,
         "freeTipShorts"
       );
-
       setCourses((prevCourses) => ({
         ...prevCourses,
-        topicSeries: topicSeriesCourses,
+        topicSeries: topicSeriesCourses.courses,
         customLearning: customLearningCourses,
         freeTipShorts: freeTipShortsCourses,
       }));
@@ -67,6 +70,39 @@ export default function TutorManageCourses() {
     } finally {
       setLoadingState(false);
     }
+  };
+
+  // 刪除課程
+  const deleteCourse = async (course_id) => {
+    Swal.fire({
+      title: "確定要刪除嗎？",
+      showCancelButton: true,
+      confirmButtonText: "刪除",
+      denyButtonText: "不要刪除",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoadingState(true);
+        try {
+          await courseApi.deleteCourse(course_id);
+          Swal.fire({
+            icon: "success",
+            title: "刪除成功",
+          });
+          Swal.fire({
+            title: "課程刪除成功",
+            icon: "success",
+          });
+          getData();
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: error.response?.data?.message,
+          });
+        } finally {
+          setLoadingState(false);
+        }
+      }
+    });
   };
 
   // 初始化 - 取得資料
@@ -196,7 +232,7 @@ export default function TutorManageCourses() {
             </li>
           ))}
         </ul>
-        <div className="tab-content" id="courseCategoryTab">
+        <div className="table-list tab-content " id="courseCategoryTab">
           {courseCategory.map((item, index) => (
             <div
               className={`tab-pane ${
@@ -207,7 +243,7 @@ export default function TutorManageCourses() {
               aria-labelledby={`${item.category}-tab`}
               key={index}
             >
-              <div className="mt-6 mt-lg-8">
+              <div className="table-wrap mt-6 mt-lg-8">
                 <table className="table">
                   <thead>
                     <tr>
@@ -227,83 +263,19 @@ export default function TutorManageCourses() {
                   </thead>
                   {item.category === "topicSeries" &&
                     courses.topicSeries.map((course) => (
-                      <TopicSeriesList course={course} key={course.id} />
+                      <TopicSeriesList
+                        course={course}
+                        key={course.id}
+                        deleteCourse={deleteCourse}
+                      />
                     ))}
                   {item.category === "customLearning" &&
                     courses.customLearning.map((course) => (
-                      <tbody key={course.id}>
-                        <tr className="align-middle">
-                          <td>
-                            <img src={course.cover_image} alt="course-image" />
-                          </td>
-                          <td>{course.title}</td>
-                          <td>{course.category}</td>
-                          <td>{course.isPublic ? "公開" : "未公開"}</td>
-                          <td>2024年12月1日</td>
-                          <td>{Number(course.view_count).toLocaleString()}</td>
-                          <td>{course.rating}</td>
-                          <td>
-                            <div>
-                              <NavLink
-                                to={`/tutor-panel/course/${course.id}/edit`}
-                                className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  edit
-                                </span>
-                                編輯
-                              </NavLink>
-                              <button
-                                type="button"
-                                className="btn link-danger border-0 f-align-center p-0 mt-1"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  delete
-                                </span>
-                                刪除
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
+                      <CustomLearningList course={course} key={course.id} />
                     ))}
                   {item.category === "freeTipShorts" &&
                     courses.freeTipShorts.map((course) => (
-                      <tbody key={course.id}>
-                        <tr className="align-middle">
-                          <td>
-                            <img src={course.cover_image} alt="course-image" />
-                          </td>
-                          <td>{course.title}</td>
-                          <td>{course.category}</td>
-                          <td>{course.isPublic ? "公開" : "未公開"}</td>
-                          <td>2024年12月1日</td>
-                          <td>{Number(course.view_count).toLocaleString()}</td>
-                          <td>{course.rating}</td>
-                          <td>
-                            <div>
-                              <NavLink
-                                to={`/tutor-panel/course/${course.id}/edit`}
-                                className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  edit
-                                </span>
-                                編輯
-                              </NavLink>
-                              <button
-                                type="button"
-                                className="btn link-danger border-0 f-align-center p-0 mt-1"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  delete
-                                </span>
-                                刪除
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
+                      <FreeTipShortsList course={course} key={course.id} />
                     ))}
                 </table>
               </div>
@@ -313,7 +285,7 @@ export default function TutorManageCourses() {
       </main>
 
       {/* 頁碼 */}
-      <div className="position-absolute end-0 bottom-0 pe-6 pb-6">
+      <div className="tutor-manage-course-pagination-wrap">
         <Pagination page={page} setPage={setPage} getData={getData} />
       </div>
     </>

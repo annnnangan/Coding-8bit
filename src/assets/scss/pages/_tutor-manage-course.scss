@@ -12,16 +12,20 @@
 .tutor-manage-course-list-wrap,
 .tutor-chapter-topicSeries-wrap {
   /* course-list-table */
-  .table {
-    flex-wrap: nowrap;
+  .table-list {
+    width: 100%;
+    overflow: hidden;
+  }
+  .table-wrap {
+    white-space: nowrap;
     overflow-x: auto;
   }
   .table thead tr th {
     font-weight: 500;
-    padding-bottom: 12px;
+    padding: 0px 8px 12px;
   }
   .table tbody tr td {
-    padding: 8px 0;
+    padding: 8px 8px;
 
     .cover_image-wrap {
       width: 120px;
@@ -34,6 +38,16 @@
     color: $gray-04;
     line-height: 1.2;
     background-color: #1e1e1e4d;
+  }
+}
+/* pagination */
+.tutor-manage-course-pagination-wrap {
+  background-color: $white;
+  margin-top: 32px;
+  padding: 24px 0px;
+
+  @include mobile {
+    padding: 12px 0px;
   }
 }
 
@@ -56,6 +70,29 @@
 
     img {
       width: 120px;
+    }
+
+    .chapter-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      @include mobile {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    .chapter-content {
+      display: flex;
+      align-items: center;
+      gap: 16px; // 控制圖片與標題間距
+    }
+
+    .chapter-image {
+      width: 120px;
+      height: 68px; // 固定高度，防止不同影片封面高度不一
+      object-fit: cover; // 確保圖片不變形
+      border-radius: 8px;
     }
   }
 }

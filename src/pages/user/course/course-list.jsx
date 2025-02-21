@@ -11,6 +11,7 @@ import MainTitle from "../../../components/MainTitle";
 import Loader from "../../../components/common/Loader";
 
 import { categoryData, hotCoursesData } from "../../../data/courses";
+import { convertSecondsToTime } from "../../../utils/timeFormatted-utils";
 
 export default function CourseList() {
   // loading
@@ -267,7 +268,7 @@ export default function CourseList() {
                                   schedule
                                 </span>
                                 <p className="fs-7 fs-lg-6">
-                                  {course.duration}
+                                  {convertSecondsToTime(course.duration)}
                                 </p>
                               </div>
                               <div className="f-center ms-2">
