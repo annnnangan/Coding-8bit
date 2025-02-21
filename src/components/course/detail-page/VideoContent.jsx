@@ -11,6 +11,7 @@ export default function VideoContent({ videoUrl, courseList }) {
         poster={courseList.cover_image}
         className="mb-6 w-100 video-show mouse-pointer-style"
         src={videoUrl}
+        style={{ height: "500px" }}
         controls
       ></video>
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
