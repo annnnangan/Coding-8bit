@@ -28,9 +28,7 @@ import SubscriptionPayment from "../pages/user/subscription/subscription-payment
 
 import TutorList from "../pages/user/tutor/tutor-list";
 import TutorBooking from "../pages/user/tutor/tutor-booking";
-import TutorBookingPaymentStep1 from "../pages/user/tutor/booking-payment/step1";
-import TutorBookingPaymentStep2 from "../pages/user/tutor/booking-payment/step2";
-import TutorBookingSuccess from "../pages/user/tutor/booking-payment/booking-success";
+import TutorBookingPayment from "../pages/user/tutor/tutor-booking-payment";
 import TutorInfo from "../pages/user/tutor/tutor-info";
 
 import HelpCenter from "../pages/user/help-center";
@@ -84,16 +82,8 @@ export const router = createHashRouter([
       { path: "tutor-list", element: <TutorList /> },
       { path: "tutor/:id", element: <TutorBooking /> },
       {
-        path: "tutor/:id/booking-payment-step1/:type",
-        element: <TutorBookingPaymentStep1 />,
-      },
-      {
-        path: "tutor/:id/booking-payment-step2/:type",
-        element: <TutorBookingPaymentStep2 />,
-      },
-      {
-        path: "tutor/:id/booking-payment-success/:type",
-        element: <TutorBookingSuccess />,
+        path: "tutor-booking-payment",
+        element: <TutorBookingPayment />,
       },
       { path: "tutor-info/:id", element: <TutorInfo /> },
 

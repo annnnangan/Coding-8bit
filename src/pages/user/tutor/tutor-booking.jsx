@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useDispatch } from "react-redux";
 
 import axios from "axios";
 import { Swiper } from "swiper";
@@ -14,6 +15,7 @@ import CourseCardList from "../../../components/course/CourseCardList";
 import CommentsSection from "../../../components/tutor/CommentsSection";
 import Loader from "../../../components/common/Loader";
 
+import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { recommendTutorData, tutorStats } from "../../../data/tutors";
 
 const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
@@ -32,17 +34,6 @@ export default function TutorBooking() {
   useEffect(() => {
     serviceSelectionModal.current = new bootstrap.Modal(serviceSelectionModalRef.current);
   }, []);
-
-  // 傳遞預約種類路由參數
-  const navigate = useNavigate();
-  const handleNavigate = (type) => {
-    navigate(`/tutor/${id}/booking-payment-step1/${type}`);
-  };
-  // 跳轉自下一頁按紐
-  const toPaymentPage = (type) => {
-    serviceSelectionModal.current.hide();
-    handleNavigate(type);
-  };
 
   // 取得資料函式
   const [courses, setCourses] = useState([]);
@@ -118,6 +109,21 @@ export default function TutorBooking() {
     getData();
   }, []);
 
+  // 建立Dispatch 來修改 RTK的State
+  const dispatch = useDispatch();
+
+  // 傳遞預約種類路由參數
+  const navigate = useNavigate();
+
+  // 跳轉自下一頁按紐
+  const toPaymentPage = (serviceType) => {
+    dispatch(updateFormData({ service_type: serviceType }));
+    dispatch(updateFormData({ tutor_id: id }));
+    dispatch(updateFormData({ tutor_name: "有API後會更新老師的名字" }));
+    serviceSelectionModal.current.hide();
+    navigate(`/tutor-booking-payment`);
+  };
+
   return (
     <>
       <Helmet>
@@ -181,20 +187,7 @@ export default function TutorBooking() {
                         關於我
                       </button>
                     </li>
-                    <li className="nav-item" role="presentation">
-                      <button
-                        className="nav-link"
-                        id="teaching-styles-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#teaching-styles-tab-pane"
-                        type="button"
-                        role="tab"
-                        aria-controls="teaching-styles-tab-pane"
-                        aria-selected="false"
-                      >
-                        我的教學風格
-                      </button>
-                    </li>
+
                     <li className="nav-item" role="presentation">
                       <button
                         className="nav-link"
@@ -213,9 +206,6 @@ export default function TutorBooking() {
                   <div className="tab-content" id="myTabContent">
                     <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
                       <ShowMoreButton text={tutorList.aboutMe} />
-                    </div>
-                    <div className="tab-pane fade" id="teaching-styles-tab-pane" role="tabpanel" aria-labelledby="teaching-styles-tab" tabIndex="0">
-                      <ShowMoreButton text={tutorList.teachingStyles} />
                     </div>
                     <div className="tab-pane fade" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
                       <TutorBookingResume resume={tutorList.resume} />
@@ -365,7 +355,12 @@ export default function TutorBooking() {
               </h4>
               <div className="row row-cols-lg-2 g-4 flex-column flex-lg-row">
                 <div className="col service-card">
-                  <button className="h-100 border-0" onClick={() => toPaymentPage("1on1")}>
+                  <button
+                    className="h-100 border-0"
+                    onClick={() => {
+                      toPaymentPage("courseSession");
+                    }}
+                  >
                     <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
                       <h3 className="fs-4 fs-md-3">一對一教學</h3>
                       <img src="images/deco/Illustration-7.png" alt="one-on-one-illustration" />
@@ -374,7 +369,12 @@ export default function TutorBooking() {
                   </button>
                 </div>
                 <div className="col service-card">
-                  <button className="h-100 border-0" onClick={() => toPaymentPage("code-review")}>
+                  <button
+                    className="h-100 border-0"
+                    onClick={() => {
+                      toPaymentPage("codeReview");
+                    }}
+                  >
                     <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
                       <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
                       <img src="images/deco/Illustration-8.png" alt="code-review-illustration" />
