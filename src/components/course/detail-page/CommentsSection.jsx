@@ -1,11 +1,22 @@
 import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
+import { formatDateToTaiwanStyle } from "../../../utils/timeFormatted-utils";
+import { countReplies } from "../../../utils/countReplies-utils";
 
 export default function CommentsSection({ comments }) {
-  console.log(comments);
-  
+  const [userComments, setUserComments] = useState([]);
+  const [replyCount, setReplyCount] = useState({});
+  useEffect(() => {
+    if (comments && comments.data) {
+      setUserComments(comments.data);
+      setReplyCount(countReplies(userComments));
+    } 
+  }, [comments]);
+
   return (
     <>
-      {/* <section className="video-comments pt-6">
+      {JSON.stringify(replyCount)}
+      <section className="video-comments pt-6">
         <div className="d-flex py-4 mb-6">
           <img
             className="user-comment-picture me-3"
@@ -21,18 +32,22 @@ export default function CommentsSection({ comments }) {
           />
         </div>
         <ul className="history-comments">
-          {comments.map((comment, index) => (
-            <li className="mb-6" key={comment.commentId}>
+          {userComments.map((userComment, index) => (
+            <li className="mb-6" key={userComment.id}>
               <div className="user-content d-flex mb-3">
                 <img
                   className="user-image me-4"
-                  src={comment.user.avatar}
+                  src={userComment.User.avatar_url}
                   alt="留言者頭像"
                 />
                 <div className="d-flex justify-content-between align-items-center flex-fill">
                   <div className="f-column">
-                    <span className="user-name mb-2">{comment.user.name}</span>
-                    <time className="comment-time fs-7">{comment.time}</time>
+                    <span className="user-name mb-2">
+                      {userComment.User.name}
+                    </span>
+                    <time className="comment-time fs-7">
+                      {formatDateToTaiwanStyle(userComment.time)}
+                    </time>
                   </div>
                   <button
                     type="button"
@@ -62,7 +77,7 @@ export default function CommentsSection({ comments }) {
                         aria-expanded="false"
                         aria-controls={`flush-collapse${index}`}
                       >
-                        {comment.replies.length} 則回覆
+                        {replyCount.id} 則回覆
                       </span>
                     </div>
                     <div
@@ -71,10 +86,11 @@ export default function CommentsSection({ comments }) {
                       aria-labelledby={`flush-collapse${index}`}
                     >
                       <div className="accordion-body">
-                        {comment.replies.map((item, index) => (
+                        {JSON.stringify(userComment)}
+                        {/* {userComment.map((item, index) => (
                           <div
                             className={`tutor-content ${
-                              index !== comment.replies.length - 1 && "mb-8"
+                              index !== userComment.length - 1 && "mb-8"
                             }`}
                             key={item.replyId}
                           >
@@ -105,7 +121,7 @@ export default function CommentsSection({ comments }) {
                               {item.content}
                             </p>
                           </div>
-                        ))}
+                        ))} */}
                       </div>
                     </div>
                   </div>
@@ -114,7 +130,7 @@ export default function CommentsSection({ comments }) {
             </li>
           ))}
         </ul>
-      </section> */}
+      </section>
     </>
   );
 }

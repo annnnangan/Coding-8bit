@@ -55,6 +55,7 @@ export default function CourseDetailPage() {
           <VideoContent
             videoUrl={chapter[0]?.Videos[0]?.video_url}
             courseList={courseList}
+            courseTutor={ courseList.tutor_id }
             introductionVideoId={chapter[0]?.Videos[0]?.id} //章節第0張為課程介紹影片
           />
 

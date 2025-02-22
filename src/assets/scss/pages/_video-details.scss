@@ -135,6 +135,8 @@
   .user-content {
     .user-image {
       height: 40px;
+      max-width: 40px;
+      object-fit: cover;
       border-radius: 88px;
     }
 

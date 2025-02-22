@@ -1,0 +1,17 @@
+// 20250221230810
+// https://service.coding-8bit.site/api/v1/video/bfef3d20-da60-4688-86cb-381ae6c3fc11/comments
+
+[
+  {
+    "id": "c07037c9-0905-47d5-baae-61afc9f55035",
+    "video_id": "bfef3d20-da60-4688-86cb-381ae6c3fc11",
+    "user_id": "00114702-fd03-49d4-9ff4-2b2166abdeb7",
+    "content": "期待這次的課程~",
+    "parent_id": null,
+    "is_deleted": false,
+    "createdAt": "2025-02-21T12:58:11.406Z",
+    "updatedAt": "2025-02-21T12:58:11.406Z"
+  }
+]
+
+

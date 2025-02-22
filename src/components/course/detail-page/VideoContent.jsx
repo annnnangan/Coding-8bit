@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import courseApi from "../../../api/courseApi";
@@ -8,6 +9,7 @@ import CommentsSection from "./CommentsSection";
 export default function VideoContent({
   videoUrl,
   courseList,
+  courseTutor,
   introductionVideoId,
 }) {
   const [comments, setComments] = useState([]);
@@ -110,7 +112,11 @@ export default function VideoContent({
           alt="作者頭像"
         />
         <div>
-          <h2 className="author-name mb-2">{courseList.Tutor.User.username}</h2>
+          <NavLink to={`/tutor-info/${courseTutor}`}>
+            <h2 className="author-name mb-2">
+              {courseList.Tutor.User.username}
+            </h2>
+          </NavLink>
           <span className="author-info fs-7">{courseList.Tutor.about}</span>
         </div>
       </div>
@@ -162,7 +168,7 @@ export default function VideoContent({
               aria-labelledby="profile-tab"
             >
               {/* <CommentsSection/> */}
-              <CommentsSection comments={comments}/>
+              <CommentsSection comments={comments} />
             </div>
           </div>
         </nav>
@@ -191,4 +197,5 @@ VideoContent.propTypes = {
   }).isRequired,
   videoUrl: PropTypes.string,
   introductionVideoId: PropTypes.string,
+  courseTutor: PropTypes.string,
 };
