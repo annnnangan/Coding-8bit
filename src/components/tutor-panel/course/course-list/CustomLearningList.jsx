@@ -7,7 +7,7 @@ import {
   formatDate,
 } from "../../../../utils/timeFormatted-utils";
 
-export default function CustomLearningList({ course }) {
+export default function CustomLearningList({ course, deleteCourse }) {
   return (
     <tbody>
       <tr className="align-middle">
@@ -23,7 +23,11 @@ export default function CustomLearningList({ course }) {
             </span>
           </div>
         </td>
-        <td>{course.title}</td>
+        <td>
+          <NavLink to={`/video/${course.id}`} className="d-inline underline-hover">
+            {course.title}
+          </NavLink>
+        </td>
         <td>{course.category}</td>
         <td>{course.is_public ? "公開" : "未公開"}</td>
         <td>{formatDate(course.created_at)}</td>
@@ -32,7 +36,7 @@ export default function CustomLearningList({ course }) {
         <td>
           <div>
             <NavLink
-              to={`/tutor-panel/course/${course.id}/edit`}
+              to={`/tutor-panel/video/customLearning/edit/${course.id}`}
               className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
             >
               <span className="material-symbols-outlined me-1">edit</span>
@@ -41,6 +45,7 @@ export default function CustomLearningList({ course }) {
             <button
               type="button"
               className="btn link-danger border-0 f-align-center p-0 mt-1"
+              onClick={() => deleteCourse(course.id, "customLearning")}
             >
               <span className="material-symbols-outlined me-1">delete</span>
               刪除
@@ -58,9 +63,10 @@ CustomLearningList.propTypes = {
     title: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     duration: PropTypes.number.isRequired,
-    created_at: PropTypes.number.isRequired,
+    created_at: PropTypes.string.isRequired,
     view_count: PropTypes.number.isRequired,
     rating: PropTypes.string.isRequired,
     is_public: PropTypes.bool.isRequired,
   }).isRequired,
+  deleteCourse: PropTypes.func.isRequired,
 };

@@ -87,7 +87,7 @@ export default function WorkExperienceSection() {
       const result = await axios.get(
         `${VITE_API_BASE}/tutor/${data.id}/experiences`
       );
-      setWorkExperiences(result.data || []);
+      setWorkExperiences(result.data.data || []);
     } catch (error) {
       Swal.fire({
         icon: "error",

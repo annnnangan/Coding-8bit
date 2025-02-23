@@ -41,8 +41,8 @@ import TutorManageBooking from "../pages/tutor/bookings/tutor-manage-bookings";
 import TutorManageCourses from "../pages/tutor/courses/tutor-manage-courses";
 import TutorManageAddTopicSeries from "../pages/tutor/courses/Course/tutor-addCourses-topicSeries";
 import TutorManageEditTopicSeries from "../pages/tutor/courses/Course/tutor-editCourses-topicSeries ";
-import TutorManageTopicSeriesChapter from "../pages/tutor/courses/Course/tutor-chapter-topicSeries";
-import TutorManageAddVideo from "../pages/tutor/courses/tutor-addVideo";
+import TutorManageAddVideo from "../pages/tutor/courses/video/tutor-addVideo";
+import TutorManageEditVideo from "../pages/tutor/courses/video/tutor-editVideo";
 import TutorProfile from "../pages/tutor/profile/tutor-profile";
 
 // 使用者後台 - 學生
@@ -107,12 +107,10 @@ export const router = createHashRouter([
         path: "course/topicSeries/:id/edit",
         element: <TutorManageEditTopicSeries />,
       },
-      {
-        path: "course/topicSeries/:id/chapter",
-        element: <TutorManageTopicSeriesChapter />,
-      },
       { path: "video/:type/add/:courseId/:id", element: <TutorManageAddVideo /> },
       { path: "video/:type/add", element: <TutorManageAddVideo /> },
+      { path: "video/:type/edit/:courseId/:id", element: <TutorManageEditVideo /> },
+      { path: "video/:type/edit/:id", element: <TutorManageEditVideo /> },
       { path: "profile", element: <TutorProfile /> },
     ],
   },

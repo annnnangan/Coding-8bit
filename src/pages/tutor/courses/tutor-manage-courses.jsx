@@ -4,14 +4,14 @@ import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 
-import userApi from "../../../api/userApi";
-import courseApi from "../../../api/courseApi";
+import userApi from "@/api/userApi";
+import courseApi from "@/api/courseApi";
 
-import TopicSeriesList from "../../../components/tutor-panel/course/course-list/TopicSeriesList";
-import CustomLearningList from "../../../components/tutor-panel/course/course-list/CustomLearningList";
-import FreeTipShortsList from "../../../components/tutor-panel/course/course-list/FreeTipShortsList";
-import Loader from "../../../components/common/Loader";
-import Pagination from "../../../components/layout/Pagination";
+import TopicSeriesList from "@/components/tutor-panel/course/course-list/TopicSeriesList";
+import CustomLearningList from "@/components/tutor-panel/course/course-list/CustomLearningList";
+import FreeTipShortsList from "@/components/tutor-panel/course/course-list/FreeTipShortsList";
+import Loader from "@/components/common/Loader";
+import Pagination from "@/components/layout/Pagination";
 
 export default function TutorManageCourses() {
   // loading
@@ -45,25 +45,56 @@ export default function TutorManageCourses() {
     customLearning: [],
     freeTipShorts: [],
   });
-  const [page, setPage] = useState(1);
-  const getData = async () => {
+  const [pageData, setPageData] = useState({
+    topicSeries: {},
+    customLearning: {},
+    freeTipShorts: {},
+  });
+  const getData = async (category, page = 1) => {
     setLoadingState(true);
     try {
       const { tutor_id } = await userApi.getUserData();
-      const topicSeriesCourses = await courseApi.getTutorCourses(tutor_id);
-      const customLearningCourses = await courseApi.getTutorVideos(
-        tutor_id,
-        "customLearning"
-      );
-      const freeTipShortsCourses = await courseApi.getTutorVideos(
-        tutor_id,
-        "freeTipShorts"
-      );
+      let newData = {};
+
+      if (category === "topicSeries") {
+        const topicSeriesCourses = await courseApi.getTutorCourses(
+          tutor_id,
+          page
+        );
+        newData = {
+          courses: topicSeriesCourses.courses,
+          pagination: topicSeriesCourses.pagination,
+        };
+      } else if (category === "customLearning") {
+        const customLearningCourses = await courseApi.getTutorVideos(
+          tutor_id,
+          "customLearning",
+          page
+        );
+        newData = {
+          courses: customLearningCourses.videos,
+          pagination: customLearningCourses.pagination,
+        };
+      } else if (category === "freeTipShorts") {
+        const freeTipShortsCourses = await courseApi.getTutorVideos(
+          tutor_id,
+          "freeTipShorts",
+          page
+        );
+        newData = {
+          courses: freeTipShortsCourses.videos,
+          pagination: freeTipShortsCourses.pagination,
+        };
+      }
+
       setCourses((prevCourses) => ({
         ...prevCourses,
-        topicSeries: topicSeriesCourses.courses,
-        customLearning: customLearningCourses,
-        freeTipShorts: freeTipShortsCourses,
+        [category]: newData.courses,
+      }));
+
+      setPageData((prevPageData) => ({
+        ...prevPageData,
+        [category]: newData.pagination,
       }));
     } catch (error) {
       console.log("錯誤", error);
@@ -73,7 +104,7 @@ export default function TutorManageCourses() {
   };
 
   // 刪除課程
-  const deleteCourse = async (course_id) => {
+  const deleteCourse = async (course_id, type) => {
     Swal.fire({
       title: "確定要刪除嗎？",
       showCancelButton: true,
@@ -83,14 +114,14 @@ export default function TutorManageCourses() {
       if (result.isConfirmed) {
         setLoadingState(true);
         try {
-          await courseApi.deleteCourse(course_id);
+          if (type === "topicSeries") {
+            await courseApi.deleteCourse(course_id);
+          } else {
+            await courseApi.deleteVideo(course_id);
+          }
           Swal.fire({
             icon: "success",
             title: "刪除成功",
-          });
-          Swal.fire({
-            title: "課程刪除成功",
-            icon: "success",
           });
           getData();
         } catch (error) {
@@ -107,7 +138,9 @@ export default function TutorManageCourses() {
 
   // 初始化 - 取得資料
   useEffect(() => {
-    getData();
+    getData("topicSeries");
+    getData("customLearning");
+    getData("freeTipShorts");
   }, []);
 
   return (
@@ -146,7 +179,7 @@ export default function TutorManageCourses() {
               </li>
               <li>
                 <Link
-                  to="/tutor-panel/course/video/customLearning/add"
+                  to="/tutor-panel/video/customLearning/add"
                   className="dropdown-item"
                 >
                   建立客製化需求影片
@@ -154,7 +187,7 @@ export default function TutorManageCourses() {
               </li>
               <li>
                 <Link
-                  to="/tutor-panel/course/video/freeTipShorts/add"
+                  to="/tutor-panel/video/freeTipShorts/add"
                   className="dropdown-item"
                 >
                   建立實用技術短影片
@@ -165,7 +198,7 @@ export default function TutorManageCourses() {
         </div>
 
         {/* 篩選與搜尋 */}
-        <div className="f-end-center mt-4 mt-lg-6">
+        {/* <div className="f-end-center mt-4 mt-lg-6">
           <div className="dropdown">
             <button
               type="button"
@@ -204,11 +237,11 @@ export default function TutorManageCourses() {
               search
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* 影片列表 */}
         <ul
-          className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-0"
+          className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-6"
           id="courseCategoryTab"
           role="tablist"
         >
@@ -271,23 +304,56 @@ export default function TutorManageCourses() {
                     ))}
                   {item.category === "customLearning" &&
                     courses.customLearning.map((course) => (
-                      <CustomLearningList course={course} key={course.id} />
+                      <CustomLearningList
+                        course={course}
+                        key={course.id}
+                        deleteCourse={deleteCourse}
+                      />
                     ))}
                   {item.category === "freeTipShorts" &&
                     courses.freeTipShorts.map((course) => (
-                      <FreeTipShortsList course={course} key={course.id} />
+                      <FreeTipShortsList
+                        course={course}
+                        key={course.id}
+                        deleteCourse={deleteCourse}
+                      />
                     ))}
                 </table>
+                {/* 頁碼 */}
+                {item.category === "topicSeries" && (
+                  <div className="tutor-manage-course-pagination-wrap">
+                    <Pagination
+                      pageData={pageData?.topicSeries}
+                      type="topicSeries"
+                      getData={getData}
+                    />
+                  </div>
+                )}
+
+                {item.category === "customLearning" && (
+                  <div className="tutor-manage-course-pagination-wrap">
+                    <Pagination
+                      pageData={pageData?.customLearning}
+                      type="customLearning"
+                      getData={getData}
+                    />
+                  </div>
+                )}
+
+                {item.category === "freeTipShorts" && (
+                  <div className="tutor-manage-course-pagination-wrap">
+                    <Pagination
+                      pageData={pageData?.freeTipShorts}
+                      type="freeTipShorts"
+                      getData={getData}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </main>
-
-      {/* 頁碼 */}
-      <div className="tutor-manage-course-pagination-wrap">
-        <Pagination page={page} setPage={setPage} getData={getData} />
-      </div>
     </>
   );
 }

@@ -3,9 +3,9 @@ import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 
-import EditContent from "../../../../components/tutor-panel/course/edit/editContent";
-import EditChapter from "../../../../components/tutor-panel/course/edit/editChapter";
-import Loader from "../../../../components/common/Loader";
+import EditContent from "@/components/tutor-panel/course/edit/editContent";
+import EditChapter from "@/components/tutor-panel/course/edit/editChapter";
+import Loader from "@/components/common/Loader";
 
 export default function TutorManageEditTopicSeries() {
   // loading
@@ -17,7 +17,7 @@ export default function TutorManageEditTopicSeries() {
       const result = await apiFunc(courseId, data);
       Swal.fire({
         icon: "success",
-        title: "課程新增成功",
+        title: "課程修改成功",
       });
       return result;
     } catch (error) {
@@ -38,7 +38,7 @@ export default function TutorManageEditTopicSeries() {
       </Helmet>
       {loadingState && <Loader />}
 
-      <main className="tutor-add-TopicSeriesCourses-wrap container-fluid">
+      <main className="tutor-edit-TopicSeriesCourses-wrap container-fluid">
         <h1 className="fs-5 fs-lg-2">編輯主題式課程影片 - 課程基本資料</h1>
 
         <div className="row f-center">

@@ -161,6 +161,7 @@ export default function AddChapter({ newCourseId, setLoadingState }) {
                           編輯影片
                         </Link>
                         <button
+                          type="button"
                           className="btn btn-outline-danger f-align-center rounded-2 border-2 p-2 ms-2"
                           onClick={() =>
                             deleteChapter(chapter.course_id, chapter.id)
@@ -189,6 +190,7 @@ export default function AddChapter({ newCourseId, setLoadingState }) {
                           新增影片
                         </Link>
                         <button
+                          type="button"
                           className="btn btn-outline-danger f-align-center rounded-2 border-2 p-2 ms-2"
                           onClick={() =>
                             deleteChapter(chapter.course_id, chapter.id)

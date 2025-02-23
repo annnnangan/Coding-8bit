@@ -44,10 +44,6 @@ export default function EditChapter({ setLoadingState }) {
           icon: "success",
           title: "新增成功",
         });
-        console.log({
-          ...data,
-          sort_order: temChapterList.length + 1,
-        });
         setTemChapterData({ title: "" });
         hideModal();
         getChapter();
@@ -158,7 +154,7 @@ export default function EditChapter({ setLoadingState }) {
                       </div>
                       <div className="f-align-center mt-2 mt-lg-0">
                         <Link
-                          to="/tutor-panel/course/video/topicSeries/edit"
+                          to={`/tutor-panel/video/topicSeries/edit/${chapter.course_id}/${chapter.id}`}
                           className="btn btn-brand-03 f-align-center rounded-2 border-2 px-3 py-2"
                         >
                           <span className="material-symbols-outlined me-1">
@@ -167,6 +163,7 @@ export default function EditChapter({ setLoadingState }) {
                           編輯影片
                         </Link>
                         <button
+                          type="button"
                           className="btn btn-outline-danger f-align-center rounded-2 border-2 p-2 ms-2"
                           onClick={() =>
                             deleteChapter(chapter.course_id, chapter.id)
@@ -195,6 +192,7 @@ export default function EditChapter({ setLoadingState }) {
                           新增影片
                         </Link>
                         <button
+                          type="button"
                           className="btn btn-outline-danger f-align-center rounded-2 border-2 p-2 ms-2"
                           onClick={() =>
                             deleteChapter(chapter.course_id, chapter.id)

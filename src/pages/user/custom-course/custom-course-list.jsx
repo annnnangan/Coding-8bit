@@ -402,7 +402,7 @@ export default function CustomCourseList() {
                       ></textarea>
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="learningNeedTags" className="form-label">
+                      <label htmlFor="learningNeedTag" className="form-label">
                         標籤（用逗號分隔）
                       </label>
                       <input

@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 
-export default function Pagination({ page, getData }) {
+export default function Pagination({ pageData, getData, type }) {
   // 切換頁碼
   const changePage = (page) => {
-    getData(page);
+    getData(type, page);
   };
 
   return (
@@ -12,8 +12,8 @@ export default function Pagination({ page, getData }) {
         <button
           className="page-link"
           aria-label="Previous"
-          disabled={page === 1}
-          onClick={() => changePage(page - 1)}
+          disabled={pageData.currentPage === 1}
+          onClick={() => changePage(pageData.currentPage - 1)}
         >
           <span aria-hidden="true">
             <span className="material-symbols-outlined align-middle">
@@ -22,39 +22,29 @@ export default function Pagination({ page, getData }) {
           </span>
         </button>
       </li>
-      <li className="page-item">
-        <button
-          type="button"
-          className={`page-link ${page === 1 && "active"}`}
-          onClick={() => changePage(1)}
+      {[...new Array(pageData.totalPages)].map((_, i) => (
+        <li
+          className={`page-item ${
+            i + 1 === pageData.currentPage ? "active" : ""
+          }`}
+          key={i}
         >
-          1
-        </button>
-      </li>
-      <li className="page-item">
-        <button
-          type="button"
-          className={`page-link ${page === 2 && "active"}`}
-          onClick={() => changePage(2)}
-        >
-          2
-        </button>
-      </li>
-      <li className="page-item">
-        <button
-          type="button"
-          className={`page-link ${page === 3 && "active"}`}
-          onClick={() => changePage(3)}
-        >
-          3
-        </button>
-      </li>
+          <a
+            className="page-link"
+            href="#"
+            onClick={(event) => getData(event, i + 1)}
+          >
+            {i + 1}
+          </a>
+        </li>
+      ))}
       <li className="page-item">
         <button
           type="button"
           className="page-link"
           aria-label="Next"
-          onClick={() => changePage(page + 1)}
+          disabled={pageData.currentPage === pageData.totalPages}
+          onClick={() => changePage(pageData.currentPage + 1)}
         >
           <span aria-hidden="true">
             <span className="material-symbols-outlined align-middle">
@@ -67,6 +57,10 @@ export default function Pagination({ page, getData }) {
   );
 }
 Pagination.propTypes = {
-  page: PropTypes.number.isRequired,
-  getData: PropTypes.func.isRequired,
+  pageData: PropTypes.shape({
+    currentPage: PropTypes.number,
+    totalPages: PropTypes.number,
+  }),
+  getData: PropTypes.func,
+  type: PropTypes.string,
 };
