@@ -55,7 +55,7 @@ export default function CourseDetailPage() {
           <VideoContent
             videoUrl={chapter[0]?.Videos[0]?.video_url}
             courseList={courseList}
-            courseTutor={ courseList.tutor_id }
+            courseTutor={courseList.tutor_id}
             introductionVideoId={chapter[0]?.Videos[0]?.id} //章節第0張為課程介紹影片
           />
 
@@ -107,7 +107,9 @@ export default function CourseDetailPage() {
                             className="chapter-view-count fs-7"
                             value="23,005"
                           >
-                            {Number(video.Videos[0].view_count).toLocaleString()}
+                            {Number(
+                              video.Videos[0].view_count
+                            ).toLocaleString()}
                           </data>
                         </div>
                       </div>
@@ -209,7 +211,10 @@ export default function CourseDetailPage() {
                         <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
                           visibility
                         </span>
-                        <data value={course.view_count} className="data-view-count fs-7">
+                        <data
+                          value={course.view_count}
+                          className="data-view-count fs-7"
+                        >
                           {Number(course.view_count).toLocaleString()}
                         </data>
                       </div>

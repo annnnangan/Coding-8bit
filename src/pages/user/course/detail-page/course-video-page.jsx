@@ -23,6 +23,7 @@ export default function CourseVideoPage() {
 
   const [chapter, setChapter] = useState([]);
   const { id, videoId } = useParams();
+  
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -61,6 +62,7 @@ export default function CourseVideoPage() {
           <VideoContent
             videoUrl={videoData?.video_url}
             courseList={videoData}
+            paramsVideoId={videoId}
           />
 
           <aside className="col-lg-5 col-xl-4">

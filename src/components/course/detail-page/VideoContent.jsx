@@ -5,21 +5,29 @@ import { useState, useEffect } from "react";
 import courseApi from "../../../api/courseApi";
 
 import CommentsSection from "./CommentsSection";
+import { Logger } from "sass";
 
 export default function VideoContent({
   videoUrl,
   courseList,
   courseTutor,
   introductionVideoId,
+  paramsVideoId
 }) {
   const [comments, setComments] = useState([]);
   useEffect(() => {
-    if (introductionVideoId) {
+    console.log(introductionVideoId);
+    
+    console.log(paramsVideoId);
+    
+    if (introductionVideoId||paramsVideoId) {
       const getCourseCommentsHandle = async () => {
         try {
           const commentsResult = await courseApi.getCourseComments(
-            introductionVideoId
+            introductionVideoId||paramsVideoId
           );
+          console.log(commentsResult);
+          
           setComments(commentsResult.data);
         } catch (error) {
           console.error("錯誤!!! 請聯繫系統管理員", error);
@@ -27,7 +35,7 @@ export default function VideoContent({
       };
       getCourseCommentsHandle();
     }
-  }, [introductionVideoId]);
+  }, [introductionVideoId||paramsVideoId]);
 
   return (
     <section className="col-lg-7 col-xl-8">
@@ -167,7 +175,6 @@ export default function VideoContent({
               role="tabpanel"
               aria-labelledby="profile-tab"
             >
-              {/* <CommentsSection/> */}
               <CommentsSection comments={comments} />
             </div>
           </div>

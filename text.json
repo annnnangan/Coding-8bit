@@ -1,6 +1,37 @@
 // 20250221230810
 // https://service.coding-8bit.site/api/v1/video/bfef3d20-da60-4688-86cb-381ae6c3fc11/comments
 
+{
+  "id": "c5fbe2ed-16db-4b80-abce-b279e9ebe31e",
+  "video_type": "topicSeries",
+  "chapter_id": "3dd4da86-a6cf-435d-964c-ff8bded328d0",
+  "course_id": "7d663a90-6306-4d41-bf4a-d2be6053a145",
+  "tutor_id": "df7e8a00-8f87-4bbf-9805-6c09af077e16",
+  "title": "OpenAI 文件概覽",
+  "description": "1. 簡介 OpenAI 提供的各種服務與功能。2. 說明 API 文件的使用方式。3. 如何快速找到所需的技術資源。",
+  "video_url": "https://firebasestorage.googleapis.com/v0/b/video-test-d54b2.appspot.com/o/%E5%BD%B1%E7%89%87%201%EF%BC%9AOpenAI%20%E6%96%87%E4%BB%B6%E6%A6%82%E8%A6%BD.mp4?alt=media&token=b43ed572-dd5f-4406-bfae-96567af36977",
+  "cover_image": "https://raw.githubusercontent.com/ahmomoz/8bit-image-data/refs/heads/main/8bit-image/chapter/course1-chpater-1.png",
+  "category": "AI",
+  "duration": 150,
+  "view_count": 450,
+  "rating": "5.00",
+  "is_free": false,
+  "is_public": true,
+  "created_at": "2025-02-20T05:52:47.243Z",
+  "updated_at": "2025-02-20T05:52:47.243Z",
+  "Tutor": {
+    "about": "一個前端後端都有涉略的人，喜歡學習新知識，也喜歡教學",
+    "expertise": "Mathematics",
+    "hourly_rate": "50.00",
+    "rating": "4.50",
+    "User": {
+      "username": "詹姆士",
+      "email": "z111048@gmail.com",
+      "avatar_url": "https://storage.googleapis.com/coding8bit-f18ad.firebasestorage.app/images/0e85005a-6858-43f1-b683-f4b6377e36cb/drink2.png"
+    }
+  }
+},
+
 [
   {
     "id": "c07037c9-0905-47d5-baae-61afc9f55035",
@@ -14,4 +45,71 @@
   }
 ]
 
+const courseCategory = [
+  {
+    title: "主題式課程影片",
+    category: "topicSeries",
+  },
+  {
+    title: "客製化需求影片",
+    category: "customLearning",
+  },
+  {
+    title: "實用技術短影片",
+    category: "freeTipShorts",
+  },
+];
 
+[
+  {
+    "id":"8e99754b-2c75-4c52-9452-2d5e4a07daa4",
+    "video_id":"bfef3d20-da60-4688-86cb-381ae6c3fc11",
+    "user_id":"00114702-fd03-49d4-9ff4-2b2166abdeb7",
+    "content":"簽到",
+    "parent_id":"c07037c9-0905-47d5-baae-61afc9f55035",
+    "createdAt":"2025-02-22T15:43:52.092Z",
+    "updatedAt":"2025-02-23T05:29:07.616Z",
+    "deleted_at":null,
+    "User":{
+      "username":"joooker",
+      "avatar_url":"https://storage.googleapis.com/coding8bit-f18ad.firebasestorage.app/images/00114702-fd03-49d4-9ff4-2b2166abdeb7/avatar_doge.jpg"
+    }
+  }
+]
+
+
+
+
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearUser } from '../utils/slice/userInfoSlice';
+
+const UserProfile = () => {
+  // 使用 useSelector 從 Redux store 中選擇用戶資訊
+  const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    // 清除 cookie 中的 authToken
+    document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    // 清除 axios 預設的 Authorization header
+    axios.defaults.headers.common.Authorization = null;
+    // 分發 clearUser action 清除 Redux store 中的用戶資訊
+    dispatch(clearUser());
+  };
+
+  return (
+    <div>
+      {user ? (
+        <div>
+          <p>歡迎, {user.username}</p>
+          <button onClick={handleLogout}>登出</button>
+        </div>
+      ) : (
+        <p>未登入</p>
+      )}
+    </div>
+  );
+};
+
+export default UserProfile;
