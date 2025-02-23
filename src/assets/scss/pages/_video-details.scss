@@ -94,7 +94,7 @@
       padding: 12px 24px;
       color: $gray-03;
     }
-    
+
     .video-comments.active,
     .video-description.active {
       color: $brand-03;
@@ -104,7 +104,8 @@
   .tab-content {
     .video-description-item {
       list-style-type: decimal;
-      h6{
+
+      h6 {
         font-weight: 400;
         font-style: 16px;
         line-height: 1.5;
@@ -112,8 +113,10 @@
     }
 
     .user-comment-picture {
-      display: block;
+      // display: block;
       height: 40px;
+      max-width: 40px;
+      object-fit: cover;
       border-radius: 88px;
     }
 
@@ -187,6 +190,8 @@
       .tutor-content {
         .tutor-image {
           height: 40px;
+          max-width: 40px;
+          object-fit: cover;
           border-radius: 88px;
         }
 
@@ -208,10 +213,12 @@
           color: $gray-01;
           line-height: 1.5;
         }
-        >div:last-of-type{
+
+        >div:last-of-type {
           margin-bottom: 0;
         }
-        >div:not(last-of-type)  {
+
+        >div:not(last-of-type) {
           margin-bottom: 32px;
         }
       }

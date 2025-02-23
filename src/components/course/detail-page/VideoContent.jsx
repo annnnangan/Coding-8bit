@@ -20,9 +20,9 @@ export default function VideoContent({
           const commentsResult = await courseApi.getCourseComments(
             introductionVideoId
           );
-          setComments(commentsResult);
+          setComments(commentsResult.data);
         } catch (error) {
-          console.error("錯誤!!! 請聯繫系統管理員");
+          console.error("錯誤!!! 請聯繫系統管理員", error);
         }
       };
       getCourseCommentsHandle();

@@ -2,25 +2,52 @@ import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { formatDateToTaiwanStyle } from "../../../utils/timeFormatted-utils";
 import { countReplies } from "../../../utils/countReplies-utils";
+import userApi from "../../../api/userApi";
 
 export default function CommentsSection({ comments }) {
   const [userComments, setUserComments] = useState([]);
   const [replyCount, setReplyCount] = useState({});
+  const [userInfo, setUserInfo] = useState({});
+
+  const reduceComments = () => {
+    const { parentComments, childComments } = comments.reduce(
+      (acc, comment) => {
+        if (comment.parent_id === null) {
+          acc.parentComments.push(comment);
+        } else {
+          acc.childComments.push(comment);
+        }
+        return acc;
+      },
+      { parentComments: [], childComments: [] }
+    );
+
+    return { parentComments, childComments };
+  };
+
   useEffect(() => {
-    if (comments && comments.data) {
-      setUserComments(comments.data);
-      setReplyCount(countReplies(userComments));
-    } 
+    if (comments && Array.isArray(comments)) {
+      const { parentComments, childComments } = reduceComments();
+      setUserComments(parentComments.reverse());
+      setReplyCount(countReplies(childComments));
+    }
   }, [comments]);
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const res = await userApi.getUserData();
+      setUserInfo(res);
+    };
+    getUserInfo();
+  }, []);
 
   return (
     <>
-      {JSON.stringify(replyCount)}
       <section className="video-comments pt-6">
         <div className="d-flex py-4 mb-6">
           <img
             className="user-comment-picture me-3"
-            src="https://raw.githubusercontent.com/ahmomoz/Coding-bit/refs/heads/main/assets/images/user/user-2.png"
+            src={userInfo.avatar_url}
             alt="當前使用者頭像"
           />
           <input
@@ -43,10 +70,10 @@ export default function CommentsSection({ comments }) {
                 <div className="d-flex justify-content-between align-items-center flex-fill">
                   <div className="f-column">
                     <span className="user-name mb-2">
-                      {userComment.User.name}
+                      {userComment.User.username}
                     </span>
                     <time className="comment-time fs-7">
-                      {formatDateToTaiwanStyle(userComment.time)}
+                      {formatDateToTaiwanStyle(userComment.createdAt)}
                     </time>
                   </div>
                   <button
@@ -58,9 +85,7 @@ export default function CommentsSection({ comments }) {
                 </div>
               </div>
               <div className="reply">
-                <p className="reply-style fs-6">
-                  這個課程把Hooks解釋得很清楚，讓我對useEffect和useCallback有了更深入的理解。講師的示例簡單易懂，推薦給大家。
-                </p>
+                <p className="reply-style fs-6">{userComment.content}</p>
                 <div
                   className="accordion accordion-flush"
                   id="accordionFlushExample"
@@ -71,13 +96,20 @@ export default function CommentsSection({ comments }) {
                       id={`flush-heading${index}`}
                     >
                       <span
-                        className="accordion-button mouse-pointer-style collapsed py-2 px-4"
+                        className={`accordion-button mouse-pointer-style collapsed py-2 px-4 ${
+                          replyCount[userComment.id] === undefined
+                            ? "d-none"
+                            : ""
+                        }`}
                         data-bs-toggle="collapse"
                         data-bs-target={`#flush-collapse${index}`}
                         aria-expanded="false"
                         aria-controls={`flush-collapse${index}`}
                       >
-                        {replyCount.id} 則回覆
+                        {replyCount[userComment.id]
+                          ? replyCount[userComment.id].length
+                          : 0}{" "}
+                        則回覆
                       </span>
                     </div>
                     <div
@@ -86,42 +118,37 @@ export default function CommentsSection({ comments }) {
                       aria-labelledby={`flush-collapse${index}`}
                     >
                       <div className="accordion-body">
-                        {JSON.stringify(userComment)}
-                        {/* {userComment.map((item, index) => (
-                          <div
-                            className={`tutor-content ${
-                              index !== userComment.length - 1 && "mb-8"
-                            }`}
-                            key={item.replyId}
-                          >
-                            <div className="d-flex mb-3">
-                              <img
-                                className="tutor-image me-4"
-                                src={item.user.avatar}
-                                alt="留言回覆者頭像"
-                              />
-                              <div className="d-flex justify-content-between align-items-center flex-fill">
-                                <div className="f-column">
-                                  <span className="tutor-name mb-2">
-                                    {item.user.name}
-                                  </span>
-                                  <time className="comment-time fs-7">
-                                    {item.time}
-                                  </time>
+                        {replyCount[userComment.id] &&
+                          replyCount[userComment.id].map((item) => (
+                            <div className="tutor-content" key={item.id}>
+                              <div className="d-flex mb-3">
+                                <img
+                                  className="tutor-image me-4"
+                                  src={item.User.avatar_url}
+                                  alt="留言回覆者頭像"
+                                />
+                                <div className="d-flex justify-content-between align-items-center flex-fill">
+                                  <div className="f-column">
+                                    <span className="tutor-name mb-2">
+                                      {item.User.username}
+                                    </span>
+                                    <time className="comment-time fs-7">
+                                      {formatDateToTaiwanStyle(item.createdAt)}
+                                    </time>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 reply-comment"
+                                  >
+                                    回覆
+                                  </button>
                                 </div>
-                                <button
-                                  type="button"
-                                  className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 reply-comment"
-                                >
-                                  回覆
-                                </button>
                               </div>
+                              <p className="tutor-reply-style fs-6">
+                                {item.content}
+                              </p>
                             </div>
-                            <p className="tutor-reply-style fs-6">
-                              {item.content}
-                            </p>
-                          </div>
-                        ))} */}
+                          ))}
                       </div>
                     </div>
                   </div>

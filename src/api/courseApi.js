@@ -4,6 +4,7 @@ import apiClient from './apiClient';
 const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", limit = 9) => {
   const response = await apiClient
   .get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+  console.log(response);
   return response.data.data;
 };
 
