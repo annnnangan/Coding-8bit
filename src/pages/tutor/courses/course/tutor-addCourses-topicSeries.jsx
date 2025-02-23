@@ -3,9 +3,9 @@ import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 
-import AddContent from "../../../../components/tutor-panel/course/add/AddContent";
-import Loader from "../../../../components/common/Loader";
-import AddChapter from "../../../../components/tutor-panel/course/add/AddChapter";
+import AddContent from "@/components/tutor-panel/course/add/AddContent";
+import Loader from "@/components/common/Loader";
+import AddChapter from "@/components/tutor-panel/course/add/AddChapter";
 
 export default function TutorManageAddTopicSeries() {
   // loading
@@ -52,6 +52,7 @@ export default function TutorManageAddTopicSeries() {
               setIsAddingChapter={setIsAddingChapter}
               setLoadingState={setLoadingState}
               submitApiRequest={submitApiRequest}
+              type="topicSeries"
             />
           ) : (
             <AddChapter

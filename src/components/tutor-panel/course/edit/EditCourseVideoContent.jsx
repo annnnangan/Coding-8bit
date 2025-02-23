@@ -11,44 +11,23 @@ import axios from "axios";
 import PropTypes from "prop-types";
 
 import courseApi from "../../../../api/courseApi";
+import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
-import userApi from "../../../../api/userApi";
 
 export default function EditCourseVideoContent({
   submitApiRequest,
   setLoadingState,
   video_url,
+  video_duration,
+  chapterVideoData,
+  videoId,
 }) {
   // 返回上一頁
   const navigate = useNavigate();
   const toPrevPage = () => {
     navigate(-1);
   };
-
-  const { id } = useParams();
-  const { courseId } = useParams();
-
-  // 取得章節資料
-  const getChapter = async () => {
-    setLoadingState(true);
-    try {
-      const result = await courseApi.getCourseChapter(courseId);
-      const chapterVideoArray = result.filter((res) => res.id === id);
-      setValue("title", chapterVideoArray[0].title);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: error.response?.data?.message,
-      });
-    } finally {
-      setLoadingState(false);
-    }
-  };
-
-  useEffect(() => {
-    getChapter();
-  }, []);
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});
@@ -143,6 +122,7 @@ export default function EditCourseVideoContent({
   });
 
   // 表單提交
+  const { id } = useParams();
   const quillRef = useRef(null);
   const onSubmit = async (data) => {
     if (temData.cover_image) {
@@ -157,16 +137,13 @@ export default function EditCourseVideoContent({
       const requestData = {
         ...data,
         ...temData,
-        is_free: false,
-        is_public: true,
         video_url: video_url,
-        video_type: "topicSeries",
+        duration: Number(video_duration.toFixed(0)),
         chapter_id: id,
         tutor_id: tutor_id,
       };
 
-      await submitApiRequest(courseApi.addVideo, requestData);
-      navigate(-1);
+      await submitApiRequest(courseApi.updateVideo, requestData, videoId);
     } else {
       Swal.fire({
         icon: "error",
@@ -174,6 +151,18 @@ export default function EditCourseVideoContent({
       });
     }
   };
+
+  // 初始化 - 取得原本的影片資料
+  useEffect(() => {
+    setValue("title", chapterVideoData?.title);
+    setValue("description", chapterVideoData?.description || "");
+    setTemData((prevData) => {
+      return {
+        ...prevData,
+        cover_image: chapterVideoData?.cover_image || "",
+      };
+    });
+  }, [chapterVideoData]);
 
   return (
     <div className="col-xxl-6">
@@ -258,7 +247,7 @@ export default function EditCourseVideoContent({
           <div className="btn-container text-end fixed-bottom pb-4 pb-lg-6 pe-4 pe-lg-13">
             <button
               type="button"
-              className="btn btn-outline-brand-03 rounded-2 border-3"
+              className="btn btn-outline-brand-03 bg-white rounded-2 border-3"
               style={{ padding: "9px 24px" }}
               onClick={toPrevPage}
             >
@@ -269,7 +258,7 @@ export default function EditCourseVideoContent({
               className="btn btn-brand-03 rounded-2 ms-4"
               disabled={!isValid}
             >
-              新增影片
+              更新影片
             </button>
           </div>
         </form>
@@ -282,4 +271,11 @@ EditCourseVideoContent.propTypes = {
   submitApiRequest: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
   video_url: PropTypes.string,
+  video_duration: PropTypes.number,
+  chapterVideoData: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    cover_image: PropTypes.string.isRequired,
+  }),
+  videoId: PropTypes.string.isRequired,
 };

@@ -42,8 +42,8 @@ export default function CourseList() {
       const customLearning = await courseApi.getAllVideos("customLearning");
       const freeTipShorts = await courseApi.getAllVideos("freeTipShorts");
       setTopicSeriesCourseList(topicSeries.courses);
-      setCustomLearningCourseList(customLearning);
-      setFreeTipShortsCourseList(freeTipShorts);
+      setCustomLearningCourseList(customLearning.videos);
+      setFreeTipShortsCourseList(freeTipShorts.videos);
     } catch (error) {
       console.log("錯誤", error);
     } finally {

@@ -11,6 +11,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 
 import courseApi from "../../../../api/courseApi";
+import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
 
@@ -18,6 +19,9 @@ export default function AddContent({
   submitApiRequest,
   setLoadingState,
   setIsAddingChapter,
+  video_url,
+  video_duration,
+  type,
 }) {
   // 返回上一頁
   const navigate = useNavigate();
@@ -107,7 +111,7 @@ export default function AddContent({
 
   // 驗證規則
   const schema = z.object({
-    title: z.string().min(1, "請輸入系列課程標題"),
+    title: z.string().min(1, "請輸入標題"),
     description: z
       .string()
       .min(1, "請輸入課程描述")
@@ -116,7 +120,7 @@ export default function AddContent({
       message: "請選擇瀏覽權限",
     }),
     category: z.string().min(1, "請選擇工具與語言"),
-    tags: z.string().min(1, "請輸入關鍵字"),
+    tag: z.string().min(1, "請輸入關鍵字"),
   });
 
   // 表單驗證
@@ -145,10 +149,28 @@ export default function AddContent({
         setValue("description", descriptionText);
       }
 
-      const requestData = { ...data, ...temData, is_free: false };
+      if (type === "topicSeries") {
+        // 主題式系列課程的新增影片
+        const requestData = { ...data, ...temData, is_free: false };
 
-      await submitApiRequest(courseApi.addCourse, requestData);
-      setIsAddingChapter(true);
+        await submitApiRequest(courseApi.addCourse, requestData);
+        setIsAddingChapter(true);
+      } else {
+        // 客製化需求影片和實用技術短影片的新增影片
+        const { tutor_id } = await userApi.getUserData();
+
+        const requestData = {
+          ...data,
+          ...temData,
+          is_free: false,
+          video_url: video_url,
+          duration: Number(video_duration.toFixed(0)),
+          video_type: type,
+          tutor_id: tutor_id,
+        };
+        
+        await submitApiRequest(courseApi.addVideo, requestData);
+      }
     } else {
       Swal.fire({
         icon: "error",
@@ -158,7 +180,7 @@ export default function AddContent({
   };
 
   return (
-    <div className="col-lg-8">
+    <div className={type === "topicSeries" ? "col-lg-8" : "col-xxl-6"}>
       <div className="course-content-wrap card-column pe-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
@@ -210,7 +232,7 @@ export default function AddContent({
               register={register}
               errors={errors}
               id="title"
-              labelText="系列課程標題"
+              labelText={type === "topicSeries" ? "系列課程標題" : "影片標題"}
               type="text"
             />
           </div>
@@ -295,7 +317,7 @@ export default function AddContent({
             <FormInput
               register={register}
               errors={errors}
-              id="tags"
+              id="tag"
               labelText="關鍵字 (請用半型逗號隔開)"
               type="text"
             />
@@ -314,7 +336,11 @@ export default function AddContent({
                   value={field.value || ""}
                   ref={quillRef}
                   onChange={field.onChange}
-                  placeholder="請描述課程目標、課程大綱等內容，幫助學習者快速了解。"
+                  placeholder={
+                    type === "topicSeries"
+                      ? "請描述課程目標、課程大綱等內容，幫助學習者快速了解。"
+                      : "請描述影片大綱、影片描述等內容，幫助學習者快速了解。"
+                  }
                 />
               )}
             />
@@ -350,5 +376,7 @@ AddContent.propTypes = {
   submitApiRequest: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
   setIsAddingChapter: PropTypes.func,
-  setNewCourseId: PropTypes.func,
+  video_url: PropTypes.string,
+  video_duration: PropTypes.number,
+  type: PropTypes.string,
 };

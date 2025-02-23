@@ -63,14 +63,13 @@ const updateCourse = async (courseId, courseData) => {
   return response;
 };
 
-
 // 後台 - 刪除課程
 const deleteCourse = async (courseId) => {
   const response = await apiClient.delete(`/course/${courseId}`);
   return response;
 };
 
-// 後台 - 建立章節
+// 後台 - 新增章節
 const addChapter = async (courseId, data) => {
   const response = await apiClient.post(`/course/${courseId}/chapters`, data);
   return response;
@@ -88,6 +87,18 @@ const addVideo = async (videoData) => {
   return response;
 };
 
+// 後台 - 修改影片
+const updateVideo = async (videoId, data) => {
+  const response = await apiClient.put(`/video/${videoId}`, data);
+  return response;
+};
+
+// 後台 - 刪除影片
+const deleteVideo = async (videoId) => {
+  const response = await apiClient.delete(`/video/${videoId}`);
+  return response;
+};
+
 export default {
   getAllCourses,
   getAllVideos,
@@ -101,6 +112,8 @@ export default {
   updateCourse,
   deleteCourse,
   addChapter,
+  deleteChapter,
   addVideo,
-  deleteChapter
+  updateVideo,
+  deleteVideo,
 };

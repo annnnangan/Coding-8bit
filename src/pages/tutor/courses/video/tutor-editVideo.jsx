@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Swal from "sweetalert2";
 import axios from "axios";
 
-import Loader from "../../../components/common/Loader";
-import AddCourseVideoContent from "../../../components/tutor-panel/course/add/AddCourseVideoContent";
+import courseApi from "../../../../api/courseApi";
+
+import EditCourseVideoContent from "../../../../components/tutor-panel/course/edit/EditCourseVideoContent";
+import EditContent from "@/components/tutor-panel/course/edit/EditContent";
+import Loader from "@/components/common/Loader";
 
 export default function TutorManageAddVideo() {
   // loading
@@ -14,7 +17,58 @@ export default function TutorManageAddVideo() {
 
   // 依路由決定此頁顯示分類
   const { type } = useParams();
+  const { id } = useParams();
+  const { courseId } = useParams();
 
+  // 取得影片資料 (主題式系列課程)
+  const [chapterVideoData, setChapterVideoData] = useState();
+  const [videoId, setVideoId] = useState("");
+  const getChapter = async () => {
+    setLoadingState(true);
+    try {
+      const result = await courseApi.getCourseChapter(courseId);
+      const chapterVideoArray = result.filter((res) => res.id === id);
+      setChapterVideoData(chapterVideoArray[0].Videos[0]);
+      setTemVideoData((prevData) => {
+        return {
+          ...prevData,
+          video_url: chapterVideoArray[0]?.Videos[0]?.video_url,
+          video_duration: chapterVideoArray[0]?.Videos[0]?.duration,
+        };
+      });
+      setVideoId(chapterVideoArray[0]?.Videos[0]?.id);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: error.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // 取得影片資料 (客製化學習需求影片、實用技術短影片)
+  const [videoData, setVideoData] = useState();
+  const getData = async () => {
+    setLoadingState(true);
+    try {
+      const result = await courseApi.getVideoDetail(id);
+      setVideoData(result);
+      setTemVideoData((prevData) => {
+        return {
+          ...prevData,
+          video_url: result?.video_url,
+          video_duration: result?.duration,
+        };
+      });
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // 影片上傳函式
   const [temVideoData, setTemVideoData] = useState("");
   const videoUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -38,8 +92,27 @@ export default function TutorManageAddVideo() {
       return;
     }
 
+    // 讀取影片時長
+    const getVideoDuration = (file) => {
+      return new Promise((resolve, reject) => {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+        video.src = URL.createObjectURL(file);
+        video.onloadedmetadata = () => {
+          URL.revokeObjectURL(video.src);
+          resolve(video.duration); // 回傳秒數
+        };
+        video.onerror = () => {
+          reject(new Error("無法讀取影片時長"));
+        };
+      });
+    };
+
     setLoadingState(true);
     try {
+      // 取得影片時長
+      const duration = await getVideoDuration(file);
+
       const token =
         document.cookie.replace(
           /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
@@ -65,14 +138,13 @@ export default function TutorManageAddVideo() {
         { filePath: filePath }
       );
 
-      // 3. 更新狀態顯示圖片
+      // 3. 更新狀態，儲存影片網址與時長
       if (res.data.videoUrl) {
-        setTemVideoData((prevData) => {
-          return {
-            ...prevData,
-            video_url: res.data.videoUrl,
-          };
-        });
+        setTemVideoData((prevData) => ({
+          ...prevData,
+          video_url: res.data.videoUrl, // 影片的網址
+          video_duration: duration, // 影片的時長
+        }));
       }
 
       Swal.fire({
@@ -89,17 +161,19 @@ export default function TutorManageAddVideo() {
     }
   };
 
-  const submitApiRequest = async (apiFunc, data) => {
+  const navigate = useNavigate();
+  // 處理編輯影片的 api 邏輯
+  const submitApiRequest = async (apiFunc, data, videoId) => {
     setLoadingState(true);
     try {
-      const result = await apiFunc(data);
+      const result = await apiFunc(videoId, data);
       Swal.fire({
         icon: "success",
-        title: "課程新增成功",
+        title: "影片修改成功",
       });
+      navigate(-1);
       return result;
     } catch (error) {
-      console.error(error);
       Swal.fire({
         icon: "error",
         title: error.response?.message || "發生錯誤，請稍後再試",
@@ -109,18 +183,26 @@ export default function TutorManageAddVideo() {
     }
   };
 
+  useEffect(() => {
+    if (type === "topicSeries") {
+      getChapter();
+    } else {
+      getData();
+    }
+  }, []);
+
   return (
     <>
       <Helmet>
-        <title>Coding∞bit ｜ 新增課程影片</title>
+        <title>Coding∞bit ｜ 編輯影片</title>
       </Helmet>
       {loadingState && <Loader />}
 
-      <main className="tutor-add-video-wrap container-fluid py-6 py-lg-0">
+      <main className="tutor-edit-video-wrap container-fluid pt-4 pb-10 pb-lg-6 py-xxl-0">
         <h1 className="fs-4 fs-lg-2">
-          {type === "topicSeries" && "新增章節影片"}
-          {type === "customLearning" && "新增課程影片 - 客製化學習需求"}
-          {type === "freeTipShorts" && "新增課程影片 - 實用技術短影片"}
+          {type === "topicSeries" && "編輯章節影片"}
+          {type === "customLearning" && "編輯課程影片 - 客製化學習需求"}
+          {type === "freeTipShorts" && "編輯課程影片 - 實用技術短影片"}
         </h1>
 
         <div className="row">
@@ -204,29 +286,26 @@ export default function TutorManageAddVideo() {
             </div>
           </div>
 
-          {type === "topicSeries" && (
-            <AddCourseVideoContent
+          {type === "topicSeries" ? (
+            <EditCourseVideoContent
               submitApiRequest={submitApiRequest}
               setLoadingState={setLoadingState}
               video_url={temVideoData.video_url}
+              video_duration={temVideoData.video_duration}
+              chapterVideoData={chapterVideoData}
+              videoId={videoId}
+            />
+          ) : (
+            <EditContent
+              submitApiRequest={submitApiRequest}
+              setLoadingState={setLoadingState}
+              video_url={temVideoData.video_url}
+              video_duration={temVideoData.video_duration}
+              type={type}
+              videoData={videoData}
             />
           )}
         </div>
-
-        {/* web button wrap
-        <div className="btn-container text-end mt-auto">
-          <button
-            type="submit"
-            className="btn btn-outline-brand-03 rounded-2 border-3"
-            style={{ padding: "9px 24px" }}
-            onClick={toPrevPage}
-          >
-            取消
-          </button>
-          <button type="submit" className="btn btn-brand-03 rounded-2 ms-4">
-            確認新增
-          </button>
-        </div> */}
       </main>
     </>
   );

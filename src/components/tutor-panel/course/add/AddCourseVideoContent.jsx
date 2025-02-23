@@ -19,6 +19,7 @@ export default function AddCourseVideoContent({
   submitApiRequest,
   setLoadingState,
   video_url,
+  video_duration,
 }) {
   // 返回上一頁
   const navigate = useNavigate();
@@ -45,10 +46,6 @@ export default function AddCourseVideoContent({
       setLoadingState(false);
     }
   };
-
-  useEffect(() => {
-    getChapter();
-  }, []);
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});
@@ -161,12 +158,12 @@ export default function AddCourseVideoContent({
         is_public: true,
         video_url: video_url,
         video_type: "topicSeries",
+        duration: Number(video_duration.toFixed(0)),
         chapter_id: id,
         tutor_id: tutor_id,
       };
 
       await submitApiRequest(courseApi.addVideo, requestData);
-      navigate(-1);
     } else {
       Swal.fire({
         icon: "error",
@@ -175,9 +172,13 @@ export default function AddCourseVideoContent({
     }
   };
 
+  useEffect(() => {
+    getChapter();
+  }, []);
+
   return (
     <div className="col-xxl-6">
-      <div className="course-content-wrap card-column pe-10">
+      <div className="course-content-wrap card-column pe-xxl-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
           <div className="image-upload-wrapper mt-1">
@@ -258,7 +259,7 @@ export default function AddCourseVideoContent({
           <div className="btn-container text-end fixed-bottom pb-4 pb-lg-6 pe-4 pe-lg-13">
             <button
               type="button"
-              className="btn btn-outline-brand-03 rounded-2 border-3"
+              className="btn btn-outline-brand-03 bg-white rounded-2 border-3"
               style={{ padding: "9px 24px" }}
               onClick={toPrevPage}
             >
@@ -282,4 +283,5 @@ AddCourseVideoContent.propTypes = {
   submitApiRequest: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
   video_url: PropTypes.string,
+  video_duration: PropTypes.number,
 };

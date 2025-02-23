@@ -2,7 +2,8 @@
 .tutor-add-TopicSeriesCourses-wrap,
 .tutor-chapter-topicSeries-wrap,
 .tutor-edit-TopicSeriesCourses-wrap,
-.tutor-add-video-wrap {
+.tutor-add-video-wrap,
+.tutor-edit-video-wrap {
   .dropdown-toggle::after {
     display: none;
   }
@@ -54,7 +55,8 @@
 /* tutor-add-TopicSeriesCourses-wrap */
 .tutor-add-TopicSeriesCourses-wrap,
 .tutor-edit-TopicSeriesCourses-wrap,
-.tutor-add-video-wrap {
+.tutor-add-video-wrap,
+.tutor-edit-video-wrap {
   /* form */
   .form-label {
     font-size: 14px;
@@ -85,14 +87,20 @@
     .chapter-content {
       display: flex;
       align-items: center;
-      gap: 16px; // 控制圖片與標題間距
+      gap: 16px; 
     }
 
     .chapter-image {
       width: 120px;
-      height: 68px; // 固定高度，防止不同影片封面高度不一
-      object-fit: cover; // 確保圖片不變形
+      height: 68px; 
+      object-fit: cover; 
       border-radius: 8px;
+    }
+  }
+
+  .btn-container {
+    @include lg-pc {
+      background-color: $white;
     }
   }
 }

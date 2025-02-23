@@ -23,7 +23,14 @@ export default function TopicSeriesList({ course, deleteCourse }) {
             </span>
           </div>
         </td>
-        <td>{course.title}</td>
+        <td>
+          <NavLink
+            to={`/course/${course.id}`}
+            className="d-inline underline-hover"
+          >
+            {course.title}
+          </NavLink>
+        </td>
         <td>{course.category}</td>
         <td>{course.is_public ? "公開" : "未公開"}</td>
         <td>{formatDate(course.created_at)}</td>
@@ -41,7 +48,7 @@ export default function TopicSeriesList({ course, deleteCourse }) {
             <button
               type="button"
               className="btn link-danger border-0 f-align-center p-0 mt-1"
-              onClick={()=>deleteCourse(course.id)}
+              onClick={() => deleteCourse(course.id, "topicSeries")}
             >
               <span className="material-symbols-outlined me-1">delete</span>
               刪除
@@ -59,7 +66,7 @@ TopicSeriesList.propTypes = {
     title: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     duration: PropTypes.number.isRequired,
-    created_at: PropTypes.number.isRequired,
+    created_at: PropTypes.string.isRequired,
     view_count: PropTypes.number.isRequired,
     rating: PropTypes.string.isRequired,
     is_public: PropTypes.bool.isRequired,

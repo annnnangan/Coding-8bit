@@ -10,11 +10,19 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import PropTypes from "prop-types";
 
-import courseApi from "../../../../api/courseApi";
+import courseApi from "@/api/courseApi";
+import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
 
-export default function EditContent({ submitApiRequest, setLoadingState }) {
+export default function EditContent({
+  submitApiRequest,
+  setLoadingState,
+  video_url,
+  video_duration,
+  type = "topicSeries",
+  videoData,
+}) {
   // 返回上一頁
   const navigate = useNavigate();
   const toPrevPage = () => {
@@ -41,7 +49,7 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
         setValue("description", result.description || "");
         setValue("is_public", result.is_public ?? false);
         setValue("category", result.category || "");
-        setValue("tags", result.tags || "");
+        setValue("tag", result.tag || "");
         setTemData((prevData) => {
           return {
             ...prevData,
@@ -138,7 +146,7 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
       message: "請選擇瀏覽權限",
     }),
     category: z.string().min(1, "請選擇工具與語言"),
-    tags: z.string().min(1, "請輸入關鍵字"),
+    tag: z.string().min(1, "請輸入關鍵字"),
   });
 
   // 表單驗證
@@ -167,9 +175,26 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
         setValue("description", descriptionText);
       }
 
-      const requestData = { ...data, ...temData, is_free: false };
+      if (type === "topicSeries") {
+        // 主題式系列課程的新增影片
+        const requestData = { ...data, ...temData, is_free: false };
 
-      await submitApiRequest(courseApi.updateCourse, id, requestData);
+        await submitApiRequest(courseApi.updateCourse, id, requestData);
+      } else {
+        // 客製化需求影片和實用技術短影片的新增影片
+        const { tutor_id } = await userApi.getUserData();
+
+        const requestData = {
+          ...data,
+          ...temData,
+          video_url: video_url,
+          duration: Number(video_duration.toFixed(0)),
+          video_type: type,
+          tutor_id: tutor_id,
+        };
+
+        await submitApiRequest(courseApi.updateVideo, requestData, id);
+      }
     } else {
       Swal.fire({
         icon: "error",
@@ -179,11 +204,27 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
   };
 
   useEffect(() => {
-    getData();
+    if (type === "topicSeries") {
+      getData();
+    }
   }, []);
 
+  useEffect(() => {
+    setValue("title", videoData?.title || "");
+    setValue("description", videoData?.description || "");
+    setValue("is_public", videoData?.is_public ?? false);
+    setValue("category", videoData?.category || "");
+    setValue("tag", videoData?.tag || "");
+    setTemData((prevData) => {
+      return {
+        ...prevData,
+        cover_image: videoData?.cover_image || "",
+      };
+    });
+  }, [videoData]);
+
   return (
-    <div className="col-lg-8">
+    <div className={type === "topicSeries" ? "col-lg-8" : "col-xxl-6"}>
       <div className="course-content-wrap card-column pe-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
@@ -235,7 +276,7 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
               register={register}
               errors={errors}
               id="title"
-              labelText="系列課程標題"
+              labelText={type === "topicSeries" ? "系列課程標題" : "影片標題"}
               type="text"
             />
           </div>
@@ -320,7 +361,7 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
             <FormInput
               register={register}
               errors={errors}
-              id="tags"
+              id="tag"
               labelText="關鍵字 (請用半型逗號隔開)"
               type="text"
             />
@@ -339,7 +380,11 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
                   value={field.value || ""}
                   ref={quillRef}
                   onChange={field.onChange}
-                  placeholder="請描述課程目標、課程大綱等內容，幫助學習者快速了解。"
+                  placeholder={
+                    type === "topicSeries"
+                      ? "請描述課程目標、課程大綱等內容，幫助學習者快速了解。"
+                      : "請描述影片大綱、影片描述等內容，幫助學習者快速了解。"
+                  }
                 />
               )}
             />
@@ -374,4 +419,8 @@ export default function EditContent({ submitApiRequest, setLoadingState }) {
 EditContent.propTypes = {
   submitApiRequest: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
+  video_url: PropTypes.string,
+  video_duration: PropTypes.number,
+  type: PropTypes.string,
+  videoData: PropTypes.object,
 };
