@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 export default function Pagination({ pageData, getData, type }) {
   // 切換頁碼
   const changePage = (page) => {
-    getData(type, page);
+    if (!type) {
+      getData(type, page);
+    } else {
+      getData(page);
+    }
   };
 
   return (
@@ -29,13 +33,13 @@ export default function Pagination({ pageData, getData, type }) {
           }`}
           key={i}
         >
-          <a
+          <button
             className="page-link"
-            href="#"
-            onClick={(event) => getData(event, i + 1)}
+            type="button"
+            onClick={() => getData(i + 1)}
           >
             {i + 1}
-          </a>
+          </button>
         </li>
       ))}
       <li className="page-item">

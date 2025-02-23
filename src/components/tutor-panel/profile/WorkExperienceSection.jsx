@@ -3,31 +3,12 @@ import { useState, useRef, useEffect } from "react";
 import * as bootstrap from "bootstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
+import PropTypes from "prop-types";
 
-import Loader from "../../common/Loader";
+import userApi from "../../../api/userApi";
+import tutorApi from "../../../api/tutorApi";
 
-const { VITE_API_BASE } = import.meta.env;
-
-export default function WorkExperienceSection() {
-  //loading
-  const [loadingState, setLoadingState] = useState(false);
-
-  // const initialExperiencesState = [
-  //   {
-  //     id: 11258,
-  //     company: "High School",
-  //     position: "Math Teacher",
-  //     start_year: "2019",
-  //     end_year: "2021",
-  //   },
-  //   {
-  //     id: 22258,
-  //     company: "High School",
-  //     position: "Math Teacher",
-  //     start_year: "2016",
-  //     end_year: "2020",
-  //   },
-  // ];
+export default function WorkExperienceSection({ setLoadingState }) {
   const [workExperiences, setWorkExperiences] = useState([]);
   const [temExperience, setTemExperience] = useState({
     company: "",
@@ -38,20 +19,23 @@ export default function WorkExperienceSection() {
 
   // modal
   const [modalType, setModalType] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const myModal = useRef(null);
   const experienceModalRef = useRef(null);
 
   const openModal = (exp, type) => {
+    setIsModalOpen(true);
     if (type === "edit") {
       setModalType("edit");
       setTemExperience(exp);
+      setUpdateDataId(exp.id);
     } else {
       setModalType("add");
       setTemExperience({
         company: "",
         position: "",
-        start_year: 0,
-        end_year: 0,
+        start_year: "",
+        end_year: "",
       });
     }
     myModal.current.show();
@@ -59,6 +43,7 @@ export default function WorkExperienceSection() {
   };
 
   const hideModal = () => {
+    setIsModalOpen(false);
     myModal.current.hide();
   };
 
@@ -81,13 +66,10 @@ export default function WorkExperienceSection() {
   const getData = async () => {
     setLoadingState(true);
     try {
-      const { data } = await axios.get(`${VITE_API_BASE}/user/users/me`);
-      setTutorId(data.id);
-      console.log(data)
-      const result = await axios.get(
-        `${VITE_API_BASE}/tutor/${data.id}/experiences`
-      );
-      setWorkExperiences(result.data.data || []);
+      const { tutor_id } = await userApi.getUserData();
+      const result = await tutorApi.getExp(tutor_id);
+      setTutorId(tutor_id);
+      setWorkExperiences(result.data || []);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -103,11 +85,7 @@ export default function WorkExperienceSection() {
   const addData = async () => {
     setLoadingState(true);
     try {
-      console.log({
-        ...temExperience,
-        tutor_id: tutorId,
-      });
-      await axios.post(`${VITE_API_BASE}/tutor/${tutorId}/experiences`, {
+      await tutorApi.addExp(tutorId, {
         ...temExperience,
         tutor_id: tutorId,
       });
@@ -116,6 +94,7 @@ export default function WorkExperienceSection() {
         icon: "success",
         title: "新增成功",
       });
+      hideModal();
       getData();
     } catch (error) {
       Swal.fire({
@@ -128,18 +107,18 @@ export default function WorkExperienceSection() {
     }
   };
 
-  // 編輯資料
-  const updateData = async (exp) => {
+  // 更新資料
+  const [updateDataId, setUpdateDataId] = useState("");
+  const updateData = async () => {
     setLoadingState(true);
     try {
-      await axios.put(
-        `${VITE_API_BASE}/tutor/${tutorId}/experiences/${exp.expId}`,
-        exp
-      );
+      await tutorApi.updateExp(tutorId, temExperience, updateDataId);
       Swal.fire({
         icon: "success",
         title: "修改成功",
       });
+      hideModal();
+      getData();
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -149,6 +128,36 @@ export default function WorkExperienceSection() {
     } finally {
       setLoadingState(false);
     }
+  };
+
+  // 刪除資料
+  const deleteData = async (expId) => {
+    Swal.fire({
+      title: "確定要刪除嗎？",
+      showCancelButton: true,
+      confirmButtonText: "刪除",
+      denyButtonText: "不要刪除",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoadingState(true);
+        try {
+          await tutorApi.deleteExp(tutorId, expId);
+          Swal.fire({
+            icon: "success",
+            title: "刪除成功",
+          });
+          getData();
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "刪除失敗",
+            text: error.response.data.message,
+          });
+        } finally {
+          setLoadingState(false);
+        }
+      }
+    });
   };
 
   // 初始化 - 啟用 modal
@@ -169,39 +178,50 @@ export default function WorkExperienceSection() {
 
   return (
     <>
-      {loadingState && <Loader />}
-
-      <section className="tutor-manage-profile-workExperiences-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6">
+      <section className="tutor-manage-profile-workExperiences-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4 mt-xxl-0">
         <h2 className="fs-6 fs-md-5 fw-bold">工作經歷</h2>
-        <table className="table mt-4 mt-lg-6">
-          <thead>
-            <tr>
-              <th>公司名稱</th>
-              <th>職稱</th>
-              <th>在職年份</th>
-              <th>離職年份</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody className="align-middle">
-            {workExperiences?.map((experience) => (
-              <tr key={experience.id}>
-                <td>{experience.company}</td>
-                <td>{experience.position}</td>
-                <td>{experience.start_year}</td>
-                <td>{experience.end_year}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-brand-03"
-                    onClick={() => openModal(experience, "edit")}
-                  >
-                    編輯
-                  </button>
-                </td>
+        <div className="table-wrap">
+          <table className="table mt-4 mt-lg-6">
+            <thead>
+              <tr>
+                <th>公司名稱</th>
+                <th>職稱</th>
+                <th>在職年份</th>
+                <th>離職年份</th>
+                <th>操作</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="align-middle">
+              {workExperiences?.map((experience) => (
+                <tr key={experience.id}>
+                  <td>{experience.company}</td>
+                  <td>{experience.position}</td>
+                  <td>{experience.start_year}</td>
+                  <td>{experience.end_year}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-brand-03"
+                      onClick={() => {
+                        openModal(experience, "edit");
+                      }}
+                    >
+                      編輯
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger rounded-2 px-1 py-1 ms-1"
+                      onClick={() => deleteData(experience.id)}
+                    >
+                      <span className="material-symbols-outlined fs-6">
+                        delete
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <button
           className="btn btn-brand-03 mt-3"
           onClick={() => openModal({}, "add")}
@@ -215,7 +235,7 @@ export default function WorkExperienceSection() {
           className="modal fade"
           tabIndex="-1"
           aria-labelledby="expModalLabel"
-          aria-hidden="true"
+          aria-hidden={!isModalOpen}
           ref={experienceModalRef}
         >
           <div className="modal-dialog">
@@ -265,7 +285,7 @@ export default function WorkExperienceSection() {
                       在職年份
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
                       placeholder="2017"
                       id="start_year"
@@ -278,7 +298,7 @@ export default function WorkExperienceSection() {
                       離職年份
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
                       placeholder="2020"
                       id="end_year"
@@ -322,3 +342,6 @@ export default function WorkExperienceSection() {
     </>
   );
 }
+WorkExperienceSection.propTypes = {
+  setLoadingState: PropTypes.func.isRequired,
+};

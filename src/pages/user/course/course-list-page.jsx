@@ -17,13 +17,14 @@ export default function CourseListPage() {
 
   // 取得課程資料函式
   const [courseList, setCourseList] = useState([]);
-  const [page, setPage] = useState(1);
-  const getCoursesData = async (dataPage = 1) => {
+  const [pageData, setPageData] = useState({});
+  const getCoursesData = async (currentPage = 1) => {
     setLoadingState(true);
     if (video_type !== "topicSeries") {
       try {
-        const result = await courseApi.getAllVideos(video_type, page);
-        setCourseList(result);
+        const result = await courseApi.getAllVideos(video_type, currentPage);
+        setCourseList(result.videos);
+        setPageData(result.pagination);
       } catch (error) {
         console.log("錯誤", error);
       } finally {
@@ -31,9 +32,13 @@ export default function CourseListPage() {
       }
     } else {
       try {
-        const result = await courseApi.getAllCourses(dataPage, sortBy, order);
-        setPage(dataPage)
+        const result = await courseApi.getAllCourses(
+          currentPage,
+          sortBy,
+          order
+        );
         setCourseList(result.courses);
+        setPageData(result.pagination);
       } catch (error) {
         console.log("錯誤", error);
       } finally {
@@ -231,10 +236,7 @@ export default function CourseListPage() {
                   </button>
                 </li>
                 <li>
-                  <button
-                    type="button"
-                    className="dropdown-item"
-                  >
+                  <button type="button" className="dropdown-item">
                     依時間(最新到最舊)
                   </button>
                 </li>
@@ -258,11 +260,7 @@ export default function CourseListPage() {
             )}
           </div>
           <nav className="mt-6 mt-lg-8" aria-label="navigation">
-            <Pagination
-              page={page}
-              setPage={setPage}
-              getData={getCoursesData}
-            />
+            <Pagination pageData={pageData} getData={getCoursesData} />
           </nav>
         </div>
       </main>
