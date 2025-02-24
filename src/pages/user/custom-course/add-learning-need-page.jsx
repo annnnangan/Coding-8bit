@@ -1,32 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 
-import ReactQuill from "react-quill-new";
+const ReactQuill = lazy(() => import("react-quill-new"));
 
 import AddLearningNeedRobot from "../../../components/custom-course/addLearningNeedRobot";
 import ChatRoom from "../../../components/custom-course/ChatRoom";
+import Loader from "../../../components/common/Loader";
 
 export default function AddLearningNeedPage() {
   // ReactQuill 文字編輯器
   const [value, setValue] = useState("");
-  const modules = {
-    toolbar: [
-      [{ font: [] }],
-      ["bold", "italic", "underline"],
-      ["link", "image", "video"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ align: [] }],
-      ["blockquote", "code-block"],
-      ["clean"],
-    ],
-  };
+  const modules = useMemo(
+    () => ({
+      toolbar: [
+        [{ font: [] }],
+        ["bold", "italic", "underline"],
+        ["link", "image", "video"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["blockquote", "code-block"],
+        ["clean"],
+      ],
+    }),
+    []
+  );
 
   // 返回上一頁
   const navigate = useNavigate();
   const toPrevPage = () => {
-    navigate(-1)
-  }
+    navigate(-1);
+  };
+
+  const [editorLoaded, setEditorLoaded] = useState(false);
+
+  useEffect(() => {
+    setEditorLoaded(true);
+  }, []);
 
   return (
     <>
@@ -144,7 +154,10 @@ export default function AddLearningNeedPage() {
                     </label>
 
                     {/* 上傳圖片後的樣子 */}
-                    <button type="button" className="img-wrapper border-0 p-0 d-none">
+                    <button
+                      type="button"
+                      className="img-wrapper border-0 p-0 d-none"
+                    >
                       <img
                         src="images/course/course-4.png"
                         alt="learning-need-image"
@@ -299,12 +312,16 @@ export default function AddLearningNeedPage() {
                     <label htmlFor="content" className="form-label">
                       學習需求描述
                     </label>
-                    <ReactQuill
-                      value={value}
-                      onChange={setValue}
-                      placeholder="請描述您的學習需求"
-                      modules={modules}
-                    />
+                    {editorLoaded && (
+                      <Suspense fallback={<Loader />}>
+                        <ReactQuill
+                          value={value}
+                          onChange={setValue}
+                          placeholder="請描述您的學習需求"
+                          modules={modules}
+                        />
+                      </Suspense>
+                    )}
                   </div>
                 </form>
 

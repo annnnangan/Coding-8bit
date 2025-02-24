@@ -31,13 +31,13 @@ const activateAccount = async (token) => {
 
 // 傳送忘記密碼信件
 const sendForgotPasswordEmail = async(email) => {
-  await apiClient.post(`/password/forgot-password`,email);
+  await apiClient.post(`/password/forgot-password`, email);
   return
 }
 
 // 重設密碼
 const resetPassword = async(data) => {
-  await apiClient.post(`/password/reset-password`,data);
+  await apiClient.post(`/password/reset-password`, data);
   return
 }
 
