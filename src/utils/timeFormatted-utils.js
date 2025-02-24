@@ -36,6 +36,13 @@ export const getDayOfWeekFromStringDate = (dateString) => {
   return dayNameInChinese;
 };
 
+export const removeYearFromDate = (isoString) => {
+  const date = new Date(isoString);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}/${day}`;
+};
+
 // 從 數字(e.g. 9) 轉到 09:00
 export const formatHour = (hour) => {
   hour = hour.toString();
