@@ -11,15 +11,15 @@ export default function VideoContent({
   courseList,
   courseTutor,
   introductionVideoId,
-  paramsVideoId
+  paramsVideoId,
 }) {
   const [comments, setComments] = useState([]);
   useEffect(() => {
-    if (introductionVideoId||paramsVideoId) {
+    if (introductionVideoId || paramsVideoId) {
       const getCourseCommentsHandle = async () => {
         try {
           const commentsResult = await courseApi.getCourseComments(
-            introductionVideoId||paramsVideoId
+            introductionVideoId || paramsVideoId
           );
           setComments(commentsResult.data);
         } catch (error) {
@@ -28,7 +28,7 @@ export default function VideoContent({
       };
       getCourseCommentsHandle();
     }
-  }, [introductionVideoId||paramsVideoId]);
+  }, [introductionVideoId || paramsVideoId]);
 
   return (
     <section className="col-lg-7 col-xl-8">
@@ -168,7 +168,10 @@ export default function VideoContent({
               role="tabpanel"
               aria-labelledby="profile-tab"
             >
-              <CommentsSection comments={comments} />
+              <CommentsSection
+                comments={comments}
+                videoId={introductionVideoId || paramsVideoId}
+              />
             </div>
           </div>
         </nav>
@@ -198,5 +201,5 @@ VideoContent.propTypes = {
   videoUrl: PropTypes.string,
   introductionVideoId: PropTypes.string,
   courseTutor: PropTypes.string,
-  paramsVideoId: PropTypes.string
+  paramsVideoId: PropTypes.string,
 };

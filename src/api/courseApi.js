@@ -37,6 +37,18 @@ const getCourseComments = async (id) => {
   return response.data;
 };
 
+// 新增個人課程的留言
+const postCourseComments = async (id,data) => {
+  const response = await apiClient.post(`/video/${id}/comments`,data);
+  return response.status;
+};
+
+// 刪除個人課程的留言
+const deleteCourseComments = async (id) => {
+  const response = await apiClient.delete(`/video/comments/${id}`);
+  return response.data;
+};
+
 // 後台 - 取得單一講師所有課程
 const getTutorCourses = async ({ tutorId = "", page = 1, sortBy = "rating", order = "DESC", limit = 6 }) => {
   const response = await apiClient
@@ -59,5 +71,7 @@ export default {
   getVideoDetail,
   getCourseComments,
   getTutorCourses,
-  getTutorVideos
+  getTutorVideos,
+  postCourseComments,
+  deleteCourseComments
 };

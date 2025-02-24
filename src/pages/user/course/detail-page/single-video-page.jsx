@@ -64,6 +64,7 @@ export default function CourseVideoPage() {
           <VideoContent
             videoUrl={videoData?.video_url}
             courseList={videoData}
+            paramsVideoId={videoId}
           />
 
           <aside className="col-lg-5 col-xl-4">

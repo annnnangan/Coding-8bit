@@ -3,12 +3,44 @@ import { useState, useEffect } from "react";
 import { formatDateToTaiwanStyle } from "../../../utils/timeFormatted-utils";
 import { countReplies } from "../../../utils/countReplies-utils";
 import userApi from "../../../api/userApi";
+import courseApi from "../../../api/courseApi";
 
-export default function CommentsSection({ comments }) {
+export default function CommentsSection({ comments, videoId }) {
   const [userComments, setUserComments] = useState([]);
   const [replyCount, setReplyCount] = useState({});
   const [userInfo, setUserInfo] = useState({});
-
+  const [commentText, setCommentText] = useState("");
+  const [hasParent, setHasParent] = useState(null);
+  const handleKeyDown = async (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      try {
+        const data = {
+          content: commentText,
+          parent_id: hasParent,
+        };
+        await courseApi.postCourseComments(videoId, data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        const reloadComments = await courseApi.getCourseComments(videoId);
+        setUserComments(reloadComments.data.reverse());
+        setCommentText("");
+      }
+    }
+  };
+  const deleteComment = async (commentId) => {
+    try {
+      await courseApi.deleteCourseComments(commentId);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await courseApi.getCourseComments(videoId);
+      const reloadComments = await courseApi.getCourseComments(videoId);
+      setUserComments(reloadComments.data.reverse());
+    }
+  };
+  const replyComment = async (commentId) => {};
   useEffect(() => {
     const reduceComments = () => {
       const { parentComments, childComments } = comments.reduce(
@@ -55,13 +87,15 @@ export default function CommentsSection({ comments }) {
             name="user-comment"
             id="user-comment"
             className="w-100 user-comment py-2"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
         </div>
         <ul className="history-comments">
           {userComments.map((userComment, index) => (
             <li className="mb-6" key={userComment.id}>
               <div className="user-content d-flex mb-3">
-                {JSON.stringify(userInfo.user_id)}
                 <img
                   className="user-image me-4"
                   src={userComment.User.avatar_url}
@@ -80,11 +114,18 @@ export default function CommentsSection({ comments }) {
                     <button
                       type="button"
                       className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 delete-comment"
+                      onClick={() => deleteComment(userComment.id)}
                     >
                       刪除
                     </button>
                   ) : (
-                    <></>
+                    <button
+                      type="button"
+                      className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 delete-comment"
+                      onClick={() => replyComment(userComment.id)}
+                    >
+                      回覆
+                    </button>
                   )}
                 </div>
               </div>
@@ -167,4 +208,5 @@ export default function CommentsSection({ comments }) {
 }
 CommentsSection.propTypes = {
   comments: PropTypes.array.isRequired,
+  videoId: PropTypes.string.isRequired
 };
