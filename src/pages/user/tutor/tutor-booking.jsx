@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -8,16 +8,19 @@ import { Autoplay, Navigation } from "swiper/modules";
 import * as bootstrap from "bootstrap";
 
 import tutorApi from "@/api/tutorApi";
+import courseApi from "@/api/courseApi";
 
-import ShowMoreButton from "../../../components/common/ShowMoreButton";
-import TutorBookingResume from "../../../components/tutor/TutorBookingResume";
-import TutorsCard from "../../../components/tutor/TutorsCard";
-import CourseCardList from "../../../components/course/CourseCardList";
-import CommentsSection from "../../../components/tutor/CommentsSection";
-import Loader from "../../../components/common/Loader";
+import ShowMoreButton from "@/components/common/ShowMoreButton";
+import TutorBookingResume from "@/components/tutor/TutorBookingResume";
+import TutorsCard from "@/components/tutor/TutorsCard";
+import CourseCardList from "@/components/course/CourseCardList";
+import CommentsSection from "@/components/tutor/CommentsSection";
+import SectionFallback from "@/components/common/SectionFallback";
+import Loader from "@/components/common/Loader";
 
 import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { recommendTutorData, tutorStats } from "../../../data/tutors";
+import { formatDateDash } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
   // loading
@@ -35,8 +38,6 @@ export default function TutorBooking() {
   }, []);
 
   // 取得資料函式
-  const [courses, setCourses] = useState([]);
-
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
     name: "API裡面沒有名字",
     avatar_url: "images/icon/default-tutor-icon.png",
@@ -48,17 +49,24 @@ export default function TutorBooking() {
     statistics: {},
   });
 
+  const [courses, setCourses] = useState([]);
+
+  const availabilityBaseDate = useMemo(() => {
+    return formatDateDash(new Date().toLocaleDateString());
+  }, []);
+
   const [comments, setComments] = useState([]);
-  const [currentStartDate] = useState(20240801);
+
   const [availableTime, setAvailableTime] = useState([]);
   const getData = async () => {
     setLoadingState(true);
     try {
-      const [basicInfoResult, experienceResult, educationResult, certificateResult] = await Promise.all([
+      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
         tutorApi.getExp(tutor_id),
         tutorApi.getEdu(tutor_id),
         tutorApi.getCertificate(tutor_id),
+        courseApi.getTutorVideosInBooking(tutor_id),
       ]);
 
       setTutorBasicInfo((prev) => ({
@@ -71,8 +79,8 @@ export default function TutorBooking() {
         },
       }));
 
-      // const coursesResult = await axios.get(`${VITE_API_BASE}/api/v1/courses`);
-      // const tutorResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}`);
+      setCourses(videos.videos);
+
       // const commentResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}/comments`);
       // const availableTimeResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}/schedule/availableTime/${currentStartDate}`);
       // 篩選出跟當前講師同名的課程
@@ -90,8 +98,6 @@ export default function TutorBooking() {
     }
   };
 
-  console.log(tutorBasicInfo);
-
   // 初始化 - swiper
   useEffect(() => {
     new Swiper(".tutor-card-swiper", {
@@ -101,7 +107,7 @@ export default function TutorBooking() {
       loop: true,
       grabCursor: true,
       autoplay: {
-        delay: 5000,
+        delay: 1000,
       },
       breakpoints: {
         768: {
@@ -258,15 +264,19 @@ export default function TutorBooking() {
                     <span className="material-symbols-outlined icon-fill">arrow_forward</span>
                   </NavLink>
                 </div>
-                <div className="swiper freeTipShortsSwiper">
-                  <div className="swiper-wrapper">
-                    {courses.map((course) => (
-                      <div className="swiper-slide" key={course.id}>
-                        <CourseCardList courseList={course} cardsNum={1} />
-                      </div>
-                    ))}
+                <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫時並無影片" />}</div>
+
+                {courses.length > 0 && (
+                  <div className="swiper freeTipShortsSwiper">
+                    <div className="swiper-wrapper">
+                      {courses.map((course) => (
+                        <div className="swiper-slide" key={course.id}>
+                          <CourseCardList courseList={course} cardsNum={1} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </section>
 
               {/* section 3 - timetable  */}
