@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -24,22 +24,11 @@ import { recommendTutorData, tutorStats } from "../../../data/tutors";
 import { formatDateDash } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
-  // loading
-  const [loadingState, setLoadingState] = useState(true);
-
   // 抓取路由上的 id 來取得遠端特定 id 的資料
   const { id: tutor_id } = useParams();
-
-  // modal
-  const serviceSelectionModal = useRef(null);
-  const serviceSelectionModalRef = useRef(null);
-
-  useEffect(() => {
-    serviceSelectionModal.current = new bootstrap.Modal(serviceSelectionModalRef.current);
-  }, []);
-
-  // 取得資料函式
-
+  // Loading的useState
+  const [loadingState, setLoadingState] = useState(true);
+  // 講師基本資料的useState
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
     name: "API裡面沒有名字",
     avatar_url: "images/icon/default-tutor-icon.png",
@@ -50,23 +39,32 @@ export default function TutorBooking() {
     resume: { work_experience: [], education: [], certificates: [] },
     statistics: {},
   });
-
   const [courses, setCourses] = useState([]);
   const [comments, setComments] = useState([]);
-  const [availableTime, setAvailableTime] = useState([]);
+  // 關於可預約時間的useState
+  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
+  const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
 
-  const getData = async () => {
+  // modal
+  const serviceSelectionModal = useRef(null);
+  const serviceSelectionModalRef = useRef(null);
+
+  useEffect(() => {
+    serviceSelectionModal.current = new bootstrap.Modal(serviceSelectionModalRef.current);
+  }, []);
+
+  // 取得講師頁面的資料的Function
+  const getTutorBasicData = async () => {
     setLoadingState(true);
     try {
-      const baseDate = formatDateDash(new Date().toLocaleDateString());
-
-      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos, availability] = await Promise.all([
+      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
         tutorApi.getExp(tutor_id),
         tutorApi.getEdu(tutor_id),
         tutorApi.getCertificate(tutor_id),
         courseApi.getTutorVideosInBooking(tutor_id),
-        tutorApi.getAvailability(tutor_id, baseDate),
       ]);
 
       setTutorBasicInfo((prev) => ({
@@ -80,8 +78,6 @@ export default function TutorBooking() {
       }));
 
       setCourses(videos.videos);
-
-      setAvailableTime(availability.data?.slice(7, 14));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -89,11 +85,45 @@ export default function TutorBooking() {
     }
   };
 
+  const getAvailabilityData = async () => {
+    setLoadingAvailableTime(true);
+    try {
+      // 計算baseDate
+      const today = new Date();
+      const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
+      const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
+
+      // 檢查資料是否已經儲在useState裡面
+      const existingData = accumulateAvailableTime.find((data) => data.baseDate === baseDate);
+
+      // 如果資料已存在，我們直接拿，不用再fetch API
+      if (existingData) {
+        setCurrentAvailableTime(existingData.timeSlots);
+      } else {
+        // 如果不存在，就可以fetch API
+        const result = await tutorApi.getAvailability(tutor_id, baseDate);
+
+        // 把剛剛fetch的data存到useState裡面，避免過度fetch API
+        const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
+        setAccumulateAvailableTime((prev) => [...prev, newData]);
+        setCurrentAvailableTime(result.data?.slice(7, 14));
+      }
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingAvailableTime(false);
+    }
+  };
+
   // 初始化 - 取得資料
   useEffect(() => {
     //TODO 檢查這個老師是否存在，才可以繼續
-    getData();
+    getTutorBasicData();
   }, []);
+
+  useEffect(() => {
+    getAvailabilityData();
+  }, [weekOffset]);
 
   // 初始化 - swiper
   useEffect(() => {
@@ -130,6 +160,17 @@ export default function TutorBooking() {
       },
     });
   }, []);
+
+  // 控制timetable的arrow
+  const toNextWeek = async () => {
+    setWeekOffset((prev) => prev + 1);
+  };
+
+  const toPrevWeek = () => {
+    if (weekOffset > 0) {
+      setWeekOffset((prev) => prev - 1);
+    }
+  };
 
   // 建立Dispatch 來修改 RTK的State
   const dispatch = useDispatch();
@@ -274,7 +315,11 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                {availableTime.length === 0 ? <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" /> : <Timetable availability={availableTime} />}
+                {currentAvailableTime.length === 0 ? (
+                  <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
+                ) : (
+                  <Timetable availability={currentAvailableTime} weekOffset={weekOffset} toNextWeek={toNextWeek} toPrevWeek={toPrevWeek} isLoading={isLoadingAvailableTime} />
+                )}
               </section>
 
               {/* section 4 - student comment */}
