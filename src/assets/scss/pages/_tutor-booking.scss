@@ -30,21 +30,7 @@
     }
   }
   .mobile-bottom-cta {
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
-      rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
-      rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-  }
-}
-
-.tab-pane {
-  .tab-details {
-    &.text-hide {
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 5; /* number of lines to show */
-      line-clamp: 5;
-      -webkit-box-orient: vertical;
-    }
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
   }
 }
 
@@ -167,7 +153,8 @@
   }
 }
 
-.student-comment,.student-comment-modal {
+.student-comment,
+.student-comment-modal {
   .progress {
     --bs-progress-bg: none;
   }
@@ -184,14 +171,13 @@
   }
 }
 
-
 .student-comment .comment-details {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* number of lines to show */
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
 
 .tutor-booking {
   .desktop-cta-card {
@@ -225,5 +211,3 @@
     }
   }
 }
-
-
