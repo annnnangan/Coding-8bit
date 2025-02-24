@@ -40,7 +40,7 @@ const getCourseComments = async (id) => {
 // 後台 - 取得單一講師所有課程
 const getTutorCourses = async (tutorId = "" , page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
   const response = await apiClient
-  .get(`/course?tutor_id=${tutorId}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+  .get(`/course/?page=${page}&limit=${limit}&sortBy=${sortBy}&order=${order}&is_free=true&is_public=true&tutor_id=${tutorId}`);
   return response.data.data;
 };
 

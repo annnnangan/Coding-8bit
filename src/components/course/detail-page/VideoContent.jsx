@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import courseApi from "../../../api/courseApi";
 
 import CommentsSection from "./CommentsSection";
-import { Logger } from "sass";
 
 export default function VideoContent({
   videoUrl,
@@ -16,18 +15,12 @@ export default function VideoContent({
 }) {
   const [comments, setComments] = useState([]);
   useEffect(() => {
-    console.log(introductionVideoId);
-    
-    console.log(paramsVideoId);
-    
     if (introductionVideoId||paramsVideoId) {
       const getCourseCommentsHandle = async () => {
         try {
           const commentsResult = await courseApi.getCourseComments(
             introductionVideoId||paramsVideoId
           );
-          console.log(commentsResult);
-          
           setComments(commentsResult.data);
         } catch (error) {
           console.error("錯誤!!! 請聯繫系統管理員", error);
@@ -205,4 +198,5 @@ VideoContent.propTypes = {
   videoUrl: PropTypes.string,
   introductionVideoId: PropTypes.string,
   courseTutor: PropTypes.string,
+  paramsVideoId: PropTypes.string
 };

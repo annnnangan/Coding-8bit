@@ -9,23 +9,22 @@ export default function CommentsSection({ comments }) {
   const [replyCount, setReplyCount] = useState({});
   const [userInfo, setUserInfo] = useState({});
 
-  const reduceComments = () => {
-    const { parentComments, childComments } = comments.reduce(
-      (acc, comment) => {
-        if (comment.parent_id === null) {
-          acc.parentComments.push(comment);
-        } else {
-          acc.childComments.push(comment);
-        }
-        return acc;
-      },
-      { parentComments: [], childComments: [] }
-    );
-
-    return { parentComments, childComments };
-  };
-
   useEffect(() => {
+    const reduceComments = () => {
+      const { parentComments, childComments } = comments.reduce(
+        (acc, comment) => {
+          if (comment.parent_id === null) {
+            acc.parentComments.push(comment);
+          } else {
+            acc.childComments.push(comment);
+          }
+          return acc;
+        },
+        { parentComments: [], childComments: [] }
+      );
+
+      return { parentComments, childComments };
+    };
     if (comments && Array.isArray(comments)) {
       const { parentComments, childComments } = reduceComments();
       setUserComments(parentComments.reverse());
@@ -62,6 +61,7 @@ export default function CommentsSection({ comments }) {
           {userComments.map((userComment, index) => (
             <li className="mb-6" key={userComment.id}>
               <div className="user-content d-flex mb-3">
+                {JSON.stringify(userInfo.user_id)}
                 <img
                   className="user-image me-4"
                   src={userComment.User.avatar_url}
@@ -76,12 +76,16 @@ export default function CommentsSection({ comments }) {
                       {formatDateToTaiwanStyle(userComment.createdAt)}
                     </time>
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 delete-comment"
-                  >
-                    刪除
-                  </button>
+                  {userComment.user_id == userInfo.id ? (
+                    <button
+                      type="button"
+                      className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 delete-comment"
+                    >
+                      刪除
+                    </button>
+                  ) : (
+                    <></>
+                  )}
                 </div>
               </div>
               <div className="reply">
