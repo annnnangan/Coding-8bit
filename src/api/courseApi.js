@@ -3,12 +3,12 @@ import apiClient from './apiClient';
 // 取得所有課程列表
 const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", limit = 9) => {
   const response = await apiClient
-  .get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+    .get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
   return response.data.data;
 };
 
 // 取得特定類別所有影片列表
-const getAllVideos = async (video_type, page = 1, limit = 9 ) => {
+const getAllVideos = async (video_type, page = 1, limit = 9) => {
   const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&limit=${limit}`);
   return response.data;
 };
@@ -38,16 +38,16 @@ const getCourseComments = async (id) => {
 };
 
 // 後台 - 取得單一講師所有課程
-const getTutorCourses = async (tutorId = "" , page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
+const getTutorCourses = async ({ tutorId = "", page = 1, sortBy = "rating", order = "DESC", limit = 6 }) => {
   const response = await apiClient
-  .get(`/course/?page=${page}&limit=${limit}&sortBy=${sortBy}&order=${order}&is_free=true&is_public=true&tutor_id=${tutorId}`);
+    .get(`/course/?page=${page}&limit=${limit}&sortBy=${sortBy}&order=${order}&is_free=true&is_public=true&tutor_id=${tutorId}`);
   return response.data.data;
 };
 
 // 後台 - 取得單一講師所有影片
-const getTutorVideos = async (tutorId = "" , video_type = "" , page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
+const getTutorVideos = async ({ tutorId = "", video_type = "", page = 1, sortBy = "rating", order = "DESC", limit = 6, category = "" }) => {
   const response = await apiClient
-  .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+    .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}&category=${category}`);
   return response.data;
 };
 
@@ -56,7 +56,7 @@ export default {
   getAllVideos,
   getCourseDetail,
   getCourseChapter,
-  getVideoDetail, 
+  getVideoDetail,
   getCourseComments,
   getTutorCourses,
   getTutorVideos

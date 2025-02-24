@@ -1,16 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams, NavLink, useLocation } from "react-router-dom";
+import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import VideoContent from "../../../../components/course/detail-page/VideoContent";
 import Loader from "../../../../components/common/Loader";
 
 import courseApi from "../../../../api/courseApi";
-import tutorApi from "../../../../api/tutorApi";
 
-import { otherVideos, relatedVideos } from "../../../../data/videos";
 import { convertSecondsToTime } from "../../../../utils/timeFormatted-utils";
-import userApi from "../../../../api/userApi";
 
 export default function CourseVideoPage() {
   // loading
@@ -23,19 +20,22 @@ export default function CourseVideoPage() {
     },
   });
 
+  const [otherVideos, setOtherVideos] = useState([]);
+  const [relatedVideo, setRelatedVideo] = useState([]);
   const { videoId } = useParams();
   const getData = async () => {
     setLoadingState(true);
     try {
-      const videoResult = await courseApi.getVideoDetail(videoId);
-      const tutorResult = await tutorApi.getTutorDetail(videoResult.tutor_id);
-      const tutorUserDataResult = await userApi.getUserData(
-        tutorResult.user_id
-      );
-      setVideoData({
-        Tutor: { ...tutorResult, User: { ...tutorUserDataResult } },
-        ...videoResult,
+      const videoResult = await courseApi.getVideoDetail(videoId); //取得影片
+      const otherCourseResult = await courseApi.getTutorCourses({
+        tutorId: videoResult.data.tutor_id,
       });
+      const relatedVideoReault = await courseApi.getTutorVideos({
+        category: videoData.category,
+      });
+      setVideoData(videoResult.data);
+      setOtherVideos(otherCourseResult.courses);
+      setRelatedVideo(relatedVideoReault.data.videos);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -43,12 +43,10 @@ export default function CourseVideoPage() {
     }
   };
 
-  const location = useLocation();
-
   // 初始化取得資料
   useEffect(() => {
     getData();
-  }, [location]);
+  }, [videoId]);
 
   return (
     <>
@@ -87,35 +85,40 @@ export default function CourseVideoPage() {
                 </NavLink>
               </div>
               <ul className="other-videos-list">
-                {otherVideos?.map((course, index) => (
+                {otherVideos?.map((other, index) => (
                   <li
                     className="d-flex py-3 py-4 px-6 video-background-color-hover"
                     key={index}
                   >
-                    <div className="position-relative">
-                      <img
-                        className="rounded-2 me-4 other-video-image"
-                        src={course.thumbnail}
-                        alt="影片縮圖"
-                      />
-                      <span className="position-absolute py-1 px-2 rounded-1 fs-7 other-video-duration">
-                        {convertSecondsToTime(course.duration)}
-                      </span>
-                    </div>
-                    <div className="f-column-between py-2">
-                      <h5 className="other-video-title">{course.title}</h5>
-                      <div className="f-align-center me-6">
-                        <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
-                          visibility
+                    <NavLink
+                      to={`/course/${other.id}`}
+                      className="d-flex justify-content-between chapter-item"
+                    >
+                      <div className="position-relative">
+                        <img
+                          className="rounded-2 me-4 other-video-image"
+                          src={other.cover_image}
+                          alt="影片縮圖"
+                        />
+                        <span className="position-absolute py-1 px-2 rounded-1 fs-7 other-video-duration">
+                          {convertSecondsToTime(other.duration)}
                         </span>
-                        <data
-                          value={course.view_count}
-                          className="data-view-count fs-7"
-                        >
-                          {Number(course.view_count).toLocaleString()}
-                        </data>
                       </div>
-                    </div>
+                      <div className="f-column-between py-2">
+                        <h5 className="other-video-title">{other.title}</h5>
+                        <div className="f-align-center me-6">
+                          <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
+                            visibility
+                          </span>
+                          <data
+                            value={other.view_count}
+                            className="data-view-count fs-7"
+                          >
+                            {Number(other.view_count).toLocaleString()}
+                          </data>
+                        </div>
+                      </div>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
@@ -136,39 +139,46 @@ export default function CourseVideoPage() {
                 </div>
               </div>
               <ul className="related-videos-list">
-                {relatedVideos?.map((course, index) => (
+                {relatedVideo?.map((related, index) => (
                   <li
                     className="d-flex py-3 py-4 px-6 video-background-color-hover position-relative"
                     key={index}
                   >
-                    <div className="position-relative me-4">
-                      <img
-                        className="rounded-2 related-video-image"
-                        src={course.thumbnail}
-                        alt="影片縮圖"
-                      />
-                      <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                        {course.duration}
-                      </span>
-                    </div>
-                    <div className="f-column-between py-2">
-                      <h5 className="related-video-title">{course.title}</h5>
-                      <div className="f-align-center">
-                        <span className="material-symbols-outlined me-1 author-icon fs-6">
-                          co_present
+                    <NavLink
+                      to={`/video/${related.id}`}
+                      className="d-flex justify-content-between chapter-item"
+                    >
+                      <div className="position-relative me-4">
+                        <img
+                          className="rounded-2 related-video-image"
+                          src={related.cover_image}
+                          alt="影片縮圖"
+                        />
+                        <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
+                          {related.duration}
                         </span>
-                        <span className="me-2 me-md-4">{course.tutor}</span>
-                        <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
-                          visibility
-                        </span>
-                        <data
-                          value={course.view_count}
-                          className="data-view-count fs-7"
-                        >
-                          {Number(course.view_count).toLocaleString()}
-                        </data>
                       </div>
-                    </div>
+                      <div className="f-column-between py-2">
+                        <h5 className="related-video-title">{related.title}</h5>
+                        <div className="f-align-center">
+                          <span className="material-symbols-outlined me-1 author-icon fs-6">
+                            co_present
+                          </span>
+                          <span className="me-2 me-md-4">
+                            {related.Tutor.User.username}
+                          </span>
+                          <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
+                            visibility
+                          </span>
+                          <data
+                            value={related.view_count}
+                            className="data-view-count fs-7"
+                          >
+                            {Number(related.view_count).toLocaleString()}
+                          </data>
+                        </div>
+                      </div>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
