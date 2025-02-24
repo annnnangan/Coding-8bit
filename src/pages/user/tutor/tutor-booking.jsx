@@ -16,6 +16,7 @@ import TutorsCard from "@/components/tutor/TutorsCard";
 import CourseCardList from "@/components/course/CourseCardList";
 import CommentsSection from "@/components/tutor/CommentsSection";
 import SectionFallback from "@/components/common/SectionFallback";
+import Timetable from "@/components/tutor/Timetable";
 import Loader from "@/components/common/Loader";
 
 import { updateFormData } from "../../../utils/slice/bookingSlice";
@@ -38,6 +39,7 @@ export default function TutorBooking() {
   }, []);
 
   // 取得資料函式
+
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
     name: "API裡面沒有名字",
     avatar_url: "images/icon/default-tutor-icon.png",
@@ -50,23 +52,21 @@ export default function TutorBooking() {
   });
 
   const [courses, setCourses] = useState([]);
-
-  const availabilityBaseDate = useMemo(() => {
-    return formatDateDash(new Date().toLocaleDateString());
-  }, []);
-
   const [comments, setComments] = useState([]);
-
   const [availableTime, setAvailableTime] = useState([]);
+
   const getData = async () => {
     setLoadingState(true);
     try {
-      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
+      const baseDate = formatDateDash(new Date().toLocaleDateString());
+
+      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos, availability] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
         tutorApi.getExp(tutor_id),
         tutorApi.getEdu(tutor_id),
         tutorApi.getCertificate(tutor_id),
         courseApi.getTutorVideosInBooking(tutor_id),
+        tutorApi.getAvailability(tutor_id, baseDate),
       ]);
 
       setTutorBasicInfo((prev) => ({
@@ -81,22 +81,19 @@ export default function TutorBooking() {
 
       setCourses(videos.videos);
 
-      // const commentResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}/comments`);
-      // const availableTimeResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}/schedule/availableTime/${currentStartDate}`);
-      // 篩選出跟當前講師同名的課程
-      // const filteredCourses = coursesResult.data.filter((course) => {
-      //   return course.tutor === tutorResult.data.name;
-      // });
-      // setCourses(filteredCourses);
-      // setTutorList(tutorResult.data);
-      // setComments(commentResult.data);
-      // setAvailableTime(availableTimeResult.data);
+      setAvailableTime(availability.data?.slice(7, 14));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
       setLoadingState(false);
     }
   };
+
+  // 初始化 - 取得資料
+  useEffect(() => {
+    //TODO 檢查這個老師是否存在，才可以繼續
+    getData();
+  }, []);
 
   // 初始化 - swiper
   useEffect(() => {
@@ -107,7 +104,7 @@ export default function TutorBooking() {
       loop: true,
       grabCursor: true,
       autoplay: {
-        delay: 1000,
+        delay: 5000,
       },
       breakpoints: {
         768: {
@@ -132,12 +129,6 @@ export default function TutorBooking() {
         },
       },
     });
-  }, []);
-
-  // 初始化 - 取得資料
-  useEffect(() => {
-    //TODO 檢查這個老師是否存在，才可以繼續
-    getData();
   }, []);
 
   // 建立Dispatch 來修改 RTK的State
@@ -264,19 +255,18 @@ export default function TutorBooking() {
                     <span className="material-symbols-outlined icon-fill">arrow_forward</span>
                   </NavLink>
                 </div>
-                <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫時並無影片" />}</div>
 
-                {courses.length > 0 && (
-                  <div className="swiper freeTipShortsSwiper">
-                    <div className="swiper-wrapper">
-                      {courses.map((course) => (
-                        <div className="swiper-slide" key={course.id}>
-                          <CourseCardList courseList={course} cardsNum={1} />
-                        </div>
-                      ))}
-                    </div>
+                <div className="swiper freeTipShortsSwiper">
+                  <div className="swiper-wrapper">
+                    {courses.map((course) => (
+                      <div className="swiper-slide" key={course.id}>
+                        <CourseCardList courseList={course} cardsNum={1} />
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
+
+                <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
               </section>
 
               {/* section 3 - timetable  */}
@@ -284,36 +274,7 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                <div className="f-between-center mb-5">
-                  <span className="prev material-symbols-outlined icon-fill bg-brand-02 text-brand-01 rounded-circle p-2 align-middle">arrow_back</span>
-                  <h5 className="text-brand-03 week fw-medium">
-                    {availableTime[0]?.year}/{availableTime[0]?.date} - {availableTime[0]?.year}/{availableTime[availableTime.length - 1]?.date}
-                  </h5>
-                  <span className="next material-symbols-outlined icon-fill bg-brand-02 text-brand-01 rounded-circle p-2 align-middle">arrow_forward</span>
-                </div>
-
-                <div>
-                  <div className="row row-cols-7 available-date-time g-0">
-                    {availableTime.map((item) => (
-                      <div className="col" key={item.date}>
-                        <div className={`date f-center flex-column ${item.timeSlots.length === 0 && "disabled"}`}>
-                          <h6>{item.day}</h6>
-                          <p>{item.date}</p>
-                        </div>
-
-                        <div>
-                          <ul className="times f-center flex-column">
-                            {item.timeSlots.map((time, index) => (
-                              <li className={`time ${time.status === "booked" && "disabled"}`} key={index}>
-                                {time.startTime}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {availableTime.length === 0 ? <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" /> : <Timetable availability={availableTime} />}
               </section>
 
               {/* section 4 - student comment */}

@@ -25,3 +25,19 @@ export const formatDateDash = (isoString) => {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+
+// 從yyyy-mm-dd來取得星期X
+export const getDayOfWeekFromStringDate = (dateString) => {
+  const date = new Date(dateString);
+  const dayOfWeek = date.getDay();
+  const daysOfWeekInChinese = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+  const dayNameInChinese = daysOfWeekInChinese[dayOfWeek];
+
+  return dayNameInChinese;
+};
+
+// 從 數字(e.g. 9) 轉到 09:00
+export const formatHour = (hour) => {
+  hour = hour.toString();
+  return hour.padStart(2, "0") + ":00";
+};

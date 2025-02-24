@@ -1,4 +1,6 @@
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
+
+/* ---------------------------------- 基本資料 ---------------------------------- */
 
 // 取得講師列表
 const getAllTutor = async () => {
@@ -18,7 +20,7 @@ const updateTutorData = async (tutorId, data) => {
   return response.data;
 };
 
-// --
+/* ---------------------------------- 工作經驗 ---------------------------------- */
 
 // 工作經驗 - 取得資料
 const getExp = async (tutorId) => {
@@ -44,7 +46,7 @@ const deleteExp = async (tutorId, expId) => {
   return response.data;
 };
 
-// ---
+/* ---------------------------------- 學歷 ---------------------------------- */
 
 // 學歷 - 取得資料
 const getEdu = async (tutorId) => {
@@ -70,7 +72,7 @@ const deleteEdu = async (tutorId, eduId) => {
   return response.data;
 };
 
-// ---
+/* ---------------------------------- 證照 ---------------------------------- */
 
 // 證照 - 取得資料
 const getCertificate = async (tutorId) => {
@@ -96,6 +98,13 @@ const deleteCertificate = async (tutorId, certificateId) => {
   return response.data;
 };
 
+/* ---------------------------------- 可預約時段 ---------------------------------- */
+
+const getAvailability = async (tutorId, baseDate) => {
+  const response = await apiClient.get(`/tutor/${tutorId}/availability/?baseDate=${baseDate}`);
+  return response.data;
+};
+
 export default {
   getAllTutor,
   getTutorDetail,
@@ -112,4 +121,5 @@ export default {
   addCertificate,
   updateCertificate,
   deleteCertificate,
+  getAvailability,
 };
