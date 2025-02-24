@@ -111,7 +111,11 @@ export default function TutorInfo() {
                 </div>
                 <div className="tab-content mt-6" id="myTabContent">
                   <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
-                    <ShowMoreButton text={tutorList.aboutMe} />
+                    <ShowMoreButton
+                      text={
+                        " Lorem ipsum dolor sit amet, consectetur adipisicing elit. Porro iusto ratione autem minima repellat officia voluptatibus atque aliquid maiores unde enim repellendus, dignissimos expedita assumenda blanditiis mollitia provident! Quod, modi?"
+                      }
+                    />
                   </div>
                 </div>
                 <ul className="d-flex mt-6 mt-lg-8">
