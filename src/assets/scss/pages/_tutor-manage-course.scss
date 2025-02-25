@@ -2,7 +2,8 @@
 .tutor-add-TopicSeriesCourses-wrap,
 .tutor-chapter-topicSeries-wrap,
 .tutor-edit-TopicSeriesCourses-wrap,
-.tutor-add-video-wrap {
+.tutor-add-video-wrap,
+.tutor-edit-video-wrap {
   .dropdown-toggle::after {
     display: none;
   }
@@ -12,16 +13,20 @@
 .tutor-manage-course-list-wrap,
 .tutor-chapter-topicSeries-wrap {
   /* course-list-table */
-  .table {
-    flex-wrap: nowrap;
+  .table-list {
+    width: 100%;
+    overflow: hidden;
+  }
+  .table-wrap {
+    white-space: nowrap;
     overflow-x: auto;
   }
   .table thead tr th {
     font-weight: 500;
-    padding-bottom: 12px;
+    padding: 0px 8px 12px;
   }
   .table tbody tr td {
-    padding: 8px 0;
+    padding: 8px 8px;
 
     .cover_image-wrap {
       width: 120px;
@@ -36,11 +41,22 @@
     background-color: #1e1e1e4d;
   }
 }
+/* pagination */
+.tutor-manage-course-pagination-wrap {
+  background-color: $white;
+  margin-top: 32px;
+  padding: 24px 0px;
+
+  @include mobile {
+    padding: 12px 0px;
+  }
+}
 
 /* tutor-add-TopicSeriesCourses-wrap */
 .tutor-add-TopicSeriesCourses-wrap,
 .tutor-edit-TopicSeriesCourses-wrap,
-.tutor-add-video-wrap {
+.tutor-add-video-wrap,
+.tutor-edit-video-wrap {
   /* form */
   .form-label {
     font-size: 14px;
@@ -56,6 +72,35 @@
 
     img {
       width: 120px;
+    }
+
+    .chapter-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      @include mobile {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+    .chapter-content {
+      display: flex;
+      align-items: center;
+      gap: 16px; 
+    }
+
+    .chapter-image {
+      width: 120px;
+      height: 68px; 
+      object-fit: cover; 
+      border-radius: 8px;
+    }
+  }
+
+  .btn-container {
+    @include lg-pc {
+      background-color: $white;
     }
   }
 }

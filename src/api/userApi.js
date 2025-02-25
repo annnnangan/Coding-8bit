@@ -8,13 +8,13 @@ const getUserData = async () => {
 
 // 更新使用者資料
 const updateUserData = async (userData) => {
-  const response = await apiClient.apiClient.put(`/user/users/me, ${userData}`);
+  const response = await apiClient.put(`/user/users/me`, userData);
   return response.data;
 };
 
 // 切換使用者角色
 const changeUserRole = async (role) => {
-  const response = await apiClient.apiClient.put(`/user/users/me/role, ${role}`);
+  const response = await apiClient.put(`/user/users/me/role`, { role: role });
   return response.data;
 };
 

@@ -1,65 +1,56 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 
-import axios from "axios";
-import Swal from "sweetalert2";
-
-import Loader from "../../components/common/Loader";
+import Loader from "@/components/common/Loader";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  loginCheck,
+  getUserData,
+  changeUserRole,
+  logout,
+} from "@/utils/slice/authSlice";
 
 export default function Header() {
   // loading
-  const [loadingState, setLoadingState] = useState(false);
+  const [loadingState, setLoadingState] = useState(true);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  // auth
+  const { isAuth, userData } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const token = document.cookie.replace(
+    /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
+
   const navigate = useNavigate();
 
-  const handleTogglerClick = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
-
-  // 取得使用者資料
-  const [userData, setUserData] = useState({});
-  const [isAuth, setIsAuth] = useState(false);
-  const getUserData = async (token) => {
-    setLoadingState(true);
-    try {
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-      const res = await axios.get(
-        `https://service.coding-8bit.site/api/v1/user/users/me`
-      );
-      setUserData(res.data);
-      if (res.status === 200) {
-        setIsAuth(true);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingState(false);
-    }
-  };
+  const navItems = useMemo(
+    () => [
+      {
+        to: "/course-list",
+        label: "精選課程",
+      },
+      {
+        to: "/tutor-list",
+        label: "一對一教學",
+      },
+      {
+        to: "/custom-course-list",
+        label: "課程客製化",
+      },
+      {
+        to: "/help-center",
+        label: "幫助中心",
+      },
+    ],
+    []
+  );
 
   // 切換身分
   const roleToggle = async () => {
     setLoadingState(true);
     try {
-      const newRole =
-        userData.last_active_role === "student" ? "tutor" : "student";
-
-      const res = await axios.put(
-        `https://service.coding-8bit.site/api/v1/user/users/me/role`,
-        { role: newRole }
-      );
-      if (res.status === 200) {
-        setUserData((prev) => ({
-          ...prev,
-          last_active_role: newRole,
-        }));
-        setIsAuth(true);
-      }
-      if (res.status === 200) {
-        setIsAuth(true);
-      }
+      await dispatch(changeUserRole(userData));
     } catch (error) {
       console.log(error);
     } finally {
@@ -68,26 +59,34 @@ export default function Header() {
   };
 
   // 登出
-  const signOut = () => {
-    document.cookie = "authToken=;expires=;";
-    Swal.fire({
-      title: "已登出",
-      icon: "success",
-    });
+  const signout = () => {
+    dispatch(logout());
     navigate(0);
   };
 
-  // 初始化 - 確認是否已登入
+  // 初始化 - 取得使用者資料
   useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
     if (token) {
-      getUserData(token);
+      dispatch(getUserData());
+      setLoadingState(false);
     }
+  }, [isAuth]);
+
+  // 初始化 - 驗證身分
+  useEffect(() => {
+    if (token) {
+      dispatch(loginCheck());
+    }
+    setLoadingState(false);
   }, []);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // 切換行動版 Menu 狀態
+  const handleTogglerClick = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
 
   // 初始化 - 監聽路由變化，有切換路由則隱藏 Menu
   useEffect(() => {
@@ -177,39 +176,23 @@ export default function Header() {
                   search
                 </span>
               </li>
-              <li className="nav-item mt-4 mt-lg-0">
-                <NavLink
-                  className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                  aria-current="page"
-                  to="/course-list"
+
+              {navItems.map((item, index) => (
+                <li
+                  key={index}
+                  className={`nav-item ${index === 0 && "mt-4 mt-lg-0"}`}
                 >
-                  精選課程
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                  to="/tutor-list"
-                >
-                  一對一教學
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                  to="/custom-course-list"
-                >
-                  課程客製化
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                  to="/help-center"
-                >
-                  幫助中心
-                </NavLink>
-              </li>
+                  <NavLink
+                    className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                    to={item.to}
+                    aria-current={
+                      item.to === window.location.pathname ? "page" : undefined
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                </li>
+              ))}
 
               {isAuth && (
                 <div className="d-lg-none">
@@ -275,7 +258,7 @@ export default function Header() {
                     <button
                       type="button"
                       className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                      onClick={signOut}
+                      onClick={signout}
                     >
                       登出
                     </button>
@@ -365,7 +348,7 @@ export default function Header() {
                         <button
                           type="button"
                           className="dropdown-item"
-                          onClick={signOut}
+                          onClick={signout}
                         >
                           登出
                         </button>

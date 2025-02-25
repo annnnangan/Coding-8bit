@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import { useIsMobile } from "../../hooks/use-mobile";
-import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { loginCheck, getUserData } from "@/utils/slice/authSlice";
 
-import axios from "axios";
-import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import clsx from "clsx";
 
-import authApi from "../../api/authApi";
 import Loader from "../../components/common/Loader";
 
 // Styled components
@@ -70,44 +68,41 @@ const MainContentWrapper = styled.div`
 
 export default function BackendPanelMenu({ children, type, menuItems }) {
   // loading
-  const [loadingState, setLoadingState] = useState(false);
+  const [loadingState, setLoadingState] = useState(true);
+
+  // auth
+  const { isAuth } = useSelector((state) => state.auth);
+  const { userData } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const token = document.cookie.replace(
+    /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
+
+  // 初始化 - 取得使用者資料
+  useEffect(() => {
+    if (token) {
+      dispatch(getUserData());
+      setLoadingState(false);
+    }
+  }, [isAuth]);
+
+  // 初始化 - 驗證身分
+  useEffect(() => {
+    if (token) {
+      dispatch(loginCheck());
+    }
+    setLoadingState(false);
+  }, []);
 
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
+  // 切換行動版 Menu 狀態
   const handleTogglerClick = () => {
     setIsMenuOpen((prev) => !prev);
   };
-
-  // 取得使用者資料
-  const [userData, setUserData] = useState({});
-  const getUserData = async (token) => {
-    setLoadingState(true);
-    try {
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-      const res = await axios.get(
-        `https://service.coding-8bit.site/api/v1/user/users/me`
-      );
-      setUserData(res.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingState(false);
-    }
-  };
-
-  // 初始化 - 確認是否已登入
-  useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
-    if (token) {
-      getUserData(token);
-    }
-  }, []);
 
   // 初始化 - 監聽路由變化，有切換路由則隱藏 Menu
   useEffect(() => {

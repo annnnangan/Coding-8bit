@@ -26,14 +26,14 @@ export default function CourseVideoPage() {
   const getData = async () => {
     setLoadingState(true);
     try {
-      const videoResult = await courseApi.getVideoDetail(videoId); //取得影片
+      const videoResult = await courseApi.getVideoDetail(videoId);
       const otherCourseResult = await courseApi.getTutorCourses({
-        tutorId: videoResult.data.tutor_id,
+        tutorId: videoResult.tutor_id,
       });
       const relatedVideoReault = await courseApi.getTutorVideos({
         category: videoData.category,
       });
-      setVideoData(videoResult.data);
+      setVideoData(videoResult);
       setOtherVideos(otherCourseResult.courses);
       setRelatedVideo(relatedVideoReault.data.videos);
     } catch (error) {

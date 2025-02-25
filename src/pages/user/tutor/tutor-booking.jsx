@@ -1,29 +1,51 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useDispatch } from "react-redux";
 
-import axios from "axios";
 import { Swiper } from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import * as bootstrap from "bootstrap";
 
-import ShowMoreButton from "../../../components/common/ShowMoreButton";
-import TutorBookingResume from "../../../components/tutor/TutorBookingResume";
-import TutorsCard from "../../../components/tutor/TutorsCard";
-import CourseCardList from "../../../components/course/CourseCardList";
-import CommentsSection from "../../../components/tutor/CommentsSection";
-import Loader from "../../../components/common/Loader";
+import tutorApi from "@/api/tutorApi";
+import courseApi from "@/api/courseApi";
 
+import ShowMoreButton from "@/components/common/ShowMoreButton";
+import TutorBookingResume from "@/components/tutor/TutorBookingResume";
+import TutorsCard from "@/components/tutor/TutorsCard";
+import CourseCardList from "@/components/course/CourseCardList";
+import CommentsSection from "@/components/tutor/CommentsSection";
+import SectionFallback from "@/components/common/SectionFallback";
+import Timetable from "@/components/tutor/Timetable";
+import Loader from "@/components/common/Loader";
+
+import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { recommendTutorData, tutorStats } from "../../../data/tutors";
-
-const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
+import { formatDateDash } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
-  // loading
-  const [loadingState, setLoadingState] = useState(true);
-
   // 抓取路由上的 id 來取得遠端特定 id 的資料
-  const { id } = useParams();
+  const { id: tutor_id } = useParams();
+  // Loading的useState
+  const [loadingState, setLoadingState] = useState(true);
+  // 講師基本資料的useState
+  const [tutorBasicInfo, setTutorBasicInfo] = useState({
+    name: "API裡面沒有名字",
+    avatar_url: "images/icon/default-tutor-icon.png",
+    about: "",
+    hourly_rate: 0,
+    expertise: "",
+    rating: "",
+    resume: { work_experience: [], education: [], certificates: [] },
+    statistics: {},
+  });
+  const [courses, setCourses] = useState([]);
+  const [comments, setComments] = useState([]);
+  // 關於可預約時間的useState
+  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
+  const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
 
   // modal
   const serviceSelectionModal = useRef(null);
@@ -33,49 +55,75 @@ export default function TutorBooking() {
     serviceSelectionModal.current = new bootstrap.Modal(serviceSelectionModalRef.current);
   }, []);
 
-  // 傳遞預約種類路由參數
-  const navigate = useNavigate();
-  const handleNavigate = (type) => {
-    navigate(`/tutor/${id}/booking-payment-step1/${type}`);
-  };
-  // 跳轉自下一頁按紐
-  const toPaymentPage = (type) => {
-    serviceSelectionModal.current.hide();
-    handleNavigate(type);
-  };
-
-  // 取得資料函式
-  const [courses, setCourses] = useState([]);
-  const [tutorList, setTutorList] = useState({
-    skills: [],
-    resume: { workExperience: [], education: [], certificates: [] },
-    statistics: {},
-  });
-  const [comments, setComments] = useState([]);
-  const [currentStartDate] = useState(20240801);
-  const [availableTime, setAvailableTime] = useState([]);
-  const getData = async () => {
+  // 取得講師頁面的資料的Function
+  const getTutorBasicData = async () => {
     setLoadingState(true);
     try {
-      const coursesResult = await axios.get(`${VITE_API_BASE}/api/v1/courses`);
-      const tutorResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}`);
-      const commentResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}/comments`);
-      const availableTimeResult = await axios.get(`${VITE_API_BASE_2}/api/v1/tutors/${id}/schedule/availableTime/${currentStartDate}`);
+      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
+        tutorApi.getTutorDetail(tutor_id),
+        tutorApi.getExp(tutor_id),
+        tutorApi.getEdu(tutor_id),
+        tutorApi.getCertificate(tutor_id),
+        courseApi.getTutorVideosInBooking(tutor_id),
+      ]);
 
-      // 篩選出跟當前講師同名的課程
-      const filteredCourses = coursesResult.data.filter((course) => {
-        return course.tutor === tutorResult.data.name;
-      });
-      setCourses(filteredCourses);
-      setTutorList(tutorResult.data);
-      setComments(commentResult.data);
-      setAvailableTime(availableTimeResult.data);
+      setTutorBasicInfo((prev) => ({
+        ...prev,
+        ...basicInfoResult.data,
+        resume: {
+          work_experience: experienceResult.data,
+          education: educationResult.data,
+          certificates: certificateResult.data,
+        },
+      }));
+
+      setCourses(videos.videos);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
       setLoadingState(false);
     }
   };
+
+  const getAvailabilityData = async () => {
+    setLoadingAvailableTime(true);
+    try {
+      // 計算baseDate
+      const today = new Date();
+      const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
+      const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
+
+      // 檢查資料是否已經儲在useState裡面
+      const existingData = accumulateAvailableTime.find((data) => data.baseDate === baseDate);
+
+      // 如果資料已存在，我們直接拿，不用再fetch API
+      if (existingData) {
+        setCurrentAvailableTime(existingData.timeSlots);
+      } else {
+        // 如果不存在，就可以fetch API
+        const result = await tutorApi.getAvailability(tutor_id, baseDate);
+
+        // 把剛剛fetch的data存到useState裡面，避免過度fetch API
+        const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
+        setAccumulateAvailableTime((prev) => [...prev, newData]);
+        setCurrentAvailableTime(result.data?.slice(7, 14));
+      }
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingAvailableTime(false);
+    }
+  };
+
+  // 初始化 - 取得資料
+  useEffect(() => {
+    //TODO 檢查這個老師是否存在，才可以繼續
+    getTutorBasicData();
+  }, []);
+
+  useEffect(() => {
+    getAvailabilityData();
+  }, [weekOffset]);
 
   // 初始化 - swiper
   useEffect(() => {
@@ -113,17 +161,38 @@ export default function TutorBooking() {
     });
   }, []);
 
-  // 初始化 - 取得資料
-  useEffect(() => {
-    getData();
-  }, []);
+  // 控制timetable的arrow
+  const toNextWeek = async () => {
+    setWeekOffset((prev) => prev + 1);
+  };
+
+  const toPrevWeek = () => {
+    if (weekOffset > 0) {
+      setWeekOffset((prev) => prev - 1);
+    }
+  };
+
+  // 建立Dispatch 來修改 RTK的State
+  const dispatch = useDispatch();
+
+  // 傳遞預約種類路由參數
+  const navigate = useNavigate();
+
+  // 跳轉自下一頁按紐
+  const toPaymentPage = (serviceType) => {
+    dispatch(updateFormData({ service_type: serviceType }));
+    dispatch(updateFormData({ tutor_id: tutor_id }));
+    dispatch(updateFormData({ tutor_name: tutorBasicInfo.name }));
+    serviceSelectionModal.current.hide();
+    navigate(`/tutor-booking-payment`);
+  };
 
   return (
     <>
       <Helmet>
-        <title>{tutorList?.name ? `${tutorList.name} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
+        <title>{tutorBasicInfo?.name ? `${tutorBasicInfo.name} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
-      {loadingState && <Loader />}
+      {/* {loadingState && <Loader />} */}
       <div className="tutor-booking">
         {/*  Mobile Top Cover */}
         <div className="position-relative d-lg-none">
@@ -143,26 +212,25 @@ export default function TutorBooking() {
         <main className="container py-lg-13 py-7">
           <div className="row">
             {/*  tutor information */}
+
             <div className="col-lg-8">
               {/*  section 1 - overview */}
               <section className="section">
                 {/*  tutor profile  */}
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
-                    <img src={tutorList.avatar} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                    <img src={tutorBasicInfo.avatar_url} alt="profile" className="object-fit-cover rounded-circle me-6" />
                   </div>
                   <div className="flex-grow-1">
-                    <h2 className="mb-2 fs-lg-2 fs-4">{tutorList.name}</h2>
-                    <p className="fs-lg-5 fs-6 text-gray-02">{tutorList.title}</p>
+                    <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.name}</h2>
+                    <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.title}</p>
                   </div>
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
-                  {tutorList.skills.map((skill, index) => (
-                    <a href="#" className="tag tag-brand-02 fs-8 me-3" key={index}>
-                      {skill}
-                    </a>
-                  ))}
+                  <a href="#" className="tag tag-brand-02 fs-8 me-3">
+                    {tutorBasicInfo.expertise}
+                  </a>
                 </div>
                 {/*  tab  */}
                 <div className="section-component">
@@ -181,20 +249,7 @@ export default function TutorBooking() {
                         關於我
                       </button>
                     </li>
-                    <li className="nav-item" role="presentation">
-                      <button
-                        className="nav-link"
-                        id="teaching-styles-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#teaching-styles-tab-pane"
-                        type="button"
-                        role="tab"
-                        aria-controls="teaching-styles-tab-pane"
-                        aria-selected="false"
-                      >
-                        我的教學風格
-                      </button>
-                    </li>
+
                     <li className="nav-item" role="presentation">
                       <button
                         className="nav-link"
@@ -212,13 +267,10 @@ export default function TutorBooking() {
                   </ul>
                   <div className="tab-content" id="myTabContent">
                     <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
-                      <ShowMoreButton text={tutorList.aboutMe} />
-                    </div>
-                    <div className="tab-pane fade" id="teaching-styles-tab-pane" role="tabpanel" aria-labelledby="teaching-styles-tab" tabIndex="0">
-                      <ShowMoreButton text={tutorList.teachingStyles} />
+                      <ShowMoreButton text={tutorBasicInfo.about} />
                     </div>
                     <div className="tab-pane fade" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
-                      <TutorBookingResume resume={tutorList.resume} />
+                      <TutorBookingResume resume={tutorBasicInfo.resume} />
                     </div>
                   </div>
                   {/* statistics */}
@@ -239,11 +291,12 @@ export default function TutorBooking() {
               <section className="section">
                 <div className="section-component f-between-center">
                   <h4>講師影片</h4>
-                  <NavLink to={`/tutor-info/${id}`} className="text-brand-03 d-flex slide-right-hover" data-show="false">
+                  <NavLink to={`/tutor-info/${tutor_id}`} className="text-brand-03 d-flex slide-right-hover" data-show="false">
                     <p>更多</p>
                     <span className="material-symbols-outlined icon-fill">arrow_forward</span>
                   </NavLink>
                 </div>
+
                 <div className="swiper freeTipShortsSwiper">
                   <div className="swiper-wrapper">
                     {courses.map((course) => (
@@ -253,6 +306,8 @@ export default function TutorBooking() {
                     ))}
                   </div>
                 </div>
+
+                <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
               </section>
 
               {/* section 3 - timetable  */}
@@ -260,36 +315,11 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                <div className="f-between-center mb-5">
-                  <span className="prev material-symbols-outlined icon-fill bg-brand-02 text-brand-01 rounded-circle p-2 align-middle">arrow_back</span>
-                  <h5 className="text-brand-03 week fw-medium">
-                    {availableTime[0]?.year}/{availableTime[0]?.date} - {availableTime[0]?.year}/{availableTime[availableTime.length - 1]?.date}
-                  </h5>
-                  <span className="next material-symbols-outlined icon-fill bg-brand-02 text-brand-01 rounded-circle p-2 align-middle">arrow_forward</span>
-                </div>
-
-                <div>
-                  <div className="row row-cols-7 available-date-time g-0">
-                    {availableTime.map((item) => (
-                      <div className="col" key={item.date}>
-                        <div className={`date f-center flex-column ${item.timeSlots.length === 0 && "disabled"}`}>
-                          <h6>{item.day}</h6>
-                          <p>{item.date}</p>
-                        </div>
-
-                        <div>
-                          <ul className="times f-center flex-column">
-                            {item.timeSlots.map((time, index) => (
-                              <li className={`time ${time.status === "booked" && "disabled"}`} key={index}>
-                                {time.startTime}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {currentAvailableTime.length === 0 ? (
+                  <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
+                ) : (
+                  <Timetable availability={currentAvailableTime} weekOffset={weekOffset} toNextWeek={toNextWeek} toPrevWeek={toPrevWeek} isLoading={isLoadingAvailableTime} />
+                )}
               </section>
 
               {/* section 4 - student comment */}
@@ -335,7 +365,7 @@ export default function TutorBooking() {
                 <div className="card-body p-0">
                   <div className="mb-lg-6 mb-5">
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
-                    <h2 className="text-brand-03 fs-lg-2 fs-3">NT $250</h2>
+                    <h2 className="text-brand-03 fs-lg-2 fs-3">NT ${tutorBasicInfo.hourly_rate}</h2>
                   </div>
 
                   <button className="btn slide-right-hover btn-brand-03 w-100" data-bs-toggle="modal" data-bs-target="#serviceSelectionModal">
@@ -365,7 +395,12 @@ export default function TutorBooking() {
               </h4>
               <div className="row row-cols-lg-2 g-4 flex-column flex-lg-row">
                 <div className="col service-card">
-                  <button className="h-100 border-0" onClick={() => toPaymentPage("1on1")}>
+                  <button
+                    className="h-100 border-0"
+                    onClick={() => {
+                      toPaymentPage("courseSession");
+                    }}
+                  >
                     <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
                       <h3 className="fs-4 fs-md-3">一對一教學</h3>
                       <img src="images/deco/Illustration-7.png" alt="one-on-one-illustration" />
@@ -374,7 +409,12 @@ export default function TutorBooking() {
                   </button>
                 </div>
                 <div className="col service-card">
-                  <button className="h-100 border-0" onClick={() => toPaymentPage("code-review")}>
+                  <button
+                    className="h-100 border-0"
+                    onClick={() => {
+                      toPaymentPage("codeReview");
+                    }}
+                  >
                     <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
                       <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
                       <img src="images/deco/Illustration-8.png" alt="code-review-illustration" />
@@ -397,7 +437,7 @@ export default function TutorBooking() {
           <div className="f-between-center">
             <div>
               <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
-              <h2 className="text-brand-03 fs-lg-2 fs-3">NT $250</h2>
+              <h2 className="text-brand-03 fs-lg-2 fs-3">NT ${tutorBasicInfo.hourly_rate}</h2>
             </div>
 
             <button className="btn slide-right-hover btn-brand-03" data-bs-toggle="modal" data-bs-target="#serviceSelectionModal">

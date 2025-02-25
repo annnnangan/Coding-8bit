@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import userApi from "../../../api/userApi";
-import courseApi from "../../../api/courseApi";
+import Swal from "sweetalert2";
 
-import TopicSeriesList from "../../../components/tutor-panel/course/course-list/TopicSeriesLis";
-import Loader from "../../../components/common/Loader";
-import Pagination from "../../../components/layout/Pagination";
+import userApi from "@/api/userApi";
+import courseApi from "@/api/courseApi";
+
+import TopicSeriesList from "@/components/tutor-panel/course/course-list/TopicSeriesList";
+import CustomLearningList from "@/components/tutor-panel/course/course-list/CustomLearningList";
+import FreeTipShortsList from "@/components/tutor-panel/course/course-list/FreeTipShortsList";
+import Loader from "@/components/common/Loader";
+import Pagination from "@/components/layout/Pagination";
 
 export default function TutorManageCourses() {
   // loading
@@ -41,26 +45,56 @@ export default function TutorManageCourses() {
     customLearning: [],
     freeTipShorts: [],
   });
-  const [page, setPage] = useState(1);
-  const getData = async () => {
+  const [pageData, setPageData] = useState({
+    topicSeries: {},
+    customLearning: {},
+    freeTipShorts: {},
+  });
+  const getData = async (category, page = 1) => {
     setLoadingState(true);
     try {
       const { tutor_id } = await userApi.getUserData();
-      const topicSeriesCourses = await courseApi.getTutorCourses(tutor_id);
-      const customLearningCourses = await courseApi.getTutorVideos(
-        tutor_id,
-        "customLearning"
-      );
-      const freeTipShortsCourses = await courseApi.getTutorVideos(
-        tutor_id,
-        "freeTipShorts"
-      );
+      let newData = {};
+
+      if (category === "topicSeries") {
+        const topicSeriesCourses = await courseApi.getTutorCourses(
+          tutor_id,
+          page
+        );
+        newData = {
+          courses: topicSeriesCourses.courses,
+          pagination: topicSeriesCourses.pagination,
+        };
+      } else if (category === "customLearning") {
+        const customLearningCourses = await courseApi.getTutorVideos(
+          tutor_id,
+          "customLearning",
+          page
+        );
+        newData = {
+          courses: customLearningCourses.videos,
+          pagination: customLearningCourses.pagination,
+        };
+      } else if (category === "freeTipShorts") {
+        const freeTipShortsCourses = await courseApi.getTutorVideos(
+          tutor_id,
+          "freeTipShorts",
+          page
+        );
+        newData = {
+          courses: freeTipShortsCourses.videos,
+          pagination: freeTipShortsCourses.pagination,
+        };
+      }
 
       setCourses((prevCourses) => ({
         ...prevCourses,
-        topicSeries: topicSeriesCourses,
-        customLearning: customLearningCourses,
-        freeTipShorts: freeTipShortsCourses,
+        [category]: newData.courses,
+      }));
+
+      setPageData((prevPageData) => ({
+        ...prevPageData,
+        [category]: newData.pagination,
       }));
     } catch (error) {
       console.log("錯誤", error);
@@ -69,9 +103,44 @@ export default function TutorManageCourses() {
     }
   };
 
+  // 刪除課程
+  const deleteCourse = async (course_id, type) => {
+    Swal.fire({
+      title: "確定要刪除嗎？",
+      showCancelButton: true,
+      confirmButtonText: "刪除",
+      denyButtonText: "不要刪除",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoadingState(true);
+        try {
+          if (type === "topicSeries") {
+            await courseApi.deleteCourse(course_id);
+          } else {
+            await courseApi.deleteVideo(course_id);
+          }
+          Swal.fire({
+            icon: "success",
+            title: "刪除成功",
+          });
+          getData();
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: error.response?.data?.message,
+          });
+        } finally {
+          setLoadingState(false);
+        }
+      }
+    });
+  };
+
   // 初始化 - 取得資料
   useEffect(() => {
-    getData();
+    getData("topicSeries");
+    getData("customLearning");
+    getData("freeTipShorts");
   }, []);
 
   return (
@@ -110,7 +179,7 @@ export default function TutorManageCourses() {
               </li>
               <li>
                 <Link
-                  to="/tutor-panel/course/video/customLearning/add"
+                  to="/tutor-panel/video/customLearning/add"
                   className="dropdown-item"
                 >
                   建立客製化需求影片
@@ -118,7 +187,7 @@ export default function TutorManageCourses() {
               </li>
               <li>
                 <Link
-                  to="/tutor-panel/course/video/freeTipShorts/add"
+                  to="/tutor-panel/video/freeTipShorts/add"
                   className="dropdown-item"
                 >
                   建立實用技術短影片
@@ -129,7 +198,7 @@ export default function TutorManageCourses() {
         </div>
 
         {/* 篩選與搜尋 */}
-        <div className="f-end-center mt-4 mt-lg-6">
+        {/* <div className="f-end-center mt-4 mt-lg-6">
           <div className="dropdown">
             <button
               type="button"
@@ -168,11 +237,11 @@ export default function TutorManageCourses() {
               search
             </span>
           </div>
-        </div>
+        </div> */}
 
         {/* 影片列表 */}
         <ul
-          className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-0"
+          className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-6"
           id="courseCategoryTab"
           role="tablist"
         >
@@ -196,7 +265,7 @@ export default function TutorManageCourses() {
             </li>
           ))}
         </ul>
-        <div className="tab-content" id="courseCategoryTab">
+        <div className="table-list tab-content " id="courseCategoryTab">
           {courseCategory.map((item, index) => (
             <div
               className={`tab-pane ${
@@ -207,7 +276,7 @@ export default function TutorManageCourses() {
               aria-labelledby={`${item.category}-tab`}
               key={index}
             >
-              <div className="mt-6 mt-lg-8">
+              <div className="table-wrap mt-6 mt-lg-8">
                 <table className="table">
                   <thead>
                     <tr>
@@ -227,95 +296,64 @@ export default function TutorManageCourses() {
                   </thead>
                   {item.category === "topicSeries" &&
                     courses.topicSeries.map((course) => (
-                      <TopicSeriesList course={course} key={course.id} />
+                      <TopicSeriesList
+                        course={course}
+                        key={course.id}
+                        deleteCourse={deleteCourse}
+                      />
                     ))}
                   {item.category === "customLearning" &&
                     courses.customLearning.map((course) => (
-                      <tbody key={course.id}>
-                        <tr className="align-middle">
-                          <td>
-                            <img src={course.cover_image} alt="course-image" />
-                          </td>
-                          <td>{course.title}</td>
-                          <td>{course.category}</td>
-                          <td>{course.isPublic ? "公開" : "未公開"}</td>
-                          <td>2024年12月1日</td>
-                          <td>{Number(course.view_count).toLocaleString()}</td>
-                          <td>{course.rating}</td>
-                          <td>
-                            <div>
-                              <NavLink
-                                to={`/tutor-panel/course/${course.id}/edit`}
-                                className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  edit
-                                </span>
-                                編輯
-                              </NavLink>
-                              <button
-                                type="button"
-                                className="btn link-danger border-0 f-align-center p-0 mt-1"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  delete
-                                </span>
-                                刪除
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
+                      <CustomLearningList
+                        course={course}
+                        key={course.id}
+                        deleteCourse={deleteCourse}
+                      />
                     ))}
                   {item.category === "freeTipShorts" &&
                     courses.freeTipShorts.map((course) => (
-                      <tbody key={course.id}>
-                        <tr className="align-middle">
-                          <td>
-                            <img src={course.cover_image} alt="course-image" />
-                          </td>
-                          <td>{course.title}</td>
-                          <td>{course.category}</td>
-                          <td>{course.isPublic ? "公開" : "未公開"}</td>
-                          <td>2024年12月1日</td>
-                          <td>{Number(course.view_count).toLocaleString()}</td>
-                          <td>{course.rating}</td>
-                          <td>
-                            <div>
-                              <NavLink
-                                to={`/tutor-panel/course/${course.id}/edit`}
-                                className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  edit
-                                </span>
-                                編輯
-                              </NavLink>
-                              <button
-                                type="button"
-                                className="btn link-danger border-0 f-align-center p-0 mt-1"
-                              >
-                                <span className="material-symbols-outlined me-1">
-                                  delete
-                                </span>
-                                刪除
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
+                      <FreeTipShortsList
+                        course={course}
+                        key={course.id}
+                        deleteCourse={deleteCourse}
+                      />
                     ))}
                 </table>
+                {/* 頁碼 */}
+                {item.category === "topicSeries" && (
+                  <div className="tutor-manage-course-pagination-wrap">
+                    <Pagination
+                      pageData={pageData?.topicSeries}
+                      type="topicSeries"
+                      getData={getData}
+                    />
+                  </div>
+                )}
+
+                {item.category === "customLearning" && (
+                  <div className="tutor-manage-course-pagination-wrap">
+                    <Pagination
+                      pageData={pageData?.customLearning}
+                      type="customLearning"
+                      getData={getData}
+                    />
+                  </div>
+                )}
+
+                {item.category === "freeTipShorts" && (
+                  <div className="tutor-manage-course-pagination-wrap">
+                    <Pagination
+                      pageData={pageData?.freeTipShorts}
+                      type="freeTipShorts"
+                      getData={getData}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       </main>
-
-      {/* 頁碼 */}
-      <div className="position-absolute end-0 bottom-0 pe-6 pb-6">
-        <Pagination page={page} setPage={setPage} getData={getData} />
-      </div>
     </>
   );
 }

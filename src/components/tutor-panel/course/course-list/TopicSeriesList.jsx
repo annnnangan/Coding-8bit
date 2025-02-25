@@ -7,7 +7,7 @@ import {
   formatDate,
 } from "../../../../utils/timeFormatted-utils";
 
-export default function FreeTipShortsList({ course, deleteCourse }) {
+export default function TopicSeriesList({ course, deleteCourse }) {
   return (
     <tbody>
       <tr className="align-middle">
@@ -24,7 +24,10 @@ export default function FreeTipShortsList({ course, deleteCourse }) {
           </div>
         </td>
         <td>
-          <NavLink to={`/video/${course.id}`} className="d-inline underline-hover">
+          <NavLink
+            to={`/course/${course.id}`}
+            className="d-inline underline-hover"
+          >
             {course.title}
           </NavLink>
         </td>
@@ -36,16 +39,16 @@ export default function FreeTipShortsList({ course, deleteCourse }) {
         <td>
           <div>
             <NavLink
-              to={`/tutor-panel/video/freeTipShorts/edit/${course.id}`}
+              to={`/tutor-panel/course/topicSeries/${course.id}/edit`}
               className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
             >
-              <span className="material-symbols-outlined me-1">edit</span>
-              編輯
+              <span className="material-symbols-outlined me-1">dataset</span>
+              詳細
             </NavLink>
             <button
               type="button"
               className="btn link-danger border-0 f-align-center p-0 mt-1"
-              onClick={() => deleteCourse(course.id, "freeTipShorts")}
+              onClick={() => deleteCourse(course.id, "topicSeries")}
             >
               <span className="material-symbols-outlined me-1">delete</span>
               刪除
@@ -56,7 +59,7 @@ export default function FreeTipShortsList({ course, deleteCourse }) {
     </tbody>
   );
 }
-FreeTipShortsList.propTypes = {
+TopicSeriesList.propTypes = {
   course: PropTypes.shape({
     id: PropTypes.string.isRequired,
     cover_image: PropTypes.string.isRequired,

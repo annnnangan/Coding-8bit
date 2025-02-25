@@ -27,31 +27,31 @@ export default function CourseVideoPage() {
   const { id, videoId } = useParams();
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
-  const getData = async () => {
-    setLoadingState(true);
-    try {
-      const courseResult = await courseApi.getCourseDetail(id);
-      const videoResult = await courseApi.getVideoDetail(videoId);
-      const chapterResult = await courseApi.getCourseChapter(id);
-      const otherCourseResult = await courseApi.getTutorCourses({
-        tutorId: videoResult.data.tutor_id,
-      });
-      const relatedVideoReault = await courseApi.getTutorVideos({
-        category: videoData.category,
-      });
-      setVideoData({ ...courseResult, ...videoResult.data });
-      setChapter(chapterResult);
-      setOtherVideos(otherCourseResult.courses);
-      setRelatedVideo(relatedVideoReault.data.videos);
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
-      setLoadingState(false);
-    }
-  };
 
   // 初始化取得資料
   useEffect(() => {
+    const getData = async () => {
+      setLoadingState(true);
+      try {
+        const courseResult = await courseApi.getCourseDetail(id);
+        const videoResult = await courseApi.getVideoDetail(videoId);
+        const chapterResult = await courseApi.getCourseChapter(id);
+        const otherCourseResult = await courseApi.getTutorCourses({
+          tutorId: videoResult.tutor_id,
+        });
+        const relatedVideoReault = await courseApi.getTutorVideos({
+          category: videoData.category,
+        });
+        setVideoData({ ...courseResult, ...videoResult });
+        setChapter(chapterResult);
+        setOtherVideos(otherCourseResult.courses);
+        setRelatedVideo(relatedVideoReault.data.videos);
+      } catch (error) {
+        console.log("錯誤", error);
+      } finally {
+        setLoadingState(false);
+      }
+    };
     getData();
   }, [videoId]);
 

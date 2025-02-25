@@ -1,4 +1,5 @@
 import { createHashRouter } from "react-router-dom";
+import { lazy } from "react";
 
 // Layout
 import UserLayout from "../router/UserLayout";
@@ -21,16 +22,14 @@ import CourseVideoPage from "../pages/user/course/detail-page/course-video-page"
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
 import CustomCourseList from "../pages/user/custom-course/custom-course-list";
-import AddLearningNeedPage from "../pages/user/custom-course/add-learning-need-page";
+const  AddLearningNeedPage = lazy(() =>import("../pages/user/custom-course/add-learning-need-page"));
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";
 
 import TutorList from "../pages/user/tutor/tutor-list";
 import TutorBooking from "../pages/user/tutor/tutor-booking";
-import TutorBookingPaymentStep1 from "../pages/user/tutor/booking-payment/step1";
-import TutorBookingPaymentStep2 from "../pages/user/tutor/booking-payment/step2";
-import TutorBookingSuccess from "../pages/user/tutor/booking-payment/booking-success";
+import TutorBookingPayment from "../pages/user/tutor/tutor-booking-payment";
 import TutorInfo from "../pages/user/tutor/tutor-info";
 
 import HelpCenter from "../pages/user/help-center";
@@ -41,10 +40,10 @@ import TutorPanel from "../pages/tutor/tutor-panel";
 import TutorManageBooking from "../pages/tutor/bookings/tutor-manage-bookings";
 
 import TutorManageCourses from "../pages/tutor/courses/tutor-manage-courses";
-import TutorManageAddTopicSeries from "../pages/tutor/courses/tutor-addCourses-topicSeries";
-import TutorManageEditTopicSeries from "../pages/tutor/courses/tutor-editCourses-topicSeries ";
-import TutorManageTopicSeriesChapter from "../pages/tutor/courses/tutor-chapter-topicSeries";
-import TutorManageAddVideo from "../pages/tutor/courses/tutor-addVideo";
+import TutorManageAddTopicSeries from "../pages/tutor/courses/Course/tutor-addCourses-topicSeries";
+import TutorManageEditTopicSeries from "../pages/tutor/courses/Course/tutor-editCourses-topicSeries ";
+import TutorManageAddVideo from "../pages/tutor/courses/video/tutor-addVideo";
+import TutorManageEditVideo from "../pages/tutor/courses/video/tutor-editVideo";
 import TutorProfile from "../pages/tutor/profile/tutor-profile";
 
 // 使用者後台 - 學生
@@ -84,16 +83,8 @@ export const router = createHashRouter([
       { path: "tutor-list", element: <TutorList /> },
       { path: "tutor/:id", element: <TutorBooking /> },
       {
-        path: "tutor/:id/booking-payment-step1/:type",
-        element: <TutorBookingPaymentStep1 />,
-      },
-      {
-        path: "tutor/:id/booking-payment-step2/:type",
-        element: <TutorBookingPaymentStep2 />,
-      },
-      {
-        path: "tutor/:id/booking-payment-success/:type",
-        element: <TutorBookingSuccess />,
+        path: "tutor-booking-payment",
+        element: <TutorBookingPayment />,
       },
       { path: "tutor-info/:id", element: <TutorInfo /> },
 
@@ -117,11 +108,10 @@ export const router = createHashRouter([
         path: "course/topicSeries/:id/edit",
         element: <TutorManageEditTopicSeries />,
       },
-      {
-        path: "course/topicSeries/:id/chapter",
-        element: <TutorManageTopicSeriesChapter />,
-      },
-      { path: "course/video/:type/add", element: <TutorManageAddVideo /> },
+      { path: "video/:type/add/:courseId/:id", element: <TutorManageAddVideo /> },
+      { path: "video/:type/add", element: <TutorManageAddVideo /> },
+      { path: "video/:type/edit/:courseId/:id", element: <TutorManageEditVideo /> },
+      { path: "video/:type/edit/:id", element: <TutorManageEditVideo /> },
       { path: "profile", element: <TutorProfile /> },
     ],
   },

@@ -27,7 +27,7 @@ export default function CourseDetailPage() {
   const modalRefMethod = useRef(null);
 
   const { id } = useParams();
-
+  
   const getData = async () => {
     setLoadingState(true);
     try {
