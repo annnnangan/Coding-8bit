@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { Modal } from "bootstrap";
 
 import courseApi from "../../../../api/courseApi";
 
@@ -18,10 +19,15 @@ export default function CourseDetailPage() {
       User: {},
     },
   });
+
   const [chapter, setChapter] = useState([]);
   const [otherVideos, setOtherVideos] = useState([]);
   const [relatedVideo, setRelatedVideo] = useState([]);
+  const modalRef = useRef(null);
+  const modalRefMethod = useRef(null);
+
   const { id } = useParams();
+
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -48,6 +54,15 @@ export default function CourseDetailPage() {
   useEffect(() => {
     getData();
   }, [id]);
+
+  useEffect(() => {
+    modalRefMethod.current = new Modal(modalRef.current);
+    modalRef.current.addEventListener("hide.bs.modal", () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -76,7 +91,10 @@ export default function CourseDetailPage() {
                 style={{ marginBottom: "22px" }}
               >
                 <h4 className="chapter-video-title">章節影片</h4>
-                <div className="f-align-center show-more-button mouse-pointer-style slide-right-hover">
+                <div
+                  className="f-align-center show-more-button mouse-pointer-style slide-right-hover"
+                  onClick={() => modalRefMethod.current.show()}
+                >
                   <span className="me-1">更多</span>
                   <span className="material-symbols-outlined">
                     arrow_forward
@@ -247,6 +265,80 @@ export default function CourseDetailPage() {
           </aside>
         </div>
       </main>
+      <div
+        ref={modalRef}
+        className="modal fade"
+        id="exampleModal"
+        tabIndex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">
+                Modal title
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <ul className="chapter-list">
+                {chapter?.map((video, index) => (
+                  <li
+                    className="video-background-color-hover px-6 py-4"
+                    onClick={() => modalRefMethod.current.hide()}
+                    key={video.id}
+                  >
+                    <NavLink
+                      to={`chapter/${video.Videos[0].id}`}
+                      className="d-flex justify-content-between chapter-item"
+                    >
+                      <span className="material-symbols-outlined player-icon me-2">
+                        play_circle
+                      </span>
+                      <div className="flex-grow-1">
+                        <div className="d-flex align-items-center justify-content-between mb-1">
+                          <span className="fs-7 chapter-contents">
+                            第 {index + 1} 章
+                          </span>
+                          <time className="video-duration fs-7 rounded-1 px-2 py-1">
+                            {convertSecondsToTime(video.Videos[0].duration)}
+                          </time>
+                        </div>
+                        <h5 className="chapter-item-title mb-2">
+                          {video.Videos[0].title}
+                        </h5>
+                        <div className="d-flex">
+                          <span className="material-symbols-outlined me-1 fs-6 eyes-icon">
+                            visibility
+                          </span>
+                          <data
+                            className="chapter-view-count fs-7"
+                            value="23,005"
+                          >
+                            {Number(
+                              video.Videos[0].view_count
+                            ).toLocaleString()}
+                          </data>
+                        </div>
+                      </div>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* <div className="modal-footer">
+        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" className="btn btn-primary">Save changes</button>
+      </div> */}
+          </div>
+        </div>
+      </div>
     </>
   );
 }
