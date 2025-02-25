@@ -76,8 +76,9 @@ export default function Header() {
   useEffect(() => {
     if (token) {
       dispatch(loginCheck());
+    } else {
+      setLoadingState(false);
     }
-    setLoadingState(false);
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
