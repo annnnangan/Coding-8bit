@@ -165,6 +165,12 @@
   }
 
   .reply {
+    .reply-comment {
+      font-size: 14px;
+      border-radius: 4px;
+      border: 2px solid #a18ec9;
+    }
+
     .accordion-button {
       color: $brand-03;
 
@@ -212,6 +218,10 @@
         .reply-comment {
           color: $gray-01;
           line-height: 1.5;
+        }
+
+        &:last-of-type {
+          margin-bottom: 0 !important;
         }
 
         >div:last-of-type {

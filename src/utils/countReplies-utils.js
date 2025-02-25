@@ -6,7 +6,7 @@ export const countReplies = (comments) => {
       if (!acc[comment.parent_id]) {
         acc[comment.parent_id] = [];
       }
-      acc[comment.parent_id].push(comment);
+      acc[comment.parent_id].unshift(comment);
     }
     return acc;
   }, {});
