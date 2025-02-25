@@ -92,6 +92,7 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
     if (token) {
       dispatch(loginCheck());
     }
+    setLoadingState(false);
   }, []);
 
   const isMobile = useIsMobile();

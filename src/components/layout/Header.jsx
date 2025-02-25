@@ -77,6 +77,7 @@ export default function Header() {
     if (token) {
       dispatch(loginCheck());
     }
+    setLoadingState(false);
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
