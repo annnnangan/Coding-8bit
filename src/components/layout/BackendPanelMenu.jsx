@@ -91,8 +91,9 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
   useEffect(() => {
     if (token) {
       dispatch(loginCheck());
+    } else {
+      setLoadingState(false);
     }
-    setLoadingState(false);
   }, []);
 
   const isMobile = useIsMobile();

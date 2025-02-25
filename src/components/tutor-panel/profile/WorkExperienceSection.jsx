@@ -1,14 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 
 import * as bootstrap from "bootstrap";
-import axios from "axios";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 
-import userApi from "../../../api/userApi";
 import tutorApi from "../../../api/tutorApi";
 
-export default function WorkExperienceSection({ setLoadingState }) {
+export default function WorkExperienceSection({ userData, setLoadingState }) {
   const [workExperiences, setWorkExperiences] = useState([]);
   const [temExperience, setTemExperience] = useState({
     company: "",
@@ -19,12 +17,10 @@ export default function WorkExperienceSection({ setLoadingState }) {
 
   // modal
   const [modalType, setModalType] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const myModal = useRef(null);
   const experienceModalRef = useRef(null);
 
   const openModal = (exp, type) => {
-    setIsModalOpen(true);
     if (type === "edit") {
       setModalType("edit");
       setTemExperience(exp);
@@ -43,7 +39,6 @@ export default function WorkExperienceSection({ setLoadingState }) {
   };
 
   const hideModal = () => {
-    setIsModalOpen(false);
     myModal.current.hide();
   };
 
@@ -61,12 +56,12 @@ export default function WorkExperienceSection({ setLoadingState }) {
     }));
   };
 
-  const [tutorId, setTutorId] = useState("");
   // 獲取資料
+  const [tutorId, setTutorId] = useState("");
   const getData = async () => {
     setLoadingState(true);
     try {
-      const { tutor_id } = await userApi.getUserData();
+      const { tutor_id } = userData;
       const result = await tutorApi.getExp(tutor_id);
       setTutorId(tutor_id);
       setWorkExperiences(result.data || []);
@@ -167,14 +162,10 @@ export default function WorkExperienceSection({ setLoadingState }) {
 
   // 初始化 - 取得資料
   useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
-    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    getData();
-  }, []);
+    if (userData.tutor_id) {
+      getData();
+    }
+  }, [userData.tutor_id]);
 
   return (
     <>
@@ -235,7 +226,6 @@ export default function WorkExperienceSection({ setLoadingState }) {
           className="modal fade"
           tabIndex="-1"
           aria-labelledby="expModalLabel"
-          aria-hidden={!isModalOpen}
           ref={experienceModalRef}
         >
           <div className="modal-dialog">
@@ -263,7 +253,7 @@ export default function WorkExperienceSection({ setLoadingState }) {
                       className="form-control"
                       id="company"
                       placeholder="七角股份有限公司"
-                      value={temExperience.company}
+                      value={temExperience.company ?? ""}
                       onChange={(e) => handleExpChange(e, "company")}
                     />
                   </div>
@@ -276,7 +266,7 @@ export default function WorkExperienceSection({ setLoadingState }) {
                       className="form-control"
                       placeholder="前端工程師"
                       id="position"
-                      value={temExperience.position}
+                      value={temExperience.position ?? ""}
                       onChange={(e) => handleExpChange(e, "position")}
                     />
                   </div>
@@ -289,7 +279,7 @@ export default function WorkExperienceSection({ setLoadingState }) {
                       className="form-control"
                       placeholder="2017"
                       id="start_year"
-                      value={temExperience.start_year}
+                      value={temExperience.start_year ?? ""}
                       onChange={(e) => handleExpChange(e, "start_year")}
                     />
                   </div>
@@ -302,7 +292,7 @@ export default function WorkExperienceSection({ setLoadingState }) {
                       className="form-control"
                       placeholder="2020"
                       id="end_year"
-                      value={temExperience.end_year}
+                      value={temExperience.end_year ?? ""}
                       onChange={(e) => handleExpChange(e, "end_year")}
                     />
                   </div>
@@ -343,5 +333,6 @@ export default function WorkExperienceSection({ setLoadingState }) {
   );
 }
 WorkExperienceSection.propTypes = {
+    userData: PropTypes.object.isRequired,
   setLoadingState: PropTypes.func.isRequired,
 };
