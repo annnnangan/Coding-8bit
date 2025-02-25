@@ -20,7 +20,7 @@ export default function CommentsSection({ comments, videoId }) {
       try {
         const data = {
           content: commentText,
-          parent_id: hasParent,
+          parent_id: null,
         };
         await courseApi.postCourseComments(videoId, data);
       } catch (error) {
@@ -32,6 +32,7 @@ export default function CommentsSection({ comments, videoId }) {
       }
     }
   };
+
   const deleteComment = async (commentId) => {
     try {
       await courseApi.deleteCourseComments(commentId);
@@ -39,8 +40,6 @@ export default function CommentsSection({ comments, videoId }) {
       console.error(error);
     } finally {
       const reloadComments = await courseApi.getCourseComments(videoId);
-      console.log(reloadComments);
-
       const reduceComments = (data) => {
         const { parentComments, childComments } = data.reduce(
           (acc, comment) => {
@@ -53,7 +52,6 @@ export default function CommentsSection({ comments, videoId }) {
           },
           { parentComments: [], childComments: [] }
         );
-
         return { parentComments, childComments };
       };
 
@@ -61,6 +59,7 @@ export default function CommentsSection({ comments, videoId }) {
         const { parentComments, childComments } = reduceComments(
           reloadComments.data
         );
+
         setUserComments(parentComments.reverse());
         setReplyCount(countReplies(childComments));
       }
@@ -68,8 +67,6 @@ export default function CommentsSection({ comments, videoId }) {
   };
 
   const replyComment = async (commentId) => {
-    console.log(commentId);
-
     setShowReplyBox((prev) => ({
       ...prev,
       [commentId]: !prev[commentId],
@@ -257,44 +254,41 @@ export default function CommentsSection({ comments, videoId }) {
                         aria-labelledby={`flush-collapse${index}`}
                       >
                         <div className="accordion-body">
-                          {replyCount[userComment.id] &&
-                            replyCount[userComment.id].map((item) => (
-                              <div className="tutor-content mb-6" key={item.id}>
-                                <div className="d-flex mb-3">
-                                  <img
-                                    className="tutor-image me-4"
-                                    src={item.User.avatar_url}
-                                    alt="留言回覆者頭像"
-                                  />
-                                  <div className="d-flex justify-content-between align-items-center flex-fill">
-                                    <div className="f-column">
-                                      <span className="tutor-name mb-2">
-                                        {item.User.username}
-                                      </span>
-                                      <time className="comment-time fs-7">
-                                        {formatDateToTaiwanStyle(
-                                          item.createdAt
-                                        )}
-                                      </time>
-                                    </div>
-                                    {item.user_id == userInfo.id ? (
-                                      <button
-                                        type="button"
-                                        className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 reply-comment"
-                                        onClick={() => deleteComment(item.id)}
-                                      >
-                                        刪除
-                                      </button>
-                                    ) : (
-                                      <></>
-                                    )}
+                          {replyCount[userComment.id].map((item) => (
+                            <div className="tutor-content mb-6" key={item.id}>
+                              <div className="d-flex mb-3">
+                                <img
+                                  className="tutor-image me-4"
+                                  src={item.User.avatar_url}
+                                  alt="留言回覆者頭像"
+                                />
+                                <div className="d-flex justify-content-between align-items-center flex-fill">
+                                  <div className="f-column">
+                                    <span className="tutor-name mb-2">
+                                      {item.User.username}
+                                    </span>
+                                    <time className="comment-time fs-7">
+                                      {formatDateToTaiwanStyle(item.createdAt)}
+                                    </time>
                                   </div>
+                                  {item.user_id == userInfo.id ? (
+                                    <button
+                                      type="button"
+                                      className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 reply-comment"
+                                      onClick={() => deleteComment(item.id)}
+                                    >
+                                      刪除
+                                    </button>
+                                  ) : (
+                                    <></>
+                                  )}
                                 </div>
-                                <p className="tutor-reply-style fs-6">
-                                  {item.content}
-                                </p>
                               </div>
-                            ))}
+                              <p className="tutor-reply-style fs-6">
+                                {item.content}
+                              </p>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
