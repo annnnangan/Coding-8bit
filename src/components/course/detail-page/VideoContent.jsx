@@ -21,7 +21,7 @@ export default function VideoContent({
           const commentsResult = await courseApi.getCourseComments(
             introductionVideoId || paramsVideoId
           );
-          setComments(commentsResult.data);
+          setComments(commentsResult);
         } catch (error) {
           console.error("錯誤!!! 請聯繫系統管理員", error);
         }

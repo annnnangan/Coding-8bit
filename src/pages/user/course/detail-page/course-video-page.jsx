@@ -36,10 +36,10 @@ export default function CourseVideoPage() {
         const courseResult = await courseApi.getCourseDetail(id);
         const videoResult = await courseApi.getVideoDetail(videoId);
         const chapterResult = await courseApi.getCourseChapter(id);
-        const otherCourseResult = await courseApi.getTutorCourses({
+        const otherCourseResult = await courseApi.getFrontTutorCourses({
           tutorId: videoResult.tutor_id,
         });
-        const relatedVideoReault = await courseApi.getTutorVideos({
+        const relatedVideoReault = await courseApi.getFrontTutorVideos({
           category: videoData.category,
         });
         setVideoData({ ...courseResult, ...videoResult });

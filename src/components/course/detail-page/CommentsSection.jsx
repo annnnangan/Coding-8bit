@@ -27,7 +27,7 @@ export default function CommentsSection({ comments, videoId }) {
         console.error(error);
       } finally {
         const reloadComments = await courseApi.getCourseComments(videoId);
-        setUserComments(reloadComments.data.reverse());
+        setUserComments(reloadComments.reverse());
         setCommentText("");
       }
     }
@@ -55,9 +55,9 @@ export default function CommentsSection({ comments, videoId }) {
         return { parentComments, childComments };
       };
 
-      if (reloadComments && Array.isArray(reloadComments.data)) {
+      if (reloadComments && Array.isArray(reloadComments)) {
         const { parentComments, childComments } = reduceComments(
-          reloadComments.data
+          reloadComments
         );
 
         setUserComments(parentComments.reverse());
@@ -102,7 +102,7 @@ export default function CommentsSection({ comments, videoId }) {
           return { parentComments, childComments };
         };
 
-        if (reloadComments && Array.isArray(reloadComments.data)) {
+        if (reloadComments && Array.isArray(reloadComments)) {
           const { parentComments, childComments } = reduceComments(
             reloadComments.data
           );

@@ -27,10 +27,10 @@ export default function CourseVideoPage() {
     setLoadingState(true);
     try {
       const videoResult = await courseApi.getVideoDetail(videoId);
-      const otherCourseResult = await courseApi.getTutorCourses({
+      const otherCourseResult = await courseApi.getFrontTutorCourses({
         tutorId: videoResult.tutor_id,
       });
-      const relatedVideoReault = await courseApi.getTutorVideos({
+      const relatedVideoReault = await courseApi.getFrontTutorVideos({
         category: videoData.category,
       });
       setVideoData(videoResult);
