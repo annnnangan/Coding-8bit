@@ -13,3 +13,20 @@ export const countReplies = (comments) => {
 
   return replyCountMap;
 };
+
+
+// 區分留言有否有 parent_id
+export const reduceComments = (data) => {
+  const { parentComments, childComments } = data.reduce(
+    (acc, comment) => {
+      if (comment.parent_id === null) {
+        acc.parentComments.push(comment);
+      } else {
+        acc.childComments.push(comment);
+      }
+      return acc;
+    },
+    { parentComments: [], childComments: [] }
+  );
+  return { parentComments, childComments };
+};

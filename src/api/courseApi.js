@@ -150,14 +150,3 @@ export default {
   updateVideo,
   deleteVideo,
 };
-
-
-
-/*
-  留言防抖
-  取消enter發送
-  API 要自己新增
-刪除要再次確認
-
-
-*/

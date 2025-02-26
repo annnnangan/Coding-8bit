@@ -1,13 +1,14 @@
+import 'bootstrap-icons/font/bootstrap-icons.css'
 import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Modal } from "bootstrap";
 
-import courseApi from "../../../../api/courseApi";
+import courseApi from "@/api/courseApi";
+import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
-import { convertSecondsToTime } from "../../../../utils/timeFormatted-utils";
-import VideoContent from "../../../../components/course/detail-page/VideoContent";
-import Loader from "../../../../components/common/Loader";
+import VideoContent from "@/components/course/detail-page/VideoContent";
+import Loader from "@/components/common/Loader";
 
 export default function CourseDetailPage() {
   // loading
@@ -42,7 +43,7 @@ export default function CourseDetailPage() {
       setCourseList(courseResult);
       setChapter(chapterResult);
       setOtherVideos(otherCourseResult.courses);
-      setRelatedVideo(relatedVideoReault.data.videos);
+      setRelatedVideo(relatedVideoReault.videos);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -77,9 +78,9 @@ export default function CourseDetailPage() {
       <main className="video-details container-lg py-lg-13 py-md-0">
         <div className="row">
           <VideoContent
-            videoUrl={chapter[0]?.Videos[0]?.video_url}
             courseList={courseList}
             courseTutor={courseList.tutor_id}
+            videoUrl={chapter[0]?.Videos[0]?.video_url}
             introductionVideoId={chapter[0]?.Videos[0]?.id} //章節第0張為課程介紹影片
           />
 

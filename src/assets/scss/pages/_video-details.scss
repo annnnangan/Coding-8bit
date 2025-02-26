@@ -113,7 +113,6 @@
     }
 
     .user-comment-picture {
-      // display: block;
       height: 40px;
       max-width: 40px;
       object-fit: cover;
@@ -128,6 +127,11 @@
       &::placeholder {
         color: $gray-03;
       }
+    }
+
+    .send-icon-color {
+      color: #645caa;
+      cursor: pointer;
     }
   }
 }
@@ -170,7 +174,10 @@
       border-radius: 4px;
       border: 2px solid #a18ec9;
     }
-
+    .reply-icon-color{
+      color: #645caa;
+      cursor: pointer;
+    }
     .accordion-button {
       color: $brand-03;
 

@@ -23,12 +23,6 @@ const login = async (formData) => {
   const { token } = response.data;
   document.cookie = `authToken=${token}; path=/`;
   axios.defaults.headers.common.Authorization = token;
-
-  // 將用戶資訊存入 Redux store
-  // const getUserInfo = await userApi.getUserData();
-  // console.log('getUserInfo:', getUserInfo);
-  // store.dispatch(setUser(getUserInfo));
-
   return;
 };
 

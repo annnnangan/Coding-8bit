@@ -1,22 +1,69 @@
 import PropTypes from "prop-types";
+import ReactLonding from "react-loading";
+import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
-import { formatDateToTaiwanStyle } from "../../../utils/timeFormatted-utils";
-import { countReplies } from "../../../utils/countReplies-utils";
-import userApi from "../../../api/userApi";
-import courseApi from "../../../api/courseApi";
+import { useDispatch, useSelector } from "react-redux";
+import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
+import { countReplies, reduceComments } from "@/utils/countReplies-utils";
+import { getUserData } from "@/utils/slice/authSlice";
+import courseApi from "@/api/courseApi";
 
 export default function CommentsSection({ comments, videoId }) {
-  const [userComments, setUserComments] = useState([]);
-  const [replyCount, setReplyCount] = useState({});
-  const [userInfo, setUserInfo] = useState({});
-  const [commentText, setCommentText] = useState("");
-  const [hasParent, setHasParent] = useState(null);
-  const [replyText, setReplyText] = useState("");
-  const [showReplyBox, setShowReplyBox] = useState({});
+  const [replyText, setReplyText] = useState(""); // 回覆輸入
+  const [commentText, setCommentText] = useState(""); // 留言輸入
+  const [userComments, setUserComments] = useState([]); // 留言
+  const [replyCount, setReplyCount] = useState({}); // 回覆數
+  const [showReplyBox, setShowReplyBox] = useState({}); // 是否顯示回覆輸入框
+  const [isSending, setIsSending] = useState(false); // 是否留言中
+  const [isRepling, setIsRepling] = useState(false); // 是否回覆中
+  const dispatch = useDispatch();
+  const userInfo = useSelector((state) => state.auth.userData);
 
-  const handleKeyDown = async (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
+  const deleteComment = async (commentId) => {
+    Swal.fire({
+      title: "確定要刪除嗎？",
+      text: "刪除後有問題請洽管理人員",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "確定",
+      cancelButtonText: "取消",
+    })
+      .then(async (result) => {
+        await courseApi.deleteCourseComments(commentId);
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(async () => {
+        const reloadComments = await courseApi.getCourseComments(videoId);
+        const { parentComments, childComments } =
+          reduceComments(reloadComments);
+        setUserComments(parentComments.reverse());
+        setReplyCount(countReplies(childComments));
+        setCommentText("");
+        setIsSending(false);
+      });
+  };
+
+  const replySwitch = async (commentId) => {
+    setShowReplyBox((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+
+  const sendComment = async () => {
+    if (commentText.trim() !== "" && !isSending) {
+      setIsSending(true);
       try {
         const data = {
           content: commentText,
@@ -27,55 +74,19 @@ export default function CommentsSection({ comments, videoId }) {
         console.error(error);
       } finally {
         const reloadComments = await courseApi.getCourseComments(videoId);
-        setUserComments(reloadComments.reverse());
-        setCommentText("");
-      }
-    }
-  };
-
-  const deleteComment = async (commentId) => {
-    try {
-      await courseApi.deleteCourseComments(commentId);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      const reloadComments = await courseApi.getCourseComments(videoId);
-      const reduceComments = (data) => {
-        const { parentComments, childComments } = data.reduce(
-          (acc, comment) => {
-            if (comment.parent_id === null) {
-              acc.parentComments.push(comment);
-            } else {
-              acc.childComments.push(comment);
-            }
-            return acc;
-          },
-          { parentComments: [], childComments: [] }
-        );
-        return { parentComments, childComments };
-      };
-
-      if (reloadComments && Array.isArray(reloadComments)) {
-        const { parentComments, childComments } = reduceComments(
-          reloadComments
-        );
-
+        const { parentComments, childComments } =
+          reduceComments(reloadComments);
         setUserComments(parentComments.reverse());
         setReplyCount(countReplies(childComments));
+        setCommentText("");
+        setIsSending(false);
       }
     }
   };
 
   const replyComment = async (commentId) => {
-    setShowReplyBox((prev) => ({
-      ...prev,
-      [commentId]: !prev[commentId],
-    }));
-  };
-
-  const handleReplyKeyDown = async (event, commentId) => {
-    if (event.key === "Enter" && replyText.trim() !== "") {
-      event.preventDefault();
+    if (replyText.trim() !== "" && !isSending) {
+      setIsRepling(true);
       try {
         const data = {
           content: replyText,
@@ -86,31 +97,12 @@ export default function CommentsSection({ comments, videoId }) {
         console.error(error);
       } finally {
         const reloadComments = await courseApi.getCourseComments(videoId);
-        const reduceComments = (data) => {
-          const { parentComments, childComments } = data.reduce(
-            (acc, comment) => {
-              if (comment.parent_id === null) {
-                acc.parentComments.push(comment);
-              } else {
-                acc.childComments.push(comment);
-              }
-              return acc;
-            },
-            { parentComments: [], childComments: [] }
-          );
-
-          return { parentComments, childComments };
-        };
-
-        if (reloadComments && Array.isArray(reloadComments)) {
-          const { parentComments, childComments } = reduceComments(
-            reloadComments.data
-          );
-          setUserComments(parentComments.reverse());
-          setReplyCount(countReplies(childComments));
-        }
-
+        const { parentComments, childComments } =
+          reduceComments(reloadComments);
+        setUserComments(parentComments.reverse());
+        setReplyCount(countReplies(childComments));
         setReplyText("");
+        setIsRepling(false);
         setShowReplyBox((prev) => ({
           ...prev,
           [commentId]: false,
@@ -120,40 +112,22 @@ export default function CommentsSection({ comments, videoId }) {
   };
 
   useEffect(() => {
-    const reduceComments = () => {
-      const { parentComments, childComments } = comments.reduce(
-        (acc, comment) => {
-          if (comment.parent_id === null) {
-            acc.parentComments.push(comment);
-          } else {
-            acc.childComments.push(comment);
-          }
-          return acc;
-        },
-        { parentComments: [], childComments: [] }
-      );
-
-      return { parentComments, childComments };
-    };
     if (comments && Array.isArray(comments)) {
-      const { parentComments, childComments } = reduceComments();
+      const { parentComments, childComments } = reduceComments(comments);
       setUserComments(parentComments.reverse());
       setReplyCount(countReplies(childComments));
     }
   }, [comments]);
 
   useEffect(() => {
-    const getUserInfo = async () => {
-      const res = await userApi.getUserData();
-      setUserInfo(res);
-    };
-    getUserInfo();
-  }, []);
+    dispatch(getUserData());
+  }, [dispatch]);
 
   return (
     <>
+      {/* <Loader/> */}
       <section className="video-comments pt-6">
-        <div className="d-flex py-4 mb-6">
+        <div className="d-flex align-items-center py-4 mb-6">
           <img
             className="user-comment-picture me-3"
             src={userInfo.avatar_url}
@@ -164,11 +138,28 @@ export default function CommentsSection({ comments, videoId }) {
             placeholder="發表留言"
             name="user-comment"
             id="user-comment"
-            className="w-100 user-comment py-2"
+            className="user-comment w-100 py-2"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={handleKeyDown}
           />
+          <div>
+            {!isSending && (
+              <i
+                className="bi bi-send fs-4 p-2 send-icon-color"
+                onClick={() => sendComment()}
+              ></i>
+            )}
+            {isSending && (
+              <div className="p-2">
+                <ReactLonding
+                  type={"spin"}
+                  color={"#645caa"}
+                  height={"1.5rem"}
+                  width={"1.5rem"}
+                />
+              </div>
+            )}
+          </div>
         </div>
         <ul className="history-comments">
           {userComments.map((userComment, index) => (
@@ -200,7 +191,7 @@ export default function CommentsSection({ comments, videoId }) {
                     <button
                       type="button"
                       className="btn btn-outline-none fs-7 py-2 px-4 rounded-2 delete-comment"
-                      onClick={() => replyComment(userComment.id)}
+                      onClick={() => replySwitch(userComment.id)}
                     >
                       回覆
                     </button>
@@ -210,16 +201,35 @@ export default function CommentsSection({ comments, videoId }) {
               <div className="reply">
                 <p className="reply-style fs-6">{userComment.content}</p>
                 {showReplyBox[userComment.id] && (
-                  <input
-                    type="text"
-                    placeholder="回覆留言"
-                    name="reply-comment"
-                    id="reply-comment"
-                    className="w-100 reply-comment p-2 mt-2"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    onKeyDown={(e) => handleReplyKeyDown(e, userComment.id)}
-                  />
+                  <div className="d-flex align-items-center py-2">
+                    <input
+                      type="text"
+                      placeholder="回覆留言"
+                      name="reply-comment"
+                      id="reply-comment"
+                      className="w-100 reply-comment p-2"
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                    />
+                    <div>
+                      {!isRepling && (
+                        <i
+                          className="bi bi-reply fs-4 p-2 reply-icon-color"
+                          onClick={() => replyComment(userComment.id)}
+                        ></i>
+                      )}
+                      {isRepling && (
+                        <div className="p-2">
+                          <ReactLonding
+                            type={"spin"}
+                            color={"#645caa"}
+                            height={"1.5rem"}
+                            width={"1.5rem"}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
                 {replyCount[userComment.id] ? (
                   <div
@@ -232,15 +242,15 @@ export default function CommentsSection({ comments, videoId }) {
                         id={`flush-heading${index}`}
                       >
                         <span
+                          data-bs-toggle="collapse"
+                          data-bs-target={`#flush-collapse${index}`}
+                          aria-expanded="false"
+                          aria-controls={`flush-collapse${index}`}
                           className={`accordion-button mouse-pointer-style collapsed py-2 px-4 ${
                             replyCount[userComment.id] === undefined
                               ? "d-none"
                               : ""
                           }`}
-                          data-bs-toggle="collapse"
-                          data-bs-target={`#flush-collapse${index}`}
-                          aria-expanded="false"
-                          aria-controls={`flush-collapse${index}`}
                         >
                           {replyCount[userComment.id]
                             ? replyCount[userComment.id].length
@@ -304,6 +314,7 @@ export default function CommentsSection({ comments, videoId }) {
     </>
   );
 }
+
 CommentsSection.propTypes = {
   comments: PropTypes.array,
   videoId: PropTypes.string,
