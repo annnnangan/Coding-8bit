@@ -26,6 +26,8 @@ export const loginCheck = createAsyncThunk(
       const response = await authApi.loginCheck();
       return response;
     } catch (error) {
+      document.cookie =
+        "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       return rejectWithValue(error.response?.data?.message);
     }
   }
