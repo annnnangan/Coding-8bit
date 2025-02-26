@@ -3,30 +3,29 @@ import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Modal } from "bootstrap";
 
-import VideoContent from "../../../../components/course/detail-page/VideoContent";
-import Loader from "../../../../components/common/Loader";
+import VideoContent from "@/components/course/detail-page/VideoContent";
+import Loader from "@/components/common/Loader";
 
-import courseApi from "../../../../api/courseApi";
+import courseApi from "@/api/courseApi";
 
-import { convertSecondsToTime } from "../../../../utils/timeFormatted-utils";
+import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
-  // loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [chapter, setChapter] = useState([]); // 章節
+  const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
+  const [relatedVideo, setRelatedVideo] = useState([]); // 相關影片
+  const { id, videoId } = useParams(); // 取得路由參數
+  const modalRef = useRef(null);
+  const modalRefMethod = useRef(null);
 
-  // 取得影片資料函式
+  const [loadingState, setLoadingState] = useState(true); // loading
+
+  // 影片資料
   const [videoData, setVideoData] = useState({
     Tutor: {
       User: {},
     },
   });
-
-  const [chapter, setChapter] = useState([]);
-  const [otherVideos, setOtherVideos] = useState([]);
-  const [relatedVideo, setRelatedVideo] = useState([]);
-  const { id, videoId } = useParams();
-  const modalRef = useRef(null);
-  const modalRefMethod = useRef(null);
 
   // 初始化取得資料
   useEffect(() => {
@@ -42,10 +41,11 @@ export default function CourseVideoPage() {
         const relatedVideoReault = await courseApi.getFrontTutorVideos({
           category: videoData.category,
         });
+
         setVideoData({ ...courseResult, ...videoResult });
         setChapter(chapterResult);
         setOtherVideos(otherCourseResult.courses);
-        setRelatedVideo(relatedVideoReault.data.videos);
+        setRelatedVideo(relatedVideoReault.videos);
       } catch (error) {
         console.log("錯誤", error);
       } finally {
@@ -264,6 +264,8 @@ export default function CourseVideoPage() {
           </aside>
         </div>
       </main>
+
+      {/* 更多章節 modal */}
       <div
         ref={modalRef}
         className="modal fade"
@@ -276,7 +278,7 @@ export default function CourseVideoPage() {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
-                Modal title
+                章節總覽
               </h5>
               <button
                 type="button"

@@ -124,6 +124,12 @@
       outline: none;
       border-bottom: 1px solid $gray-03;
 
+      &.input-error {
+        border: 1px solid #fff;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
+        animation: shake 0.1s ease-in-out;
+      }
+
       &::placeholder {
         color: $gray-03;
       }
@@ -160,8 +166,7 @@
       color: $gray-03;
     }
 
-    .delete-comment,
-    .reply-comment {
+    .delete-comment {
       color: $gray-01;
       background-color: #f1eaff;
       line-height: 1.5;
@@ -173,11 +178,19 @@
       font-size: 14px;
       border-radius: 4px;
       border: 2px solid #a18ec9;
+
+      &.input-error {
+        border: 1px solid #fff;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
+        animation: shake 0.1s ease-in-out;
+      }
     }
-    .reply-icon-color{
+
+    .reply-icon-color {
       color: #645caa;
       cursor: pointer;
     }
+
     .accordion-button {
       color: $brand-03;
 

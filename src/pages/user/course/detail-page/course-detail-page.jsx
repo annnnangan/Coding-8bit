@@ -1,4 +1,4 @@
-import 'bootstrap-icons/font/bootstrap-icons.css'
+import "bootstrap-icons/font/bootstrap-icons.css";
 import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -11,8 +11,13 @@ import VideoContent from "@/components/course/detail-page/VideoContent";
 import Loader from "@/components/common/Loader";
 
 export default function CourseDetailPage() {
-  // loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [chapter, setChapter] = useState([]); // 章節
+  const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
+  const [relatedVideo, setRelatedVideo] = useState([]); // 相關影片
+  const [loadingState, setLoadingState] = useState(true); // loading
+  const { id } = useParams();
+  const modalRef = useRef(null);
+  const modalRefMethod = useRef(null);
 
   // 課程資料
   const [courseList, setCourseList] = useState({
@@ -21,14 +26,6 @@ export default function CourseDetailPage() {
     },
   });
 
-  const [chapter, setChapter] = useState([]);
-  const [otherVideos, setOtherVideos] = useState([]);
-  const [relatedVideo, setRelatedVideo] = useState([]);
-  const modalRef = useRef(null);
-  const modalRefMethod = useRef(null);
-
-  const { id } = useParams();
-  
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -81,7 +78,7 @@ export default function CourseDetailPage() {
             courseList={courseList}
             courseTutor={courseList.tutor_id}
             videoUrl={chapter[0]?.Videos[0]?.video_url}
-            introductionVideoId={chapter[0]?.Videos[0]?.id} //章節第0張為課程介紹影片
+            introductionVideoId={chapter[0]?.Videos[0]?.id} //章節第0章影片為課程介紹影片
           />
 
           <aside className="col-lg-5 col-xl-4">
@@ -109,7 +106,7 @@ export default function CourseDetailPage() {
                     key={video.id}
                   >
                     <NavLink
-                      to={`chapter/${video.Videos[0].id}`}
+                      to={`chapter/${video.Videos[0]?.id}`}
                       className="d-flex justify-content-between chapter-item"
                     >
                       <span className="material-symbols-outlined player-icon me-2">
@@ -121,11 +118,11 @@ export default function CourseDetailPage() {
                             第 {index + 1} 章
                           </span>
                           <time className="video-duration fs-7 rounded-1 px-2 py-1">
-                            {convertSecondsToTime(video.Videos[0].duration)}
+                            {convertSecondsToTime(video.Videos[0]?.duration)}
                           </time>
                         </div>
                         <h5 className="chapter-item-title mb-2">
-                          {video.Videos[0].title}
+                          {video.Videos[0]?.title}
                         </h5>
                         <div className="d-flex">
                           <span className="material-symbols-outlined me-1 fs-6 eyes-icon">
@@ -136,7 +133,7 @@ export default function CourseDetailPage() {
                             value="23,005"
                           >
                             {Number(
-                              video.Videos[0].view_count
+                              video.Videos[0]?.view_count
                             ).toLocaleString()}
                           </data>
                         </div>
@@ -171,30 +168,30 @@ export default function CourseDetailPage() {
                     key={index}
                   >
                     <NavLink
-                      to={`/course/${other.id}`}
+                      to={`/course/${other?.id}`}
                       className="d-flex justify-content-between chapter-item"
                     >
                       <div className="position-relative">
                         <img
                           className="rounded-2 me-4 other-video-image"
-                          src={other.cover_image}
+                          src={other?.cover_image}
                           alt="影片縮圖"
                         />
                         <span className="position-absolute py-1 px-2 rounded-1 fs-7 other-video-duration">
-                          {convertSecondsToTime(other.duration)}
+                          {convertSecondsToTime(other?.duration)}
                         </span>
                       </div>
                       <div className="f-column-between py-2">
-                        <h5 className="other-video-title">{other.title}</h5>
+                        <h5 className="other-video-title">{other?.title}</h5>
                         <div className="f-align-center me-6">
                           <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
                             visibility
                           </span>
                           <data
-                            value={other.view_count}
+                            value={other?.view_count}
                             className="data-view-count fs-7"
                           >
-                            {Number(other.view_count).toLocaleString()}
+                            {Number(other?.view_count).toLocaleString()}
                           </data>
                         </div>
                       </div>
@@ -225,36 +222,36 @@ export default function CourseDetailPage() {
                     key={index}
                   >
                     <NavLink
-                      to={`/video/${related.id}`}
+                      to={`/video/${related?.id}`}
                       className="d-flex justify-content-between chapter-item"
                     >
                       <div className="position-relative me-4">
                         <img
                           className="rounded-2 related-video-image"
-                          src={related.cover_image}
+                          src={related?.cover_image}
                           alt="影片縮圖"
                         />
                         <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                          {related.duration}
+                          {related?.duration}
                         </span>
                       </div>
                       <div className="f-column-between py-2">
-                        <h5 className="related-video-title">{related.title}</h5>
+                        <h5 className="related-video-title">{related?.title}</h5>
                         <div className="f-align-center">
                           <span className="material-symbols-outlined me-1 author-icon fs-6">
                             co_present
                           </span>
                           <span className="me-2 me-md-4">
-                            {related.Tutor.User.username}
+                            {related?.Tutor.User.username}
                           </span>
                           <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
                             visibility
                           </span>
                           <data
-                            value={related.view_count}
+                            value={related?.view_count}
                             className="data-view-count fs-7"
                           >
-                            {Number(related.view_count).toLocaleString()}
+                            {Number(related?.view_count).toLocaleString()}
                           </data>
                         </div>
                       </div>
@@ -266,6 +263,8 @@ export default function CourseDetailPage() {
           </aside>
         </div>
       </main>
+
+      {/* 更多章節 modal */}
       <div
         ref={modalRef}
         className="modal fade"
@@ -278,7 +277,7 @@ export default function CourseDetailPage() {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
-                Modal title
+                章節總覽
               </h5>
               <button
                 type="button"
@@ -296,7 +295,7 @@ export default function CourseDetailPage() {
                     key={video.id}
                   >
                     <NavLink
-                      to={`chapter/${video.Videos[0].id}`}
+                      to={`chapter/${video.Videos[0]?.id}`}
                       className="d-flex justify-content-between chapter-item"
                     >
                       <span className="material-symbols-outlined player-icon me-2">
@@ -308,11 +307,11 @@ export default function CourseDetailPage() {
                             第 {index + 1} 章
                           </span>
                           <time className="video-duration fs-7 rounded-1 px-2 py-1">
-                            {convertSecondsToTime(video.Videos[0].duration)}
+                            {convertSecondsToTime(video.Videos[0]?.duration)}
                           </time>
                         </div>
                         <h5 className="chapter-item-title mb-2">
-                          {video.Videos[0].title}
+                          {video.Videos[0]?.title}
                         </h5>
                         <div className="d-flex">
                           <span className="material-symbols-outlined me-1 fs-6 eyes-icon">
@@ -323,7 +322,7 @@ export default function CourseDetailPage() {
                             value="23,005"
                           >
                             {Number(
-                              video.Videos[0].view_count
+                              video.Videos[0]?.view_count
                             ).toLocaleString()}
                           </data>
                         </div>
@@ -333,10 +332,6 @@ export default function CourseDetailPage() {
                 ))}
               </ul>
             </div>
-            {/* <div className="modal-footer">
-        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" className="btn btn-primary">Save changes</button>
-      </div> */}
           </div>
         </div>
       </div>

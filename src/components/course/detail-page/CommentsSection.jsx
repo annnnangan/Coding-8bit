@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import ReactLonding from "react-loading";
 import Swal from "sweetalert2";
+import { z } from "zod";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
@@ -16,8 +17,37 @@ export default function CommentsSection({ comments, videoId }) {
   const [showReplyBox, setShowReplyBox] = useState({}); // 是否顯示回覆輸入框
   const [isSending, setIsSending] = useState(false); // 是否留言中
   const [isRepling, setIsRepling] = useState(false); // 是否回覆中
+  const [errors, setErrors] = useState({}); // 錯誤訊息
   const dispatch = useDispatch();
   const userInfo = useSelector((state) => state.auth.userData);
+
+  // 定義驗證模式
+  const commentSchema = z.object({
+    commentText: z.string().min(1, "留言不能為空"),
+    replyText: z.string().min(1, "回覆不能為空"),
+  });
+
+  const validateComment = (text) => {
+    try {
+      commentSchema.parse({ commentText: text });
+      setErrors((prev) => ({ ...prev, commentText: null }));
+      return true;
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, commentText: error.errors[0].message }));
+      return false;
+    }
+  };
+
+  const validateReply = (text) => {
+    try {
+      commentSchema.parse({ replyText: text });
+      setErrors((prev) => ({ ...prev, replyText: null }));
+      return true;
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, replyText: error.errors[0].message }));
+      return false;
+    }
+  };
 
   const deleteComment = async (commentId) => {
     Swal.fire({
@@ -62,7 +92,11 @@ export default function CommentsSection({ comments, videoId }) {
   };
 
   const sendComment = async () => {
-    if (commentText.trim() !== "" && !isSending) {
+    if (
+      validateComment(commentText) &&
+      commentText.trim() !== "" &&
+      !isSending
+    ) {
       setIsSending(true);
       try {
         const data = {
@@ -85,7 +119,7 @@ export default function CommentsSection({ comments, videoId }) {
   };
 
   const replyComment = async (commentId) => {
-    if (replyText.trim() !== "" && !isSending) {
+    if (validateReply(replyText) && replyText.trim() !== "" && !isRepling) {
       setIsRepling(true);
       try {
         const data = {
@@ -138,10 +172,13 @@ export default function CommentsSection({ comments, videoId }) {
             placeholder="發表留言"
             name="user-comment"
             id="user-comment"
-            className="user-comment w-100 py-2"
+            className={`user-comment w-100 py-2 ${
+              errors.commentText ? "input-error" : ""
+            }`}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
           />
+
           <div>
             {!isSending && (
               <i
@@ -207,7 +244,9 @@ export default function CommentsSection({ comments, videoId }) {
                       placeholder="回覆留言"
                       name="reply-comment"
                       id="reply-comment"
-                      className="w-100 reply-comment p-2"
+                      className={`w-100 reply-comment p-2 ${
+                        errors.replyText ? "input-error" : ""
+                      }`}
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                     />

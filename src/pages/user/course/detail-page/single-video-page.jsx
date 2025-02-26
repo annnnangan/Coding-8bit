@@ -2,27 +2,26 @@ import { useState, useEffect } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import VideoContent from "../../../../components/course/detail-page/VideoContent";
-import Loader from "../../../../components/common/Loader";
+import VideoContent from "@/components/course/detail-page/VideoContent";
+import Loader from "@/components/common/Loader";
 
-import courseApi from "../../../../api/courseApi";
+import courseApi from "@/api/courseApi";
 
-import { convertSecondsToTime } from "../../../../utils/timeFormatted-utils";
+import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
-  // loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
+  const [relatedVideo, setRelatedVideo] = useState([]); // 相關影片
+  const [loadingState, setLoadingState] = useState(true); // loading
+  const { videoId } = useParams(); // 取得影片ID
 
-  // 取得影片資料函式
+  // 取得影片資料
   const [videoData, setVideoData] = useState({
     Tutor: {
       User: {},
     },
   });
 
-  const [otherVideos, setOtherVideos] = useState([]);
-  const [relatedVideo, setRelatedVideo] = useState([]);
-  const { videoId } = useParams();
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -35,7 +34,7 @@ export default function CourseVideoPage() {
       });
       setVideoData(videoResult);
       setOtherVideos(otherCourseResult.courses);
-      setRelatedVideo(relatedVideoReault.data.videos);
+      setRelatedVideo(relatedVideoReault.videos);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -92,30 +91,30 @@ export default function CourseVideoPage() {
                     key={index}
                   >
                     <NavLink
-                      to={`/course/${other.id}`}
+                      to={`/course/${other?.id}`}
                       className="d-flex justify-content-between chapter-item"
                     >
                       <div className="position-relative">
                         <img
                           className="rounded-2 me-4 other-video-image"
-                          src={other.cover_image}
+                          src={other?.cover_image}
                           alt="影片縮圖"
                         />
                         <span className="position-absolute py-1 px-2 rounded-1 fs-7 other-video-duration">
-                          {convertSecondsToTime(other.duration)}
+                          {convertSecondsToTime(other?.duration)}
                         </span>
                       </div>
                       <div className="f-column-between py-2">
-                        <h5 className="other-video-title">{other.title}</h5>
+                        <h5 className="other-video-title">{other?.title}</h5>
                         <div className="f-align-center me-6">
                           <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
                             visibility
                           </span>
                           <data
-                            value={other.view_count}
+                            value={other?.view_count}
                             className="data-view-count fs-7"
                           >
-                            {Number(other.view_count).toLocaleString()}
+                            {Number(other?.view_count).toLocaleString()}
                           </data>
                         </div>
                       </div>
@@ -146,36 +145,36 @@ export default function CourseVideoPage() {
                     key={index}
                   >
                     <NavLink
-                      to={`/video/${related.id}`}
+                      to={`/video/${related?.id}`}
                       className="d-flex justify-content-between chapter-item"
                     >
                       <div className="position-relative me-4">
                         <img
                           className="rounded-2 related-video-image"
-                          src={related.cover_image}
+                          src={related?.cover_image}
                           alt="影片縮圖"
                         />
                         <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                          {related.duration}
+                          {related?.duration}
                         </span>
                       </div>
                       <div className="f-column-between py-2">
-                        <h5 className="related-video-title">{related.title}</h5>
+                        <h5 className="related-video-title">{related?.title}</h5>
                         <div className="f-align-center">
                           <span className="material-symbols-outlined me-1 author-icon fs-6">
                             co_present
                           </span>
                           <span className="me-2 me-md-4">
-                            {related.Tutor.User.username}
+                            {related?.Tutor.User.username}
                           </span>
                           <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
                             visibility
                           </span>
                           <data
-                            value={related.view_count}
+                            value={related?.view_count}
                             className="data-view-count fs-7"
                           >
-                            {Number(related.view_count).toLocaleString()}
+                            {Number(related?.view_count).toLocaleString()}
                           </data>
                         </div>
                       </div>
