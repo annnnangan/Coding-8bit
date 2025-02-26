@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import { useIsMobile } from "../../hooks/use-mobile";
 import { useSelector, useDispatch } from "react-redux";
 import { loginCheck, getUserData } from "@/utils/slice/authSlice";
@@ -7,6 +7,7 @@ import { loginCheck, getUserData } from "@/utils/slice/authSlice";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import clsx from "clsx";
+import Swal from "sweetalert2";
 
 import Loader from "../../components/common/Loader";
 
@@ -70,6 +71,9 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // auth
   const { isAuth } = useSelector((state) => state.auth);
   const { userData } = useSelector((state) => state.auth);
@@ -81,24 +85,30 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
 
   // 初始化 - 取得使用者資料
   useEffect(() => {
-    if (token) {
-      dispatch(getUserData());
-      setLoadingState(false);
-    }
+    dispatch(getUserData());
+    setLoadingState(false);
   }, [isAuth]);
 
   // 初始化 - 驗證身分
   useEffect(() => {
     if (token) {
-      dispatch(loginCheck());
+      dispatch(loginCheck())
+        .unwrap()
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: "登入驗證失敗",
+            text: error,
+          });
+          navigate("/login");
+        });
     } else {
       setLoadingState(false);
     }
-  }, []);
+  }, [location.pathname]);
 
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
 
   // 切換行動版 Menu 狀態
   const handleTogglerClick = () => {
