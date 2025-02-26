@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import DOMPurify from "dompurify";
 
 import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -39,8 +40,12 @@ export default function CourseList() {
     setLoadingState(true);
     try {
       const topicSeries = await courseApi.getAllCourses();
-      const customLearning = await courseApi.getAllVideos("customLearning");
-      const freeTipShorts = await courseApi.getAllVideos("freeTipShorts");
+      const customLearning = await courseApi.getAllVideos(
+        "customLearning",
+        1,
+        6
+      );
+      const freeTipShorts = await courseApi.getAllVideos("freeTipShorts", 1, 6);
       setTopicSeriesCourseList(topicSeries.courses);
       setCustomLearningCourseList(customLearning.videos);
       setFreeTipShortsCourseList(freeTipShorts.videos);
@@ -439,9 +444,12 @@ export default function CourseList() {
                             <p className="card-text fs-7 fs-lg-5 mt-1 mt-lg-2">
                               by {course.Tutor.User.username}
                             </p>
-                            <p className="card-text fs-6 fs-lg-5 mt-2 mt-lg-4">
-                              {course.description}
-                            </p>
+                            <p
+                              className="card-text fs-6 fs-lg-5 mt-2 mt-lg-4"
+                              dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(course.description),
+                              }}
+                            ></p>
                           </div>
                         </div>
                       </div>

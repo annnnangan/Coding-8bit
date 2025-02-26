@@ -171,7 +171,7 @@ export default function EducationSection({ userData, setLoadingState }) {
   }, [userData.tutor_id]);
 
   return (
-    <section className="tutor-manage-profile-education-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4 mt-xxl-0">
+    <section className="tutor-manage-profile-education-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4">
       <h2 className="fs-6 fs-md-5 fw-bold">學歷</h2>
       <div className="table-wrap">
         <table className="table mt-4 mt-lg-6">
