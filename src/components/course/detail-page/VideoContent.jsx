@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 
 import courseApi from "../../../api/courseApi";
 
@@ -15,23 +16,27 @@ export default function VideoContent({
 }) {
   const [comments, setComments] = useState([]);
   const [disableInputComment, setDisableInputComment] = useState(false);
+  const getCourseCommentsHandle = async () => {
+    try {
+      const commentsResult = await courseApi.getCourseComments(
+        introductionVideoId || paramsVideoId
+      );
+
+      setComments(commentsResult);
+    } catch (error) {
+      console.log("getCourseCommentsHandle error", error);
+    }
+  };
+
   useEffect(() => {
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
 
-    if (introductionVideoId || paramsVideoId) {
-      const getCourseCommentsHandle = async () => {
-        try {
-          const commentsResult = await courseApi.getCourseComments(
-            introductionVideoId || paramsVideoId
-          );
+    console.log("introductionVideoId", introductionVideoId);
+    console.log("paramsVideoId", paramsVideoId);
 
-          setComments(commentsResult);
-        } catch (error) {
-          console.log("getCourseCommentsHandle error", error);
-        }
-      };
+    if (introductionVideoId || paramsVideoId) {
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
@@ -114,8 +119,12 @@ export default function VideoContent({
       <div className="author-content d-flex mb-10">
         <img
           className="author-image rounded-5 me-4"
-          src={courseList.Tutor.User.avatar_url}
-          alt="作者頭像"
+          src={
+            courseList.Tutor.User.avatar_url
+              ? courseList.Tutor.User.avatar_url
+              : "images/icon/user.png"
+          }
+          alt="tutor-avatar-image"
         />
         <div>
           <NavLink to={`/tutor-info/${courseTutor}`}>
@@ -164,7 +173,11 @@ export default function VideoContent({
               aria-labelledby="description-tab"
             >
               <div className="ps-5 pt-6">
-                <p>{courseList.description}</p>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(courseList.description),
+                  }}
+                ></p>
               </div>
             </div>
             <div

@@ -1,3 +1,16 @@
+// 課程語言類別
+export const categories = [
+  { id: 1, name: "HTML / CSS" },
+  { id: 2, name: "JavaScript" },
+  { id: 3, name: "React" },
+  { id: 4, name: "Vue" },
+  { id: 5, name: "UI / UX" },
+  { id: 6, name: "Python" },
+  { id: 7, name: "Node.js" },
+  { id: 8, name: "AI" },
+  { id: 9, name: "其他" },
+];
+
 // 課程類別資料物件
 export const categoryData = [
   {
@@ -30,31 +43,35 @@ export const categoryData = [
 export const hotCoursesData = [
   {
     id: "1",
-    title: "Python 基礎入門",
-    description: "新手必學課程，輕鬆學Python",
-    image: "images/course/course-10.png",
+    title: "ChatGPT API 串接與應用",
+    video_url: "/course/7d663a90-6306-4d41-bf4a-d2be6053a145",
+    description: "從零開始學習 OpenAI API 的應用",
+    image: "https://raw.githubusercontent.com/ahmomoz/8bit-image-data/refs/heads/main/8bit-image/chapter/course1-chpater-0.png",
     tag: "快速入門",
   },
   {
     id: "2",
-    title: "數據分析技巧",
-    description: "教你學會如何有效率地分析數據",
-    image: "images/course/course-3.png",
+    title: "Vue 高效開發實戰",
+    video_url: "/course/e156dfe0-a317-4389-ba74-5f3c1cf9d241",
+    description: "深入探索 Vue.js 的進階應用",
+    image: "https://raw.githubusercontent.com/ahmomoz/8bit-image-data/refs/heads/main/8bit-image/course-10.png",
     tag: "必備課程",
   },
   {
     id: "3",
-    title: "Web 開發實戰",
-    description: "手把手教你如何開發網站",
-    image: "images/course/course-12.png",
+    title: "UI/UX 設計基礎",
+    video_url: "/course/bcbf797a-c49a-47f0-afb4-b4f128565dec",
+    description: "學習視覺層次、色彩搭配與使用者體驗優化",
+    image: "https://raw.githubusercontent.com/ahmomoz/8bit-image-data/refs/heads/main/8bit-image/course-11.png",
     tag: "真材實料",
   },
   {
     id: "4",
-    title: "網路安全基礎",
-    description: "網路安全漏洞百出，你學會怎麼防了嗎？",
-    image: "images/course/course-16.png",
-    tag: "工程師必備",
+    title: "Nuxt 3 實戰",
+    video_url: "/course/4d434500-855b-4a83-b44a-d5f37e31487b",
+    description: "學習 Nuxt 3 的核心概念與專案結構",
+    image: "https://raw.githubusercontent.com/ahmomoz/8bit-image-data/refs/heads/main/8bit-image/course-13.png",
+    tag: "Vue 工程師必備",
   },
 ];
 

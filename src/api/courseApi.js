@@ -7,8 +7,20 @@ const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", limit 
 };
 
 // 取得特定類別所有影片列表
-const getAllVideos = async (video_type, page = 1, limit = 9) => {
-  const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&limit=${limit}`);
+const getAllVideos = async (video_type, page = 1, sortBy = "rating", order = "DESC", limit = 9) => {
+  const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+  return response.data.data;
+};
+
+// 特定語言種類 - 取得所有課程列表
+const getCategoryAllCourses = async (page = 1, sortBy = "rating", order = "DESC", category, limit = 9) => {
+  const response = await apiClient.get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&category=${category}&limit=${limit}`);
+  return response.data.data;
+};
+
+// 特定語言種類 -取得特定類別所有影片列表
+const getCategoryAllVideos = async (video_type, page = 1, sortBy = "rating", order = "DESC", category, limit = 9) => {
+  const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&category=${category}&limit=${limit}`);
   return response.data.data;
 };
 
@@ -132,6 +144,8 @@ const deleteVideo = async (videoId) => {
 export default {
   getAllCourses,
   getAllVideos,
+  getCategoryAllCourses,
+  getCategoryAllVideos,
   getCourseDetail,
   getCourseChapter,
   getVideoDetail,
