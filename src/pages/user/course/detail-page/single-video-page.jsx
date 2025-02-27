@@ -11,9 +11,9 @@ import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
-  const [relatedVideo, setRelatedVideo] = useState([]); // 相關影片
+  const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const [loadingState, setLoadingState] = useState(true); // loading
-  const { videoId } = useParams(); // 取得影片ID
+  const { id, videoId } = useParams(); // 取得影片ID
 
   // 取得影片資料
   const [videoData, setVideoData] = useState({
@@ -22,6 +22,21 @@ export default function CourseVideoPage() {
     },
   });
 
+  // 過濾無章節的課程
+  const filterOtherCourse = (others) => {
+    return others.filter(
+      (other) =>
+        other.CourseChapters &&
+        other.CourseChapters.length > 0 &&
+        other.id !== id
+    );
+  };
+
+  // 過濾同課程的影片
+  const filterRelatedVideo = (relateds) => {
+    return relateds.filter((related) => related.course_id !== id);
+  };
+
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -29,12 +44,12 @@ export default function CourseVideoPage() {
       const otherCourseResult = await courseApi.getFrontTutorCourses({
         tutorId: videoResult.tutor_id,
       });
-      const relatedVideoReault = await courseApi.getFrontTutorVideos({
+      const relatedVideosReault = await courseApi.getFrontTutorVideos({
         category: videoData.category,
       });
       setVideoData(videoResult);
-      setOtherVideos(otherCourseResult.courses);
-      setRelatedVideo(relatedVideoReault.videos);
+      setOtherVideos(filterOtherCourse(otherCourseResult.courses));
+      setRelatedVideos(filterRelatedVideo(relatedVideosReault.videos));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -68,121 +83,127 @@ export default function CourseVideoPage() {
 
           <aside className="col-lg-5 col-xl-4">
             {/* 講師其他影片 */}
-            <div className="other-videos rounded-4 aside-border mb-6">
-              <div
-                className="px-6 d-flex justify-content-between align-items-center"
-                style={{ marginBottom: "22px" }}
-              >
-                <h4 className="tutor-other-video-title">講師其他影片</h4>
-                <NavLink
-                  to={`/tutor-info/${videoData.tutor_id}`}
-                  className="f-align-center show-more-button slide-right-hover"
+            {otherVideos.length > 0 && (
+              <div className="other-videos rounded-4 aside-border mb-6">
+                <div
+                  className="px-6 d-flex justify-content-between align-items-center"
+                  style={{ marginBottom: "22px" }}
                 >
-                  <span className="me-1">更多</span>
-                  <span className="material-symbols-outlined">
-                    arrow_forward
-                  </span>
-                </NavLink>
-              </div>
-              <ul className="other-videos-list">
-                {otherVideos?.map((other, index) => (
-                  <li
-                    className="d-flex py-3 py-4 px-6 video-background-color-hover"
-                    key={index}
+                  <h4 className="tutor-other-video-title">講師其他影片</h4>
+                  <NavLink
+                    to={`/tutor-info/${videoData.tutor_id}`}
+                    className="f-align-center show-more-button slide-right-hover"
                   >
-                    <NavLink
-                      to={`/course/${other?.id}`}
-                      className="d-flex justify-content-between chapter-item"
+                    <span className="me-1">更多</span>
+                    <span className="material-symbols-outlined">
+                      arrow_forward
+                    </span>
+                  </NavLink>
+                </div>
+                <ul className="other-videos-list">
+                  {otherVideos.map((other, index) => (
+                    <li
+                      className="d-flex py-3 py-4 px-6 video-background-color-hover"
+                      key={index}
                     >
-                      <div className="position-relative">
-                        <img
-                          className="rounded-2 me-4 other-video-image"
-                          src={other?.cover_image}
-                          alt="影片縮圖"
-                        />
-                        <span className="position-absolute py-1 px-2 rounded-1 fs-7 other-video-duration">
-                          {convertSecondsToTime(other?.duration)}
-                        </span>
-                      </div>
-                      <div className="f-column-between py-2">
-                        <h5 className="other-video-title">{other?.title}</h5>
-                        <div className="f-align-center me-6">
-                          <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
-                            visibility
+                      <NavLink
+                        to={`/course/${other.id}`}
+                        className="d-flex justify-content-between chapter-item"
+                      >
+                        <div className="position-relative">
+                          <img
+                            className="rounded-2 me-4 other-video-image"
+                            src={other.cover_image}
+                            alt="影片縮圖"
+                          />
+                          <span className="position-absolute py-1 px-2 rounded-1 fs-7 other-video-duration">
+                            {convertSecondsToTime(other.duration)}
                           </span>
-                          <data
-                            value={other?.view_count}
-                            className="data-view-count fs-7"
-                          >
-                            {Number(other?.view_count).toLocaleString()}
-                          </data>
                         </div>
-                      </div>
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                        <div className="f-column-between py-2">
+                          <h5 className="other-video-title">{other.title}</h5>
+                          <div className="f-align-center me-6">
+                            <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
+                              visibility
+                            </span>
+                            <data
+                              value={other.view_count}
+                              className="data-view-count fs-7"
+                            >
+                              {Number(other.view_count).toLocaleString()}
+                            </data>
+                          </div>
+                        </div>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* 相關影片 */}
-            <div className="related-videos rounded-4 aside-border">
-              <div
-                className="px-6 f-between-center"
-                style={{ marginBottom: "22px" }}
-              >
-                <h4 className="tutor-related-video-title">相關影片</h4>
-                <div className="f-align-center show-more-button mouse-pointer-style slide-right-hover">
-                  <span className="me-1">更多</span>
-                  <span className="material-symbols-outlined">
-                    arrow_forward
-                  </span>
+            {relatedVideos.length > 0 && (
+              <div className="related-videos rounded-4 aside-border">
+                <div
+                  className="px-6 f-between-center"
+                  style={{ marginBottom: "22px" }}
+                >
+                  <h4 className="tutor-related-video-title">相關影片</h4>
+                  <div className="f-align-center show-more-button mouse-pointer-style slide-right-hover">
+                    <span className="me-1">更多</span>
+                    <span className="material-symbols-outlined">
+                      arrow_forward
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <ul className="related-videos-list">
-                {relatedVideo?.map((related, index) => (
-                  <li
-                    className="d-flex py-3 py-4 px-6 video-background-color-hover position-relative"
-                    key={index}
-                  >
-                    <NavLink
-                      to={`/video/${related?.id}`}
-                      className="d-flex justify-content-between chapter-item"
+                <ul className="related-videos-list">
+                  {relatedVideos.map((related, index) => (
+                    <li
+                      className="d-flex py-3 py-4 px-6 video-background-color-hover position-relative"
+                      key={index}
                     >
-                      <div className="position-relative me-4">
-                        <img
-                          className="rounded-2 related-video-image"
-                          src={related?.cover_image}
-                          alt="影片縮圖"
-                        />
-                        <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                          {related?.duration}
-                        </span>
-                      </div>
-                      <div className="f-column-between py-2">
-                        <h5 className="related-video-title">{related?.title}</h5>
-                        <div className="f-align-center">
-                          <span className="material-symbols-outlined me-1 author-icon fs-6">
-                            co_present
+                      <NavLink
+                        to={`/video/${related.id}`}
+                        className="d-flex justify-content-between chapter-item"
+                      >
+                        <div className="position-relative me-4">
+                          <img
+                            className="rounded-2 related-video-image"
+                            src={related.cover_image}
+                            alt="影片縮圖"
+                          />
+                          <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
+                            {related.duration}
                           </span>
-                          <span className="me-2 me-md-4">
-                            {related?.Tutor.User.username}
-                          </span>
-                          <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
-                            visibility
-                          </span>
-                          <data
-                            value={related?.view_count}
-                            className="data-view-count fs-7"
-                          >
-                            {Number(related?.view_count).toLocaleString()}
-                          </data>
                         </div>
-                      </div>
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                        <div className="f-column-between py-2">
+                          <h5 className="related-video-title">
+                            {related.title}
+                          </h5>
+                          <div className="f-align-center">
+                            <span className="material-symbols-outlined me-1 author-icon fs-6">
+                              co_present
+                            </span>
+                            <span className="me-2 me-md-4">
+                              {related.Tutor.User.username}
+                            </span>
+                            <span className="view-count me-1 material-symbols-outlined eyes-icon fs-6">
+                              visibility
+                            </span>
+                            <data
+                              value={related.view_count}
+                              className="data-view-count fs-7"
+                            >
+                              {Number(related.view_count).toLocaleString()}
+                            </data>
+                          </div>
+                        </div>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </aside>
         </div>
       </main>

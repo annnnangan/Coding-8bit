@@ -14,16 +14,22 @@ export default function VideoContent({
   paramsVideoId,
 }) {
   const [comments, setComments] = useState([]);
+  const [disableInputComment, setDisableInputComment] = useState(false);
   useEffect(() => {
+    videoUrl === ""
+      ? setDisableInputComment(true)
+      : setDisableInputComment(false);
+
     if (introductionVideoId || paramsVideoId) {
       const getCourseCommentsHandle = async () => {
         try {
           const commentsResult = await courseApi.getCourseComments(
             introductionVideoId || paramsVideoId
           );
+
           setComments(commentsResult);
         } catch (error) {
-          console.error("錯誤!!! 請聯繫系統管理員", error);
+          console.log("getCourseCommentsHandle error", error);
         }
       };
       getCourseCommentsHandle();
@@ -32,15 +38,14 @@ export default function VideoContent({
 
   return (
     <section className="col-lg-7 col-xl-8">
-      <video
-        poster={courseList.cover_image}
-        className="mb-6 w-100 video-show mouse-pointer-style"
-        src={videoUrl}
-        style={{
-          maxHeight: "480px",
-        }}
-        controls
-      ></video>
+      <div className="mb-6 video-container position-relative">
+        <video
+          poster={courseList.cover_image}
+          className="video-show position-absolute w-100 h-100"
+          src={videoUrl ? videoUrl : ""}
+          controls
+        ></video>
+      </div>
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
       <div className="d-flex mb-sm-6 mb-2">
         <div className="f-align-center">
@@ -171,6 +176,7 @@ export default function VideoContent({
               <CommentsSection
                 comments={comments}
                 videoId={introductionVideoId || paramsVideoId}
+                disableInputComment={disableInputComment}
               />
             </div>
           </div>

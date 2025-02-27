@@ -9,7 +9,11 @@ import { countReplies, reduceComments } from "@/utils/countReplies-utils";
 import { getUserData } from "@/utils/slice/authSlice";
 import courseApi from "@/api/courseApi";
 
-export default function CommentsSection({ comments, videoId }) {
+export default function CommentsSection({
+  comments,
+  videoId,
+  disableInputComment,
+}) {
   const [replyText, setReplyText] = useState(""); // 回覆輸入
   const [commentText, setCommentText] = useState(""); // 留言輸入
   const [userComments, setUserComments] = useState([]); // 留言
@@ -24,6 +28,9 @@ export default function CommentsSection({ comments, videoId }) {
   // 定義驗證模式
   const commentSchema = z.object({
     commentText: z.string().min(1, "留言不能為空"),
+  });
+
+  const replySchema = z.object({
     replyText: z.string().min(1, "回覆不能為空"),
   });
 
@@ -40,7 +47,7 @@ export default function CommentsSection({ comments, videoId }) {
 
   const validateReply = (text) => {
     try {
-      commentSchema.parse({ replyText: text });
+      replySchema.parse({ replyText: text });
       setErrors((prev) => ({ ...prev, replyText: null }));
       return true;
     } catch (error) {
@@ -64,8 +71,8 @@ export default function CommentsSection({ comments, videoId }) {
         await courseApi.deleteCourseComments(commentId);
         if (result.isConfirmed) {
           Swal.fire({
-            title: "Deleted!",
-            text: "Your file has been deleted.",
+            title: "成功刪除",
+            text: "已刪除留言",
             icon: "success",
           });
         }
@@ -169,34 +176,38 @@ export default function CommentsSection({ comments, videoId }) {
           />
           <input
             type="text"
-            placeholder="發表留言"
+            placeholder={disableInputComment ? "課程尚未開放" : "留言..."}
             name="user-comment"
             id="user-comment"
             className={`user-comment w-100 py-2 ${
               errors.commentText ? "input-error" : ""
             }`}
+            style={{ cursor: disableInputComment ? "not-allowed" : "" }}
+            disabled={disableInputComment}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
           />
 
-          <div>
-            {!isSending && (
-              <i
-                className="bi bi-send fs-4 p-2 send-icon-color"
-                onClick={() => sendComment()}
-              ></i>
-            )}
-            {isSending && (
-              <div className="p-2">
-                <ReactLonding
-                  type={"spin"}
-                  color={"#645caa"}
-                  height={"1.5rem"}
-                  width={"1.5rem"}
-                />
-              </div>
-            )}
-          </div>
+          {!disableInputComment && (
+            <div>
+              {!isSending && (
+                <i
+                  className="bi bi-send fs-4 p-2 send-icon-color"
+                  onClick={() => sendComment()}
+                ></i>
+              )}
+              {isSending && (
+                <div className="p-2">
+                  <ReactLonding
+                    type={"spin"}
+                    color={"#645caa"}
+                    height={"1.5rem"}
+                    width={"1.5rem"}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <ul className="history-comments">
           {userComments.map((userComment, index) => (
@@ -244,7 +255,7 @@ export default function CommentsSection({ comments, videoId }) {
                       placeholder="回覆留言"
                       name="reply-comment"
                       id="reply-comment"
-                      className={`w-100 reply-comment p-2 ${
+                      className={`w-100 reply-comment p-2 me-2 ${
                         errors.replyText ? "input-error" : ""
                       }`}
                       value={replyText}
@@ -357,4 +368,5 @@ export default function CommentsSection({ comments, videoId }) {
 CommentsSection.propTypes = {
   comments: PropTypes.array,
   videoId: PropTypes.string,
+  disableInputComment: PropTypes.bool,
 };
