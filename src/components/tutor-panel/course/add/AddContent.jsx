@@ -15,6 +15,8 @@ import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
 
+import { categories } from "../../../../data/courses";
+
 export default function AddContent({
   submitApiRequest,
   setLoadingState,
@@ -28,15 +30,6 @@ export default function AddContent({
   const toPrevPage = () => {
     navigate(-1);
   };
-  const categories = [
-    { id: 1, name: "HTML / CSS" },
-    { id: 2, name: "JavaScript" },
-    { id: 3, name: "React" },
-    { id: 4, name: "Vue" },
-    { id: 5, name: "UI / UX" },
-    { id: 6, name: "Python" },
-    { id: 7, name: "Node.js" },
-  ];
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});

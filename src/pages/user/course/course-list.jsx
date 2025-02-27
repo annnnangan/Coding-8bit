@@ -311,7 +311,7 @@ export default function CourseList() {
             <div className="swiper-wrapper">
               {hotCoursesData.map((course) => (
                 <div className="swiper-slide" key={course.id}>
-                  <a href="video-details.html">
+                  <NavLink to={course.video_url}>
                     <div className="hot-course-card card img-hover-enlarge mt-10 mt-lg-12">
                       <div className="img-wrapper rounded">
                         <img
@@ -337,7 +337,7 @@ export default function CourseList() {
                         <span className="me-1">{course.tag}</span>
                       </div>
                     </div>
-                  </a>
+                  </NavLink>
                 </div>
               ))}
             </div>
