@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import DOMPurify from "dompurify";
 
 // import CommentsSection from "./CommentsSection"
 
@@ -81,8 +82,12 @@ export default function VideoContent({ videoUrl, courseList }) {
       <div className="author-content d-flex mb-10">
         <img
           className="author-image rounded-5 me-4"
-          src={courseList.Tutor.User.avatar_url}
-          alt="作者頭像"
+          src={
+            courseList.Tutor.User.avatar_url
+              ? courseList.Tutor.User.avatar_url
+              : "images/icon/user.png"
+          }
+          alt="tutor-avatar-image"
         />
         <div>
           <h2 className="author-name mb-2">{courseList.Tutor.User.username}</h2>
@@ -127,7 +132,11 @@ export default function VideoContent({ videoUrl, courseList }) {
               aria-labelledby="description-tab"
             >
               <div className="ps-5 pt-6">
-                <p>{courseList.description}</p>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(courseList.description),
+                  }}
+                ></p>
               </div>
             </div>
             <div

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { Link, NavLink, useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import courseApi from "@/api/courseApi";
@@ -9,13 +9,16 @@ import Loader from "@/components/common/Loader";
 
 import { categories } from "@/data/courses";
 
-export default function CourseListPage() {
+export default function CourseCategoryPage() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 
   // 依路由決定此頁顯示分類
   const [searchParams] = useSearchParams();
   const video_type = searchParams.get("video_type");
+  const { category } = useParams();
+  // 解析路由，避免某些參數被 "/" 影響
+  const decodedCategory = decodeURIComponent(category);
 
   // 取得課程資料函式
   const [courseList, setCourseList] = useState([]);
@@ -24,11 +27,12 @@ export default function CourseListPage() {
     setLoadingState(true);
     if (video_type !== "topicSeries") {
       try {
-        const result = await courseApi.getAllVideos(
+        const result = await courseApi.getCategoryAllVideos(
           video_type,
           currentPage,
           sortBy,
-          order
+          order,
+          decodedCategory
         );
         setCourseList(result.videos);
         setPageData(result.pagination);
@@ -39,10 +43,11 @@ export default function CourseListPage() {
       }
     } else {
       try {
-        const result = await courseApi.getAllCourses(
+        const result = await courseApi.getCategoryAllCourses(
           currentPage,
           sortBy,
-          order
+          order,
+          decodedCategory
         );
         setCourseList(result.courses);
         setPageData(result.pagination);
@@ -81,7 +86,7 @@ export default function CourseListPage() {
   // 初始化取得資料
   useEffect(() => {
     getCoursesData();
-  }, [sortBy, order]);
+  }, [sortBy, order, category]);
 
   return (
     <>
@@ -128,12 +133,12 @@ export default function CourseListPage() {
               "由專業講師錄製，一支影片會進行一個小技術的教學"}
           </p>
           <div className="category-list f-center mt-10 mt-lg-13">
-            <NavLink
+            <Link
               to={`/course/?video_type=${video_type}`}
-              className="btn btn-brand-03 me-2 mb-4 border border-3 border-brand-03"
+              className="btn btn-outline-brand-03 me-2 mb-4"
             >
               全部
-            </NavLink>
+            </Link>
             {categories.map((category) => (
               <NavLink
                 to={`/course/category/${encodeURIComponent(
@@ -249,7 +254,7 @@ export default function CourseListPage() {
           </div>
         ) : (
           <div className="container text-center py-6 py-11">
-            <h2 className="fw-medium text-brand-03 py-6 py-lg-11">
+            <h2 className="fs-5 fs-lg-2 fw-medium text-brand-03 py-6 py-lg-11">
               此類別目前沒有資料，請選擇其他類別
             </h2>
           </div>

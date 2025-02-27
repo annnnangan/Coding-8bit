@@ -17,12 +17,15 @@ import ResetPassword from "../pages/user/auth/reset-password";
 
 import CourseList from "../pages/user/course/course-list";
 import CourseListPage from "../pages/user/course/course-list-page";
+import CourseCategoryPage from "../pages/user/course/course-category-page";
 import CourseDetailPage from "../pages/user/course/detail-page/course-detail-page";
 import CourseVideoPage from "../pages/user/course/detail-page/course-video-page";
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
 import CustomCourseList from "../pages/user/custom-course/custom-course-list";
-const  AddLearningNeedPage = lazy(() =>import("../pages/user/custom-course/add-learning-need-page"));
+const AddLearningNeedPage = lazy(() =>
+  import("../pages/user/custom-course/add-learning-need-page")
+);
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";
@@ -67,6 +70,7 @@ export const router = createHashRouter([
 
       { path: "course-list", element: <CourseList /> },
       { path: "course", element: <CourseListPage /> },
+      { path: "course/category/:category", element: <CourseCategoryPage /> },
       { path: "course/:id", element: <CourseDetailPage /> },
       { path: "course/:id/chapter/:videoId", element: <CourseVideoPage /> },
       { path: "video/:videoId", element: <SingleVideoPage /> },
@@ -108,9 +112,15 @@ export const router = createHashRouter([
         path: "course/topicSeries/:id/edit",
         element: <TutorManageEditTopicSeries />,
       },
-      { path: "video/:type/add/:courseId/:id", element: <TutorManageAddVideo /> },
+      {
+        path: "video/:type/add/:courseId/:id",
+        element: <TutorManageAddVideo />,
+      },
       { path: "video/:type/add", element: <TutorManageAddVideo /> },
-      { path: "video/:type/edit/:courseId/:id", element: <TutorManageEditVideo /> },
+      {
+        path: "video/:type/edit/:courseId/:id",
+        element: <TutorManageEditVideo />,
+      },
       { path: "video/:type/edit/:id", element: <TutorManageEditVideo /> },
       { path: "profile", element: <TutorProfile /> },
     ],

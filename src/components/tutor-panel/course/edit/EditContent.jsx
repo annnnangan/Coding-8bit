@@ -15,6 +15,8 @@ import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
 
+import { categories } from "../../../../data/courses";
+
 export default function EditContent({
   submitApiRequest,
   setLoadingState,
@@ -28,15 +30,6 @@ export default function EditContent({
   const toPrevPage = () => {
     navigate(-1);
   };
-  const categories = [
-    { id: 1, name: "HTML / CSS" },
-    { id: 2, name: "JavaScript" },
-    { id: 3, name: "React" },
-    { id: 4, name: "Vue" },
-    { id: 5, name: "UI / UX" },
-    { id: 6, name: "Python" },
-    { id: 7, name: "Node.js" },
-  ];
 
   // 取得資料函式
   const { id } = useParams();
