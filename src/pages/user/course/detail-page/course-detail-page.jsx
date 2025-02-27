@@ -26,7 +26,7 @@ export default function CourseDetailPage() {
     },
   });
 
-  // 過濾無章節的課程
+  // 過濾同講師無章節or相同課程
   const filterOtherCourse = (others) => {
     return others.filter(
       (other) =>
@@ -52,7 +52,8 @@ export default function CourseDetailPage() {
       const relatedVideosReault = await courseApi.getFrontTutorVideos({
         category: courseResult.category,
       });
-
+      console.log(relatedVideosReault);
+      
       setCourseList(courseResult);
       setChapter(chapterResult);
       setOtherVideos(filterOtherCourse(otherCourseResult.courses));

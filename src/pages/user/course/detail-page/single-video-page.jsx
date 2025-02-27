@@ -13,7 +13,7 @@ export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
   const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const [loadingState, setLoadingState] = useState(true); // loading
-  const { id, videoId } = useParams(); // 取得影片ID
+  const { videoId } = useParams(); // 取得影片ID
 
   // 取得影片資料
   const [videoData, setVideoData] = useState({
@@ -28,13 +28,13 @@ export default function CourseVideoPage() {
       (other) =>
         other.CourseChapters &&
         other.CourseChapters.length > 0 &&
-        other.id !== id
+        other.id !== videoData.course_id
     );
   };
 
   // 過濾同課程的影片
   const filterRelatedVideo = (relateds) => {
-    return relateds.filter((related) => related.course_id !== id);
+    return relateds.filter((related) => related.course_id !== videoData.course_id);
   };
 
   const getData = async () => {
@@ -47,6 +47,7 @@ export default function CourseVideoPage() {
       const relatedVideosReault = await courseApi.getFrontTutorVideos({
         category: videoData.category,
       });
+      
       setVideoData(videoResult);
       setOtherVideos(filterOtherCourse(otherCourseResult.courses));
       setRelatedVideos(filterRelatedVideo(relatedVideosReault.videos));
