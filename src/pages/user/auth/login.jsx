@@ -41,7 +41,7 @@ export default function Login() {
   const loginCheck = async () => {
     setLoadingState(true);
     try {
-      await authApi.loginCheck;
+      await authApi.loginCheck();
       navigate("/");
     } catch (error) {
       Swal.fire({
@@ -49,6 +49,8 @@ export default function Login() {
         title: "驗證錯誤",
         text: error?.response?.data?.message,
       });
+      document.cookie =
+        "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     } finally {
       setLoadingState(false);
     }
