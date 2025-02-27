@@ -1,19 +1,56 @@
 import PropTypes from "prop-types";
+import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 
-// import CommentsSection from "./CommentsSection"
+import courseApi from "../../../api/courseApi";
 
-export default function VideoContent({ videoUrl, courseList }) {
-  // const [comments, setComments] = useState([]);
+import CommentsSection from "./CommentsSection";
+
+export default function VideoContent({
+  videoUrl,
+  courseList,
+  courseTutor,
+  introductionVideoId,
+  paramsVideoId,
+}) {
+  const [comments, setComments] = useState([]);
+  const [disableInputComment, setDisableInputComment] = useState(false);
+  const getCourseCommentsHandle = async () => {
+    try {
+      const commentsResult = await courseApi.getCourseComments(
+        introductionVideoId || paramsVideoId
+      );
+
+      setComments(commentsResult);
+    } catch (error) {
+      console.log("getCourseCommentsHandle error", error);
+    }
+  };
+
+  useEffect(() => {
+    videoUrl === ""
+      ? setDisableInputComment(true)
+      : setDisableInputComment(false);
+
+    console.log("introductionVideoId", introductionVideoId);
+    console.log("paramsVideoId", paramsVideoId);
+
+    if (introductionVideoId || paramsVideoId) {
+      getCourseCommentsHandle();
+    }
+  }, [introductionVideoId || paramsVideoId]);
 
   return (
     <section className="col-lg-7 col-xl-8">
-      <video
-        poster={courseList.cover_image}
-        className="mb-6 w-100 video-show mouse-pointer-style"
-        src={videoUrl}
-        controls
-      ></video>
+      <div className="mb-6 video-container position-relative">
+        <video
+          poster={courseList.cover_image}
+          className="video-show position-absolute w-100 h-100"
+          src={videoUrl ? videoUrl : ""}
+          controls
+        ></video>
+      </div>
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
       <div className="d-flex mb-sm-6 mb-2">
         <div className="f-align-center">
@@ -90,7 +127,11 @@ export default function VideoContent({ videoUrl, courseList }) {
           alt="tutor-avatar-image"
         />
         <div>
-          <h2 className="author-name mb-2">{courseList.Tutor.User.username}</h2>
+          <NavLink to={`/tutor-info/${courseTutor}`}>
+            <h2 className="author-name mb-2">
+              {courseList.Tutor.User.username}
+            </h2>
+          </NavLink>
           <span className="author-info fs-7">{courseList.Tutor.about}</span>
         </div>
       </div>
@@ -145,7 +186,11 @@ export default function VideoContent({ videoUrl, courseList }) {
               role="tabpanel"
               aria-labelledby="profile-tab"
             >
-              {/* <CommentsSection/> */}
+              <CommentsSection
+                comments={comments}
+                videoId={introductionVideoId || paramsVideoId}
+                disableInputComment={disableInputComment}
+              />
             </div>
           </div>
         </nav>
@@ -160,9 +205,9 @@ VideoContent.propTypes = {
       User: PropTypes.shape({
         username: PropTypes.string,
         avatar_url: PropTypes.string,
-      }).isRequired,
+      }),
       about: PropTypes.string,
-    }).isRequired,
+    }),
     duration: PropTypes.number,
     view_count: PropTypes.number,
     rating: PropTypes.string,
@@ -171,6 +216,9 @@ VideoContent.propTypes = {
     category: PropTypes.string,
     is_favorite: PropTypes.string,
     is_reviewed: PropTypes.string,
-  }).isRequired,
+  }),
   videoUrl: PropTypes.string,
+  introductionVideoId: PropTypes.string,
+  courseTutor: PropTypes.string,
+  paramsVideoId: PropTypes.string,
 };

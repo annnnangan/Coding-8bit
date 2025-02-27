@@ -2,6 +2,9 @@ import axios from 'axios';
 
 import apiClient from './apiClient';
 
+// import { store } from '../utils/store';
+// import { setUser } from '../utils/slice/userInfoSlice';
+
 // 驗證身分
 const loginCheck = async () => {
   await apiClient.get(`/auth/check`);
@@ -20,7 +23,7 @@ const login = async (formData) => {
   const { token } = response.data;
   document.cookie = `authToken=${token}; path=/`;
   axios.defaults.headers.common.Authorization = token;
-  return ;
+  return;
 };
 
 // 啟用帳號
