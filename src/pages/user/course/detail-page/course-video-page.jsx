@@ -38,8 +38,8 @@ export default function CourseVideoPage() {
   };
 
   //  過濾同課程的影片
-  const filterRelatedVideo = (relateds) => {
-    return relateds.filter((related) => related.course_id !== id);
+  const filterRelatedVideo = (relatedVideo) => {
+    return relatedVideo.filter((related) => related.course_id !== id);
   };
 
   // 初始化取得資料
@@ -53,14 +53,14 @@ export default function CourseVideoPage() {
         const otherCourseResult = await courseApi.getFrontTutorCourses({
           tutorId: videoResult.tutor_id,
         });
-        const relatedVideosReault = await courseApi.getFrontTutorVideos({
+        const relatedVideosResult = await courseApi.getFrontTutorVideos({
           category: videoData.category,
         });
 
         setVideoData({ ...courseResult, ...videoResult });
         setChapter(chapterResult);
         setOtherVideos(filterOtherCourse(otherCourseResult.courses));
-        setRelatedVideos(filterRelatedVideo(relatedVideosReault.videos));
+        setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
       } catch (error) {
         console.log("錯誤", error);
       } finally {

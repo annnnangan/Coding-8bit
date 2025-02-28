@@ -32,7 +32,8 @@ export default function CourseCategoryPage() {
           currentPage,
           sortBy,
           order,
-          decodedCategory
+          decodedCategory,
+          search
         );
         setCourseList(result.videos);
         setPageData(result.pagination);
@@ -47,7 +48,8 @@ export default function CourseCategoryPage() {
           currentPage,
           sortBy,
           order,
-          decodedCategory
+          decodedCategory,
+          search
         );
         setCourseList(result.courses);
         setPageData(result.pagination);
@@ -60,8 +62,7 @@ export default function CourseCategoryPage() {
   };
 
   // 搜尋與篩選功能
-  const [ascending] = useState(false);
-  const [search, setSearch] = useState("GPT");
+  const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("rating");
   const [order, setOrder] = useState("DESC");
 
@@ -86,7 +87,7 @@ export default function CourseCategoryPage() {
   // 初始化取得資料
   useEffect(() => {
     getCoursesData();
-  }, [sortBy, order, category]);
+  }, [sortBy, order, category, search]);
 
   return (
     <>
@@ -162,7 +163,7 @@ export default function CourseCategoryPage() {
                   type="search"
                   className="form-control nav-search-desktop border border-brand-03 border-3"
                   placeholder="搜尋課程"
-                  onKeyPress={handleSearch}
+                  onKeyDown={handleSearch}
                 />
                 <span
                   className="material-symbols-outlined text-gray-03 position-absolute ps-4"
