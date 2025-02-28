@@ -52,7 +52,6 @@ export default function CourseDetailPage() {
       const relatedVideosReault = await courseApi.getFrontTutorVideos({
         category: courseResult.category,
       });
-      console.log(relatedVideosReault);
       
       setCourseList(courseResult);
       setChapter(chapterResult);
