@@ -17,7 +17,7 @@ export default function ChatRoom() {
           aria-label="Close"
         ></button>
       </div>
-      <div className="offcanvas-body position-relative">
+      <div className="offcanvas-body position-relative px-4 px-lg-8">
         <div className="d-flex align-items-center pe-8">
           <div className="flex-shrink-0 align-self-start">
             <img

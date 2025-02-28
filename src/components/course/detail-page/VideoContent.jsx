@@ -40,6 +40,7 @@ export default function VideoContent({
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
+  
 
   return (
     <section className="col-lg-7 col-xl-8">

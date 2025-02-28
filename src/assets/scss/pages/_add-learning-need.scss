@@ -2,7 +2,7 @@
   padding: 40px 0;
 
   @include lg-pc {
-    padding: 32px 0 80px 0;
+    padding: 32px 12px 80px 12px;
   }
 
   h1, h2 {
@@ -43,6 +43,7 @@
     padding: 32px;
 
     @include xl-pc{
+      border-radius: 0;
       justify-content: flex-end;
     }
 
@@ -98,7 +99,7 @@
 .ql-container {
   border-radius: 0 0 16px 16px; 
   border: 1px solid $gray-03;
-  min-height: 100px;
+  min-height: 200px;
 }
 .ql-toolbar {
   border-radius: 16px 16px 0 0;

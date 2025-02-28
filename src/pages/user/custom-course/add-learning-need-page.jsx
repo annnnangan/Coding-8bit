@@ -1,43 +1,11 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
-import { useNavigate } from "react-router-dom";
 
-const ReactQuill = lazy(() => import("react-quill-new"));
+import AddLearningNeedRobot from "@/components/custom-course/addLearningNeedRobot";
+import ChatRoom from "@/components/custom-course/ChatRoom";
 
-import AddLearningNeedRobot from "../../../components/custom-course/addLearningNeedRobot";
-import ChatRoom from "../../../components/custom-course/ChatRoom";
-import Loader from "../../../components/common/Loader";
+import LearningNeedForm from "../../../components/custom-course/LearningNeedForm";
 
 export default function AddLearningNeedPage() {
-  // ReactQuill 文字編輯器
-  const [value, setValue] = useState("");
-  const modules = useMemo(
-    () => ({
-      toolbar: [
-        [{ font: [] }],
-        ["bold", "italic", "underline"],
-        ["link", "image", "video"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        [{ align: [] }],
-        ["blockquote", "code-block"],
-        ["clean"],
-      ],
-    }),
-    []
-  );
-
-  // 返回上一頁
-  const navigate = useNavigate();
-  const toPrevPage = () => {
-    navigate(-1);
-  };
-
-  const [editorLoaded, setEditorLoaded] = useState(false);
-
-  useEffect(() => {
-    setEditorLoaded(true);
-  }, []);
-
   return (
     <>
       <Helmet>
@@ -80,7 +48,7 @@ export default function AddLearningNeedPage() {
                     <li>
                       <h3>1. 在標題寫上您使用的程式語言，並簡述您的學習需求</h3>
                       <p className="fs-7 ps-5 mt-2">
-                        開頭寫上程式語言，再用簡短的一句話說明您希望解決的問題或達成的目標。
+                        開頭寫上程式語言，再用簡短的一句話說明您希望解決的問題或達成的目標。(例如：CSS 毛玻璃樣式)
                       </p>
                     </li>
                     <li className="mt-4 mt-lg-5">
@@ -92,7 +60,7 @@ export default function AddLearningNeedPage() {
                     <li className="mt-4 mt-lg-5">
                       <h3>3. 填入關鍵字</h3>
                       <p className="fs-7 ps-5 mt-2">
-                        填寫幾個關鍵字，讓大家更容易看見這個需求。關鍵字與關鍵字之間請以半形逗號隔開。
+                        填寫幾個關鍵字，讓大家更容易看見這個需求。關鍵字與關鍵字之間請以半形逗號隔開。(例如：React, 前端開發, 效能優化, Hooks)
                       </p>
                     </li>
                     <li className="mt-4 mt-lg-5">
@@ -132,235 +100,7 @@ export default function AddLearningNeedPage() {
             </div>
 
             <div className="col-lg-6">
-              <div className="learning-need-form-wrap card-column">
-                <h1>提出您的學習需求</h1>
-                <form className="mt-6 mt-lg-8">
-                  <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
-                  <div className="image-upload-wrapper mt-1">
-                    <input
-                      type="file"
-                      accept=".jpg,.jpeg,.png"
-                      className="form-control p-0"
-                      id="image"
-                    />
-                    <label
-                      htmlFor="image"
-                      className="form-label image-upload-label mb-0"
-                    >
-                      <span className="material-symbols-outlined mb-2">
-                        imagesmode
-                      </span>
-                      請上傳圖片，讓其他人更容易理解您的需求
-                    </label>
-
-                    {/* 上傳圖片後的樣子 */}
-                    <button
-                      type="button"
-                      className="img-wrapper border-0 p-0 d-none"
-                    >
-                      <img
-                        src="images/course/course-4.png"
-                        alt="learning-need-image"
-                        className="w-100 object-fit"
-                      />
-                      <span className="material-symbols-outlined delete-icon">
-                        delete
-                      </span>
-                    </button>
-                  </div>
-
-                  <div className="mt-6 mt-lg-8">
-                    <label htmlFor="title" className="form-label">
-                      學習需求標題
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="title"
-                      placeholder="ex. CSS 毛玻璃製作效果"
-                    />
-                  </div>
-
-                  <div className="mt-6 mt-lg-8">
-                    <div className="row">
-                      <div className="col">
-                        <label className="form-label">程式語言類別</label>
-                        <div className="dropdown">
-                          <button
-                            type="button"
-                            className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          >
-                            請選擇類別
-                            <span className="material-symbols-outlined position-absolute end-0 pe-3">
-                              keyboard_arrow_down
-                            </span>
-                          </button>
-                          <ul className="dropdown-menu w-100 mt-1">
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                前端語言
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                後端語言
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                全端語言
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                其他
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div className="col">
-                        <label className="form-label" htmlFor="tech_stack">
-                          開發工具與語言
-                        </label>
-                        <div className="dropdown">
-                          <button
-                            type="button"
-                            className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4 position-relative"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                          >
-                            請選擇類別
-                            <span className="material-symbols-outlined position-absolute end-0 pe-3">
-                              keyboard_arrow_down
-                            </span>
-                          </button>
-                          <ul className="dropdown-menu w-100 mt-1">
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                Html
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                CSS
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                JavaScript
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                React
-                              </button>
-                            </li>
-                            <li>
-                              <button type="button" className="dropdown-item">
-                                Vue
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 mt-lg-8">
-                    <label className="form-label" htmlFor="level">
-                      您的學習等級
-                    </label>
-                    <div className="dropdown">
-                      <button
-                        type="button"
-                        className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        請選擇學習等級
-                        <span className="material-symbols-outlined position-absolute end-0 pe-3">
-                          keyboard_arrow_down
-                        </span>
-                      </button>
-                      <ul className="dropdown-menu w-100 mt-1">
-                        <li>
-                          <button type="button" className="dropdown-item">
-                            Lv.1 - 什麼都不會的小萌新
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 mt-lg-8">
-                    <label htmlFor="searchKeywords" className="form-label">
-                      關鍵字 (請用半型逗號隔開)
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="searchKeywords"
-                      placeholder="ex. React, 前端開發, 效能優化, Hooks"
-                    />
-                  </div>
-
-                  <div className="pb-8 mt-6 mt-lg-8">
-                    <label htmlFor="content" className="form-label">
-                      學習需求描述
-                    </label>
-                    {editorLoaded && (
-                      <Suspense fallback={<Loader />}>
-                        <ReactQuill
-                          value={value}
-                          onChange={setValue}
-                          placeholder="請描述您的學習需求"
-                          modules={modules}
-                        />
-                      </Suspense>
-                    )}
-                  </div>
-                </form>
-
-                {/*web button wrap */}
-                <div className="btn-container text-end mt-auto d-none d-lg-block">
-                  <button
-                    type="submit"
-                    className="btn btn-outline-brand-03 border-3 w-25"
-                    style={{ padding: "9px 24px" }}
-                    onClick={toPrevPage}
-                  >
-                    取消
-                  </button>
-                  <button type="submit" className="btn btn-brand-03 ms-4">
-                    提出學習需求
-                  </button>
-                </div>
-
-                {/* media button wrap */}
-                <div className="text-end fixed-bottom bg-white shadow d-lg-none py-4">
-                  <div className="container">
-                    <div className="d-flex">
-                      <button
-                        type="submit"
-                        className="btn btn-outline-brand-03 w-100"
-                        onClick={toPrevPage}
-                      >
-                        取消
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-brand-03 w-100 ms-4"
-                      >
-                        提出學習需求
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <LearningNeedForm />
             </div>
           </div>
         </div>
