@@ -54,8 +54,6 @@ const postCourseComments = async (id, data) => {
   return response.data.data;
 };
 
-
-
 // 刪除個人課程的留言
 const deleteCourseComments = async (id) => {
   const response = await apiClient.delete(`/video/comments/${id}`);
