@@ -195,8 +195,6 @@
     position: relative;
     cursor: grab;
     @include mobile {
-      //   width: 90%;
-      // padding: 40px 0;
       margin: auto;
     }
 
@@ -572,10 +570,6 @@
   @include pad {
     .banner {
       padding: 20px 0;
-
-      // .banner-text {
-      //   display: none;
-      // }
     }
 
     .footer-toggle {
@@ -587,10 +581,6 @@
   body.footer-hidden & {
     @include pad {
       transform: translateY(100%);
-
-      // .footer-toggle {
-      //   transform: translate(-50%, -100%) rotate(180deg);
-      // }
     }
   }
 }
@@ -610,10 +600,8 @@
 
 .custom-modal {
   .modal-dialog {
-    // max-width: 95%;
     height: 100vh;
     margin: auto;
-    // margin: 2.5vh auto;
   }
 
   .modal-content {
