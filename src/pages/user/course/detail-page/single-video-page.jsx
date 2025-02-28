@@ -33,8 +33,8 @@ export default function CourseVideoPage() {
   };
 
   // 過濾同課程的影片
-  const filterRelatedVideo = (relateds) => {
-    return relateds.filter((related) => related.course_id !== videoData.course_id);
+  const filterRelatedVideo = (relatedVideo) => {
+    return relatedVideo.filter((related) => related.course_id !== videoData.course_id);
   };
 
   const getData = async () => {
@@ -44,13 +44,13 @@ export default function CourseVideoPage() {
       const otherCourseResult = await courseApi.getFrontTutorCourses({
         tutorId: videoResult.tutor_id,
       });
-      const relatedVideosReault = await courseApi.getFrontTutorVideos({
+      const relatedVideosResult = await courseApi.getFrontTutorVideos({
         category: videoData.category,
       });
-      
+
       setVideoData(videoResult);
       setOtherVideos(filterOtherCourse(otherCourseResult.courses));
-      setRelatedVideos(filterRelatedVideo(relatedVideosReault.videos));
+      setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -174,7 +174,7 @@ export default function CourseVideoPage() {
                             alt="影片縮圖"
                           />
                           <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                            {related.duration}
+                            {convertSecondsToTime(related.duration)}
                           </span>
                         </div>
                         <div className="f-column-between py-2">

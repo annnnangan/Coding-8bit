@@ -33,14 +33,10 @@ export default function VideoContent({
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
 
-    console.log("introductionVideoId", introductionVideoId);
-    console.log("paramsVideoId", paramsVideoId);
-
     if (introductionVideoId || paramsVideoId) {
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
-  
 
   return (
     <section className="col-lg-7 col-xl-8">
@@ -133,7 +129,7 @@ export default function VideoContent({
               {courseList.Tutor.User.username}
             </h2>
           </NavLink>
-          <span className="author-info fs-7">{courseList.Tutor.about}</span>
+          <span className="author-info fs-7">{courseList.Tutor.slogan}</span>
         </div>
       </div>
       <div>
@@ -207,7 +203,7 @@ VideoContent.propTypes = {
         username: PropTypes.string,
         avatar_url: PropTypes.string,
       }),
-      about: PropTypes.string,
+      slogan: PropTypes.string,
     }),
     duration: PropTypes.number,
     view_count: PropTypes.number,
