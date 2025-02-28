@@ -3,9 +3,16 @@ import PropTypes from "prop-types";
 
 import { getDayOfWeekFromStringDate, formatHour, formatDate, removeYearFromDate } from "@/utils/timeFormatted-utils";
 
-export default function Timetable({ availability, weekOffset, toNextWeek, toPrevWeek, isLoading }) {
+export default function Timetable({ availability, weekOffset, toNextWeek, toPrevWeek, isLoading, handleBookingTimeslotsSelect, selectedBookingTimeslots, isModal, openBookingModal }) {
   const MAX_VISIBLE_TIMES = 7; // Default number of time slots to show
   const [showAll, setShowAll] = useState(false); // Single toggle for all dates
+
+  const handleClick = (date, hour) => {
+    handleBookingTimeslotsSelect(date, hour);
+    if (!isModal) {
+      openBookingModal();
+    }
+  };
 
   return (
     <>
@@ -39,18 +46,26 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
 
         <div className="row row-cols-7 available-date-time g-0 flex-nowrap">
           {availability.map((item) => {
+            const availableTimes = item.hours.filter((time) => time.available); // Only available times
+
             return (
               <div className="col" key={item.date}>
-                <div className={`date f-center flex-column ${item.hours.length === 0 && "disabled"}`}>
+                <div className={`date f-center flex-column${availableTimes.length === 0 ? " disabled" : ""}`}>
                   <h6>{getDayOfWeekFromStringDate(item.date)}</h6>
                   <p>{removeYearFromDate(item.date)}</p>
                 </div>
 
                 <div>
-                  <ul className="times f-center flex-column">
-                    {item.hours.slice(0, showAll ? item.hours.length : MAX_VISIBLE_TIMES).map((time) => (
-                      <li className="time" key={`${item.date}-${time}`}>
-                        {formatHour(time)}
+                  <ul className="booking-times f-center flex-column">
+                    {availableTimes.slice(0, showAll ? availableTimes.length : MAX_VISIBLE_TIMES).map((time) => (
+                      <li
+                        className={`booking-time${time.isBooked ? " disabled" : ""}${
+                          selectedBookingTimeslots?.date === item.date && selectedBookingTimeslots?.hours?.includes(time.hour) ? " selected" : ""
+                        }`}
+                        key={`${item.date}-${time.hour}`}
+                        onClick={() => handleClick(item.date, time.hour)}
+                      >
+                        {formatHour(time.hour)}
                       </li>
                     ))}
                   </ul>
@@ -67,7 +82,7 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
           <div className="f-center">
             {!showAll && <div className="see-more"></div>}
             <div className="d-flex align-items-center py-3 see-more-button" role="button" onClick={() => setShowAll(!showAll)}>
-              <p className="text-brand-03">{showAll ? "查看更少" : "查看更多"}</p>
+              <p className="text-brand-03 fs-7 fs-md-6">{showAll ? "查看更少" : "查看更多"}</p>
               <span className="material-symbols-outlined icon-fill text-brand-03 align-middle">{showAll ? "keyboard_arrow_up" : "expand_more"}</span>
             </div>
           </div>
@@ -93,4 +108,9 @@ Timetable.propTypes = {
   toNextWeek: PropTypes.func.isRequired,
   toPrevWeek: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
+  handleBookingTimeslotsSelect: PropTypes.func,
+  selectedBookingTimeslots: PropTypes.shape({
+    date: PropTypes.string,
+    hours: PropTypes.arrayOf(PropTypes.number),
+  }),
 };
