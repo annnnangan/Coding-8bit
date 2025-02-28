@@ -19,7 +19,6 @@ import { categories } from "../../../../data/courses";
 export default function AddContent({
   submitApiRequest,
   setLoadingState,
-  setIsAddingChapter,
   video_url,
   video_duration,
   type,
@@ -146,7 +145,6 @@ export default function AddContent({
         const requestData = { ...data, ...temData, is_free: false };
 
         await submitApiRequest(courseApi.addCourse, requestData);
-        setIsAddingChapter(true);
       } else {
         // 客製化需求影片和實用技術短影片的新增影片
         const { tutor_id } = await userApi.getUserData();
@@ -173,7 +171,7 @@ export default function AddContent({
 
   return (
     <div className={type === "topicSeries" ? "col-lg-8" : "col-xxl-6"}>
-      <div className="course-content-wrap card-column pe-10">
+      <div className="course-content-wrap card-column pe-xxl-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
           <div className="image-upload-wrapper mt-1">
@@ -367,7 +365,6 @@ export default function AddContent({
 AddContent.propTypes = {
   submitApiRequest: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
-  setIsAddingChapter: PropTypes.func,
   video_url: PropTypes.string,
   video_duration: PropTypes.number,
   type: PropTypes.string,

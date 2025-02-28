@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 export default function Pagination({ pageData, getData, type }) {
   // 切換頁碼
   const changePage = (page) => {
-    if (!type) {
+    if (type) {
       getData(type, page);
     } else {
       getData(page);
@@ -36,7 +36,13 @@ export default function Pagination({ pageData, getData, type }) {
           <button
             className="page-link"
             type="button"
-            onClick={() => getData(i + 1)}
+            onClick={() => {
+              if (type) {
+                getData(type, i + 1);
+              } else {
+                getData(i + 1);
+              }
+            }}
           >
             {i + 1}
           </button>
