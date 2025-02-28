@@ -36,7 +36,7 @@ const getCourseComments = async (id) => {
   return response.data.data;
 };
 
-// 講師預約 - 取得單一講師2條影片影片
+// 講師預約 - 取得單一講師6條影片影片
 const getTutorVideosInBooking = async (tutorId = "", page = 1, sortBy = "rating", order = "DESC", limit = 6) => {
   const response = await apiClient.get(`/video?tutor_id=${tutorId}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
   return response.data.data;

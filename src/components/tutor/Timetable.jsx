@@ -39,20 +39,18 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
 
         <div className="row row-cols-7 available-date-time g-0 flex-nowrap">
           {availability.map((item) => {
-            const availableTimes = item.hours.filter((time) => time.available); // Only available times
-
             return (
               <div className="col" key={item.date}>
-                <div className={`date f-center flex-column ${availableTimes.length === 0 && "disabled"}`}>
+                <div className={`date f-center flex-column ${item.hours.length === 0 && "disabled"}`}>
                   <h6>{getDayOfWeekFromStringDate(item.date)}</h6>
                   <p>{removeYearFromDate(item.date)}</p>
                 </div>
 
                 <div>
                   <ul className="times f-center flex-column">
-                    {availableTimes.slice(0, showAll ? availableTimes.length : MAX_VISIBLE_TIMES).map((time) => (
-                      <li className="time" key={`${item.date}-${time.hour}`}>
-                        {formatHour(time.hour)}
+                    {item.hours.slice(0, showAll ? item.hours.length : MAX_VISIBLE_TIMES).map((time) => (
+                      <li className="time" key={`${item.date}-${time}`}>
+                        {formatHour(time)}
                       </li>
                     ))}
                   </ul>

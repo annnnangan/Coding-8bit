@@ -30,8 +30,9 @@ export default function TutorBooking() {
   const [loadingState, setLoadingState] = useState(true);
   // 講師基本資料的useState
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
-    name: "API裡面沒有名字",
+    name: "不知道叫什麼名字好",
     avatar_url: "images/icon/default-tutor-icon.png",
+    slogan: "",
     about: "",
     hourly_rate: 0,
     expertise: "",
@@ -95,6 +96,8 @@ export default function TutorBooking() {
 
       // 檢查資料是否已經儲在useState裡面
       const existingData = accumulateAvailableTime.find((data) => data.baseDate === baseDate);
+
+      console.log(accumulateAvailableTime);
 
       // 如果資料已存在，我們直接拿，不用再fetch API
       if (existingData) {
@@ -194,20 +197,6 @@ export default function TutorBooking() {
       </Helmet>
       {/* {loadingState && <Loader />} */}
       <div className="tutor-booking">
-        {/*  Mobile Top Cover */}
-        <div className="position-relative d-lg-none">
-          <div className="img-wrapper img-hover-enlarge">
-            <img src="images/course/course-2-high-res.jpg" className="w-100" alt="tutor cover" style={{ maxHeight: "300px" }} />
-          </div>
-
-          <span className="material-symbols-outlined icon-fill text-white position-absolute top-50 start-50 translate-middle" style={{ fontSize: "56px" }}>
-            play_circle
-          </span>
-
-          <span className="favorite material-symbols-outlined icon-fill p-2 rounded-circle align-middle" role="button" style={{ backgroundColor: "#1e1e1e66" }} data-favorite="true">
-            favorite
-          </span>
-        </div>
         {/*  Main Content */}
         <main className="container py-lg-13 py-7">
           <div className="row">
@@ -223,14 +212,16 @@ export default function TutorBooking() {
                   </div>
                   <div className="flex-grow-1">
                     <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.name}</h2>
-                    <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.title}</p>
+                    <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.slogan}</p>
                   </div>
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
-                  <a href="#" className="tag tag-brand-02 fs-8 me-3">
-                    {tutorBasicInfo.expertise}
-                  </a>
+                  {tutorBasicInfo.expertise.split(",").map((item) => (
+                    <p href="#" className="tag tag-brand-02 fs-8 me-3" key={item}>
+                      {item}
+                    </p>
+                  ))}
                 </div>
                 {/*  tab  */}
                 <div className="section-component">
@@ -353,15 +344,6 @@ export default function TutorBooking() {
             {/* Desktop right CTA card */}
             <div className="col-lg-4 d-lg-block d-none">
               <div className="desktop-cta-card card p-lg-6 p-4 sticky-top">
-                <div className="position-relative mb-lg-5 mb-4">
-                  <div className="img-wrapper img-hover-enlarge rounded-2">
-                    <img src="images/course/course-2.png" className="card-img-top rounded-2 object-fit-cover" alt="course-2" />
-                  </div>
-
-                  <span className="favorite material-symbols-outlined icon-fill p-2 rounded-circle align-middle" role="button" style={{ backgroundColor: "#1e1e1e66" }} data-favorite="true">
-                    favorite
-                  </span>
-                </div>
                 <div className="card-body p-0">
                   <div className="mb-lg-6 mb-5">
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
