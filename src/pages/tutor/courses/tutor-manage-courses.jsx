@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
 
 import Swal from "sweetalert2";
 
@@ -16,6 +17,9 @@ import Pagination from "@/components/layout/Pagination";
 export default function TutorManageCourses() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
+
+  // auth
+  const { isAuth } = useSelector((state) => state.auth);
 
   const courseCategory = [
     {
@@ -138,10 +142,12 @@ export default function TutorManageCourses() {
 
   // 初始化 - 取得資料
   useEffect(() => {
-    getData("topicSeries");
-    getData("customLearning");
-    getData("freeTipShorts");
-  }, []);
+    if (isAuth) {
+      getData("topicSeries");
+      getData("customLearning");
+      getData("freeTipShorts");
+    }
+  }, [isAuth]);
 
   return (
     <>

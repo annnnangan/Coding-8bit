@@ -15,22 +15,35 @@ export default function Footer() {
             </picture>
           </NavLink>
           <ul className="mt-4">
-            <li className="f-align-center">
-              <span className="material-symbols-outlined fs-6">call</span>
-              <NavLink
-                href="tel:+0212345678"
-                className="fs-7 underline-hover lh-sm ms-2"
-              >
-                (02) 1234-5678
-              </NavLink>
-            </li>
-            <li className="f-align-center mt-2">
-              <span className="material-symbols-outlined fs-6">schedule</span>
-              <p className="fs-7 lh-sm ms-2">MON - FRI : 8:30 am - 17:30 pm</p>
-            </li>
             <li className="f-align-center mt-2">
               <p className="fs-7 lh-sm">本網站僅供作品參考，並非真實營運販售</p>
             </li>
+            <li className="f-align-center mt-2">
+              <p className="fs-7 lh-sm">
+                Copyright@2025 Coding∞bit 保留所有權利·
+                <a
+                  href="https://docs.google.com/document/d/11MltF-CDpGn3woeAfoXpE78hCRAyr65Qx2CQSU7fnsU/"
+                  target="_blank"
+                  className="underline-hover d-inline"
+                >
+                  隱私政策
+                </a>{" "}
+                |{" "}
+                <a
+                  href="https://docs.google.com/document/d/1DiFxtghhlb4nrm0IiF20nb118_-mGDtHRju0z7bmv7g/"
+                  target="_blank"
+                  className="underline-hover d-inline"
+                >
+                  使用條款
+                </a>
+              </p>
+            </li>
+            {/* <li className="f-align-center mt-2">
+              <p className="fs-7 lh-sm">
+                本網站採用 reCAPTCHA 保護機制，並遵守 Google 隱私權政策 及
+                服務條款
+              </p>
+            </li> */}
           </ul>
         </div>
         <div className="d-flex flex-grow-1 mt-8 mt-lg-0">

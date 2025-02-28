@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { Link, NavLink, useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import courseApi from "@/api/courseApi";
@@ -9,14 +9,16 @@ import Loader from "@/components/common/Loader";
 
 import { categories } from "@/data/courses";
 
-export default function CourseListPage() {
+export default function CourseCategoryPage() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 
   // 依路由決定此頁顯示分類
   const [searchParams] = useSearchParams();
   const video_type = searchParams.get("video_type");
-  const parmSearch = searchParams.get("search");
+  const { category } = useParams();
+  // 解析路由，避免某些參數被 "/" 影響
+  const decodedCategory = decodeURIComponent(category);
 
   // 取得課程資料函式
   const [courseList, setCourseList] = useState([]);
@@ -25,11 +27,12 @@ export default function CourseListPage() {
     setLoadingState(true);
     if (video_type !== "topicSeries") {
       try {
-        const result = await courseApi.getAllVideos(
+        const result = await courseApi.getCategoryAllVideos(
           video_type,
           currentPage,
           sortBy,
           order,
+          decodedCategory,
           search
         );
         setCourseList(result.videos);
@@ -41,10 +44,11 @@ export default function CourseListPage() {
       }
     } else {
       try {
-        const result = await courseApi.getAllCourses(
+        const result = await courseApi.getCategoryAllCourses(
           currentPage,
           sortBy,
           order,
+          decodedCategory,
           search
         );
         setCourseList(result.courses);
@@ -58,14 +62,13 @@ export default function CourseListPage() {
   };
 
   // 搜尋與篩選功能
+  const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("rating");
   const [order, setOrder] = useState("DESC");
 
-  const [search, setSearch] = useState(parmSearch || "");
   const handleSearch = (e) => {
     if (e.key === "Enter") {
-      const sanitizedSearch = e.target.value.trim();
-      setSearch(sanitizedSearch);
+      setSearch(e.target.value);
     }
   };
 
@@ -81,15 +84,10 @@ export default function CourseListPage() {
     pageTitle += "課程影片一覽";
   }
 
-  // 監聽 `searchParams` 變化，並更新 `search`
-  useEffect(() => {
-    setSearch(parmSearch || "");
-  }, [parmSearch]);
-
-  // 監聽變化戳取得資料 API
+  // 初始化取得資料
   useEffect(() => {
     getCoursesData();
-  }, [search, sortBy, order]);
+  }, [sortBy, order, category, search]);
 
   return (
     <>
@@ -136,12 +134,12 @@ export default function CourseListPage() {
               "由專業講師錄製，一支影片會進行一個小技術的教學"}
           </p>
           <div className="category-list f-center mt-10 mt-lg-13">
-            <NavLink
+            <Link
               to={`/course/?video_type=${video_type}`}
-              className="btn btn-brand-03 me-2 mb-4 border border-3 border-brand-03"
+              className="btn btn-outline-brand-03 me-2 mb-4"
             >
               全部
-            </NavLink>
+            </Link>
             {categories.map((category) => (
               <NavLink
                 to={`/course/category/${encodeURIComponent(
@@ -157,115 +155,111 @@ export default function CourseListPage() {
         </div>
       </header>
       <main className="topicSeries-course-section wrap">
-        <div className="container">
-          <div className="control-group f-end-center">
-            <div className="position-relative f-align-center d-flex me-2 search-tutor">
-              <input
-                type="search"
-                className="form-control nav-search-desktop border border-brand-03 border-3"
-                placeholder="搜尋課程"
-                onKeyDown={handleSearch}
-              />
-              <span
-                className="material-symbols-outlined text-gray-03 position-absolute ps-4"
-                style={{ width: "20px", height: "20px" }}
-              >
-                search
-              </span>
-            </div>
-
-            <div className="sort">
-              <button
-                type="button"
-                className="btn btn-outline-brand-03 dropdown-toggle"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {sortBy === "view_count" && "排序方式(最熱門)"}
-                {sortBy === "rating" && "排序方式(最高評價)"}
-                {sortBy === "created_at" &&
-                  order !== "ASC" &&
-                  "建立時間(最新到最舊)"}
-                {sortBy === "created_at" &&
-                  order === "ASC" &&
-                  "建立時間(最舊到最新)"}
-              </button>
-
-              <ul className="dropdown-menu dropdown-menu-end">
-                <li>
-                  <button
-                    type="button"
-                    className="dropdown-item"
-                    onClick={() => {
-                      setSortBy("view_count");
-                      setOrder("DESC");
-                    }}
-                  >
-                    最熱門
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="dropdown-item"
-                    onClick={() => {
-                      setSortBy("rating");
-                      setOrder("DESC");
-                    }}
-                  >
-                    最高評價
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="dropdown-item"
-                    onClick={() => {
-                      setSortBy("created_at");
-                      setOrder("DESC");
-                    }}
-                  >
-                    建立時間(最新到最舊)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="dropdown-item"
-                    onClick={() => {
-                      setSortBy("created_at");
-                      setOrder("ASC");
-                    }}
-                  >
-                    建立時間(最舊到最新)
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-          {courseList.length !== 0 ? (
-            <>
-              <div className="row topicSeriesCourse-card-wrap mt-6 mt-lg-8 g-5">
-                {video_type === "topicSeries" ? (
-                  <CourseCardList courseList={courseList} />
-                ) : (
-                  <CourseCardList courseList={courseList} type="singleVideo" />
-                )}
+        {courseList.length !== 0 ? (
+          <div className="container">
+            <div className="control-group f-end-center">
+              <div className="position-relative f-align-center d-flex me-2 search-tutor">
+                <input
+                  type="search"
+                  className="form-control nav-search-desktop border border-brand-03 border-3"
+                  placeholder="搜尋課程"
+                  onKeyDown={handleSearch}
+                />
+                <span
+                  className="material-symbols-outlined text-gray-03 position-absolute ps-4"
+                  style={{ width: "20px", height: "20px" }}
+                >
+                  search
+                </span>
               </div>
-            </>
-          ) : (
-            <div className="container text-center py-6 py-11">
-              <h2 className="fw-medium text-brand-03 py-6 py-lg-11">
-                此類別目前沒有資料，請選擇其他類別
-              </h2>
+
+              <div className="sort">
+                <button
+                  type="button"
+                  className="btn btn-outline-brand-03 dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {sortBy === "view_count" && "排序方式(最熱門)"}
+                  {sortBy === "rating" && "排序方式(最高評價)"}
+                  {sortBy === "created_at" &&
+                    order !== "ASC" &&
+                    "建立時間(最新到最舊)"}
+                  {sortBy === "created_at" &&
+                    order === "ASC" &&
+                    "建立時間(最舊到最新)"}
+                </button>
+
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setSortBy("view_count");
+                        setOrder("DESC");
+                      }}
+                    >
+                      最熱門
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setSortBy("rating");
+                        setOrder("DESC");
+                      }}
+                    >
+                      最高評價
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setSortBy("created_at");
+                        setOrder("DESC");
+                      }}
+                    >
+                      建立時間(最新到最舊)
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setSortBy("created_at");
+                        setOrder("ASC");
+                      }}
+                    >
+                      建立時間(最舊到最新)
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
-          )}
-          {courseList.length !== 0 && (
+            <div className="row topicSeriesCourse-card-wrap mt-6 mt-lg-8 g-5">
+              {video_type === "topicSeries" ? (
+                <CourseCardList courseList={courseList} />
+              ) : (
+                <CourseCardList courseList={courseList} type="singleVideo" />
+              )}
+            </div>
             <nav className="mt-6 mt-lg-8" aria-label="navigation">
               <Pagination pageData={pageData} getData={getCoursesData} />
             </nav>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="container text-center py-6 py-11">
+            <h2 className="fs-5 fs-lg-2 fw-medium text-brand-03 py-6 py-lg-11">
+              此類別目前沒有資料，請選擇其他類別
+            </h2>
+          </div>
+        )}
       </main>
     </>
   );

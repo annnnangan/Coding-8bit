@@ -24,6 +24,7 @@ export default function TutorManageAddTopicSeries() {
         title: "課程新增成功",
       });
       setNewCourseId(result.data.data.id);
+      setIsAddingChapter(true);
       return result;
     } catch (error) {
       console.error(error);
@@ -49,7 +50,6 @@ export default function TutorManageAddTopicSeries() {
         <div className="row f-center">
           {!isAddingChapter ? (
             <AddContent
-              setIsAddingChapter={setIsAddingChapter}
               setLoadingState={setLoadingState}
               submitApiRequest={submitApiRequest}
               type="topicSeries"

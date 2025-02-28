@@ -7,7 +7,7 @@ import Loader from "./components/common/Loader";
 function App() {
   return (
     <Suspense fallback={<Loader />}>
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </Suspense>
   );
 }

@@ -1,14 +1,26 @@
 import apiClient from "./apiClient";
 
 // 取得所有課程列表
-const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", limit = 9) => {
-  const response = await apiClient.get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+const getAllCourses = async (page = 1, sortBy = "rating", order = "DESC", search = "", limit = 9) => {
+  const response = await apiClient.get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&search=${search}&limit=${limit}`);
   return response.data.data;
 };
 
 // 取得特定類別所有影片列表
-const getAllVideos = async (video_type, page = 1, limit = 9) => {
-  const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&limit=${limit}`);
+const getAllVideos = async (video_type, page = 1, sortBy = "rating", order = "DESC", search = "", limit = 9) => {
+  const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&search=${search}&limit=${limit}`);
+  return response.data.data;
+};
+
+// 特定語言種類 - 取得所有課程列表
+const getCategoryAllCourses = async (page = 1, sortBy = "rating", order = "DESC", category, search = "", limit = 9) => {
+  const response = await apiClient.get(`/course?page=${page}&sortBy=${sortBy}&order=${order}&category=${category}&search=${search}&limit=${limit}`);
+  return response.data.data;
+};
+
+// 特定語言種類 -取得特定類別所有影片列表
+const getCategoryAllVideos = async (video_type, page = 1, sortBy = "rating", order = "DESC", category, search = "", limit = 9) => {
+  const response = await apiClient.get(`/video/?video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&category=${category}&search=${search}&limit=${limit}`);
   return response.data.data;
 };
 
@@ -32,7 +44,32 @@ const getVideoDetail = async (id) => {
 
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
-  const response = await apiClient.get(`/videos/${id}/comments`);
+  const response = await apiClient.get(`/video/${id}/comments`);
+  return response.data.data;
+};
+
+// 新增個人課程的留言
+const postCourseComments = async (id, data) => {
+  const response = await apiClient.post(`/video/${id}/comments`, data);
+  return response.data.data;
+};
+
+// 刪除個人課程的留言
+const deleteCourseComments = async (id) => {
+  const response = await apiClient.delete(`/video/comments/${id}`);
+  return response.data;
+};
+
+// 前台 - 取得單一講師所有課程
+const getFrontTutorCourses = async ({ tutorId = "", page = 1, sortBy = "rating", order = "DESC", limit = 6 }) => {
+  const response = await apiClient.get(`/course?tutor_id=${tutorId}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
+  return response.data.data;
+};
+
+// 前台 - 取得單一講師所有影片
+const getFrontTutorVideos = async ({ tutorId = "", video_type = "", page = 1, sortBy = "rating", order = "DESC", limit = 6, category = "" }) => {
+  const response = await apiClient
+    .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}&category=${category}`);
   return response.data.data;
 };
 
@@ -105,12 +142,18 @@ const deleteVideo = async (videoId) => {
 export default {
   getAllCourses,
   getAllVideos,
+  getCategoryAllCourses,
+  getCategoryAllVideos,
   getCourseDetail,
   getCourseChapter,
   getVideoDetail,
   getCourseComments,
   getTutorCourses,
   getTutorVideos,
+  getFrontTutorCourses,
+  getFrontTutorVideos,
+  postCourseComments,
+  deleteCourseComments,
   getTutorVideosInBooking,
   addCourse,
   updateCourse,

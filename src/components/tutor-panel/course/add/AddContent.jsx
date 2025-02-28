@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
-import { Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,10 +14,11 @@ import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
 
+import { categories } from "../../../../data/courses";
+
 export default function AddContent({
   submitApiRequest,
   setLoadingState,
-  setIsAddingChapter,
   video_url,
   video_duration,
   type,
@@ -28,15 +28,6 @@ export default function AddContent({
   const toPrevPage = () => {
     navigate(-1);
   };
-  const categories = [
-    { id: 1, name: "HTML / CSS" },
-    { id: 2, name: "JavaScript" },
-    { id: 3, name: "React" },
-    { id: 4, name: "Vue" },
-    { id: 5, name: "UI / UX" },
-    { id: 6, name: "Python" },
-    { id: 7, name: "Node.js" },
-  ];
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});
@@ -120,7 +111,7 @@ export default function AddContent({
       message: "請選擇瀏覽權限",
     }),
     category: z.string().min(1, "請選擇工具與語言"),
-    tag: z.string().min(1, "請輸入關鍵字"),
+    tags: z.string().min(1, "請輸入關鍵字"),
   });
 
   // 表單驗證
@@ -154,7 +145,6 @@ export default function AddContent({
         const requestData = { ...data, ...temData, is_free: false };
 
         await submitApiRequest(courseApi.addCourse, requestData);
-        setIsAddingChapter(true);
       } else {
         // 客製化需求影片和實用技術短影片的新增影片
         const { tutor_id } = await userApi.getUserData();
@@ -168,7 +158,7 @@ export default function AddContent({
           video_type: type,
           tutor_id: tutor_id,
         };
-        
+
         await submitApiRequest(courseApi.addVideo, requestData);
       }
     } else {
@@ -181,7 +171,7 @@ export default function AddContent({
 
   return (
     <div className={type === "topicSeries" ? "col-lg-8" : "col-xxl-6"}>
-      <div className="course-content-wrap card-column pe-10">
+      <div className="course-content-wrap card-column pe-xxl-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
           <div className="image-upload-wrapper mt-1">
@@ -317,7 +307,7 @@ export default function AddContent({
             <FormInput
               register={register}
               errors={errors}
-              id="tag"
+              id="tags"
               labelText="關鍵字 (請用半型逗號隔開)"
               type="text"
             />
@@ -375,7 +365,6 @@ export default function AddContent({
 AddContent.propTypes = {
   submitApiRequest: PropTypes.func.isRequired,
   setLoadingState: PropTypes.func.isRequired,
-  setIsAddingChapter: PropTypes.func,
   video_url: PropTypes.string,
   video_duration: PropTypes.number,
   type: PropTypes.string,

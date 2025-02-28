@@ -166,7 +166,7 @@ export default function EditCourseVideoContent({
 
   return (
     <div className="col-xxl-6">
-      <div className="course-content-wrap card-column pe-10">
+      <div className="course-content-wrap card-column pe-xxl-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
           <div className="image-upload-wrapper mt-1">

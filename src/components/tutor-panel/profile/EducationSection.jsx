@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 
 import * as bootstrap from "bootstrap";
-import axios from "axios";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 
 import userApi from "../../../api/userApi";
 import tutorApi from "../../../api/tutorApi";
 
-export default function EducationSection({ setLoadingState }) {
+export default function EducationSection({ userData, setLoadingState }) {
   const [education, setEducation] = useState([]);
   const [temEducation, setTemEducation] = useState({
     school_name: "",
@@ -20,12 +19,10 @@ export default function EducationSection({ setLoadingState }) {
 
   // modal
   const [modalType, setModalType] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const myModal = useRef(null);
   const educationModalRef = useRef(null);
 
   const openModal = (edu, type) => {
-    setIsModalOpen(true);
     if (type === "edit") {
       setModalType("edit");
       setTemEducation(edu);
@@ -45,7 +42,6 @@ export default function EducationSection({ setLoadingState }) {
   };
 
   const hideModal = () => {
-    setIsModalOpen(false);
     myModal.current.hide();
   };
 
@@ -63,8 +59,8 @@ export default function EducationSection({ setLoadingState }) {
     }));
   };
 
-  const [tutorId, setTutorId] = useState("");
   // 獲取資料
+  const [tutorId, setTutorId] = useState("");
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -169,17 +165,13 @@ export default function EducationSection({ setLoadingState }) {
 
   // 初始化 - 取得資料
   useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
-    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    getData();
-  }, []);
+    if (userData.tutor_id) {
+      getData();
+    }
+  }, [userData.tutor_id]);
 
   return (
-    <section className="tutor-manage-profile-education-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4 mt-xxl-0">
+    <section className="tutor-manage-profile-education-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4">
       <h2 className="fs-6 fs-md-5 fw-bold">學歷</h2>
       <div className="table-wrap">
         <table className="table mt-4 mt-lg-6">
@@ -238,7 +230,6 @@ export default function EducationSection({ setLoadingState }) {
         className="modal fade"
         tabIndex="-1"
         aria-labelledby="eduModalLabel"
-        aria-hidden={!isModalOpen}
         ref={educationModalRef}
       >
         <div className="modal-dialog">
@@ -266,7 +257,7 @@ export default function EducationSection({ setLoadingState }) {
                     className="form-control"
                     id="school_name"
                     placeholder="七角大學"
-                    value={temEducation.school_name}
+                    value={temEducation.school_name ?? ""}
                     onChange={(e) => handleEduChange(e, "school_name")}
                   />
                 </div>
@@ -279,7 +270,7 @@ export default function EducationSection({ setLoadingState }) {
                     className="form-control"
                     placeholder="資訊工程系"
                     id="major"
-                    value={temEducation.major}
+                    value={temEducation.major ?? ""}
                     onChange={(e) => handleEduChange(e, "major")}
                   />
                 </div>
@@ -292,7 +283,7 @@ export default function EducationSection({ setLoadingState }) {
                     className="form-control"
                     placeholder="學士"
                     id="degree"
-                    value={temEducation.degree}
+                    value={temEducation.degree ?? ""}
                     onChange={(e) => handleEduChange(e, "degree")}
                   />
                 </div>
@@ -305,7 +296,7 @@ export default function EducationSection({ setLoadingState }) {
                     className="form-control"
                     placeholder="2017"
                     id="edu-start_year"
-                    value={temEducation.start_year}
+                    value={temEducation.start_year ?? ""}
                     onChange={(e) => handleEduChange(e, "start_year")}
                   />
                 </div>
@@ -318,7 +309,7 @@ export default function EducationSection({ setLoadingState }) {
                     className="form-control"
                     placeholder="2020"
                     id="edu-end_year"
-                    value={temEducation.end_year}
+                    value={temEducation.end_year ?? ""}
                     onChange={(e) => handleEduChange(e, "end_year")}
                   />
                 </div>
@@ -358,5 +349,6 @@ export default function EducationSection({ setLoadingState }) {
   );
 }
 EducationSection.propTypes = {
+  userData: PropTypes.object.isRequired,
   setLoadingState: PropTypes.func.isRequired,
 };

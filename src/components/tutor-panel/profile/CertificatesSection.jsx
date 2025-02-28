@@ -1,14 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 
 import * as bootstrap from "bootstrap";
-import axios from "axios";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 
-import userApi from "../../../api/userApi";
 import tutorApi from "../../../api/tutorApi";
 
-export default function CertificatesSection({ setLoadingState }) {
+export default function CertificatesSection({ userData, setLoadingState }) {
   const [certificates, setCertificates] = useState([]);
   const [temCertificates, setTemCertificates] = useState({
     title: "",
@@ -18,12 +16,10 @@ export default function CertificatesSection({ setLoadingState }) {
 
   // modal
   const [modalType, setModalType] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const myModal = useRef(null);
   const certificateModalRef = useRef(null);
 
   const openModal = (certificate, type) => {
-    setIsModalOpen(true);
     if (type === "edit") {
       setModalType("edit");
       setTemCertificates(certificate);
@@ -41,7 +37,6 @@ export default function CertificatesSection({ setLoadingState }) {
   };
 
   const hideModal = () => {
-    setIsModalOpen(false);
     myModal.current.hide();
   };
 
@@ -59,12 +54,12 @@ export default function CertificatesSection({ setLoadingState }) {
     }));
   };
 
-  const [tutorId, setTutorId] = useState("");
   // 獲取資料
+  const [tutorId, setTutorId] = useState("");
   const getData = async () => {
     setLoadingState(true);
     try {
-      const { tutor_id } = await userApi.getUserData();
+      const { tutor_id } = userData;
       const result = await tutorApi.getCertificate(tutor_id);
       setTutorId(tutor_id);
       setCertificates(result.data || []);
@@ -165,17 +160,13 @@ export default function CertificatesSection({ setLoadingState }) {
 
   // 初始化 - 取得資料
   useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
-    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    getData();
-  }, []);
+    if (userData.tutor_id) {
+      getData();
+    }
+  }, [userData.tutor_id]);
 
   return (
-    <section className="tutor-manage-profile-certificates-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4 mt-xxl-0">
+    <section className="tutor-manage-profile-certificates-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4">
       <h2 className="fs-6 fs-md-5 fw-bold">證照</h2>
       <div className="table-wrap">
         <table className="table mt-4 mt-lg-6">
@@ -230,7 +221,6 @@ export default function CertificatesSection({ setLoadingState }) {
         className="modal fade"
         tabIndex="-1"
         aria-labelledby="certificateModalLabel"
-        aria-hidden={!isModalOpen}
         ref={certificateModalRef}
       >
         <div className="modal-dialog">
@@ -324,5 +314,6 @@ export default function CertificatesSection({ setLoadingState }) {
   );
 }
 CertificatesSection.propTypes = {
+  userData: PropTypes.object.isRequired,
   setLoadingState: PropTypes.func.isRequired,
 };

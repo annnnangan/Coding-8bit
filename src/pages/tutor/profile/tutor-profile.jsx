@@ -1,37 +1,36 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
 
 import Swal from "sweetalert2";
 
-import userApi from "../../../api/userApi";
-import tutorApi from "../../../api/tutorApi";
+import tutorApi from "@/api/tutorApi";
 
-import ResetPassword from "../../../components/common/profile/ResetPassword";
-import ProfileContent from "../../../components/common/profile/ProfileContent";
+import ResetPassword from "@/components/common/profile/ResetPassword";
+import ProfileContent from "@/components/common/profile/ProfileContent";
 
-import WorkExperienceSection from "../../../components/tutor-panel/profile/WorkExperienceSection";
-import EducationSection from "../../../components/tutor-panel/profile/EducationSection";
-import CertificatesSection from "../../../components/tutor-panel/profile/CertificatesSection";
+import WorkExperienceSection from "@/components/tutor-panel/profile/WorkExperienceSection";
+import EducationSection from "@/components/tutor-panel/profile/EducationSection";
+import CertificatesSection from "@/components/tutor-panel/profile/CertificatesSection";
 
-import Loader from "../../../components/common/Loader";
+import Loader from "@/components/common/Loader";
 
 export default function TutorProfile() {
   // loading
-  const [loadingState, setLoadingState] = useState(false);
+  const [loadingState, setLoadingState] = useState(true);
 
   // 取得使用者資料
-  const [userData, setUserData] = useState({});
+  const { userData } = useSelector((state) => state.auth);
+
   const [tutorId, setTutorId] = useState({});
   const [tutorData, setTutorData] = useState({});
   const [temTutorData, setTemTutorData] = useState({
     expertise: "",
+    slogan: "",
     about: "",
   });
-  const getUserData = async () => {
-    setLoadingState(true);
+  const getData = async () => {
     try {
-      const userData = await userApi.getUserData();
-      setUserData(userData);
       const result = await tutorApi.getTutorDetail(userData.tutor_id);
       setTutorId(userData.tutor_id);
       setTutorData(result.data);
@@ -56,6 +55,7 @@ export default function TutorProfile() {
   const [isEditingAboutMe, setIsEditingAboutMe] = useState(false);
   const handleEditAboutMe = () => {
     setIsEditingAboutMe((prev) => (prev = !prev));
+    setTemTutorData(tutorData);
   };
 
   // 更新關於我資料
@@ -68,7 +68,7 @@ export default function TutorProfile() {
         title: "修改成功",
       });
       handleEditAboutMe();
-      getUserData();
+      getData();
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -80,17 +80,11 @@ export default function TutorProfile() {
     }
   };
 
-  // 初始化 - 確認是否已登入
   useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
-    if (token) {
-      getUserData(token);
+    if (userData.tutor_id) {
+      getData();
     }
-  }, []);
+  }, [userData.tutor_id]);
 
   return (
     <>
@@ -191,11 +185,31 @@ export default function TutorProfile() {
                                 type="text"
                                 name="expertise"
                                 className="form-control fw-bold"
-                                placeholder="請輸入專長"
+                                placeholder="請輸入專長，以半形逗號隔開 (ex.Vue,React,JavaScript)"
                                 value={temTutorData.expertise}
                                 onChange={(e) =>
                                   handleAboutChange(e, "expertise")
                                 }
+                              />
+                            )}
+                          </div>
+                          <div className="fs-6 mt-2 mt-md-4">
+                            <label className="form-label" htmlFor="slogan">
+                              標語
+                            </label>
+                            {!isEditingAboutMe ? (
+                              <p className="fs-5 mb-2 fw-medium">
+                                {tutorData.slogan}
+                              </p>
+                            ) : (
+                              <input
+                                id="slogan"
+                                type="text"
+                                name="slogan"
+                                className="form-control fw-bold"
+                                placeholder="請以一句話形容自己 (ex.熱愛學習的前端工程師)"
+                                value={temTutorData.slogan}
+                                onChange={(e) => handleAboutChange(e, "slogan")}
                               />
                             )}
                           </div>
@@ -255,13 +269,22 @@ export default function TutorProfile() {
                   </div>
                   <div className="col-xxl-7">
                     {/* 工作經歷 */}
-                    <WorkExperienceSection setLoadingState={setLoadingState} />
+                    <WorkExperienceSection
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
 
                     {/* 學歷 */}
-                    <EducationSection setLoadingState={setLoadingState} />
+                    <EducationSection
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
 
                     {/* 證書 */}
-                    <CertificatesSection setLoadingState={setLoadingState} />
+                    <CertificatesSection
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
                   </div>
                 </div>
               </div>

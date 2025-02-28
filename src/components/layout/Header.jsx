@@ -14,6 +14,15 @@ export default function Header() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 
+  // 搜尋 input
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      const sanitizedSearch = e.target.value.trim();
+      navigate(`/course?video_type=topicSeries&search=${sanitizedSearch}`);
+      e.target.value = "";
+    }
+  };
+
   // auth
   const { isAuth, userData } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -76,8 +85,9 @@ export default function Header() {
   useEffect(() => {
     if (token) {
       dispatch(loginCheck());
+    } else {
+      setLoadingState(false);
     }
-    setLoadingState(false);
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -119,6 +129,7 @@ export default function Header() {
                 type="search"
                 className="form-control nav-search-desktop"
                 placeholder="搜尋感興趣的課程"
+                onKeyDown={handleSearch}
               />
               <span
                 className="material-symbols-outlined text-gray-03 position-absolute ps-4"
@@ -168,6 +179,7 @@ export default function Header() {
                   type="search"
                   className="form-control nav-search-mobile"
                   placeholder="搜尋感興趣的課程"
+                  onKeyDown={handleSearch}
                 />
                 <span
                   className="material-symbols-outlined text-gray-03 position-absolute ps-4"
