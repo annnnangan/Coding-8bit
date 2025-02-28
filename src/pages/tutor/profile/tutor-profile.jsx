@@ -4,16 +4,16 @@ import { useSelector } from "react-redux";
 
 import Swal from "sweetalert2";
 
-import tutorApi from "../../../api/tutorApi";
+import tutorApi from "@/api/tutorApi";
 
-import ResetPassword from "../../../components/common/profile/ResetPassword";
-import ProfileContent from "../../../components/common/profile/ProfileContent";
+import ResetPassword from "@/components/common/profile/ResetPassword";
+import ProfileContent from "@/components/common/profile/ProfileContent";
 
-import WorkExperienceSection from "../../../components/tutor-panel/profile/WorkExperienceSection";
-import EducationSection from "../../../components/tutor-panel/profile/EducationSection";
-import CertificatesSection from "../../../components/tutor-panel/profile/CertificatesSection";
+import WorkExperienceSection from "@/components/tutor-panel/profile/WorkExperienceSection";
+import EducationSection from "@/components/tutor-panel/profile/EducationSection";
+import CertificatesSection from "@/components/tutor-panel/profile/CertificatesSection";
 
-import Loader from "../../../components/common/Loader";
+import Loader from "@/components/common/Loader";
 
 export default function TutorProfile() {
   // loading
@@ -26,6 +26,7 @@ export default function TutorProfile() {
   const [tutorData, setTutorData] = useState({});
   const [temTutorData, setTemTutorData] = useState({
     expertise: "",
+    slogan: "",
     about: "",
   });
   const getData = async () => {
@@ -54,6 +55,7 @@ export default function TutorProfile() {
   const [isEditingAboutMe, setIsEditingAboutMe] = useState(false);
   const handleEditAboutMe = () => {
     setIsEditingAboutMe((prev) => (prev = !prev));
+    setTemTutorData(tutorData);
   };
 
   // 更新關於我資料
@@ -188,6 +190,26 @@ export default function TutorProfile() {
                                 onChange={(e) =>
                                   handleAboutChange(e, "expertise")
                                 }
+                              />
+                            )}
+                          </div>
+                          <div className="fs-6 mt-2 mt-md-4">
+                            <label className="form-label" htmlFor="slogan">
+                              標語
+                            </label>
+                            {!isEditingAboutMe ? (
+                              <p className="fs-5 mb-2 fw-medium">
+                                {tutorData.slogan}
+                              </p>
+                            ) : (
+                              <input
+                                id="slogan"
+                                type="text"
+                                name="slogan"
+                                className="form-control fw-bold"
+                                placeholder="請以一句話形容自己 (ex.熱愛學習的前端工程師)"
+                                value={temTutorData.slogan}
+                                onChange={(e) => handleAboutChange(e, "slogan")}
                               />
                             )}
                           </div>
