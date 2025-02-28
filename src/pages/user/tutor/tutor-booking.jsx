@@ -156,7 +156,7 @@ export default function TutorBooking() {
       } else {
         // 如果不存在，就可以fetch API
         const result = await tutorApi.getAvailability(tutor_id, baseDate);
-        console.log(result);
+
         // 把剛剛fetch的data存到useState裡面，避免過度fetch API
         const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
         setAccumulateAvailableTime((prev) => [...prev, newData]);
@@ -216,12 +216,12 @@ export default function TutorBooking() {
     // 從選擇service type跳轉到付款頁面
     if (currentModalStep === 2) {
       if (selectedServiceType && selectedBookingTimeslots.date && selectedBookingTimeslots.hours.length > 0) {
-        dispatch(updateFormData({ tutor_id: tutor_id }));
-        dispatch(updateFormData({ tutor_name: tutorBasicInfo.User.username }));
-        dispatch(updateFormData({ booking_date: selectedBookingTimeslots.date }));
+        dispatch(updateFormData({ tutorId: tutor_id }));
+        dispatch(updateFormData({ tutorName: tutorBasicInfo.User.username }));
+        dispatch(updateFormData({ date: selectedBookingTimeslots.date }));
         dispatch(updateFormData({ timeslots: selectedBookingTimeslots.hours }));
         dispatch(updateFormData({ price: tutorBasicInfo.hourly_rate * selectedBookingTimeslots.hours.length }));
-        dispatch(updateFormData({ service_type: selectedServiceType }));
+        dispatch(updateFormData({ serviceType: selectedServiceType }));
         bookingModal.current.hide();
         navigate(`/tutor-booking-payment`);
       } else {
@@ -233,13 +233,11 @@ export default function TutorBooking() {
   // 控制Timetable上選擇時間
   const handleBookingTimeslotsSelect = (date, time) => {
     setSelectedBookingTimeslots((prev) => {
-      // If the date is the same, toggle the selected time
       if (prev.date === date) {
         const newHours = prev.hours.includes(time)
           ? prev.hours.filter((t) => t !== time) // Remove if already selected
-          : [...prev.hours, time]; // Add if not selected
+          : [...prev.hours, time].sort((a, b) => a - b); // Add & sort
 
-        // If no hours are selected, remove the date as well
         if (newHours.length === 0) {
           return { date: "", hours: [] }; // Clear both date and hours
         }
@@ -247,15 +245,14 @@ export default function TutorBooking() {
         return { ...prev, hours: newHours };
       }
 
-      // If selecting a new date, reset hours
-      return { date, hours: [time] };
+      return { date, hours: [time] }; // Reset hours when new date is selected
     });
   };
 
   return (
     <>
       <Helmet>
-        <title>{tutorBasicInfo?.name ? `${tutorBasicInfo.name} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
+        <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
       {/* {loadingState && <Loader />} */}
       <div className="tutor-booking">
@@ -273,17 +270,36 @@ export default function TutorBooking() {
                     <img src={tutorBasicInfo.User.avatar_url} alt="profile" className="object-fit-cover rounded-circle me-6" />
                   </div>
                   <div className="flex-grow-1">
-                    <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.User.username}</h2>
-                    <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.slogan}</p>
+                    {loadingState ? (
+                      <>
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-7 placeholder-lg"></span>
+                        </p>
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-4"></span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.User.username}</h2>
+                        <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.slogan}</p>
+                      </>
+                    )}
                   </div>
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
-                  {tutorBasicInfo.expertise.split(",").map((item) => (
-                    <p href="#" className="tag tag-brand-02 fs-8 me-3" key={item}>
-                      {item}
+                  {loadingState ? (
+                    <p className="placeholder-glow">
+                      <span className="placeholder bg-brand-01 col-8"></span>
                     </p>
-                  ))}
+                  ) : (
+                    tutorBasicInfo.expertise.split(",").map((item) => (
+                      <p href="#" className="tag tag-brand-02 fs-8 me-3" key={item}>
+                        {item}
+                      </p>
+                    ))
+                  )}
                 </div>
                 {/*  tab  */}
                 <div className="section-component">
@@ -320,7 +336,15 @@ export default function TutorBooking() {
                   </ul>
                   <div className="tab-content" id="myTabContent">
                     <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
-                      <ShowMoreButton text={tutorBasicInfo.about} />
+                      {loadingState ? (
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-12"></span>
+                          <span className="placeholder bg-brand-01 col-12"></span>
+                          <span className="placeholder bg-brand-01 col-12"></span>
+                        </p>
+                      ) : (
+                        <ShowMoreButton text={tutorBasicInfo.about} />
+                      )}
                     </div>
                     <div className="tab-pane fade" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
                       <TutorBookingResume resume={tutorBasicInfo.resume} />
@@ -418,7 +442,16 @@ export default function TutorBooking() {
                 <div className="card-body p-0">
                   <div className="mb-lg-6 mb-5">
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
-                    <h2 className="text-brand-03 fs-lg-2 fs-3">NT ${tutorBasicInfo.hourly_rate}</h2>
+                    <h2 className="text-brand-03 fs-lg-2 fs-3">
+                      NT ${" "}
+                      {loadingState ? (
+                        <span className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-2"></span>
+                        </span>
+                      ) : (
+                        tutorBasicInfo.hourly_rate
+                      )}
+                    </h2>
                   </div>
 
                   <button className="btn slide-right-hover btn-brand-03 w-100" onClick={openBookingModal}>
