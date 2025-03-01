@@ -26,7 +26,7 @@ export default function CourseVideoPage() {
     },
   });
 
-  // 過濾無章節的課程
+  // 過濾同講師無章節or相同課程
   const filterOtherCourse = (others) => {
     return others.filter(
       (other) =>
@@ -36,9 +36,13 @@ export default function CourseVideoPage() {
     );
   };
 
-  // 過濾同課程的影片
+  // 過濾同課程的影片並取 6 支影片
   const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo.filter((related) => related.course_id !== videoData.course_id);
+    return relatedVideo
+      .filter((related) => {
+        return related.course_id !== videoData.course_id;
+      })
+      .slice(0, 6);
   };
 
   // 初始化取得資料
@@ -46,22 +50,36 @@ export default function CourseVideoPage() {
     setLoadingState(true);
     try {
       const videoResult = await courseApi.getVideoDetail(videoId);
-      const otherCourseResult = await courseApi.getFrontTutorCourses({
-        tutorId: videoResult.tutor_id,
-      });
-      const relatedVideosResult = await courseApi.getFrontTutorVideos({
-        category: videoData.category,
-      });
-
       setVideoData(videoResult);
-      setOtherVideos(filterOtherCourse(otherCourseResult.courses));
-      setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
       setLoadingState(false);
     }
   };
+
+  // 監聽 videoData 的變化
+  useEffect(() => {
+    // 在 videoData 更新後調用過濾函數
+    if (videoData.course_id) {
+      const fetchOtherVideos = async () => {
+        const otherCourseResult = await courseApi.getFrontTutorCourses({
+          tutorId: videoData.tutor_id,
+        });
+        setOtherVideos(filterOtherCourse(otherCourseResult.courses));
+      };
+
+      const fetchRelatedVideos = async () => {
+        const relatedVideosResult = await courseApi.getFrontTutorVideos({
+          category: videoData.category,
+        });
+        setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
+      };
+
+      fetchOtherVideos();
+      fetchRelatedVideos();
+    }
+  }, [videoData]);
 
   // 初始化
   useEffect(() => {

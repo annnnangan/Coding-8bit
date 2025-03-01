@@ -44,9 +44,11 @@ export default function CourseDetailPage() {
     );
   };
 
-  // 過濾同課程的影片
+  // 過濾同課程的影片並取 6 支影片
   const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo.filter((related) => related.course_id !== id);
+    return relatedVideo
+      .filter((related) => related.course_id !== id)
+      .slice(0, 6);
   };
 
   // 取得初始化資料
@@ -319,7 +321,7 @@ export default function CourseDetailPage() {
             </div>
             <div className="modal-body">
               <ul className="chapter-list">
-                {chapter?.map((video, index) => (
+                {chapter.slice(1,).map((video, index) => (
                   <li
                     className="video-background-color-hover px-6 py-4"
                     onClick={() => modalRefMethod.current.hide()}

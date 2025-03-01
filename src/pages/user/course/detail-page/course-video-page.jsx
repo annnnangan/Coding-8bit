@@ -35,7 +35,7 @@ export default function CourseVideoPage() {
     },
   });
 
-  // 過濾無章節的課程
+  // 過濾同講師無章節or相同課程
   const filterOtherCourse = (others) => {
     return others.filter(
       (other) =>
@@ -45,9 +45,11 @@ export default function CourseVideoPage() {
     );
   };
 
-  //  過濾同課程的影片
+  // 過濾同課程的影片並取 6 支影片
   const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo.filter((related) => related.course_id !== id);
+    return relatedVideo
+      .filter((related) => related.course_id !== id)
+      .slice(0, 6);
   };
 
   // 初始化取得資料
@@ -65,7 +67,12 @@ export default function CourseVideoPage() {
           category: videoData.category,
         });
 
-        setVideoData({ ...courseResult, ...videoResult });
+        setVideoData({
+          ...courseResult,
+          ...videoResult,
+          tag: courseResult.tag,
+          category: courseResult.category,
+        });
         setChapter(chapterResult);
         setOtherVideos(filterOtherCourse(otherCourseResult.courses));
         setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
@@ -77,7 +84,6 @@ export default function CourseVideoPage() {
     };
     getData();
   }, [videoId]);
-
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
@@ -322,7 +328,7 @@ export default function CourseVideoPage() {
             </div>
             <div className="modal-body">
               <ul className="chapter-list">
-                {chapter.map((video, index) => (
+                {chapter.slice(1,).map((video, index) => (
                   <li
                     className="video-background-color-hover px-6 py-4"
                     onClick={() => modalRefMethod.current.hide()}

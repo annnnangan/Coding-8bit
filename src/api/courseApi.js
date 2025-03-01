@@ -67,7 +67,7 @@ const getFrontTutorCourses = async ({ tutorId = "", page = 1, sortBy = "rating",
 };
 
 // 前台 - 取得單一講師所有影片
-const getFrontTutorVideos = async ({ tutorId = "", video_type = "", page = 1, sortBy = "rating", order = "DESC", limit = 6, category = "" }) => {
+const getFrontTutorVideos = async ({ tutorId = "", video_type = "", page = 1, sortBy = "rating", order = "DESC", limit = 30, category = "" }) => {
   const response = await apiClient
     .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}&category=${category}`);
   return response.data.data;
