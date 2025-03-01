@@ -15,6 +15,16 @@ export default function TutorList() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 
+  const userImages = [
+    "images/user/user-1.png",
+    "images/user/user-5.png",
+    "images/user/user-6.png",
+    "images/user/user-7.png",
+    "images/user/user-10.png",
+    "images/user/user-8.png",
+    "images/user/user-9.png",
+  ];
+
   // 找講師按鈕往下跳轉函式
   const tutorListRef = useRef(null);
   const handleScroll = (e) => {
@@ -111,41 +121,14 @@ export default function TutorList() {
                   </span>
                 </a>
                 <div className="d-flex align-items-center">
-                  <img
-                    src="images/user/user-1.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
-                  <img
-                    src="images/user/user-5.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
-                  <img
-                    src="images/user/user-6.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
-                  <img
-                    src="images/user/user-7.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
-                  <img
-                    src="images/user/user-10.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
-                  <img
-                    src="images/user/user-8.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
-                  <img
-                    src="images/user/user-9.png"
-                    alt="tutor"
-                    className="object-cover-fit profile"
-                  />
+                  {userImages.map((src, index) => (
+                    <img
+                      key={index}
+                      src={src}
+                      alt="tutor"
+                      className="object-cover-fit profile"
+                    />
+                  ))}
                   <p className="profile">100+</p>
                 </div>
               </div>
