@@ -2,19 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import axios from "axios";
 import * as bootstrap from "bootstrap";
 
-import Card from "@/components/custom-course/Card";
-import DesktopTimeline from "@/components/custom-course/DesktopTimeline";
-import ScrollBtn from "@/components/custom-course/ScrollBtn";
-import CardModal from "@/components/custom-course/CardModal";
+import customRequestsApi from "@/api/customRequestsApi";
+
+import Card from "@/components/custom-request/Card";
+import DesktopTimeline from "@/components/custom-request/DesktopTimeline";
+import ScrollBtn from "@/components/custom-request/ScrollBtn";
+import CardModal from "@/components/custom-request/CardModal";
 
 import { categories } from "@/data/courses";
 
-const { VITE_API_BASE_3 } = import.meta.env;
-
-export default function CustomCourseList() {
+export default function CustomRequestsList() {
   const isMobile = window.innerWidth <= 576;
 
   const containerRef = useRef(null);
@@ -30,18 +29,37 @@ export default function CustomCourseList() {
     navigate("/add-learning-need");
   };
 
-  // 取得課程資料函式
+  // 取得需求資料函式
   const [customCourseList, setCustomCourseList] = useState([]);
   const getData = async () => {
     try {
-      const result = await axios.get(`${VITE_API_BASE_3}/api/v1/custom-course`);
-
-      setCustomCourseList(result.data);
+      const result = await customRequestsApi.getAllCustomRequests(
+        sortBy,
+        order,
+        search
+      );
+      setCustomCourseList(result.requests);
     } catch (error) {
       console.log("錯誤", error);
     }
   };
 
+  // 搜尋與篩選功能
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [order, setOrder] = useState("DESC");
+  const [filterCategory, setFilterCategory] = useState("請選擇類別");
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [hasResponses, setHasResponses] = useState(false);
+
+  const [search, setSearch] = useState("");
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      const sanitizedSearch = e.target.value.trim();
+      setSearch(sanitizedSearch);
+    }
+  };
+
+  /* -------------------------------------- header & footer  start ---------------------------------------- */
   // header & footer 變化
   const [isFooterHidden, setIsFooterHidden] = useState(false);
   const mainContentRef = useRef(null);
@@ -145,6 +163,8 @@ export default function CustomCourseList() {
     };
   }, [customCourseList]);
 
+  /* -------------------------------------- header & footer  end ---------------------------------------- */
+
   // modal
   const [temCustomCourse, setTemCustomCourse] = useState({});
   const myModal = useRef(null);
@@ -159,11 +179,6 @@ export default function CustomCourseList() {
     myModal.current = new bootstrap.Modal(cardModalRef.current);
   }, []);
 
-  // 初始化 - 取得資料
-  useEffect(() => {
-    getData();
-  }, []);
-
   // 初始化 - 背景圖片
   useEffect(() => {
     document.body.classList.add("bg-custom-course");
@@ -172,6 +187,11 @@ export default function CustomCourseList() {
       document.body.classList.remove("bg-custom-course");
     };
   }, []);
+
+  // 初始化 - 取得資料
+  useEffect(() => {
+    getData();
+  }, [search, sortBy, order]);
 
   return (
     <>
@@ -196,21 +216,44 @@ export default function CustomCourseList() {
                     name="courseSearch"
                     className="form-control search-course border-1 border-gray-03"
                     placeholder="搜尋課程需求"
+                    onKeyDown={handleSearch}
                   />
                 </div>
               </div>
               {/* 篩選器 */}
               <div className="d-flex column-gap-4 pe-6 order-lg-1 order-2 ms-lg-auto">
-                <button className="btn status-btn text-brand-03 f-align-center">
-                  <span className="material-symbols-outlined icon">
-                    radio_button_unchecked
-                  </span>
+                <button
+                  className="btn status-btn text-brand-03 f-align-center"
+                  onClick={() => {
+                    setIsCompleted((prev) => (prev = !prev));
+                  }}
+                >
+                  {!isCompleted ? (
+                    <span className="material-symbols-outlined icon">
+                      radio_button_unchecked
+                    </span>
+                  ) : (
+                    <span className="material-symbols-outlined icon icon-fill">
+                      check_circle
+                    </span>
+                  )}
                   <span>已完成</span>
                 </button>
-                <button className="btn status-btn text-brand-03 f-align-center">
-                  <span className="material-symbols-outlined icon icon-fill">
-                    check_circle
-                  </span>
+                <button
+                  className="btn status-btn text-brand-03 f-align-center"
+                  onClick={() => {
+                    setHasResponses((prev) => (prev = !prev));
+                  }}
+                >
+                  {!hasResponses ? (
+                    <span className="material-symbols-outlined icon">
+                      radio_button_unchecked
+                    </span>
+                  ) : (
+                    <span className="material-symbols-outlined icon icon-fill">
+                      check_circle
+                    </span>
+                  )}
                   <span>已回應</span>
                 </button>
               </div>
@@ -224,18 +267,37 @@ export default function CustomCourseList() {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    排序方式
+                    {sortBy === "createdAt" &&
+                      order !== "ASC" &&
+                      "建立時間(最新)"}
+                    {sortBy === "createdAt" &&
+                      order === "ASC" &&
+                      "建立時間(最舊)"}
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="sortDropdown">
                     <li>
-                      <a className="dropdown-item" href="#">
-                        遞減
-                      </a>
+                      <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => {
+                          setSortBy("createdAt");
+                          setOrder("DESC");
+                        }}
+                      >
+                        建立時間(最新到最舊)
+                      </button>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">
-                        遞增
-                      </a>
+                      <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => {
+                          setSortBy("createdAt");
+                          setOrder("ASC");
+                        }}
+                      >
+                        建立時間(最舊到最新)
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -247,25 +309,41 @@ export default function CustomCourseList() {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    選擇類別
+                    {filterCategory}
                   </button>
                   <div
                     className="dropdown-menu p-0"
                     aria-labelledby="formatDropdown"
                     style={{ width: "250px" }}
                   >
-                    <div className="px-3 py-2">
+                    {/* <div className="px-3 py-2">
                       <input
                         type="text"
                         className="form-control form-control-sm mt-1"
                         id="tagSearch"
                         placeholder="搜尋標籤..."
                       />
-                    </div>
-                    <div className="tag-list-container">
+                    </div> */}
+                    <div className="tag-list-container py-1">
                       <ul className="list-unstyled mb-0" id="tagList">
+                        <li
+                          className="dropdown-item"
+                          onClick={() => {
+                            setSearch("");
+                            setFilterCategory("選擇類別");
+                          }}
+                        >
+                          全部
+                        </li>
                         {categories.map((category) => (
-                          <li className="dropdown-item" key={category.id}>
+                          <li
+                            className="dropdown-item"
+                            key={category.id}
+                            onClick={() => {
+                              setSearch(category.name);
+                              setFilterCategory(category.name);
+                            }}
+                          >
                             {category.name}
                           </li>
                         ))}

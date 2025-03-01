@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { utils } from "../../custom-course/utils";
+import { utils } from "../../custom-request/utils";
 
 import BookingStatusBadge from "./BookingStatusBadge";
 import { determineMeetingLinkMessage } from "../../../utils/booking-record-utils";

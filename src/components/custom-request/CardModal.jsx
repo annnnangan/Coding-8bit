@@ -1,26 +1,14 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 
 const ReactQuill = lazy(() => import("react-quill-new"));
 import PropTypes from "prop-types";
 import Loader from "@/components/common/Loader";
 
+import { formatDateToTaiwanStyle } from "../../utils/timeFormatted-utils";
+
 export default function CardModal({ temCustomCourse, cardModalRef }) {
   // ReactQuill 文字編輯器
   const [value, setValue] = useState("");
-  const modules = useMemo(
-    () => ({
-      toolbar: [
-        [{ font: [] }],
-        ["bold", "italic", "underline"],
-        ["link", "image", "video"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        [{ align: [] }],
-        ["blockquote", "code-block"],
-        ["clean"],
-      ],
-    }),
-    []
-  );
 
   const [editorLoaded, setEditorLoaded] = useState(false);
 
@@ -39,7 +27,17 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
         <div className="modal-dialog modal-xl modal-fullscreen-sm-down">
           <div className="modal-content">
             <div className="modal-header px-4">
-              <h5 className="modal-title" id="cardModalLabel"></h5>
+              <h5 className="modal-title f-align-center" id="cardModalLabel">
+                {temCustomCourse?.isCompleted && (
+                  <p className="text-brand-03 d-inline-flex f-align-center me-3">
+                    <span className="material-symbols-outlined icon-fill text-brand-03 me-1">
+                      check_circle
+                    </span>
+                    已解決
+                  </p>
+                )}
+                {temCustomCourse?.title}
+              </h5>
               <button
                 type="button"
                 className="btn-close"
@@ -55,31 +53,32 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                     <div className="d-flex align-items-center mb-3">
                       <img
                         id="modalAuthorAvatar"
-                        src={temCustomCourse?.author?.avatar}
+                        src={temCustomCourse?.User?.avatar_url}
                         alt="作者頭像"
                         className="rounded-circle me-2"
                         width="40"
                         height="40"
                       />
                       <h6 id="modalAuthorName" className="mb-0">
-                        {temCustomCourse?.title}
+                        {temCustomCourse?.User?.username}
                       </h6>
                     </div>
-                    <p id="modalContent" className="">
-                      {temCustomCourse?.content}
-                    </p>
+                    <p id="modalContent">{temCustomCourse?.content}</p>
                     <div id="modalTags" className="mb-3">
-                      {temCustomCourse?.tags?.map((tag, index) => (
-                        <span
-                          className="badge bg-secondary me-1 mt-3"
-                          key={index}
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                      {temCustomCourse.tag && temCustomCourse?.tag
+                        .split(", ")
+                        .slice(0, 5)
+                        .map((tag, index) => (
+                          <span
+                            className="badge bg-secondary me-1 mt-3"
+                            key={index}
+                          >
+                            {tag}
+                          </span>
+                        ))}
                     </div>
                     <small id="modalDate" className="text-muted d-block mb-3">
-                      {temCustomCourse?.date}
+                      {formatDateToTaiwanStyle(temCustomCourse?.createdAt)}
                     </small>
                     <img
                       id="modalPhoto"
@@ -98,7 +97,6 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                             <ReactQuill
                               value={value}
                               onChange={setValue}
-                              modules={modules}
                             />
                           </Suspense>
                         )}
@@ -121,7 +119,7 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                     <h6 className="mb-3">回覆意見：</h6>
                     <div id="modalResponses" className="comments-container">
                       {/* 回覆將在這裡動態插入 */}
-                      {temCustomCourse?.responses?.map((res) => (
+                      {/* {temCustomCourse?.responses?.map((res) => (
                         <div
                           className="card mb-3 border-0 bg-light"
                           key={res.id}
@@ -193,7 +191,7 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                             </div>
                           </div>
                         </div>
-                      ))}
+                      ))} */}
                     </div>
                   </div>
                 </div>

@@ -44,7 +44,7 @@ export default function Header() {
         label: "一對一教學",
       },
       {
-        to: "/custom-course-list",
+        to: "/custom-requests-list",
         label: "課程客製化",
       },
       {

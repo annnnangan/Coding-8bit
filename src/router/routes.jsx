@@ -22,9 +22,9 @@ import CourseDetailPage from "../pages/user/course/detail-page/course-detail-pag
 import CourseVideoPage from "../pages/user/course/detail-page/course-video-page";
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
-import CustomCourseList from "../pages/user/custom-course/custom-course-list";
+import CustomRequestsList from "../pages/user/custom-request/custom-requests-list";
 const AddLearningNeedPage = lazy(() =>
-  import("../pages/user/custom-course/add-learning-need-page")
+  import("../pages/user/custom-request/add-learning-need-page")
 );
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
@@ -76,7 +76,7 @@ export const router = createHashRouter([
       { path: "course/:id/chapter/:videoId", element: <CourseVideoPage /> },
       { path: "video/:videoId", element: <SingleVideoPage /> },
 
-      { path: "custom-course-list", element: <CustomCourseList /> },
+      { path: "custom-requests-list", element: <CustomRequestsList /> },
       { path: "add-learning-need", element: <AddLearningNeedPage /> },
 
       { path: "subscription-list", element: <SubscriptionList /> },

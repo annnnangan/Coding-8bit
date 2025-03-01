@@ -5,7 +5,7 @@ export const bannerData = [
     title: "程式學習，量身訂做",
     description: "打破一成不變舊課綱，想學什麼？讓我們為您客製化",
     btnText: "立即提需求",
-    btnLink: "/custom-course-list",
+    btnLink: "/custom-requests-list",
     imgSrc: "images/deco/Illustration-1.svg",
     imgAlt: "banner-illustration",
   },
