@@ -21,19 +21,21 @@ export default function Footer() {
             <li className="f-align-center mt-2">
               <p className="fs-7 lh-sm">
                 Copyright@2025 Coding∞bit 保留所有權利·
-                <NavLink
-                  to="/privacy-policy"
+                <a
+                  href="https://coding-8bit.site/PrivacyPolicy.html"
+                  target="_blank"
                   className="underline-hover d-inline"
                 >
                   隱私政策
-                </NavLink>{" "}
+                </a>{" "}
                 |{" "}
-                <NavLink
-                  to="/terms-of-service"
+                <a
+                  href="https://coding-8bit.site/TermsOfService.html"
+                  target="_blank"
                   className="underline-hover d-inline"
                 >
                   使用條款
-                </NavLink>
+                </a>
               </p>
             </li>
           </ul>
