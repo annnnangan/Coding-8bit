@@ -280,7 +280,7 @@ export default function Home() {
                 </NavLink>
                 <div>
                   <NavLink
-                    to="/custom-course-list"
+                    to="/custom-requests-list"
                     className="link-brand-03 fs-6 fw-medium underline-hover pb-3 pb-md-0 mt-5 mt-md-0 ms-md-10"
                   >
                     已有帳號？點此提出需求

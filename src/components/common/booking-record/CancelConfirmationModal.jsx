@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as bootstrap from "bootstrap";
 import PropTypes from "prop-types";
 
-import { utils } from "../../custom-course/utils";
+import { utils } from "../../custom-request/utils";
 
 export default function CancelConfirmationModal({ booking, isOpen, setOpenModal, setOpenDetailsModal }) {
   const modal = useRef(null);

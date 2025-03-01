@@ -62,7 +62,7 @@ export default function Footer() {
             <li className="nav-item">
               <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
-                to="/custom-course-list"
+                to="/custom-requests-list"
               >
                 課程客製化
               </NavLink>
