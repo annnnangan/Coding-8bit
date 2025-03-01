@@ -1,84 +1,122 @@
-import { generateTimeslots } from "../../../../utils/generate-timeslots-utils";
-import { BusinessHourSchema } from "../../../../utils/schema/tutor-panel-schema";
-import FormSubmitButton from "../../../common/FormSubmitButton";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import PropTypes from "prop-types";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
-export default function BusinessHour({ type, day }) {
+import Swal from "sweetalert2";
+
+import FormSubmitButton from "@/components/common/FormSubmitButton";
+
+import { generateTimeslots } from "@/utils/generate-timeslots-utils";
+import { BusinessHourSchema } from "@/utils/schema/tutor-panel-schema";
+import { daysOfWeekInChinese, formatHour } from "@/utils/timeFormatted-utils";
+import tutorApi from "@/api/tutorApi";
+
+export default function BusinessHour({ type, day, defaultValue, revalidateAvailability }) {
+  const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
   const [isEdit, setEdit] = useState(false);
+  const [isLoading, setLoadingState] = useState(false);
 
   const {
     control,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    trigger,
+    reset,
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(BusinessHourSchema),
+    defaultValues: defaultValue,
   });
 
-  const timeslotsWatch = watch("timeslots") || [];
-  const isOpenWatch = watch("isOpen");
+  const timeslotsWatch = watch("time_slots") || [];
+  const isOpenWatch = watch("is_open");
 
   const startTimeTimeslots = useMemo(() => generateTimeslots("startTime"), []);
   const endTimeTimeslots = useMemo(() => generateTimeslots("endTime"), []);
 
   // Trigger when user clicks the button to add a new timeslot row to specific day of week
   const handleAddTimeslot = () => {
-    setValue("timeslots", [...(timeslotsWatch || []), { startTime: "", endTime: "" }]);
+    setValue("time_slots", [...(timeslotsWatch || []), { start_hour: 0, end_hour: 1 }]);
+    trigger();
   };
 
   const handleRemoveTimeslot = (index) => {
     setValue(
-      `timeslots`,
+      `time_slots`,
       timeslotsWatch.filter((_, i) => i !== index)
     );
+    trigger();
   };
 
-  const onSubmit = (data) => {
-    console.log(day.value || day, data);
+  const handleEditButtonClick = () => {
+    if (isEdit) {
+      reset(defaultValue);
+    }
+    setEdit((prev) => !prev);
+  };
+
+  const onSubmit = async (data) => {
+    setLoadingState(true);
+    try {
+      //tutorId, dayOfWeek, timeslots
+      if (type === "week") {
+        if (data.is_open && data.time_slots.length > 0) {
+          await tutorApi.updateDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day), { time_slots: data.time_slots });
+        } else {
+          await tutorApi.deleteDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day));
+        }
+      }
+
+      revalidateAvailability();
+      Swal.fire({
+        icon: "success",
+        title: "修改成功",
+        text: `你已成功修改${day}的可預約時間`,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "修改失敗",
+        text: error.response.data.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="tutor-booking">
-      <div key={day.value} className="accordion" id={`accordion${day.value}`}>
+      <div key={day} className="accordion" id={`accordion${day}`}>
         <div className="accordion-item border-0 rounded-5">
-          {/* Header */}
+          {/* Accordion Header */}
           <h2 className="accordion-header">
             <button
               className="accordion-button collapsed ps-2"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target={`#collapse${type === "week" ? day.value : day}`}
-              aria-expanded={isEdit || isOpenWatch ? "true" : "false"}
-              aria-controls={`collapse${type === "week" ? day.value : day}`}
+              data-bs-target={`#collapse${day}`}
+              aria-expanded={"false"}
+              aria-controls={`collapse${day}`}
               style={{ backgroundColor: "transparent", boxShadow: "none" }}
             >
               <div className="w-100 d-flex align-items-center justify-content-between mx-4">
                 <div className="d-flex align-items-center">
-                  <p className="fs-6 fs-md-5 me-4 me-lg-5 me-xxl-10"> {type === "week" ? day.label : day}</p>
+                  <p className="fs-6 fs-md-5 me-4 me-lg-5 me-xxl-10"> {day}</p>
 
                   {!isOpenWatch && <p className="text-gray-03 fs-7">沒有可預約時間</p>}
-                </div>
-
-                <div className="btn btn-outline-brand-03 rounded-4 border-2" onClick={() => setEdit((prev) => !prev)} onMouseDown={(e) => e.preventDefault()}>
-                  {isEdit ? "取消編輯" : "編輯"}
                 </div>
               </div>
             </button>
           </h2>
-          {/* body */}
-          <div
-            id={`collapse${type === "week" ? day.value : day}`}
-            className={`accordion-collapse collapse ${isEdit || isOpenWatch ? "show" : ""}`}
-            data-bs-parent={`#accordion${type === "week" ? day.value : day}`}
-          >
+
+          {/* Accordion Body */}
+          <div id={`collapse${day}`} className={`accordion-collapse collapse`} data-bs-parent={`#accordion${day}`}>
             <div className="accordion-body pt-0">
               <Controller
-                name={`isOpen`}
+                name={`is_open`}
                 control={control}
                 render={({ field }) => (
                   <div className="form-check form-switch mb-5">
@@ -86,125 +124,120 @@ export default function BusinessHour({ type, day }) {
                       className="form-check-input"
                       type="checkbox"
                       role="switch"
-                      id={`flexSwitchCheck${type === "week" ? day.value : day}`}
+                      id={`flexSwitchCheck${day}`}
                       checked={field.value ?? false}
-                      disabled={!isEdit}
+                      disabled={!isEdit || isLoading}
                       onChange={(e) => {
                         const isChecked = e.target.checked;
                         field.onChange(isChecked);
-                        setValue(`isOpen`, isChecked);
+                        setValue(`is_open`, isChecked);
                         if (!isChecked) {
-                          setValue(`timeslots`, []);
+                          setValue(`time_slots`, []);
                         }
+                        trigger();
                       }}
                     />
-                    <label className="form-check-label" htmlFor={`flexSwitchCheck${type === "week" ? day.value : day}`}>
+                    <label className="form-check-label fs-7" htmlFor={`flexSwitchCheck${day}`}>
                       是否開放預約？
                     </label>
                   </div>
                 )}
               />
-              {errors?.timeslots?.root && <div className="text-danger mb-2">{errors?.timeslots?.root?.message}</div>}
+
+              {errors?.time_slots && <div className="text-danger mb-5 fs-7">{errors?.time_slots?.message || errors?.time_slots?.root?.message}</div>}
+
+              {/* Timeslots Pair */}
               {timeslotsWatch.length > 0 &&
                 timeslotsWatch.map((slot, index) => (
-                  <div key={index} className="d-flex align-items-center gap-2 mb-5 flex-wrap">
-                    {/* Start Time */}
-                    <Controller
-                      name={`timeslots.${index}.startTime`}
-                      control={control}
-                      render={({ field }) => (
-                        <div
-                          className="d-flex flex-column"
-                          style={{
-                            transform: errors?.timeslots?.[index]?.endTime ? "translateY(-10px)" : "translateY(0)",
-                          }}
-                        >
-                          <select
-                            className={`form-select ${errors?.timeslots?.[index]?.startTime ? "is-invalid" : ""} px-4 py-3`}
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            disabled={!isEdit}
-                          >
-                            <option value="" disabled>
+                  <div className="mb-2" key={index}>
+                    <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                      {/* Start Time */}
+                      <Controller
+                        name={`time_slots.${index}.start_hour`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className="form-floating" id="floatingSelect">
+                            <select
+                              className={`form-select ps-3 pe-11 pt-4 fs-7 pb-0${errors?.time_slots?.[index]?.start_hour ? " is-invalid" : ""}`}
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                trigger();
+                              }}
+                              disabled={!isEdit || isLoading}
+                            >
+                              {startTimeTimeslots.map((time) => (
+                                <option key={time} value={time}>
+                                  {formatHour(time)}
+                                </option>
+                              ))}
+                            </select>
+                            <label htmlFor="floatingSelect" className="fs-8">
                               開始時間
-                            </option>
-                            {startTimeTimeslots.map((time) => (
-                              <option key={time} value={time}>
-                                {time}
-                              </option>
-                            ))}
-                          </select>
-                          {errors?.timeslots?.[index]?.startTime && <div className="invalid-feedback">{errors?.timeslots[index]?.startTime?.message}</div>}
-                        </div>
-                      )}
-                    />
+                            </label>
+                          </div>
+                        )}
+                      />
 
-                    <p
-                      style={{
-                        transform:
-                          errors?.timeslots?.[index]?.startTime || errors?.timeslots?.[index]?.endTime
-                            ? errors?.timeslots?.[index]?.startTime && errors?.timeslots?.[index]?.endTime
-                              ? "translateY(-20px)"
-                              : "translateY(-10px)"
-                            : "translateY(0)",
-                      }}
-                    >
-                      -
-                    </p>
+                      <p>-</p>
 
-                    {/* End Time */}
-                    <Controller
-                      name={`timeslots.${index}.endTime`}
-                      control={control}
-                      render={({ field }) => (
-                        <div
-                          className="d-flex flex-column"
-                          style={{
-                            transform: errors?.timeslots?.[index]?.startTime ? "translateY(-10px)" : "translateY(0)",
-                          }}
-                        >
-                          <select className={`form-select px-4 py-3 ${errors?.timeslots?.[index]?.endTime ? "is-invalid" : ""}`} value={field.value || ""} onChange={field.onChange} disabled={!isEdit}>
-                            <option value="" disabled>
+                      {/* End Time */}
+                      <Controller
+                        name={`time_slots.${index}.end_hour`}
+                        control={control}
+                        render={({ field }) => (
+                          <div className="form-floating">
+                            <select
+                              className={`form-select ps-3 pe-11 pt-4 fs-7 pb-0${errors?.time_slots?.[index]?.end_hour ? " is-invalid" : ""}`}
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                trigger();
+                              }}
+                              disabled={!isEdit || isLoading}
+                            >
+                              {endTimeTimeslots.map((time) => (
+                                <option key={time} value={time}>
+                                  {formatHour(time)}
+                                </option>
+                              ))}
+                            </select>
+                            <label htmlFor="floatingSelect" className="fs-8 ps-3">
                               結束時間
-                            </option>
-                            {endTimeTimeslots.map((time) => (
-                              <option key={time} value={time}>
-                                {time}
-                              </option>
-                            ))}
-                          </select>
-                          {errors?.timeslots?.[index]?.endTime && <div className="invalid-feedback">{errors?.timeslots[index]?.endTime?.message}</div>}
-                        </div>
-                      )}
-                    />
+                            </label>
+                          </div>
+                        )}
+                      />
 
-                    {isEdit && (
-                      <span
-                        className="material-symbols-outlined cursor-pointer"
-                        onClick={() => handleRemoveTimeslot(index)}
-                        style={{
-                          transform:
-                            errors?.timeslots?.[index]?.startTime || errors?.timeslots?.[index]?.endTime
-                              ? errors?.timeslots?.[index]?.startTime && errors?.timeslots?.[index]?.endTime
-                                ? "translateY(-20px)"
-                                : "translateY(-10px)"
-                              : "translateY(0)",
-                        }}
-                      >
-                        delete
-                      </span>
-                    )}
+                      {isEdit && (
+                        <span className="material-symbols-outlined cursor-pointer" onClick={() => handleRemoveTimeslot(index)} disabled={isLoading}>
+                          delete
+                        </span>
+                      )}
+                    </div>
+                    {errors?.time_slots?.[index]?.start_hour && <div className="text-danger fs-8">{errors?.time_slots[index]?.start_hour?.message}</div>}
+                    {errors?.time_slots?.[index]?.end_hour && <div className="text-danger fs-8">{errors?.time_slots[index]?.end_hour?.message}</div>}
                   </div>
                 ))}
 
-              {isEdit && isOpenWatch && (
-                <div>
-                  <button className="btn btn-outline-brand-03 rounded-4 border-2 me-4" onClick={handleAddTimeslot}>
-                    新增
-                  </button>
-                  <FormSubmitButton isLoading={isSubmitting} buttonText="儲存" loadingText="儲存中..." roundedRadius={4} />
+              {/* Action Button */}
+              <div className="w-full d-flex justify-content-between flex-wrap gap-2 mt-5">
+                <div className="d-flex gap-2">
+                  {isOpenWatch && isEdit && (
+                    <button className="px-5 py-2 fs-8 btn btn-outline-brand-03 rounded-4 border-2" onClick={handleAddTimeslot} disabled={isLoading} type="button">
+                      新增
+                    </button>
+                  )}
+
+                  {isEdit && <FormSubmitButton buttonStyle={"px-5 py-2 fs-8"} isLoading={isLoading} buttonText="儲存" loadingText="儲存中..." roundedRadius={4} />}
                 </div>
-              )}
+
+                <div className="ms-auto">
+                  <button className="px-5 py-2 fs-8 btn btn-outline-brand-03 rounded-4 border-2" onClick={handleEditButtonClick} type="button">
+                    {isEdit ? "取消編輯" : "編輯"}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -215,11 +248,15 @@ export default function BusinessHour({ type, day }) {
 
 BusinessHour.propTypes = {
   type: PropTypes.oneOf(["week", "specific"]).isRequired,
-  day: PropTypes.oneOfType([
-    PropTypes.shape({
-      value: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-    }), // For week-based scheduling
-    PropTypes.string, // For specific date scheduling
-  ]).isRequired,
+  day: PropTypes.string.isRequired,
+  defaultValue: PropTypes.shape({
+    is_open: PropTypes.bool.isRequired,
+    time_slots: PropTypes.arrayOf(
+      PropTypes.shape({
+        start_hour: PropTypes.number.isRequired,
+        end_hour: PropTypes.number.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  revalidateAvailability: PropTypes.func.isRequired,
 };

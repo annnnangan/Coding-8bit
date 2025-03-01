@@ -5,8 +5,6 @@ import Loader from "../../../components/common/Loader";
 import AllBookingsSection from "../../../components/tutor-panel/booking/all-bookings/AllBookingsSection";
 import AvailableTimeSection from "../../../components/tutor-panel/booking/available-time/AvailableTimeSection";
 
-const { VITE_API_BASE, VITE_API_BASE_2 } = import.meta.env;
-
 export default function TutorManageBooking() {
   //loading
   const [loadingState, setLoadingState] = useState(true);
