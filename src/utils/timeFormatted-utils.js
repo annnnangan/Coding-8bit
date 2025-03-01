@@ -1,3 +1,5 @@
+/* ------------------------------- Format Video Duration ------------------------------ */
+
 // 轉換為影片時間格式
 export const convertSecondsToTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
@@ -8,6 +10,7 @@ export const convertSecondsToTime = (seconds) => {
   return timeFormatted;
 };
 
+/* ------------------------------- Format Date ------------------------------ */
 export const formatDateToTaiwanStyle = (isoString) => {
   const date = new Date(isoString);
   const options = {
@@ -56,6 +59,8 @@ export const removeYearFromDate = (isoString) => {
   const day = String(date.getDate()).padStart(2, "0");
   return `${month}/${day}`;
 };
+
+/* ------------------------------- Format Time ------------------------------ */
 
 // 從 數字(e.g. 9) 轉到 09:00
 export const formatHour = (hour) => {

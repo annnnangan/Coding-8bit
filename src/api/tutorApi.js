@@ -106,8 +106,27 @@ const deleteCertificate = async (tutorId, certificateId) => {
 
 /* ---------------------------------- 可預約時段 ---------------------------------- */
 
+// 講師頁面的Timetable
 const getAvailability = async (tutorId, baseDate) => {
   const response = await apiClient.get(`/tutor/${tutorId}/availability/?baseDate=${baseDate}`);
+  return response.data;
+};
+
+// 講師後台的設定可預約時間
+const getAllDayOfWeekAvailability = async (tutorId) => {
+  const response = await apiClient.get(`/tutor/${tutorId}/businessHours`);
+  return response.data.data;
+};
+
+// 講師後台的設定可預約時間 - 更新一個day of week的時間
+const updateDayOfWeekAvailability = async (tutorId, dayOfWeek, timeslots) => {
+  const response = await apiClient.put(`/tutor/${tutorId}/time-blocks/${dayOfWeek}`, timeslots);
+  return response.data;
+};
+
+// 講師後台的設定可預約時間 - 刪除整個一個day of week的所有時間
+const deleteDayOfWeekAvailability = async (tutorId, dayOfWeek) => {
+  const response = await apiClient.delete(`/tutor/${tutorId}/time-blocks/${dayOfWeek}`);
   return response.data;
 };
 
@@ -129,4 +148,7 @@ export default {
   updateCertificate,
   deleteCertificate,
   getAvailability,
+  updateDayOfWeekAvailability,
+  getAllDayOfWeekAvailability,
+  deleteDayOfWeekAvailability,
 };
