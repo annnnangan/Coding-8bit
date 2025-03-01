@@ -3,9 +3,9 @@ import apiClient from "./apiClient";
 /* ---------------------------------- 基本資料 ---------------------------------- */
 
 // 取得講師列表
-const getAllTutor = async () => {
-  const response = await apiClient.get(`/tutors`);
-  return response.data;
+const getAllTutor = async (page = 1, sortBy = "rating", order = "DESC", search = "", limit = 9) => {
+  const response = await apiClient.get(`/tutor?page=${page}&sortBy=${sortBy}&order=${order}&search=${search}&limit=${limit}`);
+  return response.data.data;
 };
 
 // 取得單一講師資料
