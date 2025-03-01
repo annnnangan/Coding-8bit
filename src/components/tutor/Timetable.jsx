@@ -9,7 +9,7 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
 
   const handleClick = (date, hour) => {
     handleBookingTimeslotsSelect(date, hour);
-    if (!isModal) {
+    if (!isModal && openBookingModal) {
       openBookingModal();
     }
   };
@@ -113,4 +113,6 @@ Timetable.propTypes = {
     date: PropTypes.string,
     hours: PropTypes.arrayOf(PropTypes.number),
   }),
+  isModal: PropTypes.bool,
+  openBookingModal: PropTypes.func,
 };

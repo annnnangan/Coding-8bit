@@ -217,12 +217,12 @@ export default function TutorBooking() {
     // 從選擇service type跳轉到付款頁面
     if (currentModalStep === 2) {
       if (selectedServiceType && selectedBookingTimeslots.date && selectedBookingTimeslots.hours.length > 0) {
-        dispatch(updateFormData({ tutorId: tutor_id }));
-        dispatch(updateFormData({ tutorName: tutorBasicInfo.User.username }));
-        dispatch(updateFormData({ date: selectedBookingTimeslots.date }));
+        dispatch(updateFormData({ tutor_id: tutor_id }));
+        dispatch(updateFormData({ tutor_name: tutorBasicInfo.User.username }));
+        dispatch(updateFormData({ booking_date: selectedBookingTimeslots.date }));
         dispatch(updateFormData({ timeslots: selectedBookingTimeslots.hours }));
         dispatch(updateFormData({ price: tutorBasicInfo.hourly_rate * selectedBookingTimeslots.hours.length }));
-        dispatch(updateFormData({ serviceType: selectedServiceType }));
+        dispatch(updateFormData({ service_type: selectedServiceType }));
         bookingModal.current.hide();
         navigate(`/tutor-booking-payment`);
       } else {

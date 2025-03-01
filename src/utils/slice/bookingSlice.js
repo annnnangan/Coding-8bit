@@ -3,14 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 export const bookingSlice = createSlice({
   name: "booking",
   initialState: {
-    tutorId: "",
-    tutorName: "",
-    date: "",
+    tutor_id: "",
+    tutor_name: "",
+    booking_date: "",
     timeslots: [],
     price: "",
-    serviceType: "",
-    sourceCodeUrl: "",
-    instructionDetails: "",
+    service_type: "",
+    source_code_url: "",
+    instruction_details: "",
   },
   reducers: {
     updateFormData(state, action) {
