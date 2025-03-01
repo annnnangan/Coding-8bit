@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import PropTypes from "prop-types";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 
@@ -8,12 +8,13 @@ import Swal from "sweetalert2";
 
 import FormSubmitButton from "@/components/common/FormSubmitButton";
 
+import tutorApi from "@/api/tutorApi";
 import { generateTimeslots } from "@/utils/generate-timeslots-utils";
 import { BusinessHourSchema } from "@/utils/schema/tutor-panel-schema";
 import { daysOfWeekInChinese, formatHour } from "@/utils/timeFormatted-utils";
-import tutorApi from "@/api/tutorApi";
 
 export default function BusinessHour({ type, day, defaultValue, revalidateAvailability }) {
+  console.log(type, defaultValue);
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
   const [isEdit, setEdit] = useState(false);
   const [isLoading, setLoadingState] = useState(false);

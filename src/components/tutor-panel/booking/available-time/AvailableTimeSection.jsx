@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
-import BusinessHour from "./BusinessHour";
-import { DayPicker } from "react-day-picker";
 import { useSelector } from "react-redux";
+
+import { DayPicker } from "react-day-picker";
+
+import BusinessHour from "./BusinessHour";
+import SectionFallback from "@/components/common/SectionFallback";
 
 import { daysOfWeekInChinese } from "@/utils/timeFormatted-utils";
 import tutorApi from "@/api/tutorApi";
@@ -14,14 +17,15 @@ export default function AvailableTimeSection() {
   const [isLoadingSpecificDateAvailability, setLoadingSpecificDateAvailability] = useState(false);
 
   const [dayOfWeekAvailability, setDayOfWeekAvailability] = useState(null);
-  const [specificDateAvailability, setSpecificDateAvailability] = useState(null);
+  const [specificDateAvailability, setSpecificDateAvailability] = useState({});
 
+  /* ------------------------------ Get Initial Availability Data ----------------------------- */
   const getAllDayOfWeekAvailability = async () => {
     setLoadingDayOfWeekAvailability(true);
     try {
       const result = await tutorApi.getAllDayOfWeekAvailability(tutorId);
+
       setDayOfWeekAvailability(result);
-      // data.map(({ start_hour, end_hour }) => ({ start_hour, end_hour }));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -29,10 +33,47 @@ export default function AvailableTimeSection() {
     }
   };
 
+  const getAllSpecificDateAvailability = async () => {
+    setLoadingSpecificDateAvailability(true);
+    try {
+      const result = await tutorApi.getAllSpecificDateAvailability(tutorId);
+      // Group all timeslots from row by date
+      const transformData = result.reduce((acc, item) => {
+        const { date, is_open, start_hour, end_hour, action_type } = item;
+
+        // If the date key doesn't exist, initialize it
+        if (!acc[date]) {
+          acc[date] = { is_open, time_slots: [] };
+        }
+
+        // Push the timeslot into the array
+        acc[date].time_slots.push({ start_hour, end_hour, action_type });
+
+        return acc;
+      }, {});
+
+      setSpecificDateAvailability(transformData);
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingSpecificDateAvailability(false);
+    }
+  };
+
   useEffect(() => {
     getAllDayOfWeekAvailability();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    getAllSpecificDateAvailability();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ------------------------------ Click Handler ----------------------------- */
+  // const addNewSpecificDateAvailability = () =>{
+
+  // }
 
   return (
     <div className="row tutor-booking">
@@ -90,7 +131,17 @@ export default function AvailableTimeSection() {
             </div>
           ) : (
             <>
-              <BusinessHour type="specific" day={"2025-03-02"} />
+              {Object.keys(specificDateAvailability)?.length > 0 ? (
+                <div className="d-flex flex-column gap-5">
+                  {Object.entries(specificDateAvailability).map((item) => (
+                    <BusinessHour type="specific" day={item[0]} key={item[0]} defaultValue={item[1]} revalidateAvailability={getAllSpecificDateAvailability} />
+                  ))}
+                </div>
+              ) : (
+                <div className="f-center mt-5">
+                  <SectionFallback materialIconName="calendar_clock" fallbackText="尚未新增特定日期" />
+                </div>
+              )}
             </>
           )}
         </div>
