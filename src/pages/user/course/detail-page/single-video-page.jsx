@@ -1,12 +1,16 @@
+// react 相關套件
 import { useState, useEffect } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+// API
+import courseApi from "@/api/courseApi";
+
+// 組件
 import VideoContent from "@/components/course/detail-page/VideoContent";
 import Loader from "@/components/common/Loader";
 
-import courseApi from "@/api/courseApi";
-
+// 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
@@ -37,6 +41,7 @@ export default function CourseVideoPage() {
     return relatedVideo.filter((related) => related.course_id !== videoData.course_id);
   };
 
+  // 初始化取得資料
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -58,7 +63,7 @@ export default function CourseVideoPage() {
     }
   };
 
-  // 初始化取得資料
+  // 初始化
   useEffect(() => {
     getData();
   }, [videoId]);
@@ -73,7 +78,6 @@ export default function CourseVideoPage() {
         </title>
       </Helmet>
       {loadingState && <Loader />}
-
       <main className="video-details container-lg py-lg-13 py-md-0">
         <div className="row">
           <VideoContent
@@ -81,7 +85,6 @@ export default function CourseVideoPage() {
             courseList={videoData}
             paramsVideoId={videoId}
           />
-
           <aside className="col-lg-5 col-xl-4">
             {/* 講師其他影片 */}
             {otherVideos.length > 0 && (

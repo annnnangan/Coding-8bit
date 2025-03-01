@@ -1,13 +1,19 @@
+// reacr 相關套件
 import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+// 第三方套件
 import { Modal } from "bootstrap";
 
+// API
+import courseApi from "@/api/courseApi";
+
+// 組件
 import VideoContent from "@/components/course/detail-page/VideoContent";
 import Loader from "@/components/common/Loader";
 
-import courseApi from "@/api/courseApi";
-
+// 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
@@ -15,6 +21,8 @@ export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
   const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const { id, videoId } = useParams(); // 取得路由參數
+
+  // 更多章節 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
 
@@ -70,6 +78,8 @@ export default function CourseVideoPage() {
     getData();
   }, [videoId]);
 
+
+  // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
     modalRefMethod.current = new Modal(modalRef.current);
     modalRef.current.addEventListener("hide.bs.modal", () => {
@@ -97,7 +107,6 @@ export default function CourseVideoPage() {
             courseList={videoData}
             paramsVideoId={videoId}
           />
-
           <aside className="col-lg-5 col-xl-4">
             {/* 章節影片 */}
             <div className="chapter-video rounded-4 aside-border mb-6">

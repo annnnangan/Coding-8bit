@@ -1,10 +1,15 @@
-import PropTypes from "prop-types";
-import { NavLink } from "react-router-dom";
+// react 相關套件
 import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
+
+// 第三方套件
+import PropTypes from "prop-types";
 import DOMPurify from "dompurify";
 
+// API
 import courseApi from "../../../api/courseApi";
 
+// 組件
 import CommentsSection from "./CommentsSection";
 
 export default function VideoContent({
@@ -14,8 +19,10 @@ export default function VideoContent({
   introductionVideoId,
   paramsVideoId,
 }) {
-  const [comments, setComments] = useState([]);
-  const [disableInputComment, setDisableInputComment] = useState(false);
+  const [comments, setComments] = useState([]); // 留言
+  const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
+  
+  // 取得課程留言
   const getCourseCommentsHandle = async () => {
     try {
       const commentsResult = await courseApi.getCourseComments(
@@ -24,10 +31,12 @@ export default function VideoContent({
 
       setComments(commentsResult);
     } catch (error) {
-      console.log("getCourseCommentsHandle error", error);
+      console.error("getCourseCommentsHandle error", error);
     }
   };
 
+
+  //初始化判斷是否禁用留言輸入框
   useEffect(() => {
     videoUrl === ""
       ? setDisableInputComment(true)
@@ -195,6 +204,7 @@ export default function VideoContent({
     </section>
   );
 }
+
 VideoContent.propTypes = {
   courseList: PropTypes.shape({
     title: PropTypes.string,
