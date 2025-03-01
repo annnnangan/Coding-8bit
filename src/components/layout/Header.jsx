@@ -109,7 +109,7 @@ export default function Header() {
 
       {isMenuOpen && <style>{`body { overflow: hidden; }`}</style>}
       <nav
-        className={`layout-nav-wrap navbar navbar-expand-lg navbar-light ${
+        className={`layout-nav-wrap navbar navbar-expand-lg navbar-light py-3 ${
           isMenuOpen ? "bg-white" : "bg-transparent"
         }`}
       >
@@ -230,18 +230,32 @@ export default function Header() {
                       <p className="text-gray-01">{userData.username}</p>
                     </div>
                   </div>
-                  <li className="nav-item mt-2">
-                    <button
-                      className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                      aria-current="page"
-                      type="button"
-                      onClick={roleToggle}
-                    >
-                      {userData.last_active_role === "student"
-                        ? "切換成老師身分"
-                        : "切換成學生身分"}
-                    </button>
-                  </li>
+                  {userData?.tutor_id === null &&
+                    userData.last_active_role === "student" && (
+                      <li className="nav-item mt-2">
+                        <NavLink
+                          className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                          to="/tutor-apply"
+                        >
+                          成為老師
+                        </NavLink>
+                      </li>
+                    )}
+                  {userData?.tutor_id && (
+                    <li className="nav-item mt-2">
+                      <button
+                        className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                        aria-current="page"
+                        type="button"
+                        onClick={roleToggle}
+                      >
+                        {userData.last_active_role === "student"
+                          ? "切換成老師身分222"
+                          : "切換成學生身分"}
+                      </button>
+                    </li>
+                  )}
+
                   <li className="nav-item">
                     <NavLink
                       className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
@@ -321,17 +335,31 @@ export default function Header() {
                       className="dropdown-menu dropdown-menu-end rounded-1 mt-4"
                       aria-labelledby="dropdownMenuLink"
                     >
-                      <li>
-                        <button
-                          type="button"
-                          className="dropdown-item"
-                          onClick={roleToggle}
-                        >
-                          {userData.last_active_role === "student"
-                            ? "切換成老師身分"
-                            : "切換成學生身分"}
-                        </button>
-                      </li>
+                      {userData?.tutor_id === null &&
+                        userData.last_active_role === "student" && (
+                          <li className="nav-item">
+                            <Link
+                              className="dropdown-item"
+                              to="/tutor-apply"
+                            >
+                              成為老師
+                            </Link>
+                          </li>
+                        )}
+                      {userData?.tutor_id && (
+                        <li>
+                          <button
+                            type="button"
+                            className="dropdown-item"
+                            onClick={roleToggle}
+                          >
+                            {userData.last_active_role === "student"
+                              ? "切換成老師身分"
+                              : "切換成學生身分"}
+                          </button>
+                        </li>
+                      )}
+
                       <li>
                         <Link
                           to={
