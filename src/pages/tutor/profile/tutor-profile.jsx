@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 
@@ -83,8 +84,24 @@ export default function TutorProfile() {
   useEffect(() => {
     if (userData.tutor_id) {
       getData();
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "請確認是否已經取得講師身分權限",
+      });
     }
   }, [userData.tutor_id]);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!userData.tutor_id) {
+      Swal.fire({
+        icon: "error",
+        title: "請確認是否已經取得講師身分權限",
+      });
+      navigate("/")
+    }
+  }, []);
 
   return (
     <>
