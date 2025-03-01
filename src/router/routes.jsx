@@ -36,6 +36,8 @@ import TutorBookingPayment from "../pages/user/tutor/tutor-booking-payment";
 import TutorInfo from "../pages/user/tutor/tutor-info";
 
 import HelpCenter from "../pages/user/help-center";
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsOfService from "../pages/TermsOfService";
 
 // 使用者後台 - 講師
 import TutorPanel from "../pages/tutor/tutor-panel";
@@ -93,6 +95,8 @@ export const router = createHashRouter([
       { path: "tutor-info/:id", element: <TutorInfo /> },
 
       { path: "help-center", element: <HelpCenter /> },
+      { path: "privacy-policy", element: <PrivacyPolicy /> },
+      { path: "terms-of-service", element: <TermsOfService /> },
     ],
   },
   {
