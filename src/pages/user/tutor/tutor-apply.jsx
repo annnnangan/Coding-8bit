@@ -15,7 +15,6 @@ import userApi from "@/api/userApi";
 import FormInput from "@/components/common/FormInput";
 import Loader from "@/components/common/Loader";
 
-
 export default function TutorApply() {
   // loading
   const [loadingState, setLoadingState] = useState(false);
@@ -57,8 +56,10 @@ export default function TutorApply() {
     try {
       await Promise.all([
         userApi.addRole(userData.id, "tutor"),
-        tutorApi.applyTutor({ ...data, rating: 5.0 }),
+        userApi.changeUserRole("tutor"),
+        tutorApi.applyTutor({ user_id: userData.id, ...data, rating: 5.0 }),
       ]);
+
       Swal.fire({
         title: "申請成功",
         icon: "success",
@@ -183,15 +184,15 @@ export default function TutorApply() {
           )}
           {currentStep === 2 && (
             <>
-              <h1 className="text-brand-03 mt-8">填寫講師資料</h1>
-              <p className="fs-5 mt-3">
+              <h1 className="fs-4 fs-lg-1 text-brand-03 mt-8">填寫講師資料</h1>
+              <p className="fs-6 fs-lg-5 mt-3">
                 成為講師前，請填寫相關資料，讓其他學員認識您
               </p>
               <form
                 className="row pt-6 pt-md-8 f-center"
                 onSubmit={handleSubmit(onSubmit)}
               >
-                <div className="col-xxl-8">
+                <div className="col-lg-8">
                   <div>
                     <div className="fs-6 mt-2 mt-md-4">
                       <FormInput

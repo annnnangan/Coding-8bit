@@ -22,7 +22,7 @@ export default function Footer() {
               <p className="fs-7 lh-sm">
                 Copyright@2025 Coding∞bit 保留所有權利·
                 <a
-                  href="https://coding-8bit.site/PrivacyPolicy.html#PrivacyPolicyTitle"
+                  href="https://coding-8bit.site/PrivacyPolicy.html"
                   target="_blank"
                   className="underline-hover d-inline"
                 >
@@ -30,7 +30,7 @@ export default function Footer() {
                 </a>{" "}
                 |{" "}
                 <a
-                  href="https://coding-8bit.site/TermsOfService.html#TermsOfService"
+                  href="https://coding-8bit.site/TermsOfService.html"
                   target="_blank"
                   className="underline-hover d-inline"
                 >
