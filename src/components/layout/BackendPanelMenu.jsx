@@ -85,8 +85,13 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
 
   // 初始化 - 取得使用者資料
   useEffect(() => {
-    dispatch(getUserData());
-    setLoadingState(false);
+    if (isAuth) {
+      dispatch(getUserData())
+        .catch(() => {
+          navigate("/login");
+        })
+        .finally(() => setLoadingState(false));
+    }
   }, [isAuth]);
 
   // 初始化 - 驗證身分
@@ -98,14 +103,20 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
           Swal.fire({
             icon: "error",
             title: "登入驗證失敗",
-            text: error,
+            text: error.message || "請重新登入",
+          }).then(() => {
+            navigate("/login");
           });
-          navigate("/login");
         });
     } else {
       setLoadingState(false);
+      Swal.fire({
+        icon: "error",
+        title: "請先確認是否登入或是否已經取得身分權限",
+      })
+      navigate("/login");
     }
-  }, [location.pathname]);
+  }, [token]);
 
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
