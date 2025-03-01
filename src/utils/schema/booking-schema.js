@@ -16,12 +16,12 @@ const BookingInformationSchema = z
       }),
     }),
     tutor_id: z.string().min(1, "請選擇講師。"),
-    source_code_url: z.string().url({ message: "請輸入有效連結。" }).optional(),
+    source_code_url: z.string().url({ message: "請輸入有效連結。" }).optional(), // This is optional unless `service_type` is 'codeReview'
     instruction_details: z.string().min(30, "請輸入至少輸入30字來描述你的問題。"),
   })
   .refine(
     (data) => {
-      // If service_type is "codeReview", source_code_url should not be undefined or null
+      // Custom validation: source_code_url must be provided if service_type is "codeReview"
       if (data.service_type === "codeReview" && !data.source_code_url) {
         return false; // Source code URL is required if service_type is "codeReview"
       }
