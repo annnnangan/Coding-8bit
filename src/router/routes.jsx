@@ -34,6 +34,7 @@ import TutorList from "../pages/user/tutor/tutor-list";
 import TutorBooking from "../pages/user/tutor/tutor-booking";
 import TutorBookingPayment from "../pages/user/tutor/tutor-booking-payment";
 import TutorInfo from "../pages/user/tutor/tutor-info";
+import TutorApply from "../pages/user/tutor/tutor-apply";
 
 import HelpCenter from "../pages/user/help-center";
 
@@ -91,6 +92,7 @@ export const router = createHashRouter([
         element: <TutorBookingPayment />,
       },
       { path: "tutor-info/:id", element: <TutorInfo /> },
+      { path: "tutor-apply", element: <TutorApply /> },
 
       { path: "help-center", element: <HelpCenter /> },
     ],
