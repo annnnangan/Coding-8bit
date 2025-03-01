@@ -1,23 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { Dropdown } from "bootstrap";
 
 import { DayPicker } from "react-day-picker";
 
 import BusinessHour from "./BusinessHour";
 import SectionFallback from "@/components/common/SectionFallback";
 
-import { daysOfWeekInChinese } from "@/utils/timeFormatted-utils";
+import { daysOfWeekInChinese, formatDateDash } from "@/utils/timeFormatted-utils";
 import tutorApi from "@/api/tutorApi";
 
 import "react-day-picker/dist/style.css";
 
 export default function AvailableTimeSection() {
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
+
+  const dropdownButtonRef = useRef(null);
+
   const [isLoadingDayOfWeekAvailability, setLoadingDayOfWeekAvailability] = useState(false);
   const [isLoadingSpecificDateAvailability, setLoadingSpecificDateAvailability] = useState(false);
 
   const [dayOfWeekAvailability, setDayOfWeekAvailability] = useState(null);
   const [specificDateAvailability, setSpecificDateAvailability] = useState({});
+  const [newAddSpecificDateAvailability, setNewAddSpecificDateAvailability] = useState({});
 
   /* ------------------------------ Get Initial Availability Data ----------------------------- */
   const getAllDayOfWeekAvailability = async () => {
@@ -71,9 +76,18 @@ export default function AvailableTimeSection() {
   }, []);
 
   /* ------------------------------ Click Handler ----------------------------- */
-  // const addNewSpecificDateAvailability = () =>{
+  const handleDateSelect = (date) => {
+    const dropdown = new Dropdown(dropdownButtonRef.current);
+    dropdown.hide(); // Close the dropdown when a date is selected
 
-  // }
+    // setSpecificDateAvailability((prev) => {
+    //   const newDateKey = formatDateDash(date);
+    //   return {
+    //     [newDateKey]: { is_open: true, time_slots: [] }, // Add new date first
+    //     ...prev, // Spread previous state to keep all the existing dates
+    //   };
+    // });
+  };
 
   return (
     <div className="row tutor-booking">
@@ -107,17 +121,18 @@ export default function AvailableTimeSection() {
 
           <div className="dropdown">
             <button
+              ref={dropdownButtonRef}
               className="dropdown-toggle rounded-circle btn btn-brand-02 p-8 f-center add-btn"
               type="button"
               data-bs-toggle="dropdown"
+              data-bs-auto-close="inside"
               aria-expanded="false"
-              data-bs-config='{"autoClose": "outside"}'
               style={{ width: "44px", height: "44px" }}
             >
               <span className="material-symbols-outlined icon-fill text-brand-01 fs-2">add</span>
             </button>
             <ul className="dropdown-menu">
-              <DayPicker mode="single" showOutsideDays />
+              <DayPicker mode="single" onSelect={handleDateSelect} showOutsideDays disabled={{ before: new Date() }} startMonth={new Date()} />
             </ul>
           </div>
         </div>
@@ -132,7 +147,8 @@ export default function AvailableTimeSection() {
           ) : (
             <>
               {Object.keys(specificDateAvailability)?.length > 0 ? (
-                <div className="d-flex flex-column gap-5">
+                <div className="d-flex flex-column gap-5 bg-brand-02 p-4 rounded-4">
+                  <p>已儲存日期</p>
                   {Object.entries(specificDateAvailability).map((item) => (
                     <BusinessHour type="specific" day={item[0]} key={item[0]} defaultValue={item[1]} revalidateAvailability={getAllSpecificDateAvailability} />
                   ))}

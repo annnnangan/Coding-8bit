@@ -14,7 +14,6 @@ import { BusinessHourSchema } from "@/utils/schema/tutor-panel-schema";
 import { daysOfWeekInChinese, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BusinessHour({ type, day, defaultValue, revalidateAvailability }) {
-  console.log(type, defaultValue);
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
   const [isEdit, setEdit] = useState(false);
   const [isLoading, setLoadingState] = useState(false);
@@ -62,12 +61,24 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
   const onSubmit = async (data) => {
     setLoadingState(true);
     try {
-      //tutorId, dayOfWeek, timeslots
+      // Day of Week
       if (type === "week") {
         if (data.is_open && data.time_slots.length > 0) {
           await tutorApi.updateDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day), { time_slots: data.time_slots });
         } else {
           await tutorApi.deleteDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day));
+        }
+      }
+
+      // Specific Date
+      if (type === "specific") {
+        if (data.is_open && data.time_slots.length > 0) {
+          await tutorApi.updateSpecificDateAvailability(tutorId, day, {
+            time_slots: data.time_slots.map((slot) => ({
+              ...slot,
+              action_type: "add", // Add the new action_type property for API
+            })),
+          });
         }
       }
 
