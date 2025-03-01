@@ -22,15 +22,15 @@ export default function Footer() {
               <p className="fs-7 lh-sm">
                 Copyright@2025 Coding∞bit 保留所有權利·
                 <a
-                  href="https://coding-8bit.site/PrivacyPolicy.html"
+                  href="https://coding-8bit.site/PrivacyPolicy.html#PrivacyPolicyTitle"
                   target="_blank"
                   className="underline-hover d-inline"
                 >
-                  隱私政策
+                  隱私權政策
                 </a>{" "}
                 |{" "}
                 <a
-                  href="https://coding-8bit.site/TermsOfService.html"
+                  href="https://coding-8bit.site/TermsOfService.html#TermsOfService"
                   target="_blank"
                   className="underline-hover d-inline"
                 >
