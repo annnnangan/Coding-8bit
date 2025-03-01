@@ -13,6 +13,7 @@ import courseApi from "@/api/courseApi";
 import ShowMoreButton from "@/components/common/ShowMoreButton";
 import TutorBookingResume from "@/components/tutor/TutorBookingResume";
 import TutorsCard from "@/components/tutor/TutorsCard";
+import TutorCard from "@/components/tutor/TutorCard";
 import CourseCardList from "@/components/course/CourseCardList";
 import CommentsSection from "@/components/tutor/CommentsSection";
 import SectionFallback from "@/components/common/SectionFallback";
@@ -342,7 +343,7 @@ export default function TutorBooking() {
                   <div className="swiper-wrapper mb-10 py-5">
                     {recommendTutorData.map((tutor) => (
                       <div className="swiper-slide" key={tutor.id}>
-                        <TutorsCard tutorList={tutor} cardsNum={1} />
+                        <TutorCard tutor={tutor} />
                       </div>
                     ))}
                   </div>
