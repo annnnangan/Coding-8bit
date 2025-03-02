@@ -92,7 +92,7 @@ export default function StudentManageCustomRequests() {
     if (isAuth) {
       getData();
     }
-  }, [isAuth]);
+  }, [userData.id]);
 
   return (
     <>
@@ -125,7 +125,6 @@ export default function StudentManageCustomRequests() {
         <div className="table-wrap mt-6 mt-lg-13">
           {customRequestList.length > 0 ? (
             <>
-              {" "}
               <table className="table">
                 <thead>
                   <tr>
@@ -200,6 +199,7 @@ export default function StudentManageCustomRequests() {
       <CardModal
         temCustomCourse={temCustomRequest}
         cardModalRef={cardModalRef}
+        setLoadingState={setLoadingState}
       />
     </>
   );
