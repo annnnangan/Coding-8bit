@@ -395,6 +395,12 @@
 .related-videos-list {
   .related-video-image {
     max-width: 136px;
+    height: 80px;
+    overflow: hidden;
+    
+    img {
+      object-fit: cover;
+    }
   }
 
   .related-video-duration {

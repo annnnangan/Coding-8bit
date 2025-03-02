@@ -255,9 +255,9 @@ export default function CourseDetailPage() {
                         to={`/video/${related.id}`}
                         className="d-flex justify-content-between chapter-item"
                       >
-                        <div className="position-relative me-4">
+                        <div className="position-relative me-4 related-video-image rounded-2">
                           <img
-                            className="rounded-2 related-video-image"
+                            className="w-100"
                             src={related.cover_image}
                             alt="影片縮圖"
                           />

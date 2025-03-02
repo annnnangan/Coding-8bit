@@ -44,19 +44,37 @@ const getVideoDetail = async (id) => {
 
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
-  const response = await apiClient.get(`/video/${id}/comments`);
+  const response = await apiClient.get(`/comment/videos/${id}`);
   return response.data.data;
 };
 
 // 新增個人課程的留言
 const postCourseComments = async (id, data) => {
-  const response = await apiClient.post(`/video/${id}/comments`, data);
+  const response = await apiClient.post(`/comment/videos/${id}`, data);
   return response.data.data;
 };
 
 // 刪除個人課程的留言
 const deleteCourseComments = async (id) => {
-  const response = await apiClient.delete(`/video/comments/${id}`);
+  const response = await apiClient.delete(`/comment/videos/${id}`);
+  return response.data;
+};
+
+// 前台 - 取得單一影片是否收藏
+const getFavoriteVideo = async (videoId) => {
+  const response = await apiClient.get(`/favorites/videos/${videoId}`);
+  return response.data.data;
+};
+
+// 前台 - 收藏單一影片
+const postFavoriteVideo = async (videoId) => {
+  const response = await apiClient.post(`/favorites/videos/${videoId}`);
+  return response.data;
+};
+
+// 前台 - 移除收藏單一影片
+const deleteFavoriteVideo = async (videoId) => {
+  const response = await apiClient.delete(`/favorites/videos/${videoId}`);
   return response.data;
 };
 
@@ -148,13 +166,16 @@ export default {
   getCourseChapter,
   getVideoDetail,
   getCourseComments,
-  getTutorCourses,
-  getTutorVideos,
-  getFrontTutorCourses,
-  getFrontTutorVideos,
   postCourseComments,
   deleteCourseComments,
+  getFavoriteVideo,
+  postFavoriteVideo,
+  deleteFavoriteVideo,
+  getFrontTutorCourses,
+  getFrontTutorVideos,
   getTutorVideosInBooking,
+  getTutorCourses,
+  getTutorVideos,
   addCourse,
   updateCourse,
   deleteCourse,

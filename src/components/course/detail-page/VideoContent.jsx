@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 // 第三方套件
 import PropTypes from "prop-types";
 import DOMPurify from "dompurify";
+import Swal from "sweetalert2";
 
 // API
 import courseApi from "../../../api/courseApi";
@@ -21,20 +22,52 @@ export default function VideoContent({
 }) {
   const [comments, setComments] = useState([]); // 留言
   const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
-  
+  const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
+
   // 取得課程留言
   const getCourseCommentsHandle = async () => {
     try {
       const commentsResult = await courseApi.getCourseComments(
         introductionVideoId || paramsVideoId
       );
-
       setComments(commentsResult);
     } catch (error) {
       console.error("getCourseCommentsHandle error", error);
     }
   };
 
+  // 控制收藏課程
+  const handleFavorite = async (videoId) => {
+    let response;
+    try {
+      if (favoriteVideo) {
+        response = await courseApi.deleteFavoriteVideo(videoId);
+      } else {
+        response = await courseApi.postFavoriteVideo(videoId);
+      }
+      if (response.status === "success") {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "課程已收藏",
+          showConfirmButton: false,
+          timer: 1000
+        });
+        setFavoriteVideo(true);
+      } else {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "移除收藏",
+          showConfirmButton: false,
+          timer: 1000
+        });
+        setFavoriteVideo(false);
+      }
+    } catch (error) {
+      console.error("handleFavorite error", error);
+    }
+  };
 
   //初始化判斷是否禁用留言輸入框
   useEffect(() => {
@@ -43,6 +76,14 @@ export default function VideoContent({
       : setDisableInputComment(false);
 
     if (introductionVideoId || paramsVideoId) {
+      const getFavoriteVideoStatus = async () => {
+        const resStatus = await courseApi.getFavoriteVideo(
+          introductionVideoId || paramsVideoId
+        );
+        resStatus.isFavorite ? setFavoriteVideo(true) : setFavoriteVideo(false);
+      };
+
+      getFavoriteVideoStatus();
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
@@ -85,16 +126,19 @@ export default function VideoContent({
             <button
               type="button"
               className="favorite-button f-align-center btn btn-outline-none py-2 ps-3 px-4"
+              onClick={() =>
+                handleFavorite(introductionVideoId || paramsVideoId)
+              }
             >
               <span
                 className={`fs-5 me-1 material-symbols-outlined ${
-                  courseList.is_favorite && "icon-fill"
+                  favoriteVideo && "icon-fill"
                 }`}
               >
                 favorite
               </span>
               <span className="fs-7 favorite-font">
-                {courseList.is_favorite ? "已收藏" : "未收藏"}
+                {favoriteVideo ? "已收藏" : "未收藏"}
               </span>
             </button>
             <button
