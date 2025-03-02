@@ -151,6 +151,7 @@ export default function TutorInfo() {
                     </p>
                     <div className="list-x-scroll py-2 mt-4">
                       {tutorData.expertise
+                        .trim()
                         .split(",")
                         .slice(0, 3)
                         .map((skill, index) => (
