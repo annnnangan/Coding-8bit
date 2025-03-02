@@ -186,7 +186,7 @@ export default function CardModal({
                     <small id="modalDate" className="text-muted d-block mb-3">
                       {formatDateToTaiwanStyle(temCustomCourse?.createdAt)}
                     </small>
-                    {temCustomCourse?.photos?.map((photo) => (
+                    {temCustomCourse?.CustomRequestPhotos?.map((photo) => (
                       <img
                         id="modalPhoto"
                         src={photo.photo_url}
