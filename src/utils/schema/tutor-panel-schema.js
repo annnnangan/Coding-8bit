@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { formatHour } from "@/utils/timeFormatted-utils";
 
 const validateNoOverlapTimeslots = (slots, ctx) => {
   if (slots.length > 0) {
@@ -13,7 +14,7 @@ const validateNoOverlapTimeslots = (slots, ctx) => {
         if (next.start_hour < current.end_hour) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `時段 ${current.start_hour}:00 - ${current.end_hour}:00 和 時段 ${next.start_hour}:00 - ${next.end_hour}:00 有重疊。`,
+            message: `時段 ${formatHour(current.start_hour)} - ${formatHour(current.end_hour)} 和 時段 ${formatHour(next.start_hour)} - ${formatHour(next.end_hour)} 有重疊。`,
           });
         }
       }
