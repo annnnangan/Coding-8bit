@@ -102,7 +102,7 @@ export default function StudentManageCustomRequests() {
       {loadingState && <Loader />}
 
       <main className="manage-custom-request-list-wrap container-fluid">
-        <div className="f-between">
+        <div className="f-xxl-between">
           <div className="title">
             <h1 className="fs-4 fs-lg-2">
               客製化學習需求管理 - 已提出的學習需求
@@ -111,7 +111,7 @@ export default function StudentManageCustomRequests() {
           <div>
             <NavLink
               to="/custom-requests-list"
-              className="btn btn-brand-03 rounded-2 slide-right-hover d-inline-flex f-align-center py-3"
+              className="btn btn-brand-03 rounded-2 slide-right-hover d-inline-flex f-align-center mt-6 mt-xxl-0 py-3"
             >
               前往學習需求列表
               <span className="material-symbols-outlined icon-fill fs-5 ms-1">
