@@ -1,4 +1,4 @@
-.tutor-booking {
+.tutor-panel-booking {
   // 去除 BS5 錯誤訊息跑出的驚嘆號
   select.is-invalid,
   input.is-invalid {
@@ -9,12 +9,41 @@
     display: none;
   }
 
-  .sub-section:first-child {
+  .sub-section:nth-child(1) {
     border-right: solid 1px var(--bs-gray-03);
+    padding-right: 16px;
 
-    @include xxl-pc {
+    @include xl-pc {
       border-right: solid 0px;
       border-bottom: solid 1px var(--bs-gray-03);
+      padding-bottom: 32px;
+    }
+
+    @include lg-pc {
+      border-bottom: solid 0px;
+      border-right: solid 1px var(--bs-gray-03);
+      padding-right: 16px;
+    }
+
+    @include pad {
+      border-right: solid 0px;
+      border-bottom: solid 1px var(--bs-gray-03);
+      padding-bottom: 32px;
+    }
+  }
+
+  .sub-section:nth-child(2) {
+    padding-left: 16px;
+    @include xl-pc {
+      padding-top: 32px;
+    }
+
+    @include lg-pc {
+      padding-top: 0px;
+    }
+
+    @include pad {
+      padding-top: 32px;
     }
   }
 
