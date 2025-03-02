@@ -11,29 +11,27 @@ export default function BookingCard({ booking, handleClick }) {
         <div className="card-body p-3">
           <div className="d-flex gap-3 gap-md-2">
             <div className="col-3 d-flex flex-column justify-content-center align-items-center bg-gray-04 p-2 p-lg-5 rounded-2">
-              <h2 className="text-brand-03 text-center">{new Date(booking.start_time).getDate()}</h2>
-              <p className="fs-7 text-center">{new Intl.DateTimeFormat("zh-CN", { weekday: "long" }).format(new Date(booking.start_time))}</p>
+              {/* <h2 className="text-brand-03 text-center">{new Date(booking.start_time).getDate()}</h2>
+              <p className="fs-7 text-center">{new Intl.DateTimeFormat("zh-CN", { weekday: "long" }).format(new Date(booking.start_time))}</p> */}
             </div>
             <div className="col-8">
               <ul>
                 <li className="d-flex flex-wrap justify-content-between align-items-center mb-1">
-                  <p>{booking.student || booking.tutor}</p>
+                  {/* <p>{booking.student || booking.tutor}</p> */}
 
-                  <BookingStatusBadge status={booking.status} />
+                  {/* <BookingStatusBadge status={booking.status} /> */}
                 </li>
                 <li className="d-flex flex-wrap justify-content-between align-items-center mb-1">
                   <p className="fs-7 text-gray-03">時間</p>
-                  <p className="text-gray-01">
-                    {utils.formatOnlyTime(new Date(booking.start_time))} - {utils.formatOnlyTime(new Date(booking.end_time))}{" "}
-                  </p>
+                  <p className="text-gray-01">{/* {utils.formatOnlyTime(new Date(booking.start_time))} - {utils.formatOnlyTime(new Date(booking.end_time))}{" "} */}</p>
                 </li>
                 <li className="d-flex flex-wrap justify-content-between align-items-center mb-1">
                   <p className="fs-7 text-gray-03">會議連結</p>
-                  <p className="text-gray-01">{determineMeetingLinkMessage(booking.type, booking.status, booking.meeting_link)}</p>
+                  {/* <p className="text-gray-01">{determineMeetingLinkMessage(booking.type, booking.status, booking.meeting_link)}</p> */}
                 </li>
                 <li className="d-flex flex-wrap justify-content-between align-items-center mb-1">
                   <p className="fs-7 text-gray-03">預約類型</p>
-                  <p className="text-gray-01">{booking.type}</p>
+                  <p className="text-gray-01">{booking.service_type}</p>
                 </li>
               </ul>
             </div>

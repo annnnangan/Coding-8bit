@@ -1,23 +1,31 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
 import BookingCard from "../../../common/booking-record/BookingCard";
 import BookingDetailsModal from "../../../common/booking-record/BookingDetailsModal";
+import SectionFallback from "@/components/common/SectionFallback";
 
-import { tutorInProgressBookingData, tutorCompletedBookingData, tutorCanceledBookingData } from "../../../../data/bookings";
+import bookingApi from "@/api/bookingApi";
+
+// import { tutorInProgressBookingData, tutorCompletedBookingData, tutorCanceledBookingData } from "../../../../data/bookings";
 
 const bookingTypeList = [
   { name: "所有種類", value: "all" },
-  { name: "一對一教學", value: "1on1" },
-  { name: "程式碼檢視", value: "code-review" },
+  { name: "一對一教學", value: "courseSession" },
+  { name: "程式碼檢視", value: "codeReview" },
 ];
 
 export default function AllBookingsSection() {
+  const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
+
+  const [isLoading, setLoadingState] = useState();
   const [bookingType, setBookingType] = useState("all");
   const [dateRange, setDateRange] = useState(null);
   const [activeTab, setActiveTab] = useState("in_progress");
-  const [bookingListData, setBookingListData] = useState(tutorInProgressBookingData);
+  const [bookingListData, setBookingListData] = useState({});
 
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isOpenDetailsModal, setOpenDetailsModal] = useState(false);
@@ -30,24 +38,47 @@ export default function AllBookingsSection() {
     setActiveTab(tabName); // Update active tab based on clicked tab name
   };
 
-  useEffect(() => {
-    switch (activeTab) {
-      case "in_progress": {
-        setBookingListData(tutorInProgressBookingData);
-        break;
-      }
-      case "completed": {
-        setBookingListData(tutorCompletedBookingData);
-        break;
-      }
-      case "canceled": {
-        setBookingListData(tutorCanceledBookingData);
-        break;
-      }
-      default:
-        setBookingListData(tutorInProgressBookingData);
+  const getBookingListData = async (activeTab) => {
+    setLoadingState(true);
+    try {
+      const result = await bookingApi.getTutorBookings(tutorId);
+      // Group booking data from API by yyyy-mm
+      const formatData = result.reduce((acc, item) => {
+        const date = new Date(item.booking_date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+
+        // Filter only true timeslots (booked timeslots)
+        const timeslots = Object.keys(item.hourly_availability)
+          .filter((hour) => item.hourly_availability[hour])
+          .map(Number);
+
+        const { hourly_availability, ...dataWithoutHourlyAvailability } = item;
+
+        const key = `${year}-${month}`; // Group key
+
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+
+        acc[key].push({ ...dataWithoutHourlyAvailability, timeslots });
+        return acc;
+      }, {});
+      console.log(formatData);
+      setBookingListData(formatData);
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingState(false);
     }
-  }, [activeTab]);
+  };
+
+  useEffect(() => {
+    if (tutorId) {
+      getBookingListData(activeTab);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, tutorId]);
 
   const handleDetailsModalOpen = (booking) => {
     setSelectedBooking(booking);
@@ -119,18 +150,34 @@ export default function AllBookingsSection() {
 
         {/* Booking List based on the tab name*/}
         <div>
-          {Object.entries(bookingListData).map(([month, bookings]) => (
-            <div key={month} className="mt-8">
-              <h4 className="mb-6">{month.replace("-", "年")}月</h4>
-              <div className="row flex-wrap g-2 row">
-                {bookings.map((booking) => (
-                  <div className="col-12 col-lg-6 col-xl-4" key={booking.id}>
-                    <BookingCard booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
-                  </div>
-                ))}
+          {isLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
             </div>
-          ))}
+          ) : (
+            <>
+              {Object?.keys(bookingListData)?.length === 0 && (
+                <div className="mt-1">
+                  <SectionFallback materialIconName="calendar_clock" fallbackText="尚未有預約" />
+                </div>
+              )}
+
+              {Object.entries(bookingListData).map(([month, bookings]) => (
+                <div key={month} className="mt-8">
+                  <h4 className="mb-6">{month.replace("-", "年")}月</h4>
+                  <div className="row flex-wrap g-2 row">
+                    {bookings.map((booking) => (
+                      <div className="col-12 col-lg-6 col-xl-4" key={booking.id}>
+                        <BookingCard booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </div>
 

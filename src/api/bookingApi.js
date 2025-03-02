@@ -6,6 +6,13 @@ const addBooking = async (data) => {
   return response.data.data;
 };
 
+// 講師後台 - 取得所有預約
+const getTutorBookings = async (tutorId) => {
+  const response = await apiClient.get(`/booking/tutor/${tutorId}`);
+  return response.data.data;
+};
+
 export default {
   addBooking,
+  getTutorBookings,
 };
