@@ -46,9 +46,31 @@ export default function TutorBookingPayment() {
 
   // 建立Dispatch 來修改 RTK的State
   const dispatch = useDispatch();
-  const { userData } = useSelector((state) => state.auth);
+  const { isAuth, userData } = useSelector((state) => state.auth);
   const bookingStep1FormData = useSelector((state) => state.booking);
   const { tutor_id, tutor_name, booking_date, timeslots, service_type, price } = bookingStep1FormData;
+
+  console.log("tutor booking payment", { tutor_id, tutor_name, booking_date, timeslots, service_type, price });
+
+  useEffect(() => {
+    if (!isAuth) {
+      Swal.fire({
+        icon: "error",
+        title: "請先登入",
+      });
+      navigate(`/login`);
+    }
+
+    if (!tutor_id || !tutor_name || !booking_date || !timeslots || !service_type || !price) {
+      Swal.fire({
+        icon: "error",
+        title: "開始預約前，請先選擇預約導師、時間和預約服務。",
+      });
+
+      const redirectTo = tutor_id ? `/tutor/${tutor_id}` : "/tutor-list";
+      navigate(redirectTo);
+    }
+  }, [isAuth, tutor_id, tutor_name, booking_date, timeslots, service_type, price, navigate]);
 
   const methods = useForm({
     resolver: zodResolver(BookingSchema),
