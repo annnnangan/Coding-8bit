@@ -53,6 +53,7 @@ import TutorProfile from "../pages/tutor/profile/tutor-profile";
 // 使用者後台 - 學生
 import StudentLayout from "./StudentLayout";
 import StudentPanel from "../pages/student/student-panel";
+import StudentManageCustomRequests from "../pages/student/custom-request/student-manage-custom-requests";
 import StudentProfile from "../pages/student/student-profile";
 
 export const router = createHashRouter([
@@ -133,6 +134,8 @@ export const router = createHashRouter([
     element: <StudentLayout />,
     children: [
       { index: true, element: <StudentPanel /> },
+
+      { path: "custom-request", element: <StudentManageCustomRequests /> },
 
       { path: "profile", element: <StudentProfile /> },
     ],

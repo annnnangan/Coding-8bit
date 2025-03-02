@@ -192,6 +192,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
           <div className="fs-6 mt-2 mt-md-4">
             <label className="form-label" htmlFor="username">
               暱稱
+              <span className="text-danger">*</span>
             </label>
             {!isEditingProfile ? (
               <p className="fs-5 mb-2 fw-medium">{userData.username}</p>
