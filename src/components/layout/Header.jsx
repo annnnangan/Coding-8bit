@@ -230,8 +230,7 @@ export default function Header() {
                       <p className="text-gray-01">{userData.username}</p>
                     </div>
                   </div>
-                  {userData?.tutor_id === null &&
-                    userData.last_active_role === "student" && (
+                  {!userData?.roles?.includes("tutor") && (
                       <li className="nav-item mt-2">
                         <NavLink
                           className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
@@ -241,7 +240,7 @@ export default function Header() {
                         </NavLink>
                       </li>
                     )}
-                  {userData?.tutor_id && (
+                  {userData?.roles?.includes("tutor") && (
                     <li className="nav-item mt-2">
                       <button
                         className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
@@ -250,35 +249,53 @@ export default function Header() {
                         onClick={roleToggle}
                       >
                         {userData.last_active_role === "student"
-                          ? "切換成老師身分222"
+                          ? "切換成老師身分"
                           : "切換成學生身分"}
                       </button>
                     </li>
                   )}
 
                   <li className="nav-item">
-                    <NavLink
-                      className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                      to={
-                        userData.last_active_role === "student"
-                          ? "/student-panel"
-                          : "/tutor-panel"
-                      }
-                    >
-                      後台儀表板
-                    </NavLink>
+                    {userData?.roles?.includes("tutor") ? (
+                      <NavLink
+                        className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                        to={
+                          userData.last_active_role === "student"
+                            ? "/student-panel"
+                            : "/tutor-panel"
+                        }
+                      >
+                        後台儀表板
+                      </NavLink>
+                    ) : (
+                      <NavLink
+                        className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                        to="/student-panel"
+                      >
+                        後台儀表板
+                      </NavLink>
+                    )}
                   </li>
                   <li className="nav-item">
-                    <NavLink
-                      className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                      to={
-                        userData.last_active_role === "student"
-                          ? "/student-panel/profile"
-                          : "/tutor-panel/profile"
-                      }
-                    >
-                      個人資料
-                    </NavLink>
+                    {userData?.roles?.includes("tutor") ? (
+                      <NavLink
+                        className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                        to={
+                          userData.last_active_role === "student"
+                            ? "/student-panel/profile"
+                            : "/tutor-panel/profile"
+                        }
+                      >
+                        個人資料
+                      </NavLink>
+                    ) : (
+                      <NavLink
+                        className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                        to="/student-panel/profile"
+                      >
+                        個人資料
+                      </NavLink>
+                    )}
                   </li>
                   <li className="nav-item">
                     <button
@@ -335,18 +352,14 @@ export default function Header() {
                       className="dropdown-menu dropdown-menu-end rounded-1 mt-4"
                       aria-labelledby="dropdownMenuLink"
                     >
-                      {userData?.tutor_id === null &&
-                        userData.last_active_role === "student" && (
+                      {!userData?.roles?.includes("tutor") && (
                           <li className="nav-item">
-                            <Link
-                              className="dropdown-item"
-                              to="/tutor-apply"
-                            >
+                            <Link className="dropdown-item" to="/tutor-apply">
                               成為老師
                             </Link>
                           </li>
                         )}
-                      {userData?.tutor_id && (
+                      {userData?.roles?.includes("tutor") && (
                         <li>
                           <button
                             type="button"
@@ -361,28 +374,43 @@ export default function Header() {
                       )}
 
                       <li>
-                        <Link
-                          to={
-                            userData.last_active_role === "student"
-                              ? "/student-panel"
-                              : "/tutor-panel"
-                          }
-                          className="dropdown-item"
-                        >
-                          後台儀表板
-                        </Link>
+                        {userData?.roles?.includes("tutor") ? (
+                          <Link
+                            to={
+                              userData.last_active_role === "student"
+                                ? "/student-panel"
+                                : "/tutor-panel"
+                            }
+                            className="dropdown-item"
+                          >
+                            後台儀表板
+                          </Link>
+                        ) : (
+                          <Link to="/student-panel" className="dropdown-item">
+                            後台儀表板
+                          </Link>
+                        )}
                       </li>
                       <li>
-                        <Link
-                          className="dropdown-item"
-                          to={
-                            userData.last_active_role === "student"
-                              ? "/student-panel/profile"
-                              : "/tutor-panel/profile"
-                          }
-                        >
-                          個人資料
-                        </Link>
+                        {userData?.roles?.includes("tutor") ? (
+                          <Link
+                            className="dropdown-item"
+                            to={
+                              userData.last_active_role === "student"
+                                ? "/student-panel/profile"
+                                : "/tutor-panel/profile"
+                            }
+                          >
+                            個人資料
+                          </Link>
+                        ) : (
+                          <Link
+                            className="dropdown-item"
+                            to="/student-panel/profile"
+                          >
+                            個人資料
+                          </Link>
+                        )}
                       </li>
                       <li>
                         <button
