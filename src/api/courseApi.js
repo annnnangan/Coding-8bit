@@ -78,6 +78,18 @@ const deleteFavoriteVideo = async (videoId) => {
   return response.data;
 };
 
+// 前台 - 取得單一影片評分
+const getStarRatingVideo = async (videoId) => {
+  const response = await apiClient.get(`/ratings/videos/${videoId}/is-rated`);
+  return response.data.data;
+};
+
+// 前台 - 評分單一影片
+const postRatingVideo = async (videoId, data) => {
+  const response = await apiClient.post(`/ratings/videos/${videoId}`, data);
+  return response.data;
+};
+
 // 前台 - 取得單一講師所有課程
 const getFrontTutorCourses = async ({ tutorId = "", page = 1, sortBy = "rating", order = "DESC", limit = 6 }) => {
   const response = await apiClient.get(`/course?tutor_id=${tutorId}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}`);
@@ -171,6 +183,8 @@ export default {
   getFavoriteVideo,
   postFavoriteVideo,
   deleteFavoriteVideo,
+  getStarRatingVideo,
+  postRatingVideo,
   getFrontTutorCourses,
   getFrontTutorVideos,
   getTutorVideosInBooking,

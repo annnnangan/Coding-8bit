@@ -1,17 +1,19 @@
 // react 相關套件
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 
 // 第三方套件
 import PropTypes from "prop-types";
 import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
+import { Modal } from "bootstrap";
 
 // API
 import courseApi from "../../../api/courseApi";
 
 // 組件
 import CommentsSection from "./CommentsSection";
+import StarRating from "./StarRating";
 
 export default function VideoContent({
   videoUrl,
@@ -23,6 +25,11 @@ export default function VideoContent({
   const [comments, setComments] = useState([]); // 留言
   const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
   const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
+  const [starRating, setStarRating] = useState(false); // 是否評分影片
+
+  // 評分 modal
+  const modalRef = useRef(null);
+  const modalRefMethod = useRef(null);
 
   // 取得課程留言
   const getCourseCommentsHandle = async () => {
@@ -51,7 +58,7 @@ export default function VideoContent({
           icon: "success",
           title: "課程已收藏",
           showConfirmButton: false,
-          timer: 1000
+          timer: 1000,
         });
         setFavoriteVideo(true);
       } else {
@@ -60,7 +67,7 @@ export default function VideoContent({
           icon: "success",
           title: "移除收藏",
           showConfirmButton: false,
-          timer: 1000
+          timer: 1000,
         });
         setFavoriteVideo(false);
       }
@@ -82,11 +89,28 @@ export default function VideoContent({
         );
         resStatus.isFavorite ? setFavoriteVideo(true) : setFavoriteVideo(false);
       };
-
+      const getStarRatingStatus = async () => {
+        const resRating = await courseApi.getStarRatingVideo(
+          introductionVideoId || paramsVideoId
+        );
+        resRating.isRated ? setStarRating(true) : setStarRating(false);
+      };
+      
       getFavoriteVideoStatus();
+      getStarRatingStatus();
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
+
+  // 確保 modal 隱藏時，焦點不會停留在 modal 上
+  useEffect(() => {
+    modalRefMethod.current = new Modal(modalRef.current);
+    modalRef.current.addEventListener("hide.bs.modal", () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+  }, []);
 
   return (
     <section className="col-lg-7 col-xl-8">
@@ -144,16 +168,17 @@ export default function VideoContent({
             <button
               type="button"
               className="review-button f-align-center btn btn-outline-none py-2 ps-0 pe-0 pe-sm-4 "
+              onClick={() => modalRefMethod.current.show()}
             >
               <span
                 className={`fs-5 me-1 material-symbols-outlined ${
-                  courseList.is_reviewed && "icon-fill"
+                  starRating && "icon-fill"
                 }`}
               >
                 kid_star
               </span>
               <span className="fs-7 review-font">
-                {courseList.is_reviewed ? "已評價" : "未評價"}
+                {starRating ? "已評價" : "未評價"}
               </span>
             </button>
           </div>
@@ -244,6 +269,39 @@ export default function VideoContent({
             </div>
           </div>
         </nav>
+      </div>
+
+      <div
+        ref={modalRef}
+        className="modal fade"
+        id="exampleModal"
+        tabIndex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">
+                評分
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <span>給講師 1 ~ 5 的評價</span>
+              <StarRating
+                videoId={introductionVideoId || paramsVideoId}
+                setStarRating={setStarRating}
+                hideModal={() => modalRefMethod.current.hide()}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
