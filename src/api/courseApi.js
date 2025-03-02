@@ -42,6 +42,14 @@ const getVideoDetail = async (id) => {
   return response.data.data;
 };
 
+// 取得影片播放權限
+const getVideoPermission = async (url) => {
+  const response = await apiClient.post(`/upload/get-video-url`, {
+    "filePath": url
+  });
+  return response.data.videoUrl;
+};
+
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
   const response = await apiClient.get(`/comment/videos/${id}/comments`);
@@ -177,6 +185,7 @@ export default {
   getCourseDetail,
   getCourseChapter,
   getVideoDetail,
+  getVideoPermission,
   getCourseComments,
   postCourseComments,
   deleteCourseComments,

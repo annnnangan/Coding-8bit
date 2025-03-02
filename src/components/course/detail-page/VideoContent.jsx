@@ -26,7 +26,8 @@ export default function VideoContent({
   const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
   const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
   const [starRating, setStarRating] = useState(false); // 是否評分影片
-
+  const [videoSrc, setVideoSrc] = useState(""); // 影片 URL
+  
   // 評分 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
@@ -76,6 +77,24 @@ export default function VideoContent({
     }
   };
 
+  // 取得影片播放權限
+  const getTokenToPlay = async (videoUrl) => {
+    if (!videoUrl) return "";
+
+    // 如果開頭為 "https://firebasestorage.googleapis.com/"，直接回傳網址
+    if (videoUrl.startsWith("https://firebasestorage.googleapis.com/")) {
+      return videoUrl;
+    }
+
+    // 使用正則表達式過濾掉 "https://" 到 "videos" 之前跟 "?" 後面的字串
+    const filteredUrl = videoUrl
+      .replace(/https:\/\/.*?\/videos/, "videos")
+      .split("?")[0];
+
+    const tokenUrl = await courseApi.getVideoPermission(filteredUrl);
+    return tokenUrl;
+  };
+
   //初始化判斷是否禁用留言輸入框
   useEffect(() => {
     videoUrl === ""
@@ -95,12 +114,22 @@ export default function VideoContent({
         );
         resRating.isRated ? setStarRating(true) : setStarRating(false);
       };
-      
+
       getFavoriteVideoStatus();
       getStarRatingStatus();
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
+
+  // 取得影片播放 URL
+  useEffect(() => {
+    const fetchVideoSrc = async () => {
+      const tokenUrl = await getTokenToPlay(videoUrl);
+      setVideoSrc(tokenUrl);
+    };
+
+    fetchVideoSrc();
+  }, [videoUrl]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
@@ -118,7 +147,7 @@ export default function VideoContent({
         <video
           poster={courseList.cover_image}
           className="video-show position-absolute w-100 h-100"
-          src={videoUrl ? videoUrl : ""}
+          src={videoSrc}
           controls
         ></video>
       </div>
