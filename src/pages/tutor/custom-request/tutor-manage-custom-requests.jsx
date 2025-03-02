@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import Loader from "@/components/common/Loader";
 import Pagination from "@/components/layout/Pagination";
 
-export default function TutorManageCustomCourses() {
+export default function TutorManageCustomRequests() {
   // loading
   const [loadingState, setLoadingState] = useState(true);
 

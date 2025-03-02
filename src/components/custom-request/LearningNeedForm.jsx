@@ -12,6 +12,7 @@ import axios from "axios";
 import Loader from "@/components/common/Loader";
 
 import { categories } from "@/data/courses";
+import customRequestsApi from "../../api/customRequestsApi";
 
 export default function LearningNeedForm() {
   // loading
@@ -111,16 +112,44 @@ export default function LearningNeedForm() {
     }
   };
 
+  // 新增需求函式
+  const addRequest = async (data) => {
+    setLoadingState(true);
+    try {
+      console.log(data);
+      const result = await customRequestsApi.addCustomRequest(data);
+      console.log({
+        request_id: result.data.id,
+        photo_url: temData.cover_image,
+      });
+      await customRequestsApi.addCustomRequestImg({
+        request_id: result.data.id,
+        photo_url: temData.cover_image,
+      });
+      Swal.fire({
+        icon: "success",
+        title: "新增成功",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: error.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
   // 驗證規則
   const schema = z.object({
     title: z.string().min(1, "請輸入標題"),
-    description: z
+    content: z
       .string()
       .min(1, "請輸學習需求描述")
       .max(1000, "課程描述長度不能超過 1000 字符"),
     level: z.string().min(1, "請選擇學習等級"),
     category: z.string().min(1, "請選擇工具與語言"),
-    tags: z.string().min(1, "請輸入關鍵字"),
+    tag: z.string().min(1, "請輸入關鍵字"),
   });
 
   // 表單驗證
@@ -140,13 +169,13 @@ export default function LearningNeedForm() {
   const quillRef = useRef(null);
   const onSubmit = async (data) => {
     if (temData.cover_image) {
-      const descriptionText = quillRef.current?.getEditor().getText();
+      const contentText = quillRef.current?.getEditor().getText();
 
-      if (descriptionText) {
-        setValue("description", descriptionText);
+      if (contentText) {
+        setValue("content", contentText);
       }
 
-      console.log(data);
+      addRequest(data);
     } else {
       Swal.fire({
         icon: "error",
@@ -162,7 +191,9 @@ export default function LearningNeedForm() {
       <div className="learning-need-form-wrap card-column">
         <h1>提出您的學習需求</h1>
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
-          <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
+          <h4 className="fs-7 fw-normal text-gray-01 lh-base">
+            圖片<span className="text-danger">*</span>
+          </h4>
           <div className="image-upload-wrapper mt-1">
             <input
               type="file"
@@ -221,6 +252,7 @@ export default function LearningNeedForm() {
               <div className="col-lg-7">
                 <label className="form-label" htmlFor="level">
                   您的學習等級
+                  <span className="text-danger">*</span>
                 </label>
                 <div className="dropdown">
                   <button
@@ -253,6 +285,7 @@ export default function LearningNeedForm() {
               <div className="col-lg-5 mt-6 mt-lg-0">
                 <label className="form-label" htmlFor="tech_stack">
                   開發工具與語言
+                  <span className="text-danger">*</span>
                 </label>
                 <div className="dropdown">
                   <button
@@ -288,7 +321,7 @@ export default function LearningNeedForm() {
             <FormInput
               register={register}
               errors={errors}
-              id="tags"
+              id="tag"
               labelText="關鍵字 (請用半型逗號隔開)"
               type="text"
             />
@@ -297,11 +330,12 @@ export default function LearningNeedForm() {
           <div className="pb-8 mt-6 mt-lg-8">
             <label htmlFor="content" className="form-label">
               學習需求描述
+              <span className="text-danger">*</span>
             </label>
             {editorLoaded && (
               <Suspense fallback={<Loader />}>
                 <Controller
-                  name="description"
+                  name="content"
                   control={control}
                   render={({ field }) => (
                     <ReactQuill
@@ -312,10 +346,8 @@ export default function LearningNeedForm() {
                     />
                   )}
                 />
-                {errors.description && (
-                  <p className="fs-7 text-danger">
-                    {errors?.description?.message}
-                  </p>
+                {errors.content && (
+                  <p className="fs-7 text-danger">{errors?.content?.message}</p>
                 )}
               </Suspense>
             )}

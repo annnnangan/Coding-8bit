@@ -224,6 +224,7 @@ export default function TutorApply() {
                     <div className="fs-6 mt-2 mt-md-4">
                       <label className="form-label" htmlFor="about">
                         關於我
+                        <span className="text-danger">*</span>
                       </label>
                       <textarea
                         className={`form-control ${

@@ -90,7 +90,7 @@ export default function TutorProfile() {
         icon: "error",
         title: "請確認是否已經取得講師身分權限",
       });
-      navigate("/")
+      navigate("/");
     }
   }, [userData.roles]);
 
@@ -182,6 +182,7 @@ export default function TutorProfile() {
                           <div className="fs-6 mt-2 mt-md-4">
                             <label className="form-label" htmlFor="expertise">
                               專長
+                              <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
                               <p className="fs-5 mb-2 fw-medium">
@@ -204,6 +205,7 @@ export default function TutorProfile() {
                           <div className="fs-6 mt-2 mt-md-4">
                             <label className="form-label" htmlFor="slogan">
                               標語
+                              <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
                               <p className="fs-5 mb-2 fw-medium">
@@ -224,6 +226,7 @@ export default function TutorProfile() {
                           <div className="fs-6 mt-2 mt-md-4">
                             <label className="form-label" htmlFor="about">
                               關於我
+                              <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
                               <p className="fs-5 mb-2 fw-medium">

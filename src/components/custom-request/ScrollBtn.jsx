@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 
 import PropTypes from "prop-types";
 
-export default function ScrollBtn({ containerRef }) {
+export default function ScrollBtn({ containerRef, setLimit }) {
   const leftButtonRef = useRef(null);
   const rightButtonRef = useRef(null);
 
@@ -68,28 +68,64 @@ export default function ScrollBtn({ containerRef }) {
     };
   };
 
+  const debounceTimeoutRef = useRef(null); // 用來儲存計時器 ID
+  const coolDownTime = 5000; // 設置冷卻時間
+
   const updateScrollButtonVisibility = () => {
     const wishPool = containerRef.current;
     const leftButton = leftButtonRef.current;
     const rightButton = rightButtonRef.current;
-
+  
     if (!wishPool || !leftButton || !rightButton) return;
-
+  
+    // 手機尺寸（小於等於576px）
     if (window.innerWidth <= 576) {
       leftButton.style.display = "none";
       rightButton.style.display = "none";
+  
+      const canScrollDown =
+        wishPool.scrollTop + wishPool.clientHeight < wishPool.scrollHeight;
+  
+      // 滑動到底部觸發 setLimit
+      if (wishPool.scrollHeight > wishPool.clientHeight) {
+        if (!canScrollDown && !debounceTimeoutRef.current) {
+          // 執行 setLimit，並設置冷卻時間
+          setLimit((prev) => prev + 6);
+  
+          // 設置計時器，3秒後清除冷卻期
+          debounceTimeoutRef.current = setTimeout(() => {
+            debounceTimeoutRef.current = null; // 清除冷卻期
+          }, coolDownTime);
+        }
+      }
     } else {
+      // 桌面版
       leftButton.style.display = "";
       rightButton.style.display = "";
-
+  
       const canScrollLeft = wishPool.scrollLeft > 0;
       const canScrollRight =
-        wishPool.scrollLeft < wishPool.scrollWidth - wishPool.clientWidth;
-
+        wishPool.scrollLeft + wishPool.clientWidth < wishPool.scrollWidth;
+  
       leftButton.disabled = !canScrollLeft;
       rightButton.disabled = !canScrollRight;
+  
+      // 滑到最右邊觸發取得更多筆需求卡片
+      if (wishPool.scrollWidth > wishPool.clientWidth) {
+        // 當滑動到底並且沒有觸發過（防止多次觸發）
+        if (!canScrollRight && !debounceTimeoutRef.current) {
+          // 執行 setLimit，並設置冷卻時間
+          setLimit((prev) => prev + 6);
+  
+          // 設置計時器
+          debounceTimeoutRef.current = setTimeout(() => {
+            debounceTimeoutRef.current = null; // 清除冷卻期
+          }, coolDownTime);
+        }
+      }
     }
   };
+  
 
   useEffect(() => {
     // 增加滑鼠拖動和滾動功能
@@ -149,4 +185,5 @@ ScrollBtn.propTypes = {
   containerRef: PropTypes.shape({
     current: PropTypes.instanceOf(Element),
   }).isRequired,
+  setLimit: PropTypes.func.isRequired,
 };
