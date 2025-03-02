@@ -24,8 +24,10 @@ export default function StudentManageCustomRequests() {
   const getData = async (page = 1) => {
     setLoadingState(true);
     try {
-      const result = await customRequestsApi.getUserCustomRequests(userData.id, page);
-      console.log(result);
+      const result = await customRequestsApi.getUserCustomRequests(
+        userData.id,
+        page
+      );
       setCustomRequestList(result.requests);
       setPageData(result.pagination);
     } catch (error) {
@@ -121,65 +123,76 @@ export default function StudentManageCustomRequests() {
 
         {/* 需求列表 */}
         <div className="table-wrap mt-6 mt-lg-13">
-          <table className="table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>需求標題</th>
-                <th>類別</th>
-                <th>上傳時間</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customRequestList.map((request) => (
-                <tr className="align-middle" key={request.id}>
-                  <td>
-                    <div className="cover_image-wrap position-relative">
-                      {request?.CustomRequestPhotos[0]?.image_url && (
-                        <img
-                          src={request?.CustomRequestPhotos[0]?.image_url}
-                          alt="request-image"
-                          className="w-100"
-                        />
-                      )}
-                    </div>
-                  </td>
-                  <td>{request.title}</td>
-                  <td>{request.category}</td>
-                  <td>{formatDateToTaiwanStyle(request.createdAt)}</td>
-                  <td>
-                    <div>
-                      <button
-                        type="button"
-                        className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
-                        onClick={() => openModal(request)}
-                      >
-                        <span className="material-symbols-outlined me-1">
-                          dataset
-                        </span>
-                        詳細
-                      </button>
-                      <button
-                        type="button"
-                        className="btn link-danger border-0 f-align-center p-0 mt-1"
-                        onClick={() => deleteRequest(request.id)}
-                      >
-                        <span className="material-symbols-outlined me-1">
-                          delete
-                        </span>
-                        刪除
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* 頁碼 */}
-          <div className="mt-4 mt-lg-6">
-            <Pagination pageData={pageData} getData={getData} />
-          </div>
+          {customRequestList.length > 0 ? (
+            <>
+              {" "}
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>需求標題</th>
+                    <th>類別</th>
+                    <th>上傳時間</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customRequestList.map((request) => (
+                    <tr className="align-middle" key={request.id}>
+                      <td>
+                        <div className="cover_image-wrap position-relative">
+                          {request?.CustomRequestPhotos[0]?.image_url && (
+                            <img
+                              src={request?.CustomRequestPhotos[0]?.image_url}
+                              alt="request-image"
+                              className="w-100"
+                            />
+                          )}
+                        </div>
+                      </td>
+                      <td>{request.title}</td>
+                      <td>{request.category}</td>
+                      <td>{formatDateToTaiwanStyle(request.createdAt)}</td>
+                      <td>
+                        <div>
+                          <button
+                            type="button"
+                            className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
+                            onClick={() => openModal(request)}
+                          >
+                            <span className="material-symbols-outlined me-1">
+                              dataset
+                            </span>
+                            詳細
+                          </button>
+                          <button
+                            type="button"
+                            className="btn link-danger border-0 f-align-center p-0 mt-1"
+                            onClick={() => deleteRequest(request.id)}
+                          >
+                            <span className="material-symbols-outlined me-1">
+                              delete
+                            </span>
+                            刪除
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {/* 頁碼 */}
+              <div className="mt-4 mt-lg-6">
+                <Pagination pageData={pageData} getData={getData} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-center bg-gray-04 py-8 py-lg-13">
+                <h2>暫時沒有資料</h2>
+              </div>
+            </>
+          )}
         </div>
       </main>
 

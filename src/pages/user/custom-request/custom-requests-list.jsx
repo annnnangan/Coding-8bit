@@ -245,10 +245,10 @@ export default function CustomRequestsList() {
                   >
                     {sortBy === "createdAt" &&
                       order !== "ASC" &&
-                      "建立時間(最新)"}
+                      "排序方式 - 建立時間(最新到最舊)"}
                     {sortBy === "createdAt" &&
                       order === "ASC" &&
-                      "建立時間(最舊)"}
+                      "排序方式 - 建立時間(最舊到最新)"}
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="sortDropdown">
                     <li>

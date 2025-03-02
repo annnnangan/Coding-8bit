@@ -116,11 +116,14 @@ export default function LearningNeedForm() {
   const addRequest = async (data) => {
     setLoadingState(true);
     try {
-      console.log(data)
+      console.log(data);
       const result = await customRequestsApi.addCustomRequest(data);
-      console.log(result)
+      console.log({
+        request_id: result.data.id,
+        photo_url: temData.cover_image,
+      });
       await customRequestsApi.addCustomRequestImg({
-        request_id: result.id,
+        request_id: result.data.id,
         photo_url: temData.cover_image,
       });
       Swal.fire({
