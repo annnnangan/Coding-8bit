@@ -20,6 +20,12 @@ const updateTutorData = async (tutorId, data) => {
   return response.data;
 };
 
+// 成為講師
+const applyTutor = async (data) => {
+  const response = await apiClient.post(`/tutor/`, data);
+  return response.data.data;
+};
+
 /* ---------------------------------- 工作經驗 ---------------------------------- */
 
 // 工作經驗 - 取得資料
@@ -146,6 +152,7 @@ export default {
   getAllTutor,
   getTutorDetail,
   updateTutorData,
+  applyTutor,
   getExp,
   addExp,
   updateExp,

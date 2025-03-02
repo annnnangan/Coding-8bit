@@ -14,7 +14,7 @@ export default function UserLayout() {
   const isActivateSuccessPage = useMatch("/activate-success");
   const isResetPasswordPage = useMatch("/reset-password");
   
-  const isCustomCourseListPage = useMatch("/custom-course-list");
+  const isCustomCourseListPage = useMatch("/custom-requests-list");
   const isAddLearningNeedPage = useMatch("/add-learning-need");
 
   // 根據判斷結果來顯示 Header/Footer 或 返回頂部按鈕

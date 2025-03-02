@@ -3,7 +3,7 @@ import * as bootstrap from "bootstrap";
 import PropTypes from "prop-types";
 import ReactQuill from "react-quill-new";
 
-import { utils } from "../../custom-course/utils";
+import { utils } from "../../custom-request/utils";
 import { determineMeetingLinkMessage } from "../../../utils/booking-record-utils";
 
 import AvatarWithFallback from "../AvatarWithFallback";

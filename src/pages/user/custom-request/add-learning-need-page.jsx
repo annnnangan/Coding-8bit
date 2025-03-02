@@ -1,9 +1,9 @@
 import { Helmet } from "react-helmet-async";
 
-import AddLearningNeedRobot from "@/components/custom-course/addLearningNeedRobot";
-import ChatRoom from "@/components/custom-course/ChatRoom";
+import AddLearningNeedRobot from "@/components/custom-request/addLearningNeedRobot";
+import ChatRoom from "@/components/custom-request/ChatRoom";
 
-import LearningNeedForm from "../../../components/custom-course/LearningNeedForm";
+import LearningNeedForm from "@/components/custom-request/LearningNeedForm";
 
 export default function AddLearningNeedPage() {
   return (
