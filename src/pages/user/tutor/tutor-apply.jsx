@@ -20,7 +20,7 @@ export default function TutorApply() {
   const [loadingState, setLoadingState] = useState(false);
 
   // 切換步驟
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(1);
   const toNextStep = async () => {
     if (currentStep === 1) {
       setCurrentStep((currentStep) => currentStep + 1);
@@ -64,7 +64,7 @@ export default function TutorApply() {
         title: "申請成功",
         icon: "success",
       });
-      navigate("/");
+      navigate("/tutor-panel");
     } catch (error) {
       Swal.fire({
         icon: "error",

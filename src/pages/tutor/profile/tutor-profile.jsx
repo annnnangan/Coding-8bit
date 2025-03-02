@@ -18,7 +18,7 @@ import Loader from "@/components/common/Loader";
 
 export default function TutorProfile() {
   // loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [loadingState, setLoadingState] = useState(false);
 
   // 取得使用者資料
   const { userData } = useSelector((state) => state.auth);
@@ -81,27 +81,18 @@ export default function TutorProfile() {
     }
   };
 
-  useEffect(() => {
-    if (userData.tutor_id) {
-      getData();
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "請確認是否已經取得講師身分權限",
-      });
-    }
-  }, [userData.tutor_id]);
-
   const navigate = useNavigate();
   useEffect(() => {
-    if (!userData.tutor_id) {
+    if (userData?.roles?.includes("tutor")) {
+      getData();
+    } else if (userData?.roles) {
       Swal.fire({
         icon: "error",
         title: "請確認是否已經取得講師身分權限",
       });
       navigate("/")
     }
-  }, []);
+  }, [userData.roles]);
 
   return (
     <>
