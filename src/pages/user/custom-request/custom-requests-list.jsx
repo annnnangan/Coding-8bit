@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 import customRequestsApi from "@/api/customRequestsApi";
 
@@ -10,10 +11,14 @@ import Card from "@/components/custom-request/Card";
 import DesktopTimeline from "@/components/custom-request/DesktopTimeline";
 import ScrollBtn from "@/components/custom-request/ScrollBtn";
 import CardModal from "@/components/custom-request/CardModal";
+import TransparentLoader from "@/components/common/TransparentLoader";
 
 import { categories } from "@/data/courses";
 
 export default function CustomRequestsList() {
+  // loading
+  const [loadingState, setLoadingState] = useState(true);
+
   const isMobile = window.innerWidth <= 576;
 
   const containerRef = useRef(null);
@@ -32,15 +37,23 @@ export default function CustomRequestsList() {
   // 取得需求資料函式
   const [customCourseList, setCustomCourseList] = useState([]);
   const getData = async () => {
+    setLoadingState(true);
     try {
       const result = await customRequestsApi.getAllCustomRequests(
         sortBy,
         order,
-        search
+        search,
+        limit
       );
       setCustomCourseList(result.requests);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error?.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
     }
   };
 
@@ -48,8 +61,7 @@ export default function CustomRequestsList() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [order, setOrder] = useState("DESC");
   const [filterCategory, setFilterCategory] = useState("請選擇類別");
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [hasResponses, setHasResponses] = useState(false);
+  const [limit, setLimit] = useState(8);
 
   const [search, setSearch] = useState("");
   const handleSearch = (e) => {
@@ -191,13 +203,14 @@ export default function CustomRequestsList() {
   // 初始化 - 取得資料
   useEffect(() => {
     getData();
-  }, [search, sortBy, order]);
+  }, [search, sortBy, order, limit]);
 
   return (
     <>
       <Helmet>
         <title>Coding∞bit ｜ 客製化需求一覽</title>
       </Helmet>
+      {loadingState && <TransparentLoader />}
 
       {/* header */}
       <header
@@ -209,7 +222,7 @@ export default function CustomRequestsList() {
             <div className="d-flex flex-column flex-lg-row align-items-lg-center flex-wrap position-relative pe-lg-10 row-gap-4">
               {/* 導覽 & 搜尋框 */}
               <div className="d-flex align-items-center">
-                <ScrollBtn containerRef={containerRef} />
+                <ScrollBtn containerRef={containerRef} setLimit={setLimit} />
                 <div className="searchInput pe-10">
                   <input
                     type="search"
@@ -220,45 +233,8 @@ export default function CustomRequestsList() {
                   />
                 </div>
               </div>
-              {/* 篩選器 */}
-              <div className="d-flex column-gap-4 pe-6 order-lg-1 order-2 ms-lg-auto">
-                <button
-                  className="btn status-btn text-brand-03 f-align-center"
-                  onClick={() => {
-                    setIsCompleted((prev) => (prev = !prev));
-                  }}
-                >
-                  {!isCompleted ? (
-                    <span className="material-symbols-outlined icon">
-                      radio_button_unchecked
-                    </span>
-                  ) : (
-                    <span className="material-symbols-outlined icon icon-fill">
-                      check_circle
-                    </span>
-                  )}
-                  <span>已完成</span>
-                </button>
-                <button
-                  className="btn status-btn text-brand-03 f-align-center"
-                  onClick={() => {
-                    setHasResponses((prev) => (prev = !prev));
-                  }}
-                >
-                  {!hasResponses ? (
-                    <span className="material-symbols-outlined icon">
-                      radio_button_unchecked
-                    </span>
-                  ) : (
-                    <span className="material-symbols-outlined icon icon-fill">
-                      check_circle
-                    </span>
-                  )}
-                  <span>已回應</span>
-                </button>
-              </div>
               {/* 下拉霸 */}
-              <div className="d-flex column-gap-4 pe-lg-6 order-lg-2 order-1">
+              <div className="d-flex column-gap-4 pe-lg-6 order-lg-2 order-1 ms-lg-auto">
                 <div className="dropdown">
                   <button
                     className="btn btn-outline-brand-03 dropdown-toggle"

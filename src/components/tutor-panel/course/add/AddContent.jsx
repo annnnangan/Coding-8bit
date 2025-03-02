@@ -173,7 +173,9 @@ export default function AddContent({
     <div className={type === "topicSeries" ? "col-lg-8" : "col-xxl-6"}>
       <div className="course-content-wrap card-column pe-xxl-10">
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
-          <h4 className="fs-7 fw-normal text-gray-01 lh-base">圖片</h4>
+          <h4 className="fs-7 fw-normal text-gray-01 lh-base">
+            圖片<span className="text-danger">*</span>
+          </h4>
           <div className="image-upload-wrapper mt-1">
             <input
               type="file"
@@ -230,7 +232,9 @@ export default function AddContent({
           <div className="mt-6 mt-lg-8">
             <div className="row">
               <div className="col">
-                <label className="form-label">瀏覽權限</label>
+                <label className="form-label">
+                  瀏覽權限<span className="text-danger">*</span>
+                </label>
                 <div className="dropdown">
                   <button
                     type="button"
@@ -272,6 +276,7 @@ export default function AddContent({
               <div className="col">
                 <label className="form-label" htmlFor="tech_stack">
                   開發工具與語言
+                  <span className="text-danger">*</span>
                 </label>
                 <div className="dropdown">
                   <button
@@ -316,6 +321,7 @@ export default function AddContent({
           <div className="pb-8 mt-6 mt-lg-8">
             <label htmlFor="description" className="form-label">
               課程描述
+              <span className="text-danger">*</span>
             </label>
             <Controller
               name="description"

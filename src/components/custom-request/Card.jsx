@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import PropTypes from "prop-types";
+import DOMPurify from "dompurify";
 
 import { utils } from "./utils";
 
@@ -48,7 +49,12 @@ export default function Card({ customCourse = {}, openModal, prevCourse }) {
               )}
               <h2>{customCourse.title}</h2>
             </div>
-            <p>{customCourse.content}</p>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(customCourse.content),
+              }}
+            >
+            </p>
           </div>
         </div>
       </div>

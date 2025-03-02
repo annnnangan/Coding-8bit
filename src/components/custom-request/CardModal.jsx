@@ -3,8 +3,9 @@ import { useState, useEffect, lazy, Suspense } from "react";
 const ReactQuill = lazy(() => import("react-quill-new"));
 import PropTypes from "prop-types";
 import Loader from "@/components/common/Loader";
+import DOMPurify from "dompurify";
 
-import { formatDateToTaiwanStyle } from "../../utils/timeFormatted-utils";
+import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
 
 export default function CardModal({ temCustomCourse, cardModalRef }) {
   // ReactQuill 文字編輯器
@@ -53,7 +54,11 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                     <div className="d-flex align-items-center mb-3">
                       <img
                         id="modalAuthorAvatar"
-                        src={temCustomCourse?.User?.avatar_url}
+                        src={
+                          temCustomCourse?.User?.avatar_url
+                            ? temCustomCourse?.User?.avatar_url
+                            : "/images/icon/user.png"
+                        }
                         alt="作者頭像"
                         className="rounded-circle me-2"
                         width="40"
@@ -62,30 +67,42 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                       <h6 id="modalAuthorName" className="mb-0">
                         {temCustomCourse?.User?.username}
                       </h6>
+                      <small className="text-brand-03 ms-4 ms-lg-6">
+                        {temCustomCourse?.level}
+                      </small>
                     </div>
-                    <p id="modalContent">{temCustomCourse?.content}</p>
+                    <p
+                      id="modalContent"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(temCustomCourse?.content),
+                      }}
+                    ></p>
                     <div id="modalTags" className="mb-3">
-                      {temCustomCourse.tag && temCustomCourse?.tag
-                        .split(", ")
-                        .slice(0, 5)
-                        .map((tag, index) => (
-                          <span
-                            className="badge bg-secondary me-1 mt-3"
-                            key={index}
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                      {temCustomCourse?.tag &&
+                        temCustomCourse?.tag
+                          .split(", ")
+                          .slice(0, 5)
+                          .map((tag, index) => (
+                            <span
+                              className="badge bg-secondary me-1 mt-3"
+                              key={index}
+                            >
+                              {tag}
+                            </span>
+                          ))}
                     </div>
                     <small id="modalDate" className="text-muted d-block mb-3">
                       {formatDateToTaiwanStyle(temCustomCourse?.createdAt)}
                     </small>
-                    <img
-                      id="modalPhoto"
-                      src="images/course/course-17.png"
-                      alt="相關照片"
-                      className="img-fluid mb-3"
-                    />
+                    {temCustomCourse?.photos?.map((photo) => (
+                      <img
+                        id="modalPhoto"
+                        src={photo.photo_url}
+                        alt="相關照片"
+                        className="img-fluid mb-3"
+                        key={photo.id}
+                      />
+                    ))}
                   </div>
 
                   <div className="fixed-bottom-form">
@@ -94,10 +111,7 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                       <div className="mb-3">
                         {editorLoaded && (
                           <Suspense fallback={<Loader />}>
-                            <ReactQuill
-                              value={value}
-                              onChange={setValue}
-                            />
+                            <ReactQuill value={value} onChange={setValue} />
                           </Suspense>
                         )}
                       </div>
