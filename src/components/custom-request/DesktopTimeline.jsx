@@ -22,7 +22,7 @@ export default function DesktopTimeline({ customCourseList = [] }) {
             className="timeline-point"
             style={{ left: `${topOffsetLeft}px` }}
           >
-            {utils.formatDate(new Date(customCourse.date))}
+            {utils.formatDate(new Date(customCourse.createdAt))}
           </div>
         );
       } else {
@@ -32,7 +32,7 @@ export default function DesktopTimeline({ customCourseList = [] }) {
             className="timeline-point"
             style={{ left: `${bottomOffsetLeft}px` }}
           >
-            {utils.formatDate(new Date(customCourse.date))}
+            {utils.formatDate(new Date(customCourse.createdAt))}
           </div>
         );
       }

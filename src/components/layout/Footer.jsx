@@ -21,19 +21,21 @@ export default function Footer() {
             <li className="f-align-center mt-2">
               <p className="fs-7 lh-sm">
                 Copyright@2025 Coding∞bit 保留所有權利·
-                <NavLink
-                  to="/privacy-policy"
+                <a
+                  href="https://coding-8bit.site/PrivacyPolicy.html"
+                  target="_blank"
                   className="underline-hover d-inline"
                 >
-                  隱私政策
-                </NavLink>{" "}
+                  隱私權政策
+                </a>{" "}
                 |{" "}
-                <NavLink
-                  to="/terms-of-service"
+                <a
+                  href="https://coding-8bit.site/TermsOfService.html"
+                  target="_blank"
                   className="underline-hover d-inline"
                 >
                   使用條款
-                </NavLink>
+                </a>
               </p>
             </li>
           </ul>
@@ -60,7 +62,7 @@ export default function Footer() {
             <li className="nav-item">
               <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
-                to="/custom-course-list"
+                to="/custom-requests-list"
               >
                 課程客製化
               </NavLink>

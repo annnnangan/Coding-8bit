@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Swiper } from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 import tutorApi from "@/api/tutorApi";
 import courseApi from "@/api/courseApi";
@@ -18,17 +19,20 @@ import CourseCardList from "@/components/course/CourseCardList";
 import CommentsSection from "@/components/tutor/CommentsSection";
 import SectionFallback from "@/components/common/SectionFallback";
 import Timetable from "@/components/tutor/Timetable";
-import Loader from "@/components/common/Loader";
 
 import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { recommendTutorData, tutorStats } from "../../../data/tutors";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
-  // 抓取路由上的 id 來取得遠端特定 id 的資料
-  const { id: tutor_id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // 抓取路由上的tutor id
+  const { id: tutor_id } = useParams();
+
+  // 檢查用戶是否已登入
+  const { isAuth } = useSelector((state) => state.auth);
 
   /* -------------------------------- useState -------------------------------- */
   // useState - Whole page loading
@@ -195,11 +199,18 @@ export default function TutorBooking() {
 
   // 控制Booking Modal的開關
   const openBookingModal = () => {
-    if (bookingModal.current) {
-      // Ensure `show()` is a method on the referenced element or component
-      bookingModal.current.show(); // Adjust depending on the modal component you're using
+    if (!isAuth) {
+      Swal.fire({
+        icon: "error",
+        title: "請先登入",
+      });
+      navigate(`/login?redirect=/tutor/${tutor_id}`);
+    } else {
+      if (bookingModal.current) {
+        bookingModal.current.show();
+      }
+      setBookingModalOpen(true);
     }
-    setBookingModalOpen(true);
   };
 
   // 控制Booking Modal的Step
@@ -249,6 +260,8 @@ export default function TutorBooking() {
       return { date, hours: [time] }; // Reset hours when new date is selected
     });
   };
+
+  /* -------------------------------- Login Validation -------------------------------- */
 
   return (
     <>

@@ -1,33 +1,28 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { BookingSchema } from "@/utils/schema/booking-schema";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
-import { formatDate } from "@/utils/timeFormatted-utils";
+import Swal from "sweetalert2";
 
 import { CreditCardForm } from "@/components/common/payment-form/CreditCardForm";
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
+import FormSubmitButton from "@/components/common/FormSubmitButton";
 
-import { updateFormData } from "../../../utils/slice/bookingSlice";
+import { BookingSchema } from "@/utils/schema/booking-schema";
+import { serviceTypeMap } from "@/utils/schema/booking-schema";
+import { formatDate, convertDecimalTimeslotsToArray } from "@/utils/timeFormatted-utils";
+import { updateFormData } from "@/utils/slice/bookingSlice";
+import { formatHour } from "@/utils/timeFormatted-utils";
+import bookingApi from "@/api/bookingApi";
+import tutorApi from "@/api/tutorApi";
 
 const stepFields = [
   {
     step: 1,
-    field: [
-      "booking.booking_date",
-      "booking.start_time",
-      "booking.service_type",
-      "booking.tutor_name",
-      "booking.tutor_id",
-      "booking.source_code_url",
-      "booking.instruction_details",
-      "booking.coupon_code",
-    ],
+    field: ["booking.booking_date", "booking.timeslots", "booking.service_type", "booking.tutor_name", "booking.tutor_id", "booking.source_code_url", "booking.instruction_details"],
   },
   {
     step: 2,
@@ -36,13 +31,46 @@ const stepFields = [
 ];
 
 export default function TutorBookingPayment() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setLoading] = useState(false);
+  const [bookingSuccessResult, setBookingSuccessResult] = useState({
+    tutor_id: "",
+    tutor_name: "",
+    booking_date: "",
+    service_type: "",
+    hourly_availability: [],
+    source_code_url: "",
+    instruction_details: "",
+  });
 
   // 建立Dispatch 來修改 RTK的State
   const dispatch = useDispatch();
+  const { isAuth, userData } = useSelector((state) => state.auth);
+  const bookingStep1FormData = useSelector((state) => state.booking);
+  const { tutor_id, tutor_name, booking_date, timeslots, service_type, price } = bookingStep1FormData;
 
-  const bookingFormData = useSelector((state) => state.booking);
-  const { tutor_id, tutor_name, booking_date, start_time, end_time, service_type, price, source_code_url, instruction_details } = bookingFormData;
+  console.log("tutor booking payment", { tutor_id, tutor_name, booking_date, timeslots, service_type, price });
+
+  useEffect(() => {
+    if (!isAuth) {
+      Swal.fire({
+        icon: "error",
+        title: "請先登入",
+      });
+      navigate(`/login`);
+    }
+
+    if (!tutor_id || !tutor_name || !booking_date || !timeslots || !service_type || !price) {
+      Swal.fire({
+        icon: "error",
+        title: "開始預約前，請先選擇預約導師、時間和預約服務。",
+      });
+
+      const redirectTo = tutor_id ? `/tutor/${tutor_id}` : "/tutor-list";
+      navigate(redirectTo);
+    }
+  }, [isAuth, tutor_id, tutor_name, booking_date, timeslots, service_type, price, navigate]);
 
   const methods = useForm({
     resolver: zodResolver(BookingSchema),
@@ -51,44 +79,74 @@ export default function TutorBookingPayment() {
   useEffect(() => {
     methods.reset({
       booking: {
-        tutor_id: tutor_id,
-        tutor_name: tutor_name,
-        service_type: service_type,
-        booking_date: booking_date,
-        start_time: start_time,
+        tutor_id,
+        service_type,
+        booking_date,
+        timeslots,
       },
     });
-  }, [tutor_id, tutor_name, service_type, booking_date, start_time, methods]);
+  }, [tutor_id, booking_date, timeslots, service_type, methods]);
 
   const toNextStep = async () => {
     const isValid = await methods.trigger(stepFields[currentStep - 1].field);
-    console.log("Date field valid:", isValid);
+
+    // console.log(methods.formState.errors);
+    // console.log("isValid", isValid);
 
     if (!isValid) return;
 
-    // Clear errors for the previous step before moving to the next
     const formData = methods.getValues();
 
     if (currentStep === 1) {
+      setLoading(true);
       if (isValid) setCurrentStep((currentStep) => currentStep + 1);
       methods.clearErrors(stepFields[currentStep].field);
 
-      console.log(formData.booking.source_code_url);
       if (service_type === "codeReview") {
         dispatch(updateFormData({ source_code_url: formData.booking.source_code_url }));
       }
-
       dispatch(updateFormData({ instruction_details: formData.booking.instruction_details }));
+      setLoading(false);
     }
 
     if (currentStep === 2) {
       await methods.handleSubmit(onSubmit)();
-      setCurrentStep((currentStep) => currentStep + 1);
     }
   };
 
-  const onSubmit = (data) => {
-    console.log("data", data);
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      // Correct the timeslot format from [1,2,3] to {0:false, 1: true, 2: true, 3: true, 4: false, 5: false,.......,23: false} in order to save in database
+      const convertArrayToObject = (arr, range = 24) => Object.fromEntries(Array.from({ length: range }, (_, i) => i).map((i) => [i, arr.includes(i)]));
+      const formatTimeslots = convertArrayToObject(data.booking.timeslots);
+
+      // eslint-disable-next-line no-unused-vars
+      const { timeslots, ...bookingWithoutTimeslots } = data.booking;
+      const bookingData = { ...bookingWithoutTimeslots, hourly_availability: formatTimeslots, student_id: userData.id };
+
+      const result = await bookingApi.addBooking(bookingData);
+
+      const convertedHourlyAvailability = convertDecimalTimeslotsToArray(result.hourly_availability);
+
+      const tutorNameFromAPI = (await tutorApi.getTutorDetail(result.tutor_id)).data.User.username;
+
+      const formattedResult = { ...result, tutor_name: tutorNameFromAPI, hourly_availability: convertedHourlyAvailability };
+
+      setBookingSuccessResult(formattedResult);
+      setCurrentStep((currentStep) => currentStep + 1);
+    } catch (error) {
+      console.dir(error);
+      const redirectUrl = tutor_id ? `/tutor/${tutor_id}` : "/";
+      navigate(redirectUrl);
+      Swal.fire({
+        icon: "error",
+        title: "預約失敗",
+        text: error?.response?.data?.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -162,16 +220,27 @@ export default function TutorBookingPayment() {
                             <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="service_type" value={serviceTypeMap[service_type]} disabled />
                           </div>
                           <div className="mb-md-5 mb-6">
-                            <label htmlFor="date" className="form-label">
+                            <label htmlFor="booking_date" className="form-label">
                               <h3 className="fs-6 fw-medium">預約日期</h3>
                             </label>
-                            <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="date" value={formatDate(booking_date)} disabled />
+                            <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="booking_date" value={formatDate(booking_date)} disabled />
                           </div>
                           <div className="mb-md-5 mb-6">
                             <label htmlFor="timeSlot" className="form-label">
                               <h3 className="fs-6 fw-medium">預約時段</h3>
                             </label>
-                            <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="timeSlot" value={`${start_time} - ${end_time}`} disabled />
+                            <div className="d-flex flex-wrap gap-1">
+                              {timeslots.map((time) => (
+                                <input
+                                  key={time}
+                                  type="text"
+                                  className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
+                                  id="timeSlot"
+                                  value={`${formatHour(time)} - ${formatHour(time + 1)}`}
+                                  disabled
+                                />
+                              ))}
+                            </div>
                           </div>
                         </div>
                         <hr />
@@ -198,6 +267,7 @@ export default function TutorBookingPayment() {
                               希望接受指導的項目
                               <span className="text-danger ms-1">*</span>
                             </label>
+
                             <textarea
                               className={`form-control rounded-1 ${methods?.formState?.errors?.booking?.instruction_details && "is-invalid"} `}
                               id="instruction_details"
@@ -263,26 +333,17 @@ export default function TutorBookingPayment() {
                           </tbody>
                         </table>
 
-                        <button className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100 mt-8" onClick={toNextStep}>
-                          前往付款
-                          <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1"> arrow_forward </span>
-                        </button>
+                        <FormSubmitButton
+                          buttonStyle={"w-100 mt-8"}
+                          isLoading={isLoading}
+                          buttonText={"前往付款"}
+                          loadingText={"處理中"}
+                          roundedRadius={2}
+                          withIcon={true}
+                          withSlideRightAnimation={true}
+                          handleClick={toNextStep}
+                        />
                       </div>
-                    </div>
-                  </div>
-
-                  {/* 手機版明細卡片 */}
-                  <div className="sticky-bottom bg-white border-top d-lg-none px-4 py-5">
-                    <div className="f-between-center">
-                      <div>
-                        <h4 className="fs-6 fs-lg-5 fw-medium">小計</h4>
-                        <h4 className="text-brand-03 fs-lg-2 fs-3 mt-1">NT$ {price}</h4>
-                      </div>
-
-                      <button type="button" className="btn btn-brand-03 slide-right-hover f-center rounded-2" onClick={toNextStep}>
-                        前往付款
-                        <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1"> arrow_forward </span>
-                      </button>
                     </div>
                   </div>
                 </>
@@ -313,7 +374,7 @@ export default function TutorBookingPayment() {
                                 <h4 className="fs-6 fs-lg-5 fw-medium">小計</h4>
                               </th>
                               <td className="border-0 text-end">
-                                <h4 className="fs-6 fs-lg-5 fw-medium">NT$ {bookingFormData.price}</h4>
+                                <h4 className="fs-6 fs-lg-5 fw-medium">NT$ {price}</h4>
                               </td>
                             </tr>
                           </tbody>
@@ -338,32 +399,23 @@ export default function TutorBookingPayment() {
                                 <h4 className="fs-6 fs-lg-5">總計</h4>
                               </th>
                               <td className="border-0 text-end">
-                                <h4 className="fs-2">NT$ {bookingFormData.price}</h4>
+                                <h4 className="fs-2">NT$ {price}</h4>
                               </td>
                             </tr>
                           </tbody>
                         </table>
 
-                        <button className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100" type="submit" onClick={toNextStep}>
-                          確定付款
-                          <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1"> arrow_forward </span>
-                        </button>
+                        <FormSubmitButton
+                          buttonStyle={"w-100"}
+                          isLoading={isLoading}
+                          buttonText={"確定付款"}
+                          loadingText={"處理中"}
+                          roundedRadius={2}
+                          withIcon={true}
+                          withSlideRightAnimation={true}
+                          handleClick={toNextStep}
+                        />
                       </div>
-                    </div>
-                  </div>
-
-                  {/* 手機版明細卡片 */}
-                  <div className="sticky-bottom bg-white border-top d-lg-none px-4 py-5">
-                    <div className="f-between-center">
-                      <div>
-                        <h4 className="fs-6 fs-lg-5 fw-medium">小計</h4>
-                        <h4 className="text-brand-03 fs-lg-2 fs-3 mt-1">NT$ {bookingFormData.price}</h4>
-                      </div>
-
-                      <button className="btn btn-brand-03 slide-right-hover f-center rounded-2" type="submit" onClick={toNextStep}>
-                        確定付款
-                        <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1"> arrow_forward </span>
-                      </button>
                     </div>
                   </div>
                 </>
@@ -389,25 +441,48 @@ export default function TutorBookingPayment() {
                               <label htmlFor="tutor" className="form-label">
                                 <h3 className="fs-6 fw-medium">預約老師</h3>
                               </label>
-                              <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="tutor" defaultValue={tutor_name} disabled />
+                              <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="tutor" defaultValue={bookingSuccessResult.tutor_name} disabled />
                             </div>
                             <div className="mb-md-12 mb-6">
                               <label htmlFor="bookingType" className="form-label">
                                 <h3 className="fs-6 fw-medium">預約類型</h3>
                               </label>
-                              <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="bookingType" defaultValue={serviceTypeMap[service_type]} disabled />
+                              <input
+                                type="text"
+                                className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
+                                id="bookingType"
+                                defaultValue={serviceTypeMap[bookingSuccessResult.service_type]}
+                                disabled
+                              />
                             </div>
                             <div className="mb-md-5 mb-6">
-                              <label htmlFor="date" className="form-label">
+                              <label htmlFor="booking_date" className="form-label">
                                 <h3 className="fs-6 fw-medium">預約日期</h3>
                               </label>
-                              <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="date" defaultValue={formatDate(booking_date)} disabled />
+                              <input
+                                type="text"
+                                className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
+                                id="booking_date"
+                                defaultValue={formatDate(bookingSuccessResult.booking_date)}
+                                disabled
+                              />
                             </div>
                             <div className="mb-md-5 mb-6">
                               <label htmlFor="timeSlot" className="form-label">
                                 <h3 className="fs-6 fw-medium">預約時段</h3>
                               </label>
-                              <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="timeSlot" defaultValue={`${start_time} - ${end_time}`} disabled />
+                              <div className="d-flex flex-wrap gap-1">
+                                {bookingSuccessResult.hourly_availability.map((time) => (
+                                  <input
+                                    key={time}
+                                    type="text"
+                                    className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
+                                    id="timeSlot"
+                                    value={`${formatHour(time)} - ${formatHour(time + 1)}`}
+                                    disabled
+                                  />
+                                ))}
+                              </div>
                             </div>
                           </div>
                           <hr />
@@ -416,10 +491,15 @@ export default function TutorBookingPayment() {
                             {service_type === "codeReview" ? (
                               <>
                                 <div className="mb-8">
-                                  <label htmlFor="sourceCodeURL" className="form-label">
+                                  <label htmlFor="source_code_url" className="form-label">
                                     希望接受檢視的程式碼儲存庫
                                   </label>
-                                  <input className="form-control border-0 bg-white p-0 rounded-0 text-gray-02 h-100" id="sourceCodeURL" defaultValue={source_code_url} disabled />
+                                  <input
+                                    className="form-control border-0 bg-white p-0 rounded-0 text-gray-02 h-100"
+                                    id="source_code_URL"
+                                    defaultValue={bookingSuccessResult.source_code_url}
+                                    disabled
+                                  />
                                 </div>
                                 <div>
                                   <label htmlFor="userInput" className="form-label">
@@ -430,7 +510,7 @@ export default function TutorBookingPayment() {
                                     id="userInput"
                                     style={{ resize: "none" }}
                                     rows="5"
-                                    defaultValue={instruction_details}
+                                    defaultValue={bookingSuccessResult.instruction_details}
                                     disabled
                                   />
                                 </div>
@@ -446,7 +526,7 @@ export default function TutorBookingPayment() {
                                     id="userInput"
                                     style={{ resize: "none" }}
                                     rows="5"
-                                    defaultValue={instruction_details}
+                                    defaultValue={bookingSuccessResult.instruction_details}
                                     disabled
                                   />
                                 </div>
@@ -475,6 +555,28 @@ export default function TutorBookingPayment() {
           </FormProvider>
         </div>
       </main>
+
+      {/* 手機版明細卡片 */}
+      {currentStep !== 3 && (
+        <div className="sticky-bottom bg-white border-top d-lg-none px-4 py-5">
+          <div className="f-between-center">
+            <div>
+              <h4 className="fs-6 fs-lg-5 fw-medium">小計</h4>
+              <h4 className="text-brand-03 fs-lg-2 fs-3 mt-1">NT$ {price}</h4>
+            </div>
+
+            <FormSubmitButton
+              isLoading={isLoading}
+              buttonText={currentStep === 2 ? `確定付款` : "前往付款"}
+              loadingText={"處理中"}
+              roundedRadius={2}
+              withIcon={true}
+              withSlideRightAnimation={true}
+              handleClick={toNextStep}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -27,10 +27,10 @@ TutorsCard.propTypes = {
       expertise: PropTypes.string.isRequired,
       rating: PropTypes.string.isRequired,
       hourly_rate: PropTypes.string.isRequired,
-      isFavorite: PropTypes.bool.isRequired,
+      isFavorite: PropTypes.bool,
       user: PropTypes.shape({
         username: PropTypes.string.isRequired,
-        avatar_url: PropTypes.string.isRequired,
+        avatar_url: PropTypes.string,
       }),
     })
   ).isRequired,

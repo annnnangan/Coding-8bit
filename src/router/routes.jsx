@@ -22,9 +22,9 @@ import CourseDetailPage from "../pages/user/course/detail-page/course-detail-pag
 import CourseVideoPage from "../pages/user/course/detail-page/course-video-page";
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
-import CustomCourseList from "../pages/user/custom-course/custom-course-list";
+import CustomRequestsList from "../pages/user/custom-request/custom-requests-list";
 const AddLearningNeedPage = lazy(() =>
-  import("../pages/user/custom-course/add-learning-need-page")
+  import("../pages/user/custom-request/add-learning-need-page")
 );
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
@@ -34,10 +34,9 @@ import TutorList from "../pages/user/tutor/tutor-list";
 import TutorBooking from "../pages/user/tutor/tutor-booking";
 import TutorBookingPayment from "../pages/user/tutor/tutor-booking-payment";
 import TutorInfo from "../pages/user/tutor/tutor-info";
+import TutorApply from "../pages/user/tutor/tutor-apply";
 
 import HelpCenter from "../pages/user/help-center";
-import PrivacyPolicy from "../pages/PrivacyPolicy";
-import TermsOfService from "../pages/TermsOfService";
 
 // 使用者後台 - 講師
 import TutorPanel from "../pages/tutor/tutor-panel";
@@ -77,7 +76,7 @@ export const router = createHashRouter([
       { path: "course/:id/chapter/:videoId", element: <CourseVideoPage /> },
       { path: "video/:videoId", element: <SingleVideoPage /> },
 
-      { path: "custom-course-list", element: <CustomCourseList /> },
+      { path: "custom-requests-list", element: <CustomRequestsList /> },
       { path: "add-learning-need", element: <AddLearningNeedPage /> },
 
       { path: "subscription-list", element: <SubscriptionList /> },
@@ -93,10 +92,9 @@ export const router = createHashRouter([
         element: <TutorBookingPayment />,
       },
       { path: "tutor-info/:id", element: <TutorInfo /> },
+      { path: "tutor-apply", element: <TutorApply /> },
 
       { path: "help-center", element: <HelpCenter /> },
-      { path: "privacy-policy", element: <PrivacyPolicy /> },
-      { path: "terms-of-service", element: <TermsOfService /> },
     ],
   },
   {

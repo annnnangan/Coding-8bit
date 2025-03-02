@@ -1,3 +1,5 @@
+/* ------------------------------- Format Video Duration ------------------------------ */
+
 // 轉換為影片時間格式
 export const convertSecondsToTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
@@ -8,6 +10,7 @@ export const convertSecondsToTime = (seconds) => {
   return timeFormatted;
 };
 
+/* ------------------------------- Format Date ------------------------------ */
 export const formatDateToTaiwanStyle = (isoString) => {
   const date = new Date(isoString);
   const options = {
@@ -57,8 +60,25 @@ export const removeYearFromDate = (isoString) => {
   return `${month}/${day}`;
 };
 
+/* ------------------------------- Format Time ------------------------------ */
+
 // 從 數字(e.g. 9) 轉到 09:00
 export const formatHour = (hour) => {
   hour = hour.toString();
   return hour.padStart(2, "0") + ":00";
+};
+
+// Convert decimal number (e.g. 1536) to binary (e.g. 1100000000 ) to timeslot array (e.g. [10, 11])
+// e.g. 32768 -> 1000000000000000 -> [15]
+// e.g. 17920 -> 100011000000000 -> [9,10,14]
+export const convertDecimalTimeslotsToArray = (number) => {
+  const binaryString = number.toString(2);
+  const timeslotsArray = [];
+  for (let i = 0; i < binaryString.length; i++) {
+    if (binaryString[binaryString.length - 1 - i] === "1") {
+      timeslotsArray.push(i);
+    }
+  }
+
+  return timeslotsArray;
 };

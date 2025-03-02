@@ -12,9 +12,12 @@ export default function FormInput({
   return (
     <>
       {style === "" && (
-        <label htmlFor={id} className="form-label">
-          {labelText}
-        </label>
+        <>
+          <label htmlFor={id} className="form-label">
+            {labelText}
+          </label>
+          <span className="text-danger">*</span>
+        </>
       )}
       {style === "payInput" && (
         <label htmlFor="buyerEmail" className="form-label">

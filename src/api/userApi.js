@@ -12,6 +12,12 @@ const updateUserData = async (userData) => {
   return response.data;
 };
 
+// 新增使用者角色
+const addRole = async (id, role) => {
+  const response = await apiClient.post(`/user/users/${id}/role`, { role: role });
+  return response.data;
+};
+
 // 切換使用者角色
 const changeUserRole = async (role) => {
   const response = await apiClient.put(`/user/users/me/role`, { role: role });
@@ -21,5 +27,6 @@ const changeUserRole = async (role) => {
 export default {
   getUserData,
   updateUserData,
+  addRole,
   changeUserRole
 };
