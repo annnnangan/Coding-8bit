@@ -1,6 +1,7 @@
 // react 相關套件
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // 第三方套件
 import PropTypes from "prop-types";
@@ -27,7 +28,10 @@ export default function VideoContent({
   const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
   const [starRating, setStarRating] = useState(false); // 是否評分影片
   const [videoSrc, setVideoSrc] = useState(""); // 影片 URL
-  
+
+  // redux 使用者資訊
+  const userInfo = useSelector((state) => state.auth.userData);
+
   // 評分 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
@@ -95,8 +99,15 @@ export default function VideoContent({
     return tokenUrl;
   };
 
+  // 檢查是否有登入
+  const checkToken = async () => {
+    !userInfo || Object.keys(userInfo).length === 0 ? false : true;
+  };
+
   //初始化判斷是否禁用留言輸入框
   useEffect(() => {
+    if (checkToken()) return;
+    
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
@@ -123,6 +134,7 @@ export default function VideoContent({
 
   // 取得影片播放 URL
   useEffect(() => {
+    if (checkToken()) return;
     const fetchVideoSrc = async () => {
       const tokenUrl = await getTokenToPlay(videoUrl);
       setVideoSrc(tokenUrl);
