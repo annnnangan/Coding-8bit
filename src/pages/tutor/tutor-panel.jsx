@@ -7,13 +7,10 @@ import CourseCard from "../../components/course/CourseCard";
 import DashboardSection from "../../components/common/DashboardSection";
 import BookingCard from "../../components/common/booking-record/BookingCard";
 
-import {
-  dashboardRecommendCourseList,
-} from "../../data/courses";
+import { dashboardRecommendCourseList } from "../../data/courses";
 import { userBookingData } from "../../data/bookings";
 
 export default function TutorPanel() {
-
   // 初始化 - swiper
   useEffect(() => {
     new Swiper(".swiper", {
@@ -52,29 +49,17 @@ export default function TutorPanel() {
         <div className="row">
           {/* Left */}
           <div className="col-xxl-8">
-            <DashboardSection
-              title="即將到來的預約"
-              withNavLink={true}
-              navLinkText={"所有預約"}
-              navLinkHref={"/student-panel/booking"}
-              className="mb-2 mb-xxl-8"
-            >
-              <div className="row flex-wrap g-2">
+            <DashboardSection title="即將到來的預約" withNavLink={true} navLinkText={"所有預約"} navLinkHref={"/student-panel/booking"} className="mb-2 mb-xxl-8">
+              {/* <div className="row flex-wrap g-2">
                 {userBookingData.map((booking) => (
                   <div key={booking.id} className="col-12 col-md-6">
                     <BookingCard booking={booking} />
                   </div>
                 ))}
-              </div>
+              </div> */}
             </DashboardSection>
 
-            <DashboardSection
-              title="以下課程有新留言"
-              withNavLink={true}
-              navLinkText={"所有課程"}
-              navLinkHref={"/student-panel/learning"}
-              className="mb-2 mb-xxl-0"
-            >
+            <DashboardSection title="以下課程有新留言" withNavLink={true} navLinkText={"所有課程"} navLinkHref={"/student-panel/learning"} className="mb-2 mb-xxl-0">
               <div className="swiper">
                 <div className="swiper-wrapper">
                   {dashboardRecommendCourseList.map((course) => (
@@ -89,33 +74,17 @@ export default function TutorPanel() {
 
           {/* Right */}
           <div className="col-xxl-4">
-            <DashboardSection
-              title="目前擁有"
-              withNavLink={false}
-              className="mb-2 mb-xxl-8"
-            >
+            <DashboardSection title="目前擁有" withNavLink={false} className="mb-2 mb-xxl-8">
               <div className="f-center gap-5">
-                <div
-                  className="rounded-4 bg-white f-center flex-column"
-                  style={{ height: "180px", width: "180px" }}
-                >
+                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
                   <p className="fs-2 fw-bold text-brand-03 d-flex">
-                    3{" "}
-                    <span className="fs-7 fw-medium align-self-center ms-1">
-                      個
-                    </span>
+                    3 <span className="fs-7 fw-medium align-self-center ms-1">個</span>
                   </p>
                   <p>主題式系列課程</p>
                 </div>
-                <div
-                  className="rounded-4 bg-white f-center flex-column"
-                  style={{ height: "180px", width: "180px" }}
-                >
+                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
                   <p className="fs-2 fw-bold text-brand-03 d-flex">
-                    30{" "}
-                    <span className="fs-7 fw-medium align-self-center ms-1">
-                      小時
-                    </span>
+                    30 <span className="fs-7 fw-medium align-self-center ms-1">小時</span>
                   </p>
                   <p>教學影片</p>
                 </div>
@@ -124,22 +93,12 @@ export default function TutorPanel() {
 
             <DashboardSection title="講師資料" withNavLink={false}>
               <div className="f-center gap-5">
-                <div
-                  className="rounded-4 bg-white f-center flex-column"
-                  style={{ height: "180px", width: "180px" }}
-                >
-                  <p className="fs-2 fw-bold text-brand-03 d-flex">
-                    {" "}4.0{" "}
-                  </p>
+                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
+                  <p className="fs-2 fw-bold text-brand-03 d-flex"> 4.0 </p>
                   <p>評分</p>
                 </div>
-                <div
-                  className="rounded-4 bg-white f-center flex-column"
-                  style={{ height: "180px", width: "180px" }}
-                >
-                  <p className="fs-2 fw-bold text-brand-03 d-flex">
-                    {" "}26{" "}
-                  </p>
+                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
+                  <p className="fs-2 fw-bold text-brand-03 d-flex"> 26 </p>
                   <p>評價數</p>
                 </div>
               </div>

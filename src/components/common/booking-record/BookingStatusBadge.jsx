@@ -9,9 +9,8 @@ export default function BookingStatusBadge({ status }) {
   );
 }
 
-// Define prop types
 BookingStatusBadge.propTypes = {
-  status: PropTypes.oneOf(["in_progress", "completed", "canceled"]).isRequired,
+  status: PropTypes.oneOf(["in_progress", "completed", "cancelled"]).isRequired,
 };
 
 const bookingStatusList = {
@@ -27,7 +26,7 @@ const bookingStatusList = {
     icon: "check_circle",
     backgroundColor: "bg-success-02",
   },
-  canceled: {
+  cancelled: {
     name: "已取消",
     color: "text-gray-02",
     icon: "cancel",
