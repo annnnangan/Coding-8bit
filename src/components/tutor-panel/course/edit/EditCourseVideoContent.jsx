@@ -15,6 +15,8 @@ import userApi from "../../../../api/userApi";
 
 import FormInput from "../../../common/FormInput";
 
+const { VITE_API_BASE } = import.meta.env;
+
 export default function EditCourseVideoContent({
   submitApiRequest,
   setLoadingState,
@@ -64,7 +66,7 @@ export default function EditCourseVideoContent({
       // 1. 取得上傳用的預簽名 url
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       const uploadData = await axios.post(
-        "https://coding-bit-backend.onrender.com/api/v1/upload/get-upload-url",
+        `${VITE_API_BASE}/upload/get-upload-url`,
         { fileName: file.name, fileType: file.type }
       );
 
