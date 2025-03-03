@@ -171,8 +171,8 @@ export default function CommentsSection({
   };
 
   // 檢查是否有登入
-  const checkToken = async () => {
-    !userInfo || Object.keys(userInfo).length === 0 ? false : true;
+  const checkToken = () => {
+    return Object.keys(userInfo).length === 0 ? true : false;
   };
 
   // 整理留言

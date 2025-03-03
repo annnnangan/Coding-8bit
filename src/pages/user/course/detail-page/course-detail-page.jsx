@@ -321,7 +321,7 @@ export default function CourseDetailPage() {
             </div>
             <div className="modal-body">
               <ul className="chapter-list">
-                {chapter.slice(1,).map((video, index) => (
+                {chapter.slice(1).map((video, index) => (
                   <li
                     className="video-background-color-hover px-6 py-4"
                     onClick={() => modalRefMethod.current.hide()}

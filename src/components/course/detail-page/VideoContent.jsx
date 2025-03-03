@@ -100,14 +100,14 @@ export default function VideoContent({
   };
 
   // 檢查是否有登入
-  const checkToken = async () => {
-    !userInfo || Object.keys(userInfo).length === 0 ? false : true;
+  const checkToken = () => {
+    return Object.keys(userInfo).length === 0 ? true : false;
   };
 
   //初始化判斷是否禁用留言輸入框
   useEffect(() => {
     if (checkToken()) return;
-    
+
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
