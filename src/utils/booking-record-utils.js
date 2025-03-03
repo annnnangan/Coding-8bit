@@ -1,13 +1,13 @@
 export const determineMeetingLinkMessage = (bookingType, bookingStatus, meetingLink) => {
-  if (bookingType === "一對一教學" && bookingStatus === "in_progress" && meetingLink === null) {
+  if (bookingType === "courseSession" && bookingStatus === "in_progress" && meetingLink === null) {
     return "未釋出";
   }
 
-  if (bookingType === "一對一教學" && bookingStatus === "completed") {
+  if (bookingType === "courseSession" && bookingStatus === "completed") {
     return "已過期";
   }
 
-  if (bookingType === "程式碼檢視" || (bookingType === "一對一教學" && bookingStatus === "canceled")) {
+  if (bookingType === "codeReview" || (bookingType === "courseSession" && bookingStatus === "cancelled")) {
     return "不適用";
   }
 };
