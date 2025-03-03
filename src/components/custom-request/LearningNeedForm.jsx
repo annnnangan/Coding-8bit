@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, lazy, Suspense, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 
+import PropTypes from "prop-types";
+
 const ReactQuill = lazy(() => import("react-quill-new"));
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,10 +19,7 @@ import { categories } from "@/data/courses";
 
 const { VITE_API_BASE } = import.meta.env;
 
-export default function LearningNeedForm() {
-  // loading
-  const [loadingState, setLoadingState] = useState(false);
-
+export default function LearningNeedForm({ setLoadingState }) {
   // 返回上一頁
   const navigate = useNavigate();
   const toPrevPage = () => {
@@ -185,8 +184,6 @@ export default function LearningNeedForm() {
 
   return (
     <>
-      {loadingState && <Loader />}
-
       <div className="learning-need-form-wrap card-column">
         <h1>提出您的學習需求</h1>
         <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
@@ -397,3 +394,7 @@ export default function LearningNeedForm() {
     </>
   );
 }
+
+LearningNeedForm.propTypes = {
+  setLoadingState: PropTypes.func.isRequired,
+};

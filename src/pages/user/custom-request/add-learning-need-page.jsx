@@ -1,16 +1,23 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 
 import AddLearningNeedRobot from "@/components/custom-request/addLearningNeedRobot";
 import ChatRoom from "@/components/custom-request/ChatRoom";
 
 import LearningNeedForm from "@/components/custom-request/LearningNeedForm";
+import TransparentLoader from "@/components/common/TransparentLoader";
 
 export default function AddLearningNeedPage() {
+  // loading
+  const [loadingState, setLoadingState] = useState(false);
+
   return (
     <>
       <Helmet>
         <title>Coding∞bit ｜ 新增客製化需求</title>
       </Helmet>
+      {loadingState && <TransparentLoader />}
+
       <AddLearningNeedRobot />
 
       <div className="add-learning-need-section">
@@ -48,7 +55,8 @@ export default function AddLearningNeedPage() {
                     <li>
                       <h3>1. 在標題寫上您使用的程式語言，並簡述您的學習需求</h3>
                       <p className="fs-7 ps-5 mt-2">
-                        開頭寫上程式語言，再用簡短的一句話說明您希望解決的問題或達成的目標。(例如：CSS 毛玻璃樣式)
+                        開頭寫上程式語言，再用簡短的一句話說明您希望解決的問題或達成的目標。(例如：CSS
+                        毛玻璃樣式)
                       </p>
                     </li>
                     <li className="mt-4 mt-lg-5">
@@ -60,7 +68,8 @@ export default function AddLearningNeedPage() {
                     <li className="mt-4 mt-lg-5">
                       <h3>3. 填入關鍵字</h3>
                       <p className="fs-7 ps-5 mt-2">
-                        填寫幾個關鍵字，讓大家更容易看見這個需求。關鍵字與關鍵字之間請以半形逗號隔開。(例如：React, 前端開發, 效能優化, Hooks)
+                        填寫幾個關鍵字，讓大家更容易看見這個需求。關鍵字與關鍵字之間請以半形逗號隔開。(例如：React,
+                        前端開發, 效能優化, Hooks)
                       </p>
                     </li>
                     <li className="mt-4 mt-lg-5">
@@ -100,14 +109,14 @@ export default function AddLearningNeedPage() {
             </div>
 
             <div className="col-lg-6">
-              <LearningNeedForm />
+              <LearningNeedForm setLoadingState={setLoadingState} />
             </div>
           </div>
         </div>
       </div>
 
       {/* 聊天室 */}
-      <ChatRoom />
+      <ChatRoom/>
     </>
   );
 }
