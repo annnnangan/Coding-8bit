@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
+import userApi from "@/api/userApi";
+
+const { VITE_API_BASE } = import.meta.env;
 
 export default function ProfileContent({ userData, setLoadingState }) {
   const navigate = useNavigate();
@@ -47,7 +50,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
       // 1. 取得上傳用的預簽名 url
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       const uploadData = await axios.post(
-        "https://coding-bit-backend.onrender.com/api/v1/upload/get-upload-url",
+        `${VITE_API_BASE}/upload/get-upload-url`,
         { fileName: file.name, fileType: file.type }
       );
 
@@ -88,10 +91,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
   const updateProfile = async () => {
     setLoadingState(true);
     try {
-      await axios.put(
-        `https://service.coding-8bit.site/api/v1/user/users/me`,
-        temProfile
-      );
+      await userApi.updateUserData(temProfile);
       Swal.fire({
         title: "更新成功",
         icon: "success",

@@ -6,13 +6,13 @@ import DOMPurify from "dompurify";
 import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 
-import courseApi from "../../../api/courseApi";
-import CourseCardList from "../../../components/course/CourseCardList";
-import MainTitle from "../../../components/MainTitle";
-import Loader from "../../../components/common/Loader";
+import courseApi from "@/api/courseApi";
+import CourseCardList from "@/components/course/CourseCardList";
+import MainTitle from "@/components/MainTitle";
+import Loader from "@/components/common/Loader";
 
-import { categoryData, hotCoursesData } from "../../../data/courses";
-import { convertSecondsToTime } from "../../../utils/timeFormatted-utils";
+import { categoryData, hotCoursesData } from "@/data/courses";
+import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseList() {
   // loading
@@ -251,6 +251,7 @@ export default function CourseList() {
                           <img
                             src={course.cover_image}
                             className="card-img-top cover-img rounded"
+                            style={{ height: "204px" }}
                             alt="course-image"
                           />
                         </div>
