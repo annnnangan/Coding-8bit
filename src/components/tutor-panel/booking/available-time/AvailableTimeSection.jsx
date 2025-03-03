@@ -15,7 +15,6 @@ import "react-day-picker/dist/style.css";
 export default function AvailableTimeSection() {
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
 
-  const dropdownButtonRef = useRef(null);
   const [date, setSelectedDate] = useState();
 
   const [isLoadingDayOfWeekAvailability, setLoadingDayOfWeekAvailability] = useState(false);
@@ -86,9 +85,6 @@ export default function AvailableTimeSection() {
   const handleDateSelect = (date) => {
     if (date) {
       setSelectedDate(date);
-      const dropdown = new Dropdown(dropdownButtonRef.current);
-      dropdown.hide(); // Close the dropdown when a date is selected
-
       setNewAddSpecificDateAvailability((prev) => {
         const newDateKey = formatDateDash(date); // Format date to "yyyy-mm-dd"
         return {
@@ -141,11 +137,10 @@ export default function AvailableTimeSection() {
 
           <div className="dropdown">
             <button
-              ref={dropdownButtonRef}
               className="dropdown-toggle rounded-circle btn btn-brand-02 p-6 f-center add-btn"
               type="button"
               data-bs-toggle="dropdown"
-              data-bs-auto-close="inside"
+              data-bs-auto-close="false"
               aria-expanded="false"
               style={{ width: "40px", height: "40px" }}
             >
