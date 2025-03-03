@@ -44,6 +44,7 @@ export default function TutorCard({ tutor }) {
         {/*  dynamic tag loop*/}
         <div className="mb-5">
           {tutor.expertise
+            .trim()
             .split(",")
             .slice(0, 3)
             .map((skill, index) => (

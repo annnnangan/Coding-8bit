@@ -30,10 +30,32 @@ const deleteCustomRequest = async (id) => {
   return response.data;
 };
 
+// 取得單一留言
+const getRequestsResponse = async (id) => {
+  const response = await apiClient.get(`/custom-responses/${id}`);
+  return response.data.data;
+};
+
+// 新增單一留言
+const addRequestsResponse = async (id, data) => {
+  const response = await apiClient.post(`/custom-responses/${id}`, data);
+  return response.data.data;
+};
+
+// 刪除單一留言
+const deleteRequestsResponse = async (id) => {
+  const response = await apiClient.delete(`/custom-responses/${id}`);
+  return response.data.data;
+};
+
+
 export default {
   getAllCustomRequests,
   getUserCustomRequests,
   addCustomRequest,
   addCustomRequestImg,
   deleteCustomRequest,
+  getRequestsResponse,
+  addRequestsResponse,
+  deleteRequestsResponse
 };
