@@ -3,6 +3,7 @@
 @import "./utils/variables";
 @import "./utils/custom-colors.scss";
 @import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 @import "./utils/mixin.scss";
 @import "./utils/base.scss";
 @import "./utils/btn.scss";
@@ -30,6 +31,7 @@
 @import "./components/to-top-btn.scss";
 @import "./components/add-learning-need-bot-btn.scss";
 @import "./components/upload-btn.scss";
+@import "./components/star-rating.scss";
 
 @import "./layout/loader.scss";
 @import "./pages/video-details";

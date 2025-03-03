@@ -45,7 +45,10 @@
 
   &:hover {
     background-color: transparent;
-    // font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 48;
+  }
+
+  &:focus {
+    background-color: transparent;
   }
 }
 
@@ -395,6 +398,12 @@
 .related-videos-list {
   .related-video-image {
     max-width: 136px;
+    height: 80px;
+    overflow: hidden;
+
+    img {
+      object-fit: cover;
+    }
   }
 
   .related-video-duration {

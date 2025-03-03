@@ -1,12 +1,16 @@
+// react 相關套件
 import { useState, useEffect } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+// API
+import courseApi from "@/api/courseApi";
+
+// 組件
 import VideoContent from "@/components/course/detail-page/VideoContent";
 import Loader from "@/components/common/Loader";
 
-import courseApi from "@/api/courseApi";
-
+// 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
@@ -22,7 +26,7 @@ export default function CourseVideoPage() {
     },
   });
 
-  // 過濾無章節的課程
+  // 過濾同講師無章節or相同課程
   const filterOtherCourse = (others) => {
     return others.filter(
       (other) =>
@@ -32,25 +36,21 @@ export default function CourseVideoPage() {
     );
   };
 
-  // 過濾同課程的影片
+  // 過濾同課程的影片並取 6 支影片
   const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo.filter((related) => related.course_id !== videoData.course_id);
+    return relatedVideo
+      .filter((related) => {
+        return related.course_id !== videoData.course_id;
+      })
+      .slice(0, 6);
   };
 
+  // 初始化取得資料
   const getData = async () => {
     setLoadingState(true);
     try {
       const videoResult = await courseApi.getVideoDetail(videoId);
-      const otherCourseResult = await courseApi.getFrontTutorCourses({
-        tutorId: videoResult.tutor_id,
-      });
-      const relatedVideosResult = await courseApi.getFrontTutorVideos({
-        category: videoData.category,
-      });
-
       setVideoData(videoResult);
-      setOtherVideos(filterOtherCourse(otherCourseResult.courses));
-      setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -58,7 +58,30 @@ export default function CourseVideoPage() {
     }
   };
 
-  // 初始化取得資料
+  // 監聽 videoData 的變化
+  useEffect(() => {
+    // 在 videoData 更新後調用過濾函數
+    if (videoData.course_id) {
+      const fetchOtherVideos = async () => {
+        const otherCourseResult = await courseApi.getFrontTutorCourses({
+          tutorId: videoData.tutor_id,
+        });
+        setOtherVideos(filterOtherCourse(otherCourseResult.courses));
+      };
+
+      const fetchRelatedVideos = async () => {
+        const relatedVideosResult = await courseApi.getFrontTutorVideos({
+          category: videoData.category,
+        });
+        setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
+      };
+
+      fetchOtherVideos();
+      fetchRelatedVideos();
+    }
+  }, [videoData]);
+
+  // 初始化
   useEffect(() => {
     getData();
   }, [videoId]);
@@ -73,7 +96,6 @@ export default function CourseVideoPage() {
         </title>
       </Helmet>
       {loadingState && <Loader />}
-
       <main className="video-details container-lg py-lg-13 py-md-0">
         <div className="row">
           <VideoContent
@@ -81,7 +103,6 @@ export default function CourseVideoPage() {
             courseList={videoData}
             paramsVideoId={videoId}
           />
-
           <aside className="col-lg-5 col-xl-4">
             {/* 講師其他影片 */}
             {otherVideos.length > 0 && (
@@ -167,9 +188,9 @@ export default function CourseVideoPage() {
                         to={`/video/${related.id}`}
                         className="d-flex justify-content-between chapter-item"
                       >
-                        <div className="position-relative me-4">
+                        <div className="position-relative me-4 related-video-image rounded-2">
                           <img
-                            className="rounded-2 related-video-image"
+                            className="w-100"
                             src={related.cover_image}
                             alt="影片縮圖"
                           />

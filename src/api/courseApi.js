@@ -42,21 +42,59 @@ const getVideoDetail = async (id) => {
   return response.data.data;
 };
 
+// 取得影片播放權限
+const getVideoPermission = async (url) => {
+  const response = await apiClient.post(`/upload/get-video-url`, {
+    "filePath": url
+  });
+  return response.data.videoUrl;
+};
+
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
-  const response = await apiClient.get(`/video/${id}/comments`);
+  const response = await apiClient.get(`/comment/videos/${id}/comments`);
   return response.data.data;
 };
 
 // 新增個人課程的留言
 const postCourseComments = async (id, data) => {
-  const response = await apiClient.post(`/video/${id}/comments`, data);
+  const response = await apiClient.post(`/comment/videos/${id}/comments`, data);
   return response.data.data;
 };
 
 // 刪除個人課程的留言
 const deleteCourseComments = async (id) => {
-  const response = await apiClient.delete(`/video/comments/${id}`);
+  const response = await apiClient.delete(`/comment/videos/comments/${id}`);
+  return response.data;
+};
+
+// 前台 - 取得單一影片是否收藏
+const getFavoriteVideo = async (videoId) => {
+  const response = await apiClient.get(`/favorites/videos/${videoId}/is-favorite`);
+  return response.data.data;
+};
+
+// 前台 - 收藏單一影片
+const postFavoriteVideo = async (videoId) => {
+  const response = await apiClient.post(`/favorites/videos/${videoId}`);
+  return response.data;
+};
+
+// 前台 - 移除收藏單一影片
+const deleteFavoriteVideo = async (videoId) => {
+  const response = await apiClient.delete(`/favorites/videos/${videoId}`);
+  return response.data;
+};
+
+// 前台 - 取得單一影片評分
+const getStarRatingVideo = async (videoId) => {
+  const response = await apiClient.get(`/ratings/videos/${videoId}/is-rated`);
+  return response.data.data;
+};
+
+// 前台 - 評分單一影片
+const postRatingVideo = async (videoId, data) => {
+  const response = await apiClient.post(`/ratings/videos/${videoId}`, data);
   return response.data;
 };
 
@@ -67,7 +105,7 @@ const getFrontTutorCourses = async ({ tutorId = "", page = 1, sortBy = "rating",
 };
 
 // 前台 - 取得單一講師所有影片
-const getFrontTutorVideos = async ({ tutorId = "", video_type = "", page = 1, sortBy = "rating", order = "DESC", limit = 6, category = "" }) => {
+const getFrontTutorVideos = async ({ tutorId = "", video_type = "", page = 1, sortBy = "rating", order = "DESC", limit = 30, category = "" }) => {
   const response = await apiClient
     .get(`/video?tutor_id=${tutorId}&video_type=${video_type}&page=${page}&sortBy=${sortBy}&order=${order}&limit=${limit}&category=${category}`);
   return response.data.data;
@@ -147,14 +185,20 @@ export default {
   getCourseDetail,
   getCourseChapter,
   getVideoDetail,
+  getVideoPermission,
   getCourseComments,
-  getTutorCourses,
-  getTutorVideos,
-  getFrontTutorCourses,
-  getFrontTutorVideos,
   postCourseComments,
   deleteCourseComments,
+  getFavoriteVideo,
+  postFavoriteVideo,
+  deleteFavoriteVideo,
+  getStarRatingVideo,
+  postRatingVideo,
+  getFrontTutorCourses,
+  getFrontTutorVideos,
   getTutorVideosInBooking,
+  getTutorCourses,
+  getTutorVideos,
   addCourse,
   updateCourse,
   deleteCourse,

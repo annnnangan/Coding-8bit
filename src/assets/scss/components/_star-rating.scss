@@ -1,0 +1,25 @@
+.star-rating {
+  display: flex;
+  direction: row;
+}
+
+.star-rating .star {
+  font-size: 2rem;
+  color: #d3d3d3;
+  cursor: pointer;
+}
+
+.star-rating .on .star {
+  color: #d0a2f7
+}
+
+.star-rating .off .star {
+  color: #d3d3d3;
+}
+
+.star-rating button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
