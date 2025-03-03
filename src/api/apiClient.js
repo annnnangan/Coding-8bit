@@ -3,7 +3,7 @@ import axios from "axios";
 // 建立 Axios
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE, // 環境變數 API
-  timeout: 10000, // 超時時間
+  timeout: 60000, // 超時時間
   headers: {
     "Content-Type": "application/json",
   },

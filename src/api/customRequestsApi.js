@@ -48,6 +48,12 @@ const deleteRequestsResponse = async (id) => {
   return response.data.data;
 };
 
+// 傳送 post 給 AI 機器人
+const postChat = async (data) => {
+  const response = await apiClient.post(`/chat/`, data);
+  return response.data.data;
+};
+
 
 export default {
   getAllCustomRequests,
@@ -57,5 +63,6 @@ export default {
   deleteCustomRequest,
   getRequestsResponse,
   addRequestsResponse,
-  deleteRequestsResponse
+  deleteRequestsResponse,
+  postChat
 };

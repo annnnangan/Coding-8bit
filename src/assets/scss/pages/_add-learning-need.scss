@@ -115,6 +115,8 @@
 
 /* chat-room */
 .chat-room {
+  overflow-wrap: break-word;
+  
   .room-title {
     color: $gray-01;
   
