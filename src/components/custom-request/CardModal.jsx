@@ -1,21 +1,112 @@
 import { useState, useEffect, lazy, Suspense } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserData } from "@/utils/slice/authSlice";
 
 const ReactQuill = lazy(() => import("react-quill-new"));
 import PropTypes from "prop-types";
-import Loader from "@/components/common/Loader";
 import DOMPurify from "dompurify";
+import Swal from "sweetalert2";
+
+import customRequestsApi from "@/api/customRequestsApi";
+
+import Loader from "@/components/common/Loader";
 
 import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
 
-export default function CardModal({ temCustomCourse, cardModalRef }) {
+export default function CardModal({
+  temCustomCourse,
+  cardModalRef,
+  setLoadingState,
+}) {
+  // 取得使用者資料
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.auth);
+
   // ReactQuill 文字編輯器
   const [value, setValue] = useState("");
-
   const [editorLoaded, setEditorLoaded] = useState(false);
-
   useEffect(() => {
     setEditorLoaded(true);
   }, []);
+
+  // 取得留言函式
+  const [response, setResponse] = useState([]);
+  const getResponse = async (id) => {
+    setLoadingState(true);
+    try {
+      const result = await customRequestsApi.getRequestsResponse(id);
+      setResponse(result);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "取得留言失敗",
+        text: error?.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // 新增留言函式
+  const addResponse = async () => {
+    setLoadingState(true);
+    try {
+      await customRequestsApi.addRequestsResponse(temCustomCourse.id, {
+        content: value,
+      });
+      Swal.fire({
+        icon: "success",
+        title: "新增留言成功",
+      });
+      getResponse(temCustomCourse.id);
+      setValue("");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "新增留言失敗",
+        text: error?.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // 刪除單一留言
+  const deleteResponse = async (id) => {
+    Swal.fire({
+      title: "確定要刪除嗎？",
+      showCancelButton: true,
+      confirmButtonText: "刪除",
+      denyButtonText: "不要刪除",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoadingState(true);
+        try {
+          await customRequestsApi.deleteRequestsResponse(id);
+          Swal.fire({
+            icon: "success",
+            title: "刪除留言成功",
+          });
+          getResponse(temCustomCourse.id);
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "刪除留言失敗",
+            text: error?.response?.data?.message,
+          });
+        } finally {
+          setLoadingState(false);
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    dispatch(getUserData());
+    if (temCustomCourse.id) {
+      getResponse(temCustomCourse.id);
+    }
+  }, [temCustomCourse.id]);
 
   return (
     <>
@@ -80,7 +171,8 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                     <div id="modalTags" className="mb-3">
                       {temCustomCourse?.tag &&
                         temCustomCourse?.tag
-                          .split(", ")
+                          .trim()
+                          .split(",")
                           .slice(0, 5)
                           .map((tag, index) => (
                             <span
@@ -94,7 +186,7 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                     <small id="modalDate" className="text-muted d-block mb-3">
                       {formatDateToTaiwanStyle(temCustomCourse?.createdAt)}
                     </small>
-                    {temCustomCourse?.photos?.map((photo) => (
+                    {temCustomCourse?.CustomRequestPhotos?.map((photo) => (
                       <img
                         id="modalPhoto"
                         src={photo.photo_url}
@@ -117,8 +209,9 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                       </div>
                       <div className="form-actions">
                         <button
-                          type="submit"
+                          type="button"
                           className="btn btn-brand-03 rounded-2"
+                          onClick={addResponse}
                         >
                           提交回應
                         </button>
@@ -133,79 +226,111 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
                     <h6 className="mb-3">回覆意見：</h6>
                     <div id="modalResponses" className="comments-container">
                       {/* 回覆將在這裡動態插入 */}
-                      {/* {temCustomCourse?.responses?.map((res) => (
-                        <div
-                          className="card mb-3 border-0 bg-light"
-                          key={res.id}
-                        >
-                          <div className="card-body p-3">
-                            <div className="d-flex justify-content-between align-items-center mb-2">
-                              <div className="d-flex align-items-center">
-                                <img
-                                  src={res.avatar}
-                                  alt="author-avatar-image"
-                                  className="rounded-circle me-2"
-                                  width="32"
-                                  height="32"
-                                />
-                                <div>
-                                  <h6 className="mb-0 fw-bold">{res.author}</h6>
-                                  <small className="text-muted">
-                                    {res.date}
-                                  </small>
+                      {response.length > 0 ? (
+                        <>
+                          {response
+                            ?.sort(
+                              (a, b) =>
+                                new Date(a.createdAt) - new Date(b.createdAt)
+                            )
+                            .map((res) => (
+                              <div
+                                className="card mb-3 border-0 bg-light"
+                                key={res.id}
+                              >
+                                <div className="card-body p-3">
+                                  <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <div className="d-flex align-items-center">
+                                      <img
+                                        src={res.User.avatar_url}
+                                        alt="author-avatar-image"
+                                        className="rounded-circle me-2"
+                                        width="32"
+                                        height="32"
+                                      />
+                                      <div>
+                                        <h6 className="mb-0 fw-bold">
+                                          {res.User.username}
+                                        </h6>
+                                        <small className="text-muted">
+                                          {formatDateToTaiwanStyle(
+                                            res.createdAt
+                                          )}
+                                        </small>
+                                      </div>
+                                    </div>
+                                    <div className="dropdown">
+                                      <button
+                                        className="btn btn-link text-muted p-0"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                      >
+                                        <span className="material-symbols-outlined">
+                                          more_vert
+                                        </span>
+                                      </button>
+                                      <ul className="dropdown-menu dropdown-menu-end">
+                                        {res.User.id === userData.id && (
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="dropdown-item"
+                                              onClick={() =>
+                                                deleteResponse(res.id)
+                                              }
+                                            >
+                                              刪除
+                                            </button>
+                                          </li>
+                                        )}
+
+                                        <li>
+                                          <a className="dropdown-item" href="#">
+                                            舉報
+                                          </a>
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                  <p
+                                    className="card-text mb-2"
+                                    dangerouslySetInnerHTML={{
+                                      __html: DOMPurify.sanitize(res.content),
+                                    }}
+                                  ></p>
+                                  <div className="d-flex align-items-center">
+                                    <button
+                                      className="btn btn-sm btn-light me-2 like-button d-flex align-items-center"
+                                      data-response-id="r1"
+                                    >
+                                      <span className="material-symbols-outlined icon-fill me-2">
+                                        thumb_up
+                                      </span>
+                                      <span className="like-count">
+                                        {res.likes}
+                                      </span>
+                                    </button>
+                                    {/* <button className="btn btn-sm btn-light d-flex align-items-center">
+                                      <span className="material-symbols-outlined me-2">
+                                        comment
+                                      </span>
+                                      回覆
+                                    </button> */}
+                                  </div>
                                 </div>
                               </div>
-                              <div className="dropdown">
-                                <button
-                                  className="btn btn-link text-muted p-0"
-                                  type="button"
-                                  data-bs-toggle="dropdown"
-                                  aria-expanded="false"
-                                >
-                                  <span className="material-symbols-outlined">
-                                    more_vert
-                                  </span>
-                                </button>
-                                <ul className="dropdown-menu dropdown-menu-end">
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      編輯
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      刪除
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a className="dropdown-item" href="#">
-                                      舉報
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                            <p className="card-text mb-2">{res.content}</p>
-                            <div className="d-flex align-items-center">
-                              <button
-                                className="btn btn-sm btn-light me-2 like-button d-flex align-items-center"
-                                data-response-id="r1"
-                              >
-                                <span className="material-symbols-outlined icon-fill me-2">
-                                  thumb_up
-                                </span>
-                                <span className="like-count">{res.likes}</span>
-                              </button>
-                              <button className="btn btn-sm btn-light d-flex align-items-center">
-                                <span className="material-symbols-outlined me-2">
-                                  comment
-                                </span>
-                                回覆
-                              </button>
-                            </div>
+                            ))}
+                        </>
+                      ) : (
+                        <>
+                          <div className="card mb-3 border-0 bg-light text-center py-13">
+                            <p className="fs-6 fs-lg-5 text-brand-03">
+                              目前暫時還沒有人回應
+                            </p>
                           </div>
-                        </div>
-                      ))} */}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -221,4 +346,5 @@ export default function CardModal({ temCustomCourse, cardModalRef }) {
 CardModal.propTypes = {
   temCustomCourse: PropTypes.object,
   cardModalRef: PropTypes.object,
+  setLoadingState: PropTypes.func,
 };

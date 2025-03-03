@@ -222,7 +222,11 @@ export default function CustomRequestsList() {
             <div className="d-flex flex-column flex-lg-row align-items-lg-center flex-wrap position-relative pe-lg-10 row-gap-4">
               {/* 導覽 & 搜尋框 */}
               <div className="d-flex align-items-center">
-                <ScrollBtn containerRef={containerRef} setLimit={setLimit} />
+                <ScrollBtn
+                  containerRef={containerRef}
+                  limit={limit}
+                  setLimit={setLimit}
+                />
                 <div className="searchInput pe-10">
                   <input
                     type="search"
@@ -234,7 +238,7 @@ export default function CustomRequestsList() {
                 </div>
               </div>
               {/* 下拉霸 */}
-              <div className="d-flex column-gap-4 pe-lg-6 order-lg-2 order-1 ms-lg-auto">
+              <div className="d-flex column-gap-4 pe-lg-6 order-lg-2 order-1 ms-xl-auto">
                 <div className="dropdown">
                   <button
                     className="btn btn-outline-brand-03 dropdown-toggle"
@@ -245,10 +249,10 @@ export default function CustomRequestsList() {
                   >
                     {sortBy === "createdAt" &&
                       order !== "ASC" &&
-                      "排序方式 - 建立時間(最新到最舊)"}
+                      "建立時間(新到舊)"}
                     {sortBy === "createdAt" &&
                       order === "ASC" &&
-                      "排序方式 - 建立時間(最舊到最新)"}
+                      "建立時間(舊到新)"}
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="sortDropdown">
                     <li>
@@ -260,7 +264,7 @@ export default function CustomRequestsList() {
                           setOrder("DESC");
                         }}
                       >
-                        建立時間(最新到最舊)
+                        建立時間(新到舊)
                       </button>
                     </li>
                     <li>
@@ -272,7 +276,7 @@ export default function CustomRequestsList() {
                           setOrder("ASC");
                         }}
                       >
-                        建立時間(最舊到最新)
+                        建立時間(舊到新)
                       </button>
                     </li>
                   </ul>
@@ -357,7 +361,9 @@ export default function CustomRequestsList() {
                   <Card
                     key={customCourse.id}
                     customCourse={customCourse}
-                    openModal={() => openModal(customCourse)}
+                    openModal={() => {
+                      openModal(customCourse);
+                    }}
                     prevCourse={customCourseList[index - 1]}
                   />
                 ))
@@ -370,7 +376,9 @@ export default function CustomRequestsList() {
                         <Card
                           key={customCourse.id}
                           customCourse={customCourse}
-                          openModal={() => openModal(customCourse)}
+                          openModal={() => {
+                            openModal(customCourse);
+                          }}
                         />
                       ))}
                   </div>
@@ -381,7 +389,9 @@ export default function CustomRequestsList() {
                         <Card
                           key={customCourse.id}
                           customCourse={customCourse}
-                          openModal={() => openModal(customCourse)}
+                          openModal={() => {
+                            openModal(customCourse);
+                          }}
                         />
                       ))}
                   </div>
@@ -442,6 +452,7 @@ export default function CustomRequestsList() {
       <CardModal
         temCustomCourse={temCustomCourse}
         cardModalRef={cardModalRef}
+        setLoadingState={setLoadingState}
       />
     </>
   );

@@ -116,12 +116,7 @@ export default function LearningNeedForm() {
   const addRequest = async (data) => {
     setLoadingState(true);
     try {
-      console.log(data);
       const result = await customRequestsApi.addCustomRequest(data);
-      console.log({
-        request_id: result.data.id,
-        photo_url: temData.cover_image,
-      });
       await customRequestsApi.addCustomRequestImg({
         request_id: result.data.id,
         photo_url: temData.cover_image,
@@ -130,6 +125,7 @@ export default function LearningNeedForm() {
         icon: "success",
         title: "新增成功",
       });
+      navigate("/custom-requests-list");
     } catch (error) {
       Swal.fire({
         icon: "error",
