@@ -29,7 +29,9 @@ export default function TutorCard({ tutor }) {
                 {tutor.user.username}
               </h5>
               {/*  dynamic title */}
-              <p className="text-gray-02 fs-8">{tutor.slogan}</p>
+              {tutor.slogan && (
+                <p className="text-gray-02 fs-8">{tutor.slogan}</p>
+              )}
             </div>
           </div>
           <p className="f-center text-brand-03">
@@ -42,17 +44,19 @@ export default function TutorCard({ tutor }) {
         </div>
 
         {/*  dynamic tag loop*/}
-        <div className="mb-5">
-          {tutor.expertise
-            .trim()
-            .split(",")
-            .slice(0, 3)
-            .map((skill, index) => (
-              <div className="d-inline-block me-1" key={index}>
-                <span className="tag tag-brand-02 fs-8">{skill.trim()}</span>
-              </div>
-            ))}
-        </div>
+        {tutor.expertise && (
+          <div className="mb-5">
+            {tutor.expertise
+              .trim()
+              .split(",")
+              .slice(0, 3)
+              .map((skill, index) => (
+                <div className="d-inline-block me-1" key={index}>
+                  <span className="tag tag-brand-02 fs-8">{skill.trim()}</span>
+                </div>
+              ))}
+          </div>
+        )}
 
         <div className="mb-lg-6 mb-5 mt-auto">
           <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>

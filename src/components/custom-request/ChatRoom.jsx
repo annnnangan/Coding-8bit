@@ -100,6 +100,29 @@ export default function ChatRoom() {
         ></button>
       </div>
       <div className="offcanvas-body position-relative px-4 px-lg-8">
+      <div
+            className="d-flex align-items-center pe-8"
+          >
+            <div className="flex-shrink-0 align-self-start">
+            <img
+                  src="images/deco/robot-avatar.svg"
+                  alt="user-image"
+                  className="user-page-header-img rounded-circle"
+                />
+            </div>
+            <ul
+              className="flex-grow-1 ms-4 ms-lg-6"
+            >
+              <li
+                className="bg-white rounded-5 py-3 px-5 mb-6 mb-lg-8"
+              >
+                <p className="fs-7 fs-lg-6">
+                  哈囉你好^_^ 我是建立需求小幫手~請在輸入框輸入內容與我開始進行對話。
+                </p>
+              </li>
+            </ul>
+          </div>
+
         {sortedResponses.map((res, index) => (
           <div
             className={`d-flex align-items-center ${
@@ -125,7 +148,7 @@ export default function ChatRoom() {
               <li
                 className={`${
                   res.type === "user"
-                    ? "bg-brand-02 d-inline-block"
+                    ? "bg-brand-02 d-inline-block text-start"
                     : "bg-white"
                 } rounded-5 py-3 px-5 mb-6 mb-lg-8`}
               >

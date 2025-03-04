@@ -128,6 +128,9 @@ export const userBookingData = [
     end_time: "2025-02-16 11:00",
     type: "一對一教學",
     meeting_link: null,
+    booking_date: "2025-03-11",
+    service_type: "codeReview",
+    timeslots: [10, 11]
   },
   {
     id: 2,
@@ -137,5 +140,8 @@ export const userBookingData = [
     end_time: "2025-02-20 13:00",
     type: "程式碼檢視",
     meeting_link: null,
+    booking_date: "2025-03-10",
+    service_type: "courseSession",
+    timeslots: [13, 14]
   },
 ];
