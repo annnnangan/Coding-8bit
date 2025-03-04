@@ -23,8 +23,8 @@ TutorsCard.propTypes = {
   tutorList: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      slogan: PropTypes.string.isRequired,
-      expertise: PropTypes.string.isRequired,
+      slogan: PropTypes.string,
+      expertise: PropTypes.string,
       rating: PropTypes.string.isRequired,
       hourly_rate: PropTypes.string.isRequired,
       isFavorite: PropTypes.bool,
