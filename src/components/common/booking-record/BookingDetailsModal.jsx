@@ -31,7 +31,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
   // ReactQuill 文字編輯器
   const [value, setValue] = useState("");
   const modules = {
-    toolbar: [[{ font: [] }], ["bold", "italic", "underline"], ["link"], [{ list: "ordered" }, { list: "bullet" }], [{ align: [] }], ["blockquote", "code-block"], ["clean"]],
+    toolbar: [["bold", "italic", "underline"], ["link"], [{ list: "ordered" }, { list: "bullet" }], [{ align: [] }], ["blockquote", "code-block"], ["clean"]],
   };
 
   /* ---------------------------------- Modal --------------------------------- */
@@ -82,6 +82,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
     setLoadingState(true);
     try {
       const result = await bookingApi.getBooking(booking.id);
+      setValue(result.tutor_notes);
       setTutorNotes(result.tutor_notes);
       setStudentComment({ comment: result.student_comment, rating: result.rating });
     } catch (error) {
@@ -198,9 +199,17 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
               {activeTab === "tutorNotes" && (
                 <div className="tutor-notes">
                   {!loadingState && (
-                    <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditTutorNotes}>
-                      {!submittingState && (isEditTutorNotes ? "儲存筆記" : "修改筆記")}
-                    </p>
+                    <div className="d-flex justify-content-end gap-2">
+                      <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditTutorNotes}>
+                        {!submittingState && (isEditTutorNotes ? "儲存筆記" : "修改筆記")}
+                      </p>
+
+                      {!submittingState && isEditTutorNotes && (
+                        <p className="fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={() => setIsEditTutorNotes(false)}>
+                          取消修改
+                        </p>
+                      )}
+                    </div>
                   )}
 
                   {submittingState && (
@@ -235,7 +244,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
                   {isEditTutorNotes && (
                     <>
-                      <ReactQuill defaultValue={tutorNotes} onChange={setValue} placeholder="輸入筆記" modules={modules} />
+                      <ReactQuill value={value} onChange={setValue} placeholder="輸入筆記" modules={modules} />
                       <p className="text-danger fs-7 mt-2">{editError}</p>
                     </>
                   )}
