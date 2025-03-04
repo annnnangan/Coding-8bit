@@ -117,7 +117,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
       getTutorNotesAndStudentComment();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [booking]);
+  }, [isOpen, booking]);
 
   const handleEditTutorNotes = () => {
     if (isEditTutorNotes) {
