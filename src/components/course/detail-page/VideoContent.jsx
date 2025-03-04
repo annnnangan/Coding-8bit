@@ -209,7 +209,9 @@ export default function VideoContent({
             <button
               type="button"
               className="review-button f-align-center btn btn-outline-none py-2 ps-0 pe-0 pe-sm-4 "
-              onClick={() => modalRefMethod.current.show()}
+              onClick={() =>
+                starRating ? null : modalRefMethod.current.show()
+              }
             >
               <span
                 className={`fs-5 me-1 material-symbols-outlined ${
