@@ -121,15 +121,15 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
   const handleEditTutorNotes = () => {
     if (isEditTutorNotes) {
-      if (value < 10) {
+      if (value.length < 10) {
         setEditError("請填寫至少10個字。");
         return;
       } else {
         saveTutorNotes();
+        setEditError("");
       }
     }
     setIsEditTutorNotes((prev) => !prev);
-    setEditError("");
   };
 
   return (
@@ -233,12 +233,17 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     </div>
                   )}
 
-                  {isEditTutorNotes && <ReactQuill defaultValue={tutorNotes} onChange={setValue} placeholder="輸入筆記" modules={modules} />}
+                  {isEditTutorNotes && (
+                    <>
+                      <ReactQuill defaultValue={tutorNotes} onChange={setValue} placeholder="輸入筆記" modules={modules} />
+                      <p className="text-danger fs-7 mt-2">{editError}</p>
+                    </>
+                  )}
                 </div>
               )}
             </div>
 
-            <div className="modal-footer border-top-0">
+            <div className="modal-footer border-top-0 mt-3">
               <button
                 className="col btn btn-outline-brand-03 fs-6 f-center gap-2"
                 type="button"
