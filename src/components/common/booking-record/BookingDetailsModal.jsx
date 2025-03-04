@@ -135,7 +135,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
   return (
     <>
       <div id="bookingDetailsModal" className="modal" ref={bookingDetailsModalRef}>
-        <div className="modal-dialog modal-dialog-centered modal-lg">
+        <div className="modal-dialog modal-dialog-centered modal-lg text text-break">
           <div className="modal-content border-0 shadow px-3 py-5">
             <div className="modal-header border-bottom-0">
               <div className="d-flex align-items-center justify-content-center gap-2">
