@@ -199,7 +199,7 @@ export default function AllBookingsSection() {
         </div>
       </div>
 
-      {selectedBooking && <BookingDetailsModal isOpen={isOpenDetailsModal} setOpenModal={setOpenDetailsModal} booking={selectedBooking} setOpenDetailsModal={setOpenDetailsModal} />}
+      {selectedBooking && <BookingDetailsModal role={"tutor"} isOpen={isOpenDetailsModal} setOpenModal={setOpenDetailsModal} booking={selectedBooking} setOpenDetailsModal={setOpenDetailsModal} />}
     </>
   );
 }

@@ -19,7 +19,21 @@ const getTutorBookings = async ({ tutorId, status, startDate, endDate, serviceTy
   return response.data.data;
 };
 
+// 取得單一預約
+const getBooking = async (bookingId) => {
+  const response = await apiClient.get(`/booking/${bookingId}`);
+  return response.data.data;
+};
+
+// 講師後台 - 儲存預約講師筆記
+const saveTutorNotes = async (bookingId, tutorNotes) => {
+  const response = await apiClient.put(`/booking/${bookingId}`, { tutor_notes: tutorNotes });
+  return response.data.data.tutor_notes;
+};
+
 export default {
   addBooking,
   getTutorBookings,
+  getBooking,
+  saveTutorNotes,
 };
