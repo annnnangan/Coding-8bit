@@ -55,3 +55,14 @@
     }
   }
 }
+
+.tutor-notes {
+  li {
+    list-style-type: decimal;
+  }
+
+  a {
+    color: blue;
+    text-decoration: underline;
+  }
+}
