@@ -83,7 +83,6 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
       const result = await bookingApi.getBooking(booking.id);
       setTutorNotesInput(result.tutor_notes);
       setTutorNotes(result.tutor_notes);
-      console.log(result);
       if (result.student_comment || result.rating) {
         setHasStudentComment(true);
         setStudentComment({ student_comment: result.student_comment, rating: result.rating });
@@ -146,11 +145,9 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
     if (hasStudentComment) return;
     if (isEditStudentComment) {
       if (studentComment.student_comment.length < 5) {
-        console.log(studentComment.student_comment.length);
         setEditError({ ...editError, studentComment: "請填寫至少5個字。" });
         return;
       } else if (!studentComment.rating) {
-        console.log("hello");
         setEditError({ ...editError, studentComment: "請為是次預約評分。" });
         return;
       } else {
@@ -417,7 +414,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 BookingDetailsModal.propTypes = {
   role: PropTypes.oneOf(["tutor", "student"]),
   booking: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     student_name: PropTypes.string,
     student_avatar: PropTypes.string,
     tutor_name: PropTypes.string,
@@ -429,7 +426,6 @@ BookingDetailsModal.propTypes = {
     meeting_link: PropTypes.string,
     source_code_url: PropTypes.string,
     instruction_details: PropTypes.string.isRequired,
-    tutor_notes: PropTypes.string,
   }),
   isOpen: PropTypes.bool,
   setOpenModal: PropTypes.func,
