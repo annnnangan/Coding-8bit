@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 
-import Loader from "../../../components/common/Loader";
 import AllBookingsSection from "../../../components/tutor-panel/booking/all-bookings/AllBookingsSection";
 import AvailableTimeSection from "../../../components/tutor-panel/booking/available-time/AvailableTimeSection";
 
 export default function TutorManageBooking() {
-  //loading
-
   const [activeTab, setActiveTab] = useState("allBookings");
 
   const handleTabClick = (tabName) => {
@@ -36,8 +33,8 @@ export default function TutorManageBooking() {
           </li>
         </ul>
 
-        <div className="bg-gray-04 p-8 rounded-bottom-3 min-vh-100">
-          {activeTab === "allBookings" && <AllBookingsSection />}
+        <div className="bg-gray-04 p-8 rounded-bottom-3 tutor-manage-booking-section">
+          {activeTab === "allBookings" && <AllBookingsSection role="tutor" />}
           {activeTab === "availableTime" && <AvailableTimeSection />}
         </div>
       </div>

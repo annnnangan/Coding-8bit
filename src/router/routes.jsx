@@ -23,9 +23,7 @@ import CourseVideoPage from "../pages/user/course/detail-page/course-video-page"
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
 import CustomRequestsList from "../pages/user/custom-request/custom-requests-list";
-const AddLearningNeedPage = lazy(() =>
-  import("../pages/user/custom-request/add-learning-need-page")
-);
+const AddLearningNeedPage = lazy(() => import("../pages/user/custom-request/add-learning-need-page"));
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";
@@ -55,6 +53,7 @@ import StudentLayout from "./StudentLayout";
 import StudentPanel from "../pages/student/student-panel";
 import StudentManageCustomRequests from "../pages/student/custom-request/student-manage-custom-requests";
 import StudentProfile from "../pages/student/student-profile";
+import StudentManageBooking from "../pages/student/bookings/student-manage-bookings";
 
 export const router = createHashRouter([
   {
@@ -138,6 +137,7 @@ export const router = createHashRouter([
       { path: "custom-request", element: <StudentManageCustomRequests /> },
 
       { path: "profile", element: <StudentProfile /> },
+      { path: "booking", element: <StudentManageBooking /> },
     ],
   },
   { path: "*", element: <NotFound /> },
