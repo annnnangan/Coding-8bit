@@ -484,7 +484,7 @@ export default function TutorBooking() {
       {/* Modal */}
       {/* Modal - Service Select Modal */}
 
-      <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" aria-hidden={!isBookingModalOpen} ref={bookingModalRef}>
+      <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
           <div className="modal-content px-3 py-2">
             <div className="modal-header border-0 pb-0">

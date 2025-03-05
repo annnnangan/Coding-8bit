@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import ReactQuill from "react-quill-new";
 import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
+import ReactStars from "react-rating-stars-component";
 
 import AvatarWithFallback from "../AvatarWithFallback";
 import BookingStatusBadge from "./BookingStatusBadge";
@@ -23,13 +24,15 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
   const [activeTab, setActiveTab] = useState("tutorNotes");
 
+  const [editError, setEditError] = useState({ tutorNotes: "", studentComment: "" });
   const [tutorNotes, setTutorNotes] = useState("");
   const [isEditTutorNotes, setIsEditTutorNotes] = useState(false);
-  const [studentComment, setStudentComment] = useState({ comment: "", rating: "" });
-  const [editError, setEditError] = useState("");
+  const [hasStudentComment, setHasStudentComment] = useState();
+  const [studentComment, setStudentComment] = useState({ student_comment: "", rating: "", comment_at: "" });
+  const [isEditStudentComment, setIsEditStudentComment] = useState(false);
 
   // ReactQuill 文字編輯器
-  const [value, setValue] = useState("");
+  const [tutorNotesInput, setTutorNotesInput] = useState("");
   const modules = {
     toolbar: [["bold", "italic", "underline"], ["link"], [{ list: "ordered" }, { list: "bullet" }], [{ align: [] }], ["blockquote", "code-block"], ["clean"]],
   };
@@ -56,35 +59,35 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
   }, [isOpen]);
 
   const handleCloseModal = () => {
-    setIsEditTutorNotes(false);
-    setTutorNotes("");
-    setStudentComment("");
-    setValue("");
-    setEditError("");
     if (bookingDetailsModal.current) {
+      setIsEditTutorNotes(false);
+      setTutorNotes("");
+      setStudentComment({ student_comment: "", rating: "", comment_at: "" });
+      setHasStudentComment();
+      setTutorNotesInput("");
+      setEditError({ tutorNotes: "", studentComment: "" });
       bookingDetailsModal.current.hide();
+      setOpenModal(false);
     }
-
-    setOpenModal(false);
-
-    // Delay restoring scrolling to avoid conflicts with another open modal
-    setTimeout(() => {
-      if (!document.querySelector(".modal.show")) {
-        document.body.style.overflow = "";
-        document.body.style.paddingRight = "";
-      }
-    }, 300); // Delay to ensure Bootstrap fully removes modal
   };
 
   /* ---------------------------------- Data from API --------------------------------- */
 
   const getTutorNotesAndStudentComment = async () => {
+    setHasStudentComment();
+    setTutorNotesInput("");
+    setTutorNotes("");
+    setStudentComment({ student_comment: "", rating: "", comment_at: "" });
     setLoadingState(true);
     try {
       const result = await bookingApi.getBooking(booking.id);
-      setValue(result.tutor_notes);
+      setTutorNotesInput(result.tutor_notes);
       setTutorNotes(result.tutor_notes);
-      setStudentComment({ comment: result.student_comment, rating: result.rating });
+      console.log(result);
+      if (result.student_comment || result.rating) {
+        setHasStudentComment(true);
+        setStudentComment({ student_comment: result.student_comment, rating: result.rating });
+      }
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -92,11 +95,20 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
     }
   };
 
+  useEffect(() => {
+    if (booking.id) {
+      getTutorNotesAndStudentComment();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, booking.id]);
+
+  /* ---------------------------------- Edit Tutor Notes / Student Comment --------------------------------- */
+
   const saveTutorNotes = async () => {
     if (role === "student") return;
     setSubmittingState(true);
     try {
-      await bookingApi.saveTutorNotes(booking.id, value);
+      await bookingApi.saveTutorNotes(booking.id, tutorNotesInput);
       Swal.fire({
         icon: "success",
         title: "儲存成功",
@@ -113,24 +125,62 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
     }
   };
 
-  useEffect(() => {
-    if (booking.id) {
-      getTutorNotesAndStudentComment();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, booking]);
-
   const handleEditTutorNotes = () => {
     if (isEditTutorNotes) {
-      if (value.length < 10) {
-        setEditError("請填寫至少10個字。");
+      if (tutorNotesInput.length < 10) {
+        setEditError({ ...editError, tutorNotes: "請填寫至少10個字。" });
         return;
       } else {
         saveTutorNotes();
-        setEditError("");
+        setEditError({ tutorNotes: "", studentComment: "" });
       }
     }
     setIsEditTutorNotes((prev) => !prev);
+  };
+
+  const handleRating = (rate) => {
+    setStudentComment({ ...studentComment, rating: rate });
+  };
+
+  const handleEditStudentComment = () => {
+    if (hasStudentComment) return;
+    if (isEditStudentComment) {
+      if (studentComment.student_comment.length < 5) {
+        console.log(studentComment.student_comment.length);
+        setEditError({ ...editError, studentComment: "請填寫至少5個字。" });
+        return;
+      } else if (!studentComment.rating) {
+        console.log("hello");
+        setEditError({ ...editError, studentComment: "請為是次預約評分。" });
+        return;
+      } else {
+        saveStudentComment();
+        setEditError({ tutorNotes: "", studentComment: "" });
+      }
+    }
+    setIsEditStudentComment((prev) => !prev);
+  };
+
+  const saveStudentComment = async () => {
+    if (role === "tutor") return;
+    setSubmittingState(true);
+    try {
+      await bookingApi.saveStudentComment(booking.id, { ...studentComment, comment_at: new Date().toISOString() });
+
+      Swal.fire({
+        icon: "success",
+        title: "儲存成功",
+      });
+      getTutorNotesAndStudentComment();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "儲存失敗",
+        text: error.response.data.message,
+      });
+    } finally {
+      setSubmittingState(false);
+    }
   };
 
   return (
@@ -198,26 +248,36 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
               {activeTab === "tutorNotes" && (
                 <div className="tutor-notes">
-                  {!loadingState && (
-                    <div className="d-flex justify-content-end gap-2">
-                      <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditTutorNotes}>
-                        {!submittingState && (isEditTutorNotes ? "儲存筆記" : "修改筆記")}
-                      </p>
+                  {role === "tutor" && (
+                    <>
+                      {!loadingState && (
+                        <div className="d-flex justify-content-end gap-2">
+                          <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditTutorNotes}>
+                            {!submittingState && (isEditTutorNotes ? "儲存筆記" : "修改筆記")}
+                          </p>
 
-                      {!submittingState && isEditTutorNotes && (
-                        <p className="fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={() => setIsEditTutorNotes(false)}>
-                          取消修改
-                        </p>
+                          {!submittingState && isEditTutorNotes && (
+                            <p
+                              className="fs-7 text-brand-03 fw-medium cursor-pointer mb-3"
+                              onClick={() => {
+                                setIsEditTutorNotes(false);
+                                setEditError({ tutorNotes: "", studentComment: "" });
+                              }}
+                            >
+                              取消修改
+                            </p>
+                          )}
+                        </div>
                       )}
-                    </div>
-                  )}
 
-                  {submittingState && (
-                    <div className="d-flex justify-content-end">
-                      <div className="spinner-border text-primary spinner-border-sm " role="status">
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    </div>
+                      {submittingState && (
+                        <div className="d-flex justify-content-end">
+                          <div className="spinner-border text-primary spinner-border-sm " role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {!isEditTutorNotes &&
@@ -242,13 +302,86 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     </div>
                   )}
 
-                  {isEditTutorNotes && (
+                  {isEditTutorNotes && role === "tutor" && (
                     <>
-                      <ReactQuill value={value} onChange={setValue} placeholder="輸入筆記" modules={modules} />
-                      <p className="text-danger fs-7 mt-2">{editError}</p>
+                      <ReactQuill value={tutorNotesInput} onChange={setTutorNotesInput} placeholder="輸入筆記" modules={modules} />
+                      {editError.tutorNotes && <p className="text-danger fs-7 mt-2">{editError.tutorNotes}</p>}
                     </>
                   )}
                 </div>
+              )}
+
+              {activeTab === "studentComment" && (
+                <>
+                  {booking.status !== "completed" && (
+                    <div className="mt-10">
+                      <SectionFallback materialIconName="cards_star" fallbackText={`完成預約後，學生才能評價`} />
+                    </div>
+                  )}
+
+                  {booking.status === "completed" && (
+                    <>
+                      {loadingState && (
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-8 rounded-2"></span>
+                          <span className="placeholder bg-brand-01 col-8 rounded-2"></span>
+                        </p>
+                      )}
+
+                      {!loadingState && hasStudentComment && (
+                        <div>
+                          <ReactStars count={5} value={studentComment.rating} size={30} activeColor="#d0a2f7" />
+                          <p>{studentComment.student_comment}</p>
+                        </div>
+                      )}
+
+                      {!loadingState && !hasStudentComment && !isEditStudentComment && booking.status === "completed" && role === "tutor" && (
+                        <div className="mt-10">{<SectionFallback materialIconName="cards_star" fallbackText={`未有評論`} />}</div>
+                      )}
+                    </>
+                  )}
+
+                  {!loadingState && role === "student" && booking.status === "completed" && (
+                    <>
+                      {!hasStudentComment && (
+                        <div className="d-flex justify-content-end gap-2">
+                          <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditStudentComment}>
+                            {!submittingState && (isEditStudentComment ? "儲存評論" : "新增評論")}
+                          </p>
+
+                          {!submittingState && isEditStudentComment && (
+                            <p className="fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={() => setIsEditStudentComment(false)}>
+                              取消評論
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {!loadingState && !hasStudentComment && !isEditStudentComment && <div className="mt-10">{<SectionFallback materialIconName="cards_star" fallbackText={`未有評論`} />}</div>}
+
+                      {!hasStudentComment && isEditStudentComment && (
+                        <div>
+                          <ReactStars count={5} onChange={handleRating} size={30} activeColor="#d0a2f7" />
+
+                          <div className="my-3">
+                            <label htmlFor="comment" className="form-label">
+                              評論
+                            </label>
+                            <textarea
+                              className={`form-control`}
+                              id="comment"
+                              rows="5"
+                              placeholder="請輸入你對是次預約的評論。"
+                              value={studentComment.student_comment}
+                              onChange={(e) => setStudentComment({ ...studentComment, student_comment: e.target.value })}
+                            ></textarea>
+                            {editError.studentComment && <p className="text-danger fs-7 mt-2">{editError.studentComment}</p>}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
               )}
             </div>
 
@@ -282,13 +415,14 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 }
 
 BookingDetailsModal.propTypes = {
+  role: PropTypes.oneOf(["tutor", "student"]),
   booking: PropTypes.shape({
     id: PropTypes.number.isRequired,
     student_name: PropTypes.string,
     student_avatar: PropTypes.string,
     tutor_name: PropTypes.string,
     tutor_avatar: PropTypes.string,
-    status: PropTypes.oneOf(["in_progress", "completed", "cancelled"]).isRequired, // Adjust based on possible statuses
+    status: PropTypes.oneOf(["in_progress", "completed", "cancelled"]).isRequired,
     booking_date: PropTypes.string.isRequired,
     timeslots: PropTypes.array.isRequired,
     service_type: PropTypes.string.isRequired,

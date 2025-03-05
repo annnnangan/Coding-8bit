@@ -28,7 +28,14 @@ const getBooking = async (bookingId) => {
 // 講師後台 - 儲存預約講師筆記
 const saveTutorNotes = async (bookingId, tutorNotes) => {
   const response = await apiClient.put(`/booking/${bookingId}`, { tutor_notes: tutorNotes });
-  return response.data.data.tutor_notes;
+  return response.data.data;
+};
+
+// 學生後台 - 儲存學生評價
+const saveStudentComment = async (bookingId, studentComment) => {
+  console.log("api", studentComment);
+  const response = await apiClient.put(`/booking/${bookingId}/comment`, studentComment);
+  return response.data.data;
 };
 
 export default {
@@ -36,4 +43,5 @@ export default {
   getTutorBookings,
   getBooking,
   saveTutorNotes,
+  saveStudentComment,
 };
