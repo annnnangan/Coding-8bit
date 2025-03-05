@@ -6,7 +6,7 @@ import { determineMeetingLinkMessage } from "@/utils/booking-record-utils";
 import { serviceTypeMap } from "@/utils/schema/booking-schema";
 import { getDayOfWeekFromStringDate, formatHour } from "@/utils/timeFormatted-utils";
 
-export default function BookingCard({ role = "tutor", booking, handleClick }) {
+export default function BookingCard({ role, booking, handleClick }) {
   return (
     <>
       <div className="card cursor-pointer" onClick={handleClick}>

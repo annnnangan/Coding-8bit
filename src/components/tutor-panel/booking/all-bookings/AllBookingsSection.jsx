@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -18,8 +19,9 @@ const serviceTypeList = [
   { name: "程式碼檢視", value: "codeReview" },
 ];
 
-export default function AllBookingsSection() {
+export default function AllBookingsSection({ role }) {
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
+  const studentId = useSelector((state) => state.auth?.userData?.id);
 
   const [isLoading, setLoadingState] = useState();
   const [serviceType, setServiceType] = useState("all");
@@ -37,7 +39,16 @@ export default function AllBookingsSection() {
     setLoadingState(true);
 
     try {
-      const result = (await bookingApi.getTutorBookings({ tutorId, status: activeTab, startDate, endDate, serviceType })).bookings;
+      let result;
+
+      if (role === "tutor") {
+        result = (await bookingApi.getTutorBookings({ tutorId, status: activeTab, startDate, endDate, serviceType })).bookings;
+      }
+
+      if (role === "student") {
+        console.log("user id in function", studentId);
+        result = (await bookingApi.getStudentBookings({ studentId, status: activeTab, startDate, endDate, serviceType })).bookings;
+      }
 
       // Group booking data from API by yyyy-mm
       const formatData = result.reduce((acc, item) => {
@@ -72,11 +83,13 @@ export default function AllBookingsSection() {
   };
 
   useEffect(() => {
-    if (tutorId) {
+    if ((role === "tutor" && tutorId) || (role === "student" && studentId)) {
+      console.log("user id", studentId);
       getBookingListData({ activeTab, startDate: debounceDateRange?.from, endDate: debounceDateRange?.to, serviceType });
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, tutorId, serviceType, debounceDateRange]);
+  }, [activeTab, tutorId, serviceType, debounceDateRange, studentId]);
 
   /* ---------------------------- Click Handler --------------------------- */
   // Set debounce for date range selection
@@ -188,7 +201,7 @@ export default function AllBookingsSection() {
                   <div className="row flex-wrap g-2 row">
                     {bookings.map((booking) => (
                       <div className="col-12 col-lg-6 col-xl-4" key={booking.id}>
-                        <BookingCard role={"tutor"} booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
+                        <BookingCard role={role} booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
                       </div>
                     ))}
                   </div>
@@ -199,7 +212,11 @@ export default function AllBookingsSection() {
         </div>
       </div>
 
-      {selectedBooking && <BookingDetailsModal role={"tutor"} isOpen={isOpenDetailsModal} setOpenModal={setOpenDetailsModal} booking={selectedBooking} setOpenDetailsModal={setOpenDetailsModal} />}
+      {selectedBooking && <BookingDetailsModal role={role} isOpen={isOpenDetailsModal} setOpenModal={setOpenDetailsModal} booking={selectedBooking} setOpenDetailsModal={setOpenDetailsModal} />}
     </>
   );
 }
+
+AllBookingsSection.propTypes = {
+  role: PropTypes.oneOf(["tutor", "student"]),
+};

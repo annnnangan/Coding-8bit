@@ -38,10 +38,23 @@ const saveStudentComment = async (bookingId, studentComment) => {
   return response.data.data;
 };
 
+// 學生後台 - 取得預約
+const getStudentBookings = async ({ studentId, status, startDate, endDate, serviceType }) => {
+  const params = new URLSearchParams({ status });
+  serviceType = serviceType === "all" ? undefined : serviceType;
+  if (startDate) params.append("startDate", formatDateDash(startDate));
+  if (endDate) params.append("endDate", formatDateDash(endDate));
+  if (serviceType) params.append("service_type", serviceType);
+
+  const response = await apiClient.get(`/booking/student/${studentId}?${params.toString()}`);
+  return response.data.data;
+};
+
 export default {
   addBooking,
   getTutorBookings,
   getBooking,
   saveTutorNotes,
   saveStudentComment,
+  getStudentBookings,
 };

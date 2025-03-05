@@ -327,7 +327,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
                       {!loadingState && hasStudentComment && (
                         <div>
-                          <ReactStars count={5} value={studentComment.rating} size={30} activeColor="#d0a2f7" />
+                          <ReactStars count={5} value={studentComment.rating} size={30} activeColor="#d0a2f7" edit={false} />
                           <p>{studentComment.student_comment}</p>
                         </div>
                       )}
@@ -382,7 +382,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
               )}
             </div>
 
-            <div className="modal-footer border-top-0 mt-3">
+            {/* <div className="modal-footer border-top-0 mt-3">
               <button
                 className="col btn btn-outline-brand-03 fs-6 f-center gap-2"
                 type="button"
@@ -403,7 +403,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
               >
                 <span className="material-symbols-outlined">event_busy</span> 取消預約
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
