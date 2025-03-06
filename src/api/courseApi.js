@@ -177,6 +177,12 @@ const deleteVideo = async (videoId) => {
   return response;
 };
 
+// 後台 - 使用者取得收藏影片
+const getAllFavoriteVideo = async () => {
+  const response = await apiClient.get(`/favorites/videos`);
+  return response.data;
+};
+
 export default {
   getAllCourses,
   getAllVideos,
@@ -207,4 +213,5 @@ export default {
   addVideo,
   updateVideo,
   deleteVideo,
+  getAllFavoriteVideo
 };

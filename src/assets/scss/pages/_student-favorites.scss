@@ -1,0 +1,42 @@
+.student-favorites-section {
+  min-height: calc(100vh - 200px);
+
+  .table-list {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .table-wrap {
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+
+  .table thead tr th {
+    font-weight: 500;
+    padding: 0px 8px 12px;
+  }
+
+  .table tbody tr td {
+    padding: 8px 8px;
+
+    .cover_image-wrap {
+      width: 120px;
+      height: 80px;
+      overflow: hidden;
+
+      .related-video-duration {
+        right: 0;
+        bottom: 0;
+        color: $gray-04;
+        line-height: 1.2;
+        background-color: #1e1e1e4d;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}

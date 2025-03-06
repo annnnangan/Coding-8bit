@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import { Modal } from "bootstrap";
 
 // API
-import courseApi from "../../../api/courseApi";
+import courseApi from "@/api/courseApi";
 
 // 組件
 import CommentsSection from "./CommentsSection";
