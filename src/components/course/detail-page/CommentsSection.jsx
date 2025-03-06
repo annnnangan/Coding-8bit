@@ -15,7 +15,7 @@ import courseApi from "@/api/courseApi";
 // 工具
 import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
 import { countReplies, reduceComments } from "@/utils/countReplies-utils";
-import { getUserData } from "@/utils/slice/authSlice";
+import { getUserData, loginCheck } from "@/utils/slice/authSlice";
 
 export default function CommentsSection({
   comments,
@@ -170,11 +170,6 @@ export default function CommentsSection({
     }
   };
 
-  // 檢查是否有登入
-  const checkToken = () => {
-    return Object.keys(userInfo).length === 0 ? true : false;
-  };
-
   // 整理留言
   useEffect(() => {
     if (comments && Array.isArray(comments)) {
@@ -184,28 +179,33 @@ export default function CommentsSection({
     }
   }, [comments]);
 
-  // 取得使用者資訊
+  // 留言取完再取得使用者資訊，避免重整時 redux 丟失導致判斷是否登入錯誤
   useEffect(() => {
-    if (checkToken()) {
-      Swal.fire({
-        title: "還不是我們的會員嗎？",
-        text: "趕緊加入觀賞優質課程吧",
-        icon: "error",
-        showCancelButton: true,
-        confirmButtonText: "註冊",
-        cancelButtonText: "登入",
-        allowOutsideClick: false,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/signup"); // 註冊
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          navigate("/login"); // 登入
-        }
-      });
-      return;
-    }
-    dispatch(getUserData());
-  }, [dispatch]);
+    const checkLoginStatus = async () => {
+      try {
+        await dispatch(loginCheck()).unwrap();
+        dispatch(getUserData());
+      } catch (error) {
+        Swal.fire({
+          title: "還不是我們的會員嗎？",
+          text: "趕緊加入觀賞優質課程吧",
+          icon: "error",
+          showCancelButton: true,
+          confirmButtonText: "註冊",
+          cancelButtonText: "登入",
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/signup"); // 註冊
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            navigate("/login"); // 登入
+          }
+        });
+      }
+    };
+
+    checkLoginStatus();
+  }, [userComments]);
 
   return (
     <>
@@ -214,7 +214,11 @@ export default function CommentsSection({
         <div className="d-flex align-items-center py-4 mb-6">
           <img
             className="user-comment-picture me-3"
-            src={userInfo.avatar_url}
+            src={
+              userInfo.avatar_url
+                ? userInfo.avatar_url
+                : "/public/images/icon/user.png"
+            }
             alt="當前使用者頭像"
           />
           <input
@@ -362,7 +366,11 @@ export default function CommentsSection({
                               <div className="d-flex mb-3">
                                 <img
                                   className="tutor-image me-4"
-                                  src={item.User.avatar_url}
+                                  src={
+                                    item.User.avatar_url
+                                      ? item.User.avatar_url
+                                      : "/public/images/icon/user.png"
+                                  }
                                   alt="留言回覆者頭像"
                                 />
                                 <div className="d-flex justify-content-between align-items-center flex-fill">
