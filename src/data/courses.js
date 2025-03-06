@@ -91,6 +91,7 @@ export const dashboardContinueToWatchCourseList = [
     view_count: 12345,
     rating: "4",
     learning_progress_in_percent: 10,
+    video_type: "topicSeries"
   },
   {
     id: "2",
@@ -106,6 +107,7 @@ export const dashboardContinueToWatchCourseList = [
     view_count: 402,
     rating: "4",
     learning_progress_in_percent: 80,
+    video_type: "topicSeries"
   },
   {
     id: "3",
@@ -121,6 +123,7 @@ export const dashboardContinueToWatchCourseList = [
     view_count: 48,
     rating: "4",
     learning_progress_in_percent: 34,
+    video_type: "topicSeries"
   },
 ];
 
@@ -138,6 +141,7 @@ export const dashboardRecommendCourseList = [
     duration: 36,
     view_count: 798,
     rating: "3.8",
+    video_type: "topicSeries"
   },
   {
     id: "5",
@@ -152,6 +156,7 @@ export const dashboardRecommendCourseList = [
     duration: 3.2,
     view_count: 402,
     rating: "4.5",  
+    video_type: "topicSeries"
   },
   {
     id: "6",
@@ -166,5 +171,6 @@ export const dashboardRecommendCourseList = [
     duration: 1.8,
     view_count: 48,
     rating: "4",
+    video_type: "topicSeries"
   },
 ];
