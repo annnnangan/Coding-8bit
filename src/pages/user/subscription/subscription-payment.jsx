@@ -1,15 +1,18 @@
-import { NavLink, useParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { useState } from "react";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import Swal from "sweetalert2";
 
 import subscriptionApi from "@/api/subscriptionApi";
+import orderApi from "@/api/orderApi";
 
 import { CreditCardForm } from "@/components/common/payment-form/CreditCardForm";
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
+import Loader from "@/components/common/Loader";
 
 import { PaymentSchema } from "@/utils/schema/payment-schema";
 
@@ -23,17 +26,57 @@ const step2Fields = [
 ];
 
 export default function SubscriptionPayment() {
+  // loading
+  const [loadingState, setLoadingState] = useState(false);
+
+  // 取得路由中的值
+  const { subscriptionPlan, duration } = useParams();
+
+  // 目前處於的步驟進度
   const [currentStep, setCurrentStep] = useState(1);
 
   const methods = useForm({
     resolver: zodResolver(PaymentSchema),
   });
 
+  // 往下一步
   const toNextStep = async () => {
+    // 第一步，建立訂閱方案
     if (currentStep === 1) {
-      setCurrentStep((currentStep) => currentStep + 1);
+      const today = new Date();
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+      const startDate = today
+        .toLocaleDateString("zh-TW", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .replace(/\//g, "-");
+      setFormattedToday(startDate);
+
+      const endDate = nextMonth
+        .toLocaleDateString("zh-TW", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .replace(/\//g, "-");
+      setFormattedNextMonth(endDate);
+
+      addSubscription({
+        plan_id:
+          subscriptionPlan === "normal"
+            ? "a05de56e-0228-4cdb-a85a-d1d31589b88a"
+            : "6f11324d-4fac-432d-ac4f-182f9873db72",
+        billing_cycle: duration,
+        start_date: startDate,
+        end_date: endDate,
+      });
     }
 
+    // 第二步，根據剛剛的訂閱方案建立付款 (建立後預設是處理中，還需一個狀態變為付款成功的動作)
     if (currentStep === 2) {
       const isValid = await methods.trigger(step2Fields);
       if (!isValid) {
@@ -47,19 +90,38 @@ export default function SubscriptionPayment() {
     }
   };
 
-  const toPrevStep = () => {
+  // 往上一步
+  const toPrevStep = async () => {
     if (currentStep > 1) {
-      setCurrentStep((step) => step - 1);
+      setCurrentStep((currentStep) => currentStep - 1);
+    }
+    if (currentStep === 2) {
+      await subscriptionApi.addSubscription(subscriptionId, {
+        status: "cancelled",
+      });
     }
   };
 
+  // 建立訂閱函式
+  const [formattedToday, setFormattedToday] = useState("");
+  const [formattedNextMonth, setFormattedNextMonth] = useState("");
+  const [subscriptionId, setSubscription] = useState("");
+
+  const navigate = useNavigate();
+  // 取得 RTK 使用者資料
+  const { isAuth } = useSelector((state) => state.auth);
+  const { userData } = useSelector((state) => state.auth);
+
   const addSubscription = async (subscriptionData) => {
+    setLoadingState(true);
     try {
-      await subscriptionApi.addSubscription(subscriptionData);
-      Swal.fire({
-        title: "訂閱成功",
-        icon: "success",
-      });
+      if (!isAuth) {
+        Swal.fire("請先登入再進行訂閱");
+        navigate("/login");
+        return;
+      }
+      const res = await subscriptionApi.addSubscription(subscriptionData);
+      setSubscription(res.data.id);
       setCurrentStep((currentStep) => currentStep + 1);
     } catch (error) {
       Swal.fire({
@@ -67,30 +129,57 @@ export default function SubscriptionPayment() {
         title: "訂閱失敗",
         text: error.response.data.message,
       });
+    } finally {
+      setLoadingState(false);
     }
   };
-  const [formattedToday, setFormattedToday] = useState("");
-  const [formattedNextMonth, setFormattedNextMonth] = useState("");
-  const onSubmit = (data) => {
-    console.log("data", data);
-    const today = new Date();
-    setFormattedToday(today.toISOString().split("T")[0]);
 
-    const nextMonth = new Date();
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    setFormattedNextMonth(nextMonth.toISOString().split("T")[0]);
-    addSubscription({
-      plan_type: subscriptionPlan,
-      billing_cycle: duration,
-      start_date: today.toISOString().split("T")[0],
-      end_date: nextMonth.toISOString().split("T")[0],
-    });
-    console.log("data", {
-      plan_type: subscriptionPlan,
-      billing_cycle: duration,
-      start_date: formattedToday,
-      end_date: formattedNextMonth,
-    });
+  // 建立訂單函式
+  const addOrder = async () => {
+    setLoadingState(true);
+    try {
+      const orderData = {
+        order_type: "subscription",
+        target_id: subscriptionId,
+        amount: Number(prices[subscriptionPlan]?.[duration]),
+      };
+
+      // 建立訂單
+      const res = await orderApi.addOrder({
+        user_id: userData.id,
+        ...orderData,
+      });
+
+      // 付款後，更改訂單與訂閱的狀態
+      await Promise.all([
+        orderApi.updateOrder(res.data.id, {
+          order_status: "paid",
+          ...orderData,
+        }),
+        subscriptionApi.updateSubscription(subscriptionId, {
+          status: "active",
+        }),
+      ]);
+
+      Swal.fire({
+        title: "付款成功",
+        icon: "success",
+      });
+
+      setCurrentStep(3);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "付款失敗",
+        text: error.response?.data?.message || "發生未知錯誤",
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  const onSubmit = () => {
+    addOrder();
   };
 
   // 訂閱方案及各方案價格
@@ -105,14 +194,12 @@ export default function SubscriptionPayment() {
     },
   };
 
-  // 取得路由中的值
-  const { subscriptionPlan, duration } = useParams();
-
   return (
     <>
       <Helmet>
         <title>Coding∞bit ｜ 訂閱付款</title>
       </Helmet>
+      {loadingState && <Loader />}
 
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
