@@ -1,4 +1,5 @@
 // react 相關套件
+import ReactLoading from "react-loading";
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -10,30 +11,57 @@ import courseApi from "@/api/courseApi";
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 function StudentFavorites() {
-  const [favorite, setFavorite] = useState([]); // 收藏陣列
-  const [tutors, setTutors] = useState({}); // 導師資料
+  const [favoriteVideo, setFavoriteVideo] = useState([]); // 收藏影片陣列
+  const [favoriteTutor, setFavoriteTutor] = useState([]); // 收藏講師陣列
+  const [isgetData, setIsGetData] = useState(false); // 是否留言中
 
-  // 獲取所有導師資料
-  const getTutorHandle = async () => {
-    const tutorData = {};
-    for (const item of favorite) {
-      const tutor = await courseApi.getVideoDetail(item.video_id);
-      tutorData[item.video_id] = tutor.Tutor.User.username;
+  // 獲取所有收藏影片
+  const getFavoriteVideo = async () => {
+    try {
+      setIsGetData(true);
+      const response = await courseApi.getAllFavoriteVideo();
+      const { data } = response;
+      setFavoriteVideo(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsGetData(false);
     }
-    setTutors(tutorData);
   };
 
-  // 獲取所有收藏
-  const getFavoriteVideo = async () => {
-    const response = await courseApi.getAllFavoriteVideo();
-    const { data } = response;
-    setFavorite(data);
+  // 獲取所有收藏老師
+  const getFavoriteTutor = async () => {
+    try {
+      setIsGetData(true);
+      const response = await courseApi.getAllFavoriteTutor();
+      const { data } = response;
+      setFavoriteTutor(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsGetData(false);
+    }
+  };
+
+  // 刪除收藏老師
+  const deleteFavoriteTutor = async (tutorId) => {
+    try {
+      setIsGetData(true);
+      const response = await courseApi.deleteFavoriteTutor(tutorId);
+      if (response.status === 204) {
+        getFavoriteTutor();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsGetData(false);
+    }
   };
 
   // 初始化
   useEffect(() => {
+    setIsGetData(true);
     getFavoriteVideo();
-    getTutorHandle();
   }, []);
 
   return (
@@ -56,6 +84,7 @@ function StudentFavorites() {
                 role="tab"
                 aria-controls="home"
                 aria-selected="true"
+                onClick={() => getFavoriteVideo()}
               >
                 收藏影片
               </button>
@@ -70,12 +99,13 @@ function StudentFavorites() {
                 role="tab"
                 aria-controls="profile"
                 aria-selected="false"
+                onClick={() => getFavoriteTutor()}
               >
                 收藏導師
               </button>
             </li>
           </ul>
-          <div className="tab-content" id="myTabContent">
+          <div className="tab-content position-relative" id="myTabContent">
             <div
               className="tab-pane fade show active"
               id="home"
@@ -95,15 +125,17 @@ function StudentFavorites() {
                     </tr>
                   </thead>
                   <tbody>
-                    {favorite.map((item, index) => (
+                    {favoriteVideo.map((item, index) => (
                       <tr className="align-middle" key={index}>
                         <td>
-                          <div className="cover_image-wrap position-relative">
-                            <img src={item.Video.cover_image} alt="封面圖" />
-                            <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                              {convertSecondsToTime(item.Video.duration)}
-                            </span>
-                          </div>
+                          <NavLink to={`/video/${item.video_id}`}>
+                            <div className="cover_image-wrap position-relative">
+                              <img src={item.Video.cover_image} alt="封面圖" />
+                              <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
+                                {convertSecondsToTime(item.Video.duration)}
+                              </span>
+                            </div>
+                          </NavLink>
                         </td>
                         <td>{item.Video.title}</td>
                         <td>{item.Video.category}</td>
@@ -130,8 +162,125 @@ function StudentFavorites() {
               role="tabpanel"
               aria-labelledby="profile-tab"
             >
-              ...
+              <div className="container tutor-style">
+                <div className="row">
+                  {favoriteTutor.map((tutor, index) => (
+                    <div
+                      className="card p-lg-5 p-md-4 p-4 img-hover-enlarge col-md-6 col-xl-4 col-12"
+                      style={{ boxShadow: "0px 25px 50px -12px #0000001F" }}
+                      key={index}
+                    >
+                      <div className="card-body p-0 d-flex flex-column flex-grow-1">
+                        <div className="mb-5 f-between-start">
+                          <div className="f-center">
+                            {/* dynamic tutor profile */}
+                            <img
+                              src={
+                                tutor.Tutor.User.avatar_url
+                                  ? tutor.Tutor.User.avatar_url
+                                  : "images/icon/user.png"
+                              }
+                              className="object-cover-fit rounded-circle me-2"
+                              width="45"
+                              height="45"
+                              alt="tutor-avatar"
+                            />
+                            <div>
+                              {/*  dynamic tutor name */}
+                              <h5 className="card-title fw-medium text-gray-01 fs-lg-6 fs-5 mb-1">
+                                {tutor.Tutor.User.username}
+                              </h5>
+                              {/*  dynamic title */}
+                              {tutor.Tutor.slogan && (
+                                <p className="text-gray-02 fs-8">
+                                  {tutor.Tutor.slogan}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <p className="f-center text-brand-03">
+                            <span className="material-symbols-outlined icon-fill text-brand-01 me-1">
+                              kid_star
+                            </span>
+                            {Number(tutor.Tutor.rating).toFixed(1)}
+                          </p>
+                        </div>
+
+                        {tutor.Tutor.expertise && (
+                          <div className="mb-5">
+                            {tutor.Tutor.expertise
+                              .trim()
+                              .split(",")
+                              .slice(0, 3)
+                              .map((skill, index) => (
+                                <div
+                                  className="d-inline-block me-1"
+                                  key={index}
+                                >
+                                  <span className="tag tag-brand-02 fs-8">
+                                    {skill.trim()}
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                        <div className="mb-lg-6 mb-5 mt-auto">
+                          <p className="text-gray-02 fs-7 fs-lg-6">
+                            每小時收費
+                          </p>
+                          <h2 className="text-brand-03 fs-lg-2 fs-3">
+                            NT ${" "}
+                            {Number(tutor.Tutor.hourly_rate).toLocaleString(
+                              "en-IN"
+                            )}
+                          </h2>
+                        </div>
+                        <div className="position-relative">
+                          <span
+                            className="favorite material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle
+                             text-brand-01
+                            "
+                            role="button"
+                            onClick={() => deleteFavoriteTutor(tutor.Tutor.id)}
+                          >
+                            favorite
+                          </span>
+                        </div>
+                        <NavLink
+                          to={`/tutor/${tutor.Tutor.User.id}`}
+                          className="btn btn-brand-03 w-100 slide-right-hover"
+                        >
+                          <p className="f-center me-1">
+                            前往導師頁
+                            <span className="material-symbols-outlined">
+                              arrow_forward
+                            </span>
+                          </p>
+                        </NavLink>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+            {isgetData && (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundColor: "rgba(255,255,255,0.3)",
+                  zIndex: 999,
+                }}
+              >
+                <ReactLoading
+                  type="spin"
+                  color="black"
+                  width="4rem"
+                  height="4rem"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
