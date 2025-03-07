@@ -5,11 +5,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-import courseApi from "../../../../api/courseApi";
+import courseApi from "@/api/courseApi";
 
-import EditCourseVideoContent from "../../../../components/tutor-panel/course/edit/EditCourseVideoContent";
+import EditCourseVideoContent from "@/components/tutor-panel/course/edit/EditCourseVideoContent";
 import EditContent from "@/components/tutor-panel/course/edit/EditContent";
 import Loader from "@/components/common/Loader";
+
+const { VITE_API_BASE } = import.meta.env;
 
 export default function TutorManageAddVideo() {
   // loading
@@ -122,7 +124,7 @@ export default function TutorManageAddVideo() {
       // 1. 取得上傳用的預簽名 url
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       const uploadData = await axios.post(
-        "https://coding-bit-backend.onrender.com/api/v1/upload/get-upload-url",
+        `${VITE_API_BASE}/upload/get-upload-url`,
         { fileName: file.name, fileType: file.type }
       );
 
@@ -133,10 +135,9 @@ export default function TutorManageAddVideo() {
       const { filePath } = uploadData.data;
 
       // 2. 將檔案上傳到取得的預簽名
-      const res = await axios.post(
-        "https://coding-bit-backend.onrender.com/api/v1/upload/get-video-url",
-        { filePath: filePath }
-      );
+      const res = await axios.post(`${VITE_API_BASE}/upload/get-video-url`, {
+        filePath: filePath,
+      });
 
       // 3. 更新狀態，儲存影片網址與時長
       if (res.data.videoUrl) {
@@ -272,12 +273,17 @@ export default function TutorManageAddVideo() {
                   </li>
                   <li className="mt-4 mt-lg-5">
                     <p className="fs-6 mt-2">
-                      2. 音訊需為立體聲（左右聲道），並與影片畫面完全同步。
+                      2. 目前僅能上傳編碼為 H264 的影片。
                     </p>
                   </li>
                   <li className="mt-4 mt-lg-5">
                     <p className="fs-6 mt-2">
-                      3.
+                      3. 音訊需為立體聲（左右聲道），並與影片畫面完全同步。
+                    </p>
+                  </li>
+                  <li className="mt-4 mt-lg-5">
+                    <p className="fs-6 mt-2">
+                      4.
                       音訊應保持清晰，避免回音和背景雜音，以確保學生能專注於學習內容。
                     </p>
                   </li>

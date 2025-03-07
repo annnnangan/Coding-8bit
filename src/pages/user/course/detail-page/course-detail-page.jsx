@@ -1,21 +1,29 @@
-import "bootstrap-icons/font/bootstrap-icons.css";
+// react 相關套件
 import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+// 第三方套件
 import { Modal } from "bootstrap";
 
-import courseApi from "@/api/courseApi";
-import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
-
+// 組件
 import VideoContent from "@/components/course/detail-page/VideoContent";
 import Loader from "@/components/common/Loader";
+
+// API
+import courseApi from "@/api/courseApi";
+
+// 工具
+import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseDetailPage() {
   const [chapter, setChapter] = useState([]); // 章節
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
   const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const [loadingState, setLoadingState] = useState(true); // loading
-  const { id } = useParams();
+  const { id } = useParams(); // 取得路由參數
+
+  // 更多章節 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
 
@@ -36,11 +44,14 @@ export default function CourseDetailPage() {
     );
   };
 
-  // 過濾同課程的影片
+  // 過濾同課程的影片並取 6 支影片
   const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo.filter((related) => related.course_id !== id);
+    return relatedVideo
+      .filter((related) => related.course_id !== id)
+      .slice(0, 6);
   };
 
+  // 取得初始化資料
   const getData = async () => {
     setLoadingState(true);
     try {
@@ -52,7 +63,7 @@ export default function CourseDetailPage() {
       const relatedVideosResult = await courseApi.getFrontTutorVideos({
         category: courseResult.category,
       });
-      
+
       setCourseList(courseResult);
       setChapter(chapterResult);
       setOtherVideos(filterOtherCourse(otherCourseResult.courses));
@@ -64,11 +75,12 @@ export default function CourseDetailPage() {
     }
   };
 
-  // 初始化取得資料
+  // 初始化
   useEffect(() => {
     getData();
   }, [id]);
 
+  // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
     modalRefMethod.current = new Modal(modalRef.current);
     modalRef.current.addEventListener("hide.bs.modal", () => {
@@ -96,7 +108,6 @@ export default function CourseDetailPage() {
             videoUrl={chapter.length > 0 ? chapter[0]?.Videos[0].video_url : ""}
             introductionVideoId={chapter[0]?.Videos[0].id}
           />
-
           <aside className="col-lg-5 col-xl-4">
             {/* 章節影片 */}
             <div className="chapter-video rounded-4 aside-border mb-6">
@@ -244,14 +255,14 @@ export default function CourseDetailPage() {
                         to={`/video/${related.id}`}
                         className="d-flex justify-content-between chapter-item"
                       >
-                        <div className="position-relative me-4">
+                        <div className="position-relative me-4 related-video-image rounded-2">
                           <img
-                            className="rounded-2 related-video-image"
+                            className="w-100"
                             src={related.cover_image}
                             alt="影片縮圖"
                           />
                           <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
-                            {related.duration}
+                            {convertSecondsToTime(related.duration)}
                           </span>
                         </div>
                         <div className="f-column-between py-2">
@@ -310,7 +321,7 @@ export default function CourseDetailPage() {
             </div>
             <div className="modal-body">
               <ul className="chapter-list">
-                {chapter?.map((video, index) => (
+                {chapter.slice(1).map((video, index) => (
                   <li
                     className="video-background-color-hover px-6 py-4"
                     onClick={() => modalRefMethod.current.hide()}

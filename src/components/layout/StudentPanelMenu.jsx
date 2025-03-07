@@ -23,7 +23,7 @@ const menuItems = [
   {
     icon: "auto_stories",
     name: "學習需求管理",
-    href: "/student-panel/learning",
+    href: "/student-panel/custom-request",
   },
   {
     icon: "equalizer",

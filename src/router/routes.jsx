@@ -22,10 +22,8 @@ import CourseDetailPage from "../pages/user/course/detail-page/course-detail-pag
 import CourseVideoPage from "../pages/user/course/detail-page/course-video-page";
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
-import CustomCourseList from "../pages/user/custom-course/custom-course-list";
-const AddLearningNeedPage = lazy(() =>
-  import("../pages/user/custom-course/add-learning-need-page")
-);
+import CustomRequestsList from "../pages/user/custom-request/custom-requests-list";
+const AddLearningNeedPage = lazy(() => import("../pages/user/custom-request/add-learning-need-page"));
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";
@@ -34,6 +32,7 @@ import TutorList from "../pages/user/tutor/tutor-list";
 import TutorBooking from "../pages/user/tutor/tutor-booking";
 import TutorBookingPayment from "../pages/user/tutor/tutor-booking-payment";
 import TutorInfo from "../pages/user/tutor/tutor-info";
+import TutorApply from "../pages/user/tutor/tutor-apply";
 
 import HelpCenter from "../pages/user/help-center";
 
@@ -52,7 +51,9 @@ import TutorProfile from "../pages/tutor/profile/tutor-profile";
 // 使用者後台 - 學生
 import StudentLayout from "./StudentLayout";
 import StudentPanel from "../pages/student/student-panel";
+import StudentManageCustomRequests from "../pages/student/custom-request/student-manage-custom-requests";
 import StudentProfile from "../pages/student/student-profile";
+import StudentManageBooking from "../pages/student/bookings/student-manage-bookings";
 
 export const router = createHashRouter([
   {
@@ -75,7 +76,7 @@ export const router = createHashRouter([
       { path: "course/:id/chapter/:videoId", element: <CourseVideoPage /> },
       { path: "video/:videoId", element: <SingleVideoPage /> },
 
-      { path: "custom-course-list", element: <CustomCourseList /> },
+      { path: "custom-requests-list", element: <CustomRequestsList /> },
       { path: "add-learning-need", element: <AddLearningNeedPage /> },
 
       { path: "subscription-list", element: <SubscriptionList /> },
@@ -91,6 +92,7 @@ export const router = createHashRouter([
         element: <TutorBookingPayment />,
       },
       { path: "tutor-info/:id", element: <TutorInfo /> },
+      { path: "tutor-apply", element: <TutorApply /> },
 
       { path: "help-center", element: <HelpCenter /> },
     ],
@@ -132,7 +134,10 @@ export const router = createHashRouter([
     children: [
       { index: true, element: <StudentPanel /> },
 
+      { path: "custom-request", element: <StudentManageCustomRequests /> },
+
       { path: "profile", element: <StudentProfile /> },
+      { path: "booking", element: <StudentManageBooking /> },
     ],
   },
   { path: "*", element: <NotFound /> },

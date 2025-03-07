@@ -22,15 +22,15 @@ export default function Footer() {
               <p className="fs-7 lh-sm">
                 Copyright@2025 Coding∞bit 保留所有權利·
                 <a
-                  href="https://docs.google.com/document/d/11MltF-CDpGn3woeAfoXpE78hCRAyr65Qx2CQSU7fnsU/"
+                  href="https://coding-8bit.site/PrivacyPolicy.html"
                   target="_blank"
                   className="underline-hover d-inline"
                 >
-                  隱私政策
+                  隱私權政策
                 </a>{" "}
                 |{" "}
                 <a
-                  href="https://docs.google.com/document/d/1DiFxtghhlb4nrm0IiF20nb118_-mGDtHRju0z7bmv7g/"
+                  href="https://coding-8bit.site/TermsOfService.html"
                   target="_blank"
                   className="underline-hover d-inline"
                 >
@@ -38,12 +38,6 @@ export default function Footer() {
                 </a>
               </p>
             </li>
-            {/* <li className="f-align-center mt-2">
-              <p className="fs-7 lh-sm">
-                本網站採用 reCAPTCHA 保護機制，並遵守 Google 隱私權政策 及
-                服務條款
-              </p>
-            </li> */}
           </ul>
         </div>
         <div className="d-flex flex-grow-1 mt-8 mt-lg-0">
@@ -68,7 +62,7 @@ export default function Footer() {
             <li className="nav-item">
               <NavLink
                 className="nav-link underline-hover d-inline-flex link-gray-02 fs-7"
-                to="/custom-course-list"
+                to="/custom-requests-list"
               >
                 課程客製化
               </NavLink>

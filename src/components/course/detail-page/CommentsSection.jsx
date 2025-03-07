@@ -1,13 +1,21 @@
+// react 相關套件
+import ReactLoading from "react-loading";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+// 第三方套件
 import PropTypes from "prop-types";
-import ReactLonding from "react-loading";
 import Swal from "sweetalert2";
 import { z } from "zod";
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
+// API
+import courseApi from "@/api/courseApi";
+
+// 工具
 import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
 import { countReplies, reduceComments } from "@/utils/countReplies-utils";
-import { getUserData } from "@/utils/slice/authSlice";
-import courseApi from "@/api/courseApi";
+import { getUserData, loginCheck } from "@/utils/slice/authSlice";
 
 export default function CommentsSection({
   comments,
@@ -20,20 +28,25 @@ export default function CommentsSection({
   const [replyCount, setReplyCount] = useState({}); // 回覆數
   const [showReplyBox, setShowReplyBox] = useState({}); // 是否顯示回覆輸入框
   const [isSending, setIsSending] = useState(false); // 是否留言中
-  const [isRepling, setIsRepling] = useState(false); // 是否回覆中
+  const [isReply, setIsReply] = useState(false); // 是否回覆中
   const [errors, setErrors] = useState({}); // 錯誤訊息
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // redux 分發
+  const navigate = useNavigate(); // 用於導頁
+
+  // redux 使用者資訊
   const userInfo = useSelector((state) => state.auth.userData);
 
-  // 定義驗證模式
+  // 定義留言規則
   const commentSchema = z.object({
     commentText: z.string().min(1, "留言不能為空"),
   });
 
+  // 定義回覆規則
   const replySchema = z.object({
     replyText: z.string().min(1, "回覆不能為空"),
   });
 
+  // 驗證留言
   const validateComment = (text) => {
     try {
       commentSchema.parse({ commentText: text });
@@ -45,6 +58,7 @@ export default function CommentsSection({
     }
   };
 
+  // 驗證回覆
   const validateReply = (text) => {
     try {
       replySchema.parse({ replyText: text });
@@ -56,6 +70,7 @@ export default function CommentsSection({
     }
   };
 
+  // 刪除留言
   const deleteComment = async (commentId) => {
     Swal.fire({
       title: "確定要刪除嗎？",
@@ -91,6 +106,7 @@ export default function CommentsSection({
       });
   };
 
+  // 切換回覆輸入框
   const replySwitch = async (commentId) => {
     setShowReplyBox((prev) => ({
       ...prev,
@@ -98,6 +114,7 @@ export default function CommentsSection({
     }));
   };
 
+  // 留言
   const sendComment = async () => {
     if (
       validateComment(commentText) &&
@@ -125,9 +142,10 @@ export default function CommentsSection({
     }
   };
 
+  // 回覆
   const replyComment = async (commentId) => {
-    if (validateReply(replyText) && replyText.trim() !== "" && !isRepling) {
-      setIsRepling(true);
+    if (validateReply(replyText) && replyText.trim() !== "" && !isReply) {
+      setIsReply(true);
       try {
         const data = {
           content: replyText,
@@ -143,7 +161,7 @@ export default function CommentsSection({
         setUserComments(parentComments.reverse());
         setReplyCount(countReplies(childComments));
         setReplyText("");
-        setIsRepling(false);
+        setIsReply(false);
         setShowReplyBox((prev) => ({
           ...prev,
           [commentId]: false,
@@ -152,6 +170,7 @@ export default function CommentsSection({
     }
   };
 
+  // 整理留言
   useEffect(() => {
     if (comments && Array.isArray(comments)) {
       const { parentComments, childComments } = reduceComments(comments);
@@ -160,9 +179,33 @@ export default function CommentsSection({
     }
   }, [comments]);
 
+  // 留言取完再取得使用者資訊，避免重整時 redux 丟失導致判斷是否登入錯誤
   useEffect(() => {
-    dispatch(getUserData());
-  }, [dispatch]);
+    const checkLoginStatus = async () => {
+      try {
+        await dispatch(loginCheck()).unwrap();
+        dispatch(getUserData());
+      } catch (error) {
+        Swal.fire({
+          title: "還不是我們的會員嗎？",
+          text: "趕緊加入觀賞優質課程吧",
+          icon: "error",
+          showCancelButton: true,
+          confirmButtonText: "註冊",
+          cancelButtonText: "登入",
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/signup"); // 註冊
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            navigate("/login"); // 登入
+          }
+        });
+      }
+    };
+
+    checkLoginStatus();
+  }, [userComments]);
 
   return (
     <>
@@ -171,7 +214,11 @@ export default function CommentsSection({
         <div className="d-flex align-items-center py-4 mb-6">
           <img
             className="user-comment-picture me-3"
-            src={userInfo.avatar_url}
+            src={
+              userInfo.avatar_url
+                ? userInfo.avatar_url
+                : "/public/images/icon/user.png"
+            }
             alt="當前使用者頭像"
           />
           <input
@@ -198,7 +245,7 @@ export default function CommentsSection({
               )}
               {isSending && (
                 <div className="p-2">
-                  <ReactLonding
+                  <ReactLoading
                     type={"spin"}
                     color={"#645caa"}
                     height={"1.5rem"}
@@ -262,15 +309,15 @@ export default function CommentsSection({
                       onChange={(e) => setReplyText(e.target.value)}
                     />
                     <div>
-                      {!isRepling && (
+                      {!isReply && (
                         <i
                           className="bi bi-reply fs-4 p-2 reply-icon-color"
                           onClick={() => replyComment(userComment.id)}
                         ></i>
                       )}
-                      {isRepling && (
+                      {isReply && (
                         <div className="p-2">
-                          <ReactLonding
+                          <ReactLoading
                             type={"spin"}
                             color={"#645caa"}
                             height={"1.5rem"}
@@ -319,7 +366,11 @@ export default function CommentsSection({
                               <div className="d-flex mb-3">
                                 <img
                                   className="tutor-image me-4"
-                                  src={item.User.avatar_url}
+                                  src={
+                                    item.User.avatar_url
+                                      ? item.User.avatar_url
+                                      : "/public/images/icon/user.png"
+                                  }
                                   alt="留言回覆者頭像"
                                 />
                                 <div className="d-flex justify-content-between align-items-center flex-fill">

@@ -1,13 +1,19 @@
+// reacr 相關套件
 import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+
+// 第三方套件
 import { Modal } from "bootstrap";
 
+// API
+import courseApi from "@/api/courseApi";
+
+// 組件
 import VideoContent from "@/components/course/detail-page/VideoContent";
 import Loader from "@/components/common/Loader";
 
-import courseApi from "@/api/courseApi";
-
+// 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 export default function CourseVideoPage() {
@@ -15,6 +21,8 @@ export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
   const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const { id, videoId } = useParams(); // 取得路由參數
+
+  // 更多章節 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
 
@@ -27,7 +35,7 @@ export default function CourseVideoPage() {
     },
   });
 
-  // 過濾無章節的課程
+  // 過濾同講師無章節or相同課程
   const filterOtherCourse = (others) => {
     return others.filter(
       (other) =>
@@ -37,9 +45,11 @@ export default function CourseVideoPage() {
     );
   };
 
-  //  過濾同課程的影片
+  // 過濾同課程的影片並取 6 支影片
   const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo.filter((related) => related.course_id !== id);
+    return relatedVideo
+      .filter((related) => related.course_id !== id)
+      .slice(0, 6);
   };
 
   // 初始化取得資料
@@ -57,7 +67,12 @@ export default function CourseVideoPage() {
           category: videoData.category,
         });
 
-        setVideoData({ ...courseResult, ...videoResult });
+        setVideoData({
+          ...courseResult,
+          ...videoResult,
+          tag: courseResult.tag,
+          category: courseResult.category,
+        });
         setChapter(chapterResult);
         setOtherVideos(filterOtherCourse(otherCourseResult.courses));
         setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
@@ -70,6 +85,7 @@ export default function CourseVideoPage() {
     getData();
   }, [videoId]);
 
+  // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
     modalRefMethod.current = new Modal(modalRef.current);
     modalRef.current.addEventListener("hide.bs.modal", () => {
@@ -97,7 +113,6 @@ export default function CourseVideoPage() {
             courseList={videoData}
             paramsVideoId={videoId}
           />
-
           <aside className="col-lg-5 col-xl-4">
             {/* 章節影片 */}
             <div className="chapter-video rounded-4 aside-border mb-6">
@@ -247,9 +262,9 @@ export default function CourseVideoPage() {
                         to={`/video/${related.id}`}
                         className="d-flex justify-content-between chapter-item"
                       >
-                        <div className="position-relative me-4">
+                        <div className="position-relative me-4 related-video-image rounded-2">
                           <img
-                            className="rounded-2 related-video-image"
+                            className="w-100"
                             src={related.cover_image}
                             alt="影片縮圖"
                           />
@@ -313,7 +328,7 @@ export default function CourseVideoPage() {
             </div>
             <div className="modal-body">
               <ul className="chapter-list">
-                {chapter.map((video, index) => (
+                {chapter.slice(1,).map((video, index) => (
                   <li
                     className="video-background-color-hover px-6 py-4"
                     onClick={() => modalRefMethod.current.hide()}

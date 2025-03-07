@@ -4,13 +4,17 @@ import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 
-import authApi from "../../../api/authApi";
-import Loader from "../../../components/common/Loader";
+import authApi from "@/api/authApi";
+import Loader from "@/components/common/Loader";
 
 const { VITE_API_BASE } = import.meta.env;
 
 export default function Login() {
   const navigate = useNavigate();
+
+  // 抓取路由上的search params
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams?.get("redirect");
 
   // loading
   const [loadingState, setLoadingState] = useState(false);
@@ -25,7 +29,9 @@ export default function Login() {
         title: "登入成功",
         icon: "success",
       });
-      navigate("/");
+
+      const redirectTo = redirectPath ?? "/";
+      navigate(redirectTo);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -82,7 +88,7 @@ export default function Login() {
   }, []);
 
   // 初始化 - 第三方登入確認身分
-  const [searchParams] = useSearchParams();
+
   const paramToken = searchParams.get("token");
   useEffect(() => {
     if (paramToken) {
@@ -210,9 +216,22 @@ export default function Login() {
                     <hr />
                   </div>
                   <a
-                    href={`${VITE_API_BASE}/auth/google`}
+                    href={`${VITE_API_BASE}/auth/line`}
                     type="button"
                     className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt-lg-8"
+                  >
+                    <img
+                      src="images/icon/icons-line.svg"
+                      alt="icon-google"
+                      className="me-3"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                    使用 Line 登入
+                  </a>
+                  <a
+                    href={`${VITE_API_BASE}/auth/google`}
+                    type="button"
+                    className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-2"
                   >
                     <img
                       src="images/icon/icons-google.svg"
@@ -221,6 +240,7 @@ export default function Login() {
                     />
                     使用 Google 登入
                   </a>
+
                   <div className="f-end-center mt-6 mt-lg-8">
                     <p className="text-center">還不是會員？</p>
                     <NavLink

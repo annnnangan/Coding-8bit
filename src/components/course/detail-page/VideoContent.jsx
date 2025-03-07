@@ -1,11 +1,20 @@
-import PropTypes from "prop-types";
+// react 相關套件
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
-import { useState, useEffect } from "react";
-import DOMPurify from "dompurify";
+import { useSelector } from "react-redux";
 
+// 第三方套件
+import PropTypes from "prop-types";
+import DOMPurify from "dompurify";
+import Swal from "sweetalert2";
+import { Modal } from "bootstrap";
+
+// API
 import courseApi from "../../../api/courseApi";
 
+// 組件
 import CommentsSection from "./CommentsSection";
+import StarRating from "./StarRating";
 
 export default function VideoContent({
   videoUrl,
@@ -14,29 +23,135 @@ export default function VideoContent({
   introductionVideoId,
   paramsVideoId,
 }) {
-  const [comments, setComments] = useState([]);
-  const [disableInputComment, setDisableInputComment] = useState(false);
+  const [comments, setComments] = useState([]); // 留言
+  const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
+  const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
+  const [starRating, setStarRating] = useState(false); // 是否評分影片
+  const [videoSrc, setVideoSrc] = useState(""); // 影片 URL
+
+  // redux 使用者資訊
+  const userInfo = useSelector((state) => state.auth.userData);
+
+  // 評分 modal
+  const modalRef = useRef(null);
+  const modalRefMethod = useRef(null);
+
+  // 取得課程留言
   const getCourseCommentsHandle = async () => {
     try {
       const commentsResult = await courseApi.getCourseComments(
         introductionVideoId || paramsVideoId
       );
-
       setComments(commentsResult);
     } catch (error) {
-      console.log("getCourseCommentsHandle error", error);
+      console.error("getCourseCommentsHandle error", error);
     }
   };
 
+  // 控制收藏課程
+  const handleFavorite = async (videoId) => {
+    let response;
+    try {
+      if (favoriteVideo) {
+        response = await courseApi.deleteFavoriteVideo(videoId);
+      } else {
+        response = await courseApi.postFavoriteVideo(videoId);
+      }
+      if (response.status === "success") {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "課程已收藏",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+        setFavoriteVideo(true);
+      } else {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "移除收藏",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+        setFavoriteVideo(false);
+      }
+    } catch (error) {
+      console.error("handleFavorite error", error);
+    }
+  };
+
+  // 取得影片播放權限
+  const getTokenToPlay = async (videoUrl) => {
+    if (!videoUrl) return "";
+
+    // 如果開頭為 "https://firebasestorage.googleapis.com/"，直接回傳網址
+    if (videoUrl.startsWith("https://firebasestorage.googleapis.com/")) {
+      return videoUrl;
+    }
+
+    // 使用正則表達式過濾掉 "https://" 到 "videos" 之前跟 "?" 後面的字串
+    const filteredUrl = videoUrl
+      .replace(/https:\/\/.*?\/videos/, "videos")
+      .split("?")[0];
+
+    const tokenUrl = await courseApi.getVideoPermission(filteredUrl);
+    return tokenUrl;
+  };
+
+  // 檢查是否有登入
+  const checkToken = () => {
+    return Object.keys(userInfo).length === 0 ? true : false;
+  };
+
+  //初始化判斷是否禁用留言輸入框
   useEffect(() => {
+    if (checkToken()) return;
+
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
 
     if (introductionVideoId || paramsVideoId) {
+      const getFavoriteVideoStatus = async () => {
+        const resStatus = await courseApi.getFavoriteVideo(
+          introductionVideoId || paramsVideoId
+        );
+        resStatus.isFavorite ? setFavoriteVideo(true) : setFavoriteVideo(false);
+      };
+      const getStarRatingStatus = async () => {
+        const resRating = await courseApi.getStarRatingVideo(
+          introductionVideoId || paramsVideoId
+        );
+        resRating.isRated ? setStarRating(true) : setStarRating(false);
+      };
+
+      getFavoriteVideoStatus();
+      getStarRatingStatus();
       getCourseCommentsHandle();
     }
   }, [introductionVideoId || paramsVideoId]);
+
+  // 取得影片播放 URL
+  useEffect(() => {
+    if (checkToken()) return;
+    const fetchVideoSrc = async () => {
+      const tokenUrl = await getTokenToPlay(videoUrl);
+      setVideoSrc(tokenUrl);
+    };
+
+    fetchVideoSrc();
+  }, [videoUrl]);
+
+  // 確保 modal 隱藏時，焦點不會停留在 modal 上
+  useEffect(() => {
+    modalRefMethod.current = new Modal(modalRef.current);
+    modalRef.current.addEventListener("hide.bs.modal", () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    });
+  }, []);
 
   return (
     <section className="col-lg-7 col-xl-8">
@@ -44,7 +159,7 @@ export default function VideoContent({
         <video
           poster={courseList.cover_image}
           className="video-show position-absolute w-100 h-100"
-          src={videoUrl ? videoUrl : ""}
+          src={videoSrc}
           controls
         ></video>
       </div>
@@ -76,31 +191,37 @@ export default function VideoContent({
             <button
               type="button"
               className="favorite-button f-align-center btn btn-outline-none py-2 ps-3 px-4"
+              onClick={() =>
+                handleFavorite(introductionVideoId || paramsVideoId)
+              }
             >
               <span
                 className={`fs-5 me-1 material-symbols-outlined ${
-                  courseList.is_favorite && "icon-fill"
+                  favoriteVideo && "icon-fill"
                 }`}
               >
                 favorite
               </span>
               <span className="fs-7 favorite-font">
-                {courseList.is_favorite ? "已收藏" : "未收藏"}
+                {favoriteVideo ? "已收藏" : "未收藏"}
               </span>
             </button>
             <button
               type="button"
               className="review-button f-align-center btn btn-outline-none py-2 ps-0 pe-0 pe-sm-4 "
+              onClick={() =>
+                starRating ? null : modalRefMethod.current.show()
+              }
             >
               <span
                 className={`fs-5 me-1 material-symbols-outlined ${
-                  courseList.is_reviewed && "icon-fill"
+                  starRating && "icon-fill"
                 }`}
               >
                 kid_star
               </span>
               <span className="fs-7 review-font">
-                {courseList.is_reviewed ? "已評價" : "未評價"}
+                {starRating ? "已評價" : "未評價"}
               </span>
             </button>
           </div>
@@ -192,9 +313,43 @@ export default function VideoContent({
           </div>
         </nav>
       </div>
+
+      <div
+        ref={modalRef}
+        className="modal fade"
+        id="exampleModal"
+        tabIndex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">
+                評分
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="modal-body">
+              <span>給講師 1 ~ 5 的評價</span>
+              <StarRating
+                videoId={introductionVideoId || paramsVideoId}
+                setStarRating={setStarRating}
+                hideModal={() => modalRefMethod.current.hide()}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
+
 VideoContent.propTypes = {
   courseList: PropTypes.shape({
     title: PropTypes.string,

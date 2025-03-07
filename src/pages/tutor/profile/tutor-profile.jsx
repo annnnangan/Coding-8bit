@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import Swal from "sweetalert2";
 
@@ -17,7 +18,7 @@ import Loader from "@/components/common/Loader";
 
 export default function TutorProfile() {
   // loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [loadingState, setLoadingState] = useState(false);
 
   // 取得使用者資料
   const { userData } = useSelector((state) => state.auth);
@@ -80,11 +81,18 @@ export default function TutorProfile() {
     }
   };
 
+  const navigate = useNavigate();
   useEffect(() => {
-    if (userData.tutor_id) {
+    if (userData?.roles?.includes("tutor")) {
       getData();
+    } else if (userData?.roles) {
+      Swal.fire({
+        icon: "error",
+        title: "請確認是否已經取得講師身分權限",
+      });
+      navigate("/");
     }
-  }, [userData.tutor_id]);
+  }, [userData.roles]);
 
   return (
     <>
@@ -174,6 +182,7 @@ export default function TutorProfile() {
                           <div className="fs-6 mt-2 mt-md-4">
                             <label className="form-label" htmlFor="expertise">
                               專長
+                              <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
                               <p className="fs-5 mb-2 fw-medium">
@@ -196,6 +205,7 @@ export default function TutorProfile() {
                           <div className="fs-6 mt-2 mt-md-4">
                             <label className="form-label" htmlFor="slogan">
                               標語
+                              <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
                               <p className="fs-5 mb-2 fw-medium">
@@ -216,6 +226,7 @@ export default function TutorProfile() {
                           <div className="fs-6 mt-2 mt-md-4">
                             <label className="form-label" htmlFor="about">
                               關於我
+                              <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
                               <p className="fs-5 mb-2 fw-medium">

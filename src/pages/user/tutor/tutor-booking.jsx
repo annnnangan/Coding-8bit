@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Swiper } from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 import tutorApi from "@/api/tutorApi";
 import courseApi from "@/api/courseApi";
@@ -13,25 +14,36 @@ import courseApi from "@/api/courseApi";
 import ShowMoreButton from "@/components/common/ShowMoreButton";
 import TutorBookingResume from "@/components/tutor/TutorBookingResume";
 import TutorsCard from "@/components/tutor/TutorsCard";
+import TutorCard from "@/components/tutor/TutorCard";
 import CourseCardList from "@/components/course/CourseCardList";
 import CommentsSection from "@/components/tutor/CommentsSection";
 import SectionFallback from "@/components/common/SectionFallback";
 import Timetable from "@/components/tutor/Timetable";
-import Loader from "@/components/common/Loader";
 
 import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { recommendTutorData, tutorStats } from "../../../data/tutors";
-import { formatDateDash } from "@/utils/timeFormatted-utils";
+import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
-  // 抓取路由上的 id 來取得遠端特定 id 的資料
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // 抓取路由上的tutor id
   const { id: tutor_id } = useParams();
-  // Loading的useState
+
+  // 檢查用戶是否已登入
+  const { isAuth } = useSelector((state) => state.auth);
+
+  /* -------------------------------- useState -------------------------------- */
+  // useState - Whole page loading
   const [loadingState, setLoadingState] = useState(true);
-  // 講師基本資料的useState
+  // useState - 講師基本資料
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
-    name: "API裡面沒有名字",
-    avatar_url: "images/icon/default-tutor-icon.png",
+    User: {
+      username: "",
+      avatar_url: "images/icon/default-tutor-icon.png",
+    },
+    slogan: "",
     about: "",
     hourly_rate: 0,
     expertise: "",
@@ -41,21 +53,67 @@ export default function TutorBooking() {
   });
   const [courses, setCourses] = useState([]);
   const [comments, setComments] = useState([]);
-  // 關於可預約時間的useState
+  // useState - 可預約時間
   const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
   const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
   const [weekOffset, setWeekOffset] = useState(0);
   const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
 
+  // useState - 控制預約Modal的內容的useState - 第一頁: timetable / 第二頁: 選擇服務
+  const [isBookingModalOpen, setBookingModalOpen] = useState(false);
+  const [currentModalStep, setCurrentModalStep] = useState(1);
+  const [selectedServiceType, setSelectedServiceType] = useState();
+  const [selectedBookingTimeslots, setSelectedBookingTimeslots] = useState({ date: "", hours: [] });
+  const [modalError, setModalError] = useState();
+
+  /* -------------------------------- UI Initialization -------------------------------- */
   // modal
-  const serviceSelectionModal = useRef(null);
-  const serviceSelectionModalRef = useRef(null);
+  const bookingModal = useRef(null);
+  const bookingModalRef = useRef(null);
 
   useEffect(() => {
-    serviceSelectionModal.current = new bootstrap.Modal(serviceSelectionModalRef.current);
+    if (bookingModalRef.current) {
+      bookingModal.current = new bootstrap.Modal(bookingModalRef.current, { backdrop: "static" });
+    }
   }, []);
 
-  // 取得講師頁面的資料的Function
+  // swiper
+  useEffect(() => {
+    new Swiper(".tutor-card-swiper", {
+      modules: [Navigation, Autoplay],
+      slidesPerView: 1,
+      spaceBetween: 40,
+      loop: true,
+      grabCursor: true,
+      autoplay: {
+        delay: 5000,
+      },
+      breakpoints: {
+        768: {
+          slidesPerView: 2,
+          spaceBetween: 20,
+        },
+      },
+    });
+    new Swiper(".freeTipShortsSwiper", {
+      modules: [Navigation, Autoplay],
+      slidesPerView: 1,
+      spaceBetween: 40,
+      loop: true,
+      grabCursor: true,
+      autoplay: {
+        delay: 5000,
+      },
+      breakpoints: {
+        768: {
+          slidesPerView: 2,
+          spaceBetween: 20,
+        },
+      },
+    });
+  }, []);
+
+  /* -------------------------------- Get Data From API -------------------------------- */
   const getTutorBasicData = async () => {
     setLoadingState(true);
     try {
@@ -70,6 +128,7 @@ export default function TutorBooking() {
       setTutorBasicInfo((prev) => ({
         ...prev,
         ...basicInfoResult.data,
+        hourly_rate: Number(basicInfoResult.data.hourly_rate),
         resume: {
           work_experience: experienceResult.data,
           education: educationResult.data,
@@ -115,52 +174,18 @@ export default function TutorBooking() {
     }
   };
 
-  // 初始化 - 取得資料
   useEffect(() => {
     //TODO 檢查這個老師是否存在，才可以繼續
     getTutorBasicData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     getAvailabilityData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekOffset]);
 
-  // 初始化 - swiper
-  useEffect(() => {
-    new Swiper(".tutor-card-swiper", {
-      modules: [Navigation, Autoplay],
-      slidesPerView: 1,
-      spaceBetween: 40,
-      loop: true,
-      grabCursor: true,
-      autoplay: {
-        delay: 5000,
-      },
-      breakpoints: {
-        768: {
-          slidesPerView: 2,
-          spaceBetween: 20,
-        },
-      },
-    });
-    new Swiper(".freeTipShortsSwiper", {
-      modules: [Navigation, Autoplay],
-      slidesPerView: 1,
-      spaceBetween: 40,
-      loop: true,
-      grabCursor: true,
-      autoplay: {
-        delay: 5000,
-      },
-      breakpoints: {
-        768: {
-          slidesPerView: 2,
-          spaceBetween: 20,
-        },
-      },
-    });
-  }, []);
-
+  /* -------------------------------- Click Function -------------------------------- */
   // 控制timetable的arrow
   const toNextWeek = async () => {
     setWeekOffset((prev) => prev + 1);
@@ -172,42 +197,79 @@ export default function TutorBooking() {
     }
   };
 
-  // 建立Dispatch 來修改 RTK的State
-  const dispatch = useDispatch();
-
-  // 傳遞預約種類路由參數
-  const navigate = useNavigate();
-
-  // 跳轉自下一頁按紐
-  const toPaymentPage = (serviceType) => {
-    dispatch(updateFormData({ service_type: serviceType }));
-    dispatch(updateFormData({ tutor_id: tutor_id }));
-    dispatch(updateFormData({ tutor_name: tutorBasicInfo.name }));
-    serviceSelectionModal.current.hide();
-    navigate(`/tutor-booking-payment`);
+  // 控制Booking Modal的開關
+  const openBookingModal = () => {
+    if (!isAuth) {
+      Swal.fire({
+        icon: "error",
+        title: "請先登入",
+      });
+      navigate(`/login?redirect=/tutor/${tutor_id}`);
+    } else {
+      if (bookingModal.current) {
+        bookingModal.current.show();
+      }
+      setBookingModalOpen(true);
+    }
   };
+
+  // 控制Booking Modal的Step
+  const toNextModalStep = () => {
+    setModalError("");
+    // 從Timetable跳轉到選擇service type
+    if (currentModalStep === 1) {
+      if (selectedBookingTimeslots.date && selectedBookingTimeslots.hours.length > 0) {
+        setCurrentModalStep((prev) => prev + 1);
+      } else {
+        setModalError("請選擇預約日期及時間。");
+      }
+    }
+
+    // 從選擇service type跳轉到付款頁面
+    if (currentModalStep === 2) {
+      if (selectedServiceType && selectedBookingTimeslots.date && selectedBookingTimeslots.hours.length > 0) {
+        dispatch(updateFormData({ tutor_id: tutor_id }));
+        dispatch(updateFormData({ tutor_name: tutorBasicInfo.User.username }));
+        dispatch(updateFormData({ booking_date: selectedBookingTimeslots.date }));
+        dispatch(updateFormData({ timeslots: selectedBookingTimeslots.hours }));
+        dispatch(updateFormData({ price: tutorBasicInfo.hourly_rate * selectedBookingTimeslots.hours.length }));
+        dispatch(updateFormData({ service_type: selectedServiceType }));
+        bookingModal.current.hide();
+        navigate(`/tutor-booking-payment`);
+      } else {
+        setModalError("請選擇預約服務。");
+      }
+    }
+  };
+
+  // 控制Timetable上選擇時間
+  const handleBookingTimeslotsSelect = (date, time) => {
+    setSelectedBookingTimeslots((prev) => {
+      if (prev.date === date) {
+        const newHours = prev.hours.includes(time)
+          ? prev.hours.filter((t) => t !== time) // Remove if already selected
+          : [...prev.hours, time].sort((a, b) => a - b); // Add & sort
+
+        if (newHours.length === 0) {
+          return { date: "", hours: [] }; // Clear both date and hours
+        }
+
+        return { ...prev, hours: newHours };
+      }
+
+      return { date, hours: [time] }; // Reset hours when new date is selected
+    });
+  };
+
+  /* -------------------------------- Login Validation -------------------------------- */
 
   return (
     <>
       <Helmet>
-        <title>{tutorBasicInfo?.name ? `${tutorBasicInfo.name} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
+        <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
       {/* {loadingState && <Loader />} */}
       <div className="tutor-booking">
-        {/*  Mobile Top Cover */}
-        <div className="position-relative d-lg-none">
-          <div className="img-wrapper img-hover-enlarge">
-            <img src="images/course/course-2-high-res.jpg" className="w-100" alt="tutor cover" style={{ maxHeight: "300px" }} />
-          </div>
-
-          <span className="material-symbols-outlined icon-fill text-white position-absolute top-50 start-50 translate-middle" style={{ fontSize: "56px" }}>
-            play_circle
-          </span>
-
-          <span className="favorite material-symbols-outlined icon-fill p-2 rounded-circle align-middle" role="button" style={{ backgroundColor: "#1e1e1e66" }} data-favorite="true">
-            favorite
-          </span>
-        </div>
         {/*  Main Content */}
         <main className="container py-lg-13 py-7">
           <div className="row">
@@ -219,18 +281,39 @@ export default function TutorBooking() {
                 {/*  tutor profile  */}
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
-                    <img src={tutorBasicInfo.avatar_url} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                    <img src={tutorBasicInfo.User.avatar_url} alt="profile" className="object-fit-cover rounded-circle me-6" />
                   </div>
                   <div className="flex-grow-1">
-                    <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.name}</h2>
-                    <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.title}</p>
+                    {loadingState ? (
+                      <>
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-7 placeholder-lg"></span>
+                        </p>
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-4"></span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.User.username}</h2>
+                        <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.slogan}</p>
+                      </>
+                    )}
                   </div>
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
-                  <a href="#" className="tag tag-brand-02 fs-8 me-3">
-                    {tutorBasicInfo.expertise}
-                  </a>
+                  {loadingState ? (
+                    <p className="placeholder-glow">
+                      <span className="placeholder bg-brand-01 col-8"></span>
+                    </p>
+                  ) : (
+                    tutorBasicInfo.expertise.split(",").map((item) => (
+                      <p href="#" className="tag tag-brand-02 fs-8 me-3" key={item}>
+                        {item}
+                      </p>
+                    ))
+                  )}
                 </div>
                 {/*  tab  */}
                 <div className="section-component">
@@ -267,7 +350,15 @@ export default function TutorBooking() {
                   </ul>
                   <div className="tab-content" id="myTabContent">
                     <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
-                      <ShowMoreButton text={tutorBasicInfo.about} />
+                      {loadingState ? (
+                        <p className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-12"></span>
+                          <span className="placeholder bg-brand-01 col-12"></span>
+                          <span className="placeholder bg-brand-01 col-12"></span>
+                        </p>
+                      ) : (
+                        <ShowMoreButton text={tutorBasicInfo.about} />
+                      )}
                     </div>
                     <div className="tab-pane fade" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
                       <TutorBookingResume resume={tutorBasicInfo.resume} />
@@ -318,7 +409,16 @@ export default function TutorBooking() {
                 {currentAvailableTime.length === 0 ? (
                   <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
                 ) : (
-                  <Timetable availability={currentAvailableTime} weekOffset={weekOffset} toNextWeek={toNextWeek} toPrevWeek={toPrevWeek} isLoading={isLoadingAvailableTime} />
+                  <Timetable
+                    availability={currentAvailableTime}
+                    weekOffset={weekOffset}
+                    toNextWeek={toNextWeek}
+                    toPrevWeek={toPrevWeek}
+                    isLoading={isLoadingAvailableTime}
+                    isModal={false}
+                    openBookingModal={openBookingModal}
+                    handleBookingTimeslotsSelect={handleBookingTimeslotsSelect}
+                  />
                 )}
               </section>
 
@@ -342,7 +442,7 @@ export default function TutorBooking() {
                   <div className="swiper-wrapper mb-10 py-5">
                     {recommendTutorData.map((tutor) => (
                       <div className="swiper-slide" key={tutor.id}>
-                        <TutorsCard tutorList={tutor} cardsNum={1} />
+                        <TutorCard tutor={tutor} />
                       </div>
                     ))}
                   </div>
@@ -353,22 +453,22 @@ export default function TutorBooking() {
             {/* Desktop right CTA card */}
             <div className="col-lg-4 d-lg-block d-none">
               <div className="desktop-cta-card card p-lg-6 p-4 sticky-top">
-                <div className="position-relative mb-lg-5 mb-4">
-                  <div className="img-wrapper img-hover-enlarge rounded-2">
-                    <img src="images/course/course-2.png" className="card-img-top rounded-2 object-fit-cover" alt="course-2" />
-                  </div>
-
-                  <span className="favorite material-symbols-outlined icon-fill p-2 rounded-circle align-middle" role="button" style={{ backgroundColor: "#1e1e1e66" }} data-favorite="true">
-                    favorite
-                  </span>
-                </div>
                 <div className="card-body p-0">
                   <div className="mb-lg-6 mb-5">
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
-                    <h2 className="text-brand-03 fs-lg-2 fs-3">NT ${tutorBasicInfo.hourly_rate}</h2>
+                    <h2 className="text-brand-03 fs-lg-2 fs-3">
+                      NT ${" "}
+                      {loadingState ? (
+                        <span className="placeholder-glow">
+                          <span className="placeholder bg-brand-01 col-2"></span>
+                        </span>
+                      ) : (
+                        tutorBasicInfo.hourly_rate
+                      )}
+                    </h2>
                   </div>
 
-                  <button className="btn slide-right-hover btn-brand-03 w-100" data-bs-toggle="modal" data-bs-target="#serviceSelectionModal">
+                  <button className="btn slide-right-hover btn-brand-03 w-100" onClick={openBookingModal}>
                     <p className="f-center me-1">
                       立即預約
                       <span className="material-symbols-outlined">arrow_forward</span>
@@ -383,45 +483,120 @@ export default function TutorBooking() {
 
       {/* Modal */}
       {/* Modal - Service Select Modal */}
-      <div className="modal fade service-selection-modal" id="serviceSelectionModal" tabIndex="-1" aria-labelledby="serviceSelectionModalLabel" aria-hidden="true" ref={serviceSelectionModalRef}>
-        <div className="modal-dialog modal-dialog-centered modal-xl">
-          <div className="modal-content">
+
+      <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+          <div className="modal-content px-3 py-2">
             <div className="modal-header border-0 pb-0">
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              {currentModalStep === 2 && (
+                <button
+                  className="btn btn-link"
+                  onClick={() => {
+                    setCurrentModalStep(1);
+                    setModalError();
+                  }}
+                >
+                  <span className="material-symbols-outlined icon-fill fs-7">arrow_back_ios</span>返回
+                </button>
+              )}
+
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={() => {
+                  bookingModal.current.hide();
+                  setCurrentModalStep(1);
+                  setModalError();
+                }}
+              ></button>
             </div>
-            <div className="modal-body">
-              <h4 className="modal-title fs-md-2 fs-3 text-center mb-8" id="serviceSelectionModalLabel">
-                請選擇想預約的項目
-              </h4>
-              <div className="row row-cols-lg-2 g-4 flex-column flex-lg-row">
-                <div className="col service-card">
-                  <button
-                    className="h-100 border-0"
-                    onClick={() => {
-                      toPaymentPage("courseSession");
-                    }}
-                  >
-                    <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
-                      <h3 className="fs-4 fs-md-3">一對一教學</h3>
-                      <img src="images/deco/Illustration-7.png" alt="one-on-one-illustration" />
-                      <p className="text-center mb-auto">以線上Google meeting的形式， 將於預約時間前一天發送會議連結， 講師會於預約時間內進行一對一單獨指導。</p>
+
+            <div className="modal-body pt-0">
+              {currentModalStep === 1 && (
+                <>
+                  <h4 className="modal-title fs-md-2 fs-3 text-center mb-3" id="bookingModalLabel">
+                    請選擇預約日期和時間
+                  </h4>
+                  {selectedBookingTimeslots.date && (
+                    <div className="mb-4">
+                      <p className="mb-2"> 預約日期: {selectedBookingTimeslots.date} </p>
+                      <div className="flex flex-wrap">
+                        <p>
+                          預約時間:{" "}
+                          {selectedBookingTimeslots.hours.map((time) => (
+                            <span key={time} className="booking-time me-2 pe-none">
+                              {formatHour(time)}
+                            </span>
+                          ))}
+                        </p>
+                      </div>
                     </div>
-                  </button>
-                </div>
-                <div className="col service-card">
-                  <button
-                    className="h-100 border-0"
-                    onClick={() => {
-                      toPaymentPage("codeReview");
-                    }}
-                  >
-                    <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
-                      <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
-                      <img src="images/deco/Illustration-8.png" alt="code-review-illustration" />
-                      <p className="text-center mb-auto">您需要於預約時繳交GitHub Repo， 提供想接受檢視的程式碼， 講師會於預約時間內進行程式碼檢視服務， 並且於時間結束時回覆檢視後的結果。</p>
+                  )}
+                  <div className="schedule">
+                    {currentAvailableTime.length === 0 ? (
+                      <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
+                    ) : (
+                      <Timetable
+                        availability={currentAvailableTime}
+                        weekOffset={weekOffset}
+                        toNextWeek={toNextWeek}
+                        toPrevWeek={toPrevWeek}
+                        isLoading={isLoadingAvailableTime}
+                        handleBookingTimeslotsSelect={handleBookingTimeslotsSelect}
+                        selectedBookingTimeslots={selectedBookingTimeslots}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
+
+              {currentModalStep === 2 && (
+                <>
+                  <h4 className="modal-title fs-md-2 fs-3 text-center mb-3" id="bookingModalLabel">
+                    請選擇預約項目
+                  </h4>
+                  <div className="row row-cols-md-2 g-4 flex-column flex-md-row">
+                    <div className="col service-card">
+                      <div
+                        className="h-100 border-0 cursor-pointer"
+                        onClick={() => {
+                          setSelectedServiceType("courseSession");
+                        }}
+                      >
+                        <div className={`f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100${selectedServiceType === "courseSession" ? " selected" : ""}`}>
+                          <h3 className="fs-4 fs-md-3">一對一教學</h3>
+                          <img src="images/deco/Illustration-7.png" alt="one-on-one-illustration" />
+                          <p className="text-center mb-auto">以線上Google meeting的形式， 將於預約時間前一天發送會議連結， 講師會於預約時間內進行一對一單獨指導。</p>
+                        </div>
+                      </div>
                     </div>
-                  </button>
-                </div>
+                    <div className="col service-card">
+                      <div
+                        className={`f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100${selectedServiceType === "codeReview" ? " selected" : ""}`}
+                        onClick={() => {
+                          setSelectedServiceType("codeReview");
+                        }}
+                      >
+                        <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
+                          <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
+                          <img src="images/deco/Illustration-8.png" alt="code-review-illustration" />
+                          <p className="text-center mb-auto">您需要於預約時繳交GitHub Repo， 提供想接受檢視的程式碼， 講師會於預約時間內進行程式碼檢視服務， 並且於時間結束時回覆檢視後的結果。</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="modal-footer p-0 border-top-0">
+              <div className="d-flex flex-column align-items-end">
+                {modalError && <p className="text-danger mb-3">{modalError}</p>}
+                <button type="button" className="btn btn-secondary fs-7 fs-md-6 py-2" onClick={toNextModalStep}>
+                  下一步
+                </button>
               </div>
             </div>
           </div>
@@ -440,7 +615,7 @@ export default function TutorBooking() {
               <h2 className="text-brand-03 fs-lg-2 fs-3">NT ${tutorBasicInfo.hourly_rate}</h2>
             </div>
 
-            <button className="btn slide-right-hover btn-brand-03" data-bs-toggle="modal" data-bs-target="#serviceSelectionModal">
+            <button className="btn slide-right-hover btn-brand-03" onClick={openBookingModal}>
               <p className="f-center me-1">
                 立即預約
                 <span className="material-symbols-outlined">arrow_forward</span>

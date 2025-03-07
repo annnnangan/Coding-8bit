@@ -3,9 +3,9 @@ import apiClient from "./apiClient";
 /* ---------------------------------- 基本資料 ---------------------------------- */
 
 // 取得講師列表
-const getAllTutor = async () => {
-  const response = await apiClient.get(`/tutors`);
-  return response.data;
+const getAllTutor = async (page = 1, sortBy = "rating", order = "DESC", search = "", limit = 9) => {
+  const response = await apiClient.get(`/tutor?page=${page}&sortBy=${sortBy}&order=${order}&search=${search}&limit=${limit}`);
+  return response.data.data;
 };
 
 // 取得單一講師資料
@@ -18,6 +18,12 @@ const getTutorDetail = async (tutorId) => {
 const updateTutorData = async (tutorId, data) => {
   const response = await apiClient.patch(`/tutor/${tutorId}`, data);
   return response.data;
+};
+
+// 成為講師
+const applyTutor = async (data) => {
+  const response = await apiClient.post(`/tutor/`, data);
+  return response.data.data;
 };
 
 /* ---------------------------------- 工作經驗 ---------------------------------- */
@@ -100,8 +106,45 @@ const deleteCertificate = async (tutorId, certificateId) => {
 
 /* ---------------------------------- 可預約時段 ---------------------------------- */
 
+// 講師頁面的Timetable
 const getAvailability = async (tutorId, baseDate) => {
   const response = await apiClient.get(`/tutor/${tutorId}/availability/?baseDate=${baseDate}`);
+  return response.data;
+};
+
+// 講師後台 - day of week - 取得所有day of week 的可預約時間
+const getAllDayOfWeekAvailability = async (tutorId) => {
+  const response = await apiClient.get(`/tutor/${tutorId}/businessHours`);
+  return response.data.data;
+};
+
+// 講師後台 - day of week - 更新一個day of week的時間
+const updateDayOfWeekAvailability = async (tutorId, dayOfWeek, timeslots) => {
+  const response = await apiClient.put(`/tutor/${tutorId}/time-blocks/${dayOfWeek}`, timeslots);
+  return response.data;
+};
+
+// 講師後台 - day of week - 刪除整個一個day of week的所有時間
+const deleteDayOfWeekAvailability = async (tutorId, dayOfWeek) => {
+  const response = await apiClient.delete(`/tutor/${tutorId}/time-blocks/${dayOfWeek}`);
+  return response.data;
+};
+
+// 講師後台 - specific date - 取得所有specific date的可預約時間
+const getAllSpecificDateAvailability = async (tutorId) => {
+  const response = await apiClient.get(`/tutor/${tutorId}/overrideBusinessHours`);
+  return response.data.data;
+};
+
+// 講師後台 - specific date - 更新一個specific date的時間
+const updateSpecificDateAvailability = async (tutorId, date, timeslots) => {
+  const response = await apiClient.put(`/tutor/${tutorId}/override-time-blocks/${date}`, timeslots);
+  return response.data;
+};
+
+// 講師後台 - specific date - 刪除整個一個specific date的所有時間
+const deleteSpecificDateAvailability = async (tutorId, date) => {
+  const response = await apiClient.delete(`/tutor/${tutorId}/override-time-blocks/${date}`);
   return response.data;
 };
 
@@ -109,6 +152,7 @@ export default {
   getAllTutor,
   getTutorDetail,
   updateTutorData,
+  applyTutor,
   getExp,
   addExp,
   updateExp,
@@ -122,4 +166,10 @@ export default {
   updateCertificate,
   deleteCertificate,
   getAvailability,
+  updateDayOfWeekAvailability,
+  getAllDayOfWeekAvailability,
+  deleteDayOfWeekAvailability,
+  updateSpecificDateAvailability,
+  getAllSpecificDateAvailability,
+  deleteSpecificDateAvailability,
 };
