@@ -217,7 +217,7 @@ export default function CommentsSection({
             src={
               userInfo.avatar_url
                 ? userInfo.avatar_url
-                : "/public/images/icon/user.png"
+                : "/images/icon/user.png"
             }
             alt="當前使用者頭像"
           />
@@ -369,7 +369,7 @@ export default function CommentsSection({
                                   src={
                                     item.User.avatar_url
                                       ? item.User.avatar_url
-                                      : "/public/images/icon/user.png"
+                                      : "/images/icon/user.png"
                                   }
                                   alt="留言回覆者頭像"
                                 />

@@ -1,10 +1,11 @@
 // react 相關套件
 import { useState, useEffect, useRef } from "react";
-import { useParams, NavLink } from "react-router-dom";
+import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 // 第三方套件
 import { Modal } from "bootstrap";
+import Swal from "sweetalert2";
 
 // 組件
 import VideoContent from "@/components/course/detail-page/VideoContent";
@@ -12,6 +13,7 @@ import Loader from "@/components/common/Loader";
 
 // API
 import courseApi from "@/api/courseApi";
+import userApi from "@/api/userApi";
 
 // 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
@@ -21,11 +23,16 @@ export default function CourseDetailPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
   const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const [loadingState, setLoadingState] = useState(true); // loading
+  const [swalShown, setSwalShown] = useState(false); // 狀態變數來追蹤是否已經顯示過 Swal 彈窗
   const { id } = useParams(); // 取得路由參數
+  const navigate = useNavigate(); // 用於導頁
 
   // 更多章節 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
+
+  // 只會記錄一次錯誤訊息，防止重覆彈出 modal
+  const errorLogged = useRef(false);
 
   // 課程資料
   const [courseList, setCourseList] = useState({
@@ -53,8 +60,16 @@ export default function CourseDetailPage() {
 
   // 取得初始化資料
   const getData = async () => {
+    if (swalShown) return;
     setLoadingState(true);
+
     try {
+      const userSubscriptionsPlan = await userApi.getUserData();
+      if (userSubscriptionsPlan.subscriptions[0].plan_name === "free") {
+        const errObject = new Error("請升級訂閱方案方可觀看課程");
+        errObject.name = "SubscriptionError";
+        throw errObject;
+      }
       const courseResult = await courseApi.getCourseDetail(id);
       const chapterResult = await courseApi.getCourseChapter(id);
       const otherCourseResult = await courseApi.getFrontTutorCourses({
@@ -69,7 +84,29 @@ export default function CourseDetailPage() {
       setOtherVideos(filterOtherCourse(otherCourseResult.courses));
       setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
     } catch (error) {
-      console.log("錯誤", error);
+      if (!errorLogged.current) {
+        if (error.name === "SubscriptionError") {
+          setSwalShown(true);
+          Swal.fire({
+            title: "無法觀看課程",
+            text: "輕鬆升級，詳情請至訂閱了解",
+            icon: "error",
+            showCancelButton: true,
+            confirmButtonText: "立馬升級！",
+            cancelButtonText: "回首頁",
+            allowOutsideClick: false,
+          }).then((result) => {
+            setSwalShown(false);
+            if (result.isConfirmed) {
+              navigate("/subscription-list"); // 立馬升級
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              navigate("/"); // 返回首頁
+            }
+          });
+        }
+        errorLogged.current = true;
+      }
+      console.log("錯誤，請洽詢客服人員");
     } finally {
       setLoadingState(false);
     }
