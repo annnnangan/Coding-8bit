@@ -1,14 +1,21 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import SubscriptionCard from "../../../components/subscription/SubscriptionCard";
+import SubscriptionCard from "@/components/subscription/SubscriptionCard";
+import Loader from "@/components/common/Loader";
 
 export default function SubscriptionList() {
+  // loading
+  const [loadingState, setLoadingState] = useState(false);
+
   return (
     <>
       <Helmet>
         <title>Coding∞bit ｜ 訂閱方案一覽</title>
       </Helmet>
+      {loadingState && <Loader />}
+
       <main className="subscription-section">
         <div className="container">
           <nav aria-label="breadcrumb">
@@ -72,7 +79,10 @@ export default function SubscriptionList() {
                   aria-labelledby="monthly-tab"
                 >
                   <div className="row">
-                    <SubscriptionCard duration="monthly" />
+                    <SubscriptionCard
+                      duration="price_monthly"
+                      setLoadingState={setLoadingState}
+                    />
                   </div>
                 </div>
                 <div
@@ -82,7 +92,10 @@ export default function SubscriptionList() {
                   aria-labelledby="annually-tab"
                 >
                   <div className="row">
-                    <SubscriptionCard duration="annually" />
+                    <SubscriptionCard
+                      duration="price_annually"
+                      setLoadingState={setLoadingState}
+                    />
                   </div>
                 </div>
               </div>
