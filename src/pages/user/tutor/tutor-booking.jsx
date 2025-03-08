@@ -21,7 +21,7 @@ import SectionFallback from "@/components/common/SectionFallback";
 import Timetable from "@/components/tutor/Timetable";
 
 import { updateFormData } from "../../../utils/slice/bookingSlice";
-import { recommendTutorData, tutorStats } from "../../../data/tutors";
+import { tutorStats } from "../../../data/tutors";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
@@ -36,13 +36,13 @@ export default function TutorBooking() {
 
   /* -------------------------------- useState -------------------------------- */
   // useState - Whole page loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [loadingBasicInfoState, setLoadingBasicInfoState] = useState(true);
 
   // useState - 講師基本資料
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
     User: {
       username: "",
-      avatar_url: "images/icon/default-tutor-icon.png",
+      avatar_url: "images/icon/user.png",
     },
     slogan: "",
     about: "",
@@ -61,7 +61,7 @@ export default function TutorBooking() {
   const [loadingRecommendTutorState, setLoadingRecommendTutorState] = useState(true);
 
   // useState - 可預約時間
-  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
+  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState({ tutorId: "", baseDateList: [] }); //儲存已fetch過的時間
   const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
   const [weekOffset, setWeekOffset] = useState(0);
   const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
@@ -82,7 +82,7 @@ export default function TutorBooking() {
     if (bookingModalRef.current) {
       bookingModal.current = new bootstrap.Modal(bookingModalRef.current, { backdrop: "static" });
     }
-  }, []);
+  }, [tutor_id]);
 
   // swiper
   useEffect(() => {
@@ -118,11 +118,11 @@ export default function TutorBooking() {
         },
       },
     });
-  }, []);
+  }, [tutor_id, recommendTutor]);
 
   /* -------------------------------- Get Data From API -------------------------------- */
   const getTutorBasicData = async () => {
-    setLoadingState(true);
+    setLoadingBasicInfoState(true);
     try {
       const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
@@ -147,32 +147,43 @@ export default function TutorBooking() {
     } catch (error) {
       console.log("錯誤", error);
     } finally {
-      setLoadingState(false);
+      setLoadingBasicInfoState(false);
     }
   };
 
   const getAvailabilityData = async () => {
     setLoadingAvailableTime(true);
     try {
-      // 計算baseDate
-      const today = new Date();
-      const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
-      const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
-
-      // 檢查資料是否已經儲在useState裡面
-      const existingData = accumulateAvailableTime.find((data) => data.baseDate === baseDate);
-
-      // 如果資料已存在，我們直接拿，不用再fetch API
-      if (existingData) {
-        setCurrentAvailableTime(existingData.timeSlots);
-      } else {
-        // 如果不存在，就可以fetch API
+      if (accumulateAvailableTime.tutorId !== tutor_id) {
+        console.log("hello");
+        const today = new Date();
+        const baseDate = formatDateDash(today);
         const result = await tutorApi.getAvailability(tutor_id, baseDate);
-
-        // 把剛剛fetch的data存到useState裡面，避免過度fetch API
-        const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
-        setAccumulateAvailableTime((prev) => [...prev, newData]);
+        setWeekOffset(0);
+        setAccumulateAvailableTime({ tutorId: tutor_id, baseDateList: [{ baseDate, timeSlots: result.data?.slice(7, 14) }] });
         setCurrentAvailableTime(result.data?.slice(7, 14));
+      } else {
+        // 計算baseDate
+        const today = new Date();
+        const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
+        const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
+
+        // 檢查資料是否已經儲在useState裡面
+        const existingData = accumulateAvailableTime.baseDateList.find((data) => data.baseDate === baseDate);
+
+        // 如果資料已存在，我們直接拿，不用再fetch API
+        if (existingData) {
+          setCurrentAvailableTime(existingData.timeSlots);
+        } else {
+          // 如果不存在，就可以fetch API
+          const result = await tutorApi.getAvailability(tutor_id, baseDate);
+
+          // 把剛剛fetch的data存到useState裡面，避免過度fetch API
+          const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
+          // setAccumulateAvailableTime((prev) => [...prev, newData]);
+          setAccumulateAvailableTime({ ...accumulateAvailableTime, baseDateList: [...accumulateAvailableTime.baseDateList, newData] });
+          setCurrentAvailableTime(result.data?.slice(7, 14));
+        }
       }
     } catch (error) {
       console.log("錯誤", error);
@@ -200,12 +211,12 @@ export default function TutorBooking() {
     getTutorBasicData();
     getRecommendTutor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tutor_id]);
 
   useEffect(() => {
     getAvailabilityData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weekOffset]);
+  }, [weekOffset, tutor_id]);
 
   /* -------------------------------- Click Function -------------------------------- */
   // 控制timetable的arrow
@@ -290,7 +301,6 @@ export default function TutorBooking() {
       <Helmet>
         <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
-      {/* {loadingState && <Loader />} */}
 
       <div className="tutor-booking">
         {/*  Main Content */}
@@ -303,10 +313,16 @@ export default function TutorBooking() {
                 {/*  tutor profile  */}
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
-                    <img src={tutorBasicInfo.User.avatar_url} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                    {loadingBasicInfoState ? (
+                      <p className="placeholder-glow">
+                        <span className="placeholder rounded-circle bg-brand-01 me-4" style={{ width: "64px", height: "64px" }}></span>
+                      </p>
+                    ) : (
+                      <img src={tutorBasicInfo.User.avatar_url || "images/icon/user.png"} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                    )}
                   </div>
                   <div className="flex-grow-1">
-                    {loadingState ? (
+                    {loadingBasicInfoState ? (
                       <>
                         <p className="placeholder-glow">
                           <span className="placeholder bg-brand-01 col-7 placeholder-lg"></span>
@@ -335,7 +351,7 @@ export default function TutorBooking() {
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
-                  {loadingState ? (
+                  {loadingBasicInfoState ? (
                     <p className="placeholder-glow">
                       <span className="placeholder bg-brand-01 col-8"></span>
                     </p>
@@ -382,7 +398,7 @@ export default function TutorBooking() {
                   </ul>
                   <div className="tab-content" id="myTabContent">
                     <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
-                      {loadingState ? (
+                      {loadingBasicInfoState ? (
                         <p className="placeholder-glow">
                           <span className="placeholder bg-brand-01 col-12"></span>
                           <span className="placeholder bg-brand-01 col-12"></span>
@@ -491,7 +507,7 @@ export default function TutorBooking() {
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
                     <h2 className="text-brand-03 fs-lg-2 fs-3">
                       NT ${" "}
-                      {loadingState ? (
+                      {loadingBasicInfoState ? (
                         <span className="placeholder-glow">
                           <span className="placeholder bg-brand-01 col-2"></span>
                         </span>

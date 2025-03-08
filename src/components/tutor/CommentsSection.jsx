@@ -103,4 +103,5 @@ export default function CommentsSection({ modal = false, tutorId }) {
 }
 CommentsSection.propTypes = {
   modal: PropTypes.bool,
+  tutorId: PropTypes.string,
 };
