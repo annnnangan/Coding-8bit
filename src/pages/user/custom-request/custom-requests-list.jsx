@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserData } from "@/utils/slice/authSlice";
 import { Helmet } from "react-helmet-async";
 
 import * as bootstrap from "bootstrap";
@@ -31,7 +33,29 @@ export default function CustomRequestsList() {
 
   // 前往新增需求頁面按鈕
   const toAddLearningNeedPage = () => {
-    navigate("/add-learning-need");
+    if (
+      userData.id &&
+      !userData.subscriptions
+        .filter((item) => item.plan_name === "premium")
+        .filter((item) => item.status === "active").length > 0
+    ) {
+      Swal.fire({
+        title: "成為高級會員後即可提出客製化學習需求唷",
+        showCancelButton: true,
+        confirmButtonText: "前往訂閱頁面",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/subscription-list");
+        }
+      });
+    } else if (
+      userData.id &&
+      userData.subscriptions
+        .filter((item) => item.plan_name === "premium")
+        .filter((item) => item.status === "active").length > 0
+    ) {
+      navigate("/add-learning-need");
+    }
   };
 
   // 取得需求資料函式
@@ -199,6 +223,16 @@ export default function CustomRequestsList() {
       document.body.classList.remove("bg-custom-course");
     };
   }, []);
+
+  // 取得使用者資料
+  const dispatch = useDispatch();
+  const { userData, isAuth } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(getUserData());
+    }
+  }, [customCourseList[0]?.id]);
 
   // 初始化 - 取得資料
   useEffect(() => {
