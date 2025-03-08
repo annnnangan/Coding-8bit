@@ -1,15 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginCheck, getUserData } from "@/utils/slice/authSlice";
 import { Helmet } from "react-helmet-async";
+
+import Swal from "sweetalert2";
 
 import AddLearningNeedRobot from "@/components/custom-request/addLearningNeedRobot";
 import ChatRoom from "@/components/custom-request/ChatRoom";
 
 import LearningNeedForm from "@/components/custom-request/LearningNeedForm";
 import TransparentLoader from "@/components/common/TransparentLoader";
+import { useNavigate } from "react-router-dom";
 
 export default function AddLearningNeedPage() {
   // loading
   const [loadingState, setLoadingState] = useState(false);
+
+  // 取得使用者資料
+  const dispatch = useDispatch();
+  const { userData, isAuth } = useSelector((state) => state.auth);
+
+  // 初始化 - 確認身分
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (
+      userData.id &&
+      !userData.subscriptions
+        .filter((item) => item.plan_name === "premium")
+        .filter((item) => item.status === "active").length > 0
+    ) {
+      Swal.fire({
+        title: "成為高級會員後即可提出客製化學習需求",
+        showCancelButton: false,
+        confirmButtonText: "確定",
+      })
+      navigate(-1);
+    }
+  }, [userData.id]);
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(getUserData());
+    }
+  }, [isAuth]);
+
+  useEffect(() => {
+    dispatch(loginCheck());
+  }, []);
 
   return (
     <>
@@ -116,7 +153,7 @@ export default function AddLearningNeedPage() {
       </div>
 
       {/* 聊天室 */}
-      <ChatRoom/>
+      <ChatRoom />
     </>
   );
 }

@@ -66,14 +66,6 @@ export default function ChatRoom() {
   ];
   const sortedResponses = combinedResponses.sort((a, b) => a.id - b.id);
 
-  useEffect(() => {
-    console.log("目前為止的所有使用者問答:", userResponses);
-  }, [userResponses]);
-
-  useEffect(() => {
-    console.log("目前為止的所有機器人問答:", botResponses);
-  }, [botResponses]);
-
   // 每次留言滾到最底邏輯
   const endOfMessagesRef = useRef(null);
   useEffect(() => {

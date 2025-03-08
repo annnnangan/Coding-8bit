@@ -20,7 +20,7 @@ export default function CardModal({
 }) {
   // 取得使用者資料
   const dispatch = useDispatch();
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, isAuth } = useSelector((state) => state.auth);
 
   // ReactQuill 文字編輯器
   const [value, setValue] = useState("");
@@ -102,7 +102,9 @@ export default function CardModal({
   };
 
   useEffect(() => {
-    dispatch(getUserData());
+    if (isAuth) {
+      dispatch(getUserData());
+    }
     if (temCustomCourse.id) {
       getResponse(temCustomCourse.id);
     }
@@ -164,6 +166,7 @@ export default function CardModal({
                     </div>
                     <p
                       id="modalContent"
+                      className="domPurify-wrap"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(temCustomCourse?.content),
                       }}
@@ -197,27 +200,29 @@ export default function CardModal({
                     ))}
                   </div>
 
-                  <div className="fixed-bottom-form">
-                    <h6 className="mb-3">新增回應：</h6>
-                    <form id="newResponseForm">
-                      <div className="mb-3">
-                        {editorLoaded && (
-                          <Suspense fallback={<Loader />}>
-                            <ReactQuill value={value} onChange={setValue} />
-                          </Suspense>
-                        )}
-                      </div>
-                      <div className="form-actions">
-                        <button
-                          type="button"
-                          className="btn btn-brand-03 rounded-2"
-                          onClick={addResponse}
-                        >
-                          提交回應
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                  {isAuth && userData?.roles?.includes("tutor") && (
+                    <div className="fixed-bottom-form">
+                      <h6 className="mb-3">新增回應：</h6>
+                      <form id="newResponseForm">
+                        <div className="mb-3">
+                          {editorLoaded && (
+                            <Suspense fallback={<Loader />}>
+                              <ReactQuill value={value} onChange={setValue} />
+                            </Suspense>
+                          )}
+                        </div>
+                        <div className="form-actions">
+                          <button
+                            type="button"
+                            className="btn btn-brand-03 rounded-2"
+                            onClick={addResponse}
+                          >
+                            提交回應
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
 
                 {/* 右側欄：回覆意見 */}
@@ -294,7 +299,7 @@ export default function CardModal({
                                     </div>
                                   </div>
                                   <p
-                                    className="card-text mb-2"
+                                    className="card-text domPurify-wrap mb-2"
                                     dangerouslySetInnerHTML={{
                                       __html: DOMPurify.sanitize(res.content),
                                     }}
@@ -311,12 +316,6 @@ export default function CardModal({
                                         {res.likes}
                                       </span>
                                     </button>
-                                    {/* <button className="btn btn-sm btn-light d-flex align-items-center">
-                                      <span className="material-symbols-outlined me-2">
-                                        comment
-                                      </span>
-                                      回覆
-                                    </button> */}
                                   </div>
                                 </div>
                               </div>

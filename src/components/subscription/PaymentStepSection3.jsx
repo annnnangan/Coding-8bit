@@ -92,7 +92,6 @@ PaymentStepSection3.propTypes = {
   prices: PropTypes.object.isRequired,
   duration: PropTypes.oneOf(["price_monthly", "price_annually"]).isRequired,
   subscriptionPlan: PropTypes.string.isRequired,
-  toNextStep: PropTypes.func.isRequired,
   formattedToday: PropTypes.string.isRequired,
   formattedNextMonth: PropTypes.string.isRequired,
   formattedNextYear: PropTypes.string.isRequired,
