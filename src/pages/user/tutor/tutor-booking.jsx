@@ -21,7 +21,7 @@ import SectionFallback from "@/components/common/SectionFallback";
 import Timetable from "@/components/tutor/Timetable";
 
 import { updateFormData } from "../../../utils/slice/bookingSlice";
-import { recommendTutorData, tutorStats } from "../../../data/tutors";
+import { tutorStats } from "../../../data/tutors";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function TutorBooking() {
@@ -36,12 +36,13 @@ export default function TutorBooking() {
 
   /* -------------------------------- useState -------------------------------- */
   // useState - Whole page loading
-  const [loadingState, setLoadingState] = useState(true);
+  const [loadingBasicInfoState, setLoadingBasicInfoState] = useState(true);
+
   // useState - 講師基本資料
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
     User: {
       username: "",
-      avatar_url: "images/icon/default-tutor-icon.png",
+      avatar_url: "images/icon/user.png",
     },
     slogan: "",
     about: "",
@@ -51,10 +52,16 @@ export default function TutorBooking() {
     resume: { work_experience: [], education: [], certificates: [] },
     statistics: {},
   });
+
+  // useState - 講師的影片
   const [courses, setCourses] = useState([]);
-  const [comments, setComments] = useState([]);
+
+  // useState - 推薦老師
+  const [recommendTutor, setRecommendTutor] = useState([]);
+  const [loadingRecommendTutorState, setLoadingRecommendTutorState] = useState(true);
+
   // useState - 可預約時間
-  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
+  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState({ tutorId: "", baseDateList: [] }); //儲存已fetch過的時間
   const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
   const [weekOffset, setWeekOffset] = useState(0);
   const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
@@ -75,7 +82,7 @@ export default function TutorBooking() {
     if (bookingModalRef.current) {
       bookingModal.current = new bootstrap.Modal(bookingModalRef.current, { backdrop: "static" });
     }
-  }, []);
+  }, [tutor_id]);
 
   // swiper
   useEffect(() => {
@@ -111,11 +118,11 @@ export default function TutorBooking() {
         },
       },
     });
-  }, []);
+  }, [tutor_id, recommendTutor]);
 
   /* -------------------------------- Get Data From API -------------------------------- */
   const getTutorBasicData = async () => {
-    setLoadingState(true);
+    setLoadingBasicInfoState(true);
     try {
       const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
@@ -140,32 +147,43 @@ export default function TutorBooking() {
     } catch (error) {
       console.log("錯誤", error);
     } finally {
-      setLoadingState(false);
+      setLoadingBasicInfoState(false);
     }
   };
 
   const getAvailabilityData = async () => {
     setLoadingAvailableTime(true);
     try {
-      // 計算baseDate
-      const today = new Date();
-      const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
-      const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
-
-      // 檢查資料是否已經儲在useState裡面
-      const existingData = accumulateAvailableTime.find((data) => data.baseDate === baseDate);
-
-      // 如果資料已存在，我們直接拿，不用再fetch API
-      if (existingData) {
-        setCurrentAvailableTime(existingData.timeSlots);
-      } else {
-        // 如果不存在，就可以fetch API
+      if (accumulateAvailableTime.tutorId !== tutor_id) {
+        console.log("hello");
+        const today = new Date();
+        const baseDate = formatDateDash(today);
         const result = await tutorApi.getAvailability(tutor_id, baseDate);
-
-        // 把剛剛fetch的data存到useState裡面，避免過度fetch API
-        const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
-        setAccumulateAvailableTime((prev) => [...prev, newData]);
+        setWeekOffset(0);
+        setAccumulateAvailableTime({ tutorId: tutor_id, baseDateList: [{ baseDate, timeSlots: result.data?.slice(7, 14) }] });
         setCurrentAvailableTime(result.data?.slice(7, 14));
+      } else {
+        // 計算baseDate
+        const today = new Date();
+        const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
+        const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
+
+        // 檢查資料是否已經儲在useState裡面
+        const existingData = accumulateAvailableTime.baseDateList.find((data) => data.baseDate === baseDate);
+
+        // 如果資料已存在，我們直接拿，不用再fetch API
+        if (existingData) {
+          setCurrentAvailableTime(existingData.timeSlots);
+        } else {
+          // 如果不存在，就可以fetch API
+          const result = await tutorApi.getAvailability(tutor_id, baseDate);
+
+          // 把剛剛fetch的data存到useState裡面，避免過度fetch API
+          const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
+          // setAccumulateAvailableTime((prev) => [...prev, newData]);
+          setAccumulateAvailableTime({ ...accumulateAvailableTime, baseDateList: [...accumulateAvailableTime.baseDateList, newData] });
+          setCurrentAvailableTime(result.data?.slice(7, 14));
+        }
       }
     } catch (error) {
       console.log("錯誤", error);
@@ -174,16 +192,31 @@ export default function TutorBooking() {
     }
   };
 
+  const getRecommendTutor = async () => {
+    setLoadingRecommendTutorState(true);
+    try {
+      const result = (await tutorApi.getAllTutor(1, "rating", "DESC", "", 20)).tutors;
+      const resultWithoutCurrentTutor = result.filter((tutor) => tutor.id !== tutor_id);
+      // randomly pick 4 tutor
+      setRecommendTutor(resultWithoutCurrentTutor.sort(() => Math.random() - 0.5).slice(0, 4));
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingRecommendTutorState(false);
+    }
+  };
+
   useEffect(() => {
     //TODO 檢查這個老師是否存在，才可以繼續
     getTutorBasicData();
+    getRecommendTutor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tutor_id]);
 
   useEffect(() => {
     getAvailabilityData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weekOffset]);
+  }, [weekOffset, tutor_id]);
 
   /* -------------------------------- Click Function -------------------------------- */
   // 控制timetable的arrow
@@ -268,23 +301,28 @@ export default function TutorBooking() {
       <Helmet>
         <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
-      {/* {loadingState && <Loader />} */}
+
       <div className="tutor-booking">
         {/*  Main Content */}
-        <main className="container py-lg-13 py-7">
+        <main className="container py-lg-9 py-7">
           <div className="row">
             {/*  tutor information */}
-
             <div className="col-lg-8">
               {/*  section 1 - overview */}
-              <section className="section">
+              <section className="section position-relative">
                 {/*  tutor profile  */}
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
-                    <img src={tutorBasicInfo.User.avatar_url} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                    {loadingBasicInfoState ? (
+                      <p className="placeholder-glow">
+                        <span className="placeholder rounded-circle bg-brand-01 me-4" style={{ width: "64px", height: "64px" }}></span>
+                      </p>
+                    ) : (
+                      <img src={tutorBasicInfo.User.avatar_url || "images/icon/user.png"} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                    )}
                   </div>
                   <div className="flex-grow-1">
-                    {loadingState ? (
+                    {loadingBasicInfoState ? (
                       <>
                         <p className="placeholder-glow">
                           <span className="placeholder bg-brand-01 col-7 placeholder-lg"></span>
@@ -300,10 +338,20 @@ export default function TutorBooking() {
                       </>
                     )}
                   </div>
+
+                  <p>
+                    <span
+                      className={`position-absolute top-0 end-0 me-5 mt-3 material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle`}
+                      role="button"
+                      style={{ backgroundColor: "#1e1e1e66" }}
+                    >
+                      favorite
+                    </span>
+                  </p>
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
-                  {loadingState ? (
+                  {loadingBasicInfoState ? (
                     <p className="placeholder-glow">
                       <span className="placeholder bg-brand-01 col-8"></span>
                     </p>
@@ -350,7 +398,7 @@ export default function TutorBooking() {
                   </ul>
                   <div className="tab-content" id="myTabContent">
                     <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
-                      {loadingState ? (
+                      {loadingBasicInfoState ? (
                         <p className="placeholder-glow">
                           <span className="placeholder bg-brand-01 col-12"></span>
                           <span className="placeholder bg-brand-01 col-12"></span>
@@ -401,7 +449,7 @@ export default function TutorBooking() {
                 <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
               </section>
 
-              {/* section 3 - timetable  */}
+              {/* section 3 - timetable */}
               <section className="section schedule">
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
@@ -423,7 +471,8 @@ export default function TutorBooking() {
               </section>
 
               {/* section 4 - student comment */}
-              <CommentsSection comments={comments} />
+
+              <CommentsSection modal={false} tutorId={tutor_id} />
 
               {/* section 5 - tutor recommendation */}
               <section className="section mb-0">
@@ -436,11 +485,11 @@ export default function TutorBooking() {
                 </div>
 
                 {/* desktop */}
-                <TutorsCard tutorList={recommendTutorData} cardsNum={2} />
+                <TutorsCard tutorList={recommendTutor} cardsNum={2} />
                 {/* mobile */}
                 <div className="swiper tutor-card-swiper d-block d-lg-none">
                   <div className="swiper-wrapper mb-10 py-5">
-                    {recommendTutorData.map((tutor) => (
+                    {recommendTutor.map((tutor) => (
                       <div className="swiper-slide" key={tutor.id}>
                         <TutorCard tutor={tutor} />
                       </div>
@@ -458,7 +507,7 @@ export default function TutorBooking() {
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
                     <h2 className="text-brand-03 fs-lg-2 fs-3">
                       NT ${" "}
-                      {loadingState ? (
+                      {loadingBasicInfoState ? (
                         <span className="placeholder-glow">
                           <span className="placeholder bg-brand-01 col-2"></span>
                         </span>
@@ -482,8 +531,7 @@ export default function TutorBooking() {
       </div>
 
       {/* Modal */}
-      {/* Modal - Service Select Modal */}
-
+      {/* Modal - Booking Modal */}
       <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
           <div className="modal-content px-3 py-2">
@@ -604,7 +652,7 @@ export default function TutorBooking() {
       </div>
 
       {/* Modal - Student Comment Modal */}
-      <CommentsSection comments={comments} modal={true} />
+      <CommentsSection modal={true} tutorId={tutor_id} />
 
       {/* Mobile sticky bottom CTA card */}
       <div className="mobile-bottom-cta d-lg-none sticky-bottom border border-2 border-brand-02 bg-white" style={{ borderRadius: "16px 16px 0px 0px" }}>
