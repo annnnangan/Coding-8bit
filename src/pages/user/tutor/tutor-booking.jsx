@@ -33,8 +33,10 @@ export default function TutorBooking() {
   // 抓取路由上的tutor id
   const { id: tutor_id } = useParams();
 
-  // 檢查用戶是否已登入
+  // redux - 檢查用戶是否已登入
   const { isAuth } = useSelector((state) => state.auth);
+  // redux - 拿取使用者資訊
+  const userData = useSelector((state) => state.auth.userData);
 
   /* -------------------------------- useState -------------------------------- */
   // useState - Whole page loading
@@ -126,6 +128,25 @@ export default function TutorBooking() {
   }, [tutor_id, recommendTutor]);
 
   /* -------------------------------- Get Data From API -------------------------------- */
+  const checkIsValidTutor = async () => {
+    setLoadingBasicInfoState(true);
+    try {
+      const [isTutorExist, businessHours] = await Promise.all([tutorApi.getTutorDetail(tutor_id), tutorApi.getAllDayOfWeekAvailability(tutor_id)]);
+      if (businessHours.length === 0) {
+        throw new Error("沒有設定預約時間");
+      }
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "此講師不存在",
+      });
+      navigate("/tutor-list");
+    } finally {
+      setLoadingBasicInfoState(false);
+    }
+  };
+
   const getTutorBasicData = async () => {
     setLoadingBasicInfoState(true);
     try {
@@ -148,7 +169,6 @@ export default function TutorBooking() {
         },
         statistics: { student_count: basicInfoResult.data.studentCount, class_count: basicInfoResult.data.classCount, video_count: basicInfoResult.data.videoCount },
       }));
-
       setCourses(videos.videos);
     } catch (error) {
       console.log("錯誤", error);
@@ -221,10 +241,42 @@ export default function TutorBooking() {
   };
 
   useEffect(() => {
-    //TODO 檢查這個老師是否存在，才可以繼續
-    getTutorBasicData();
-    getRecommendTutor();
-    getTutorBookmark();
+    (async () => {
+      /* ------------------ Reset Everything when tutor id changes ----------------- */
+      setTutorBasicInfo({
+        User: {
+          username: "",
+          avatar_url: "images/icon/user.png",
+        },
+        slogan: "",
+        about: "",
+        hourly_rate: 0,
+        expertise: "",
+        rating: "",
+        resume: { work_experience: [], education: [], certificates: [] },
+        statistics: { student_count: 0, class_count: 0, video_count: 0 },
+      });
+
+      setCourses([]);
+      setRecommendTutor([]);
+      setAccumulateAvailableTime({ tutorId: tutor_id, baseDateList: [] });
+      setCurrentAvailableTime([]);
+      setWeekOffset(0);
+      setBookingModalOpen(false);
+      setCurrentModalStep(1);
+      setSelectedServiceType(undefined);
+      setSelectedBookingTimeslots({ date: "", hours: [] });
+      setModalError(undefined);
+      setBookmark(false);
+
+      /* ------------------ Check if Tutor Exists ----------------- */
+      await checkIsValidTutor();
+
+      /* ------------------ Fetch Data ----------------- */
+      getTutorBasicData();
+      getRecommendTutor();
+      getTutorBookmark();
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutor_id]);
 
@@ -266,12 +318,21 @@ export default function TutorBooking() {
 
   // 控制Booking Modal的開關
   const openBookingModal = () => {
+    // 檢查用戶是否登入
     if (!isAuth) {
       Swal.fire({
         icon: "error",
         title: "請先登入",
       });
       navigate(`/login?redirect=/tutor/${tutor_id}`);
+    } else if (userData?.subscriptions.length === 0 || !userData.subscriptions) {
+      // 檢查用戶是否為基本會員或高級會員
+      Swal.fire({
+        icon: "error",
+        title: "請先訂閱為基本會員或高級會員",
+        text: "一對一教學預約服務僅限基本會員或高級會員",
+      });
+      navigate(`/subscription-list`);
     } else {
       if (bookingModal.current) {
         bookingModal.current.show();
