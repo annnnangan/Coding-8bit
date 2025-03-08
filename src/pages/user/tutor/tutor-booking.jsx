@@ -24,6 +24,7 @@ import TutorCardLoadingSkeleton from "@/components/tutor/TutorCardLoadingSkeleto
 import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { tutorStats } from "../../../data/tutors";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
+import CourseCardLoadingSkeleton from "../../../components/course/CourseCardLoadingSkeleton";
 
 export default function TutorBooking() {
   const dispatch = useDispatch();
@@ -464,7 +465,8 @@ export default function TutorBooking() {
               <section className="section">
                 <div className="section-component f-between-center">
                   <h4>講師影片</h4>
-                  {courses.length > 0 && (
+
+                  {!loadingBasicInfoState && courses.length > 0 && (
                     <NavLink to={`/tutor-info/${tutor_id}`} className="text-brand-03 d-flex slide-right-hover" data-show="false">
                       <p>更多</p>
                       <span className="material-symbols-outlined icon-fill">arrow_forward</span>
@@ -474,15 +476,23 @@ export default function TutorBooking() {
 
                 <div className="swiper freeTipShortsSwiper">
                   <div className="swiper-wrapper">
-                    {courses.map((course) => (
-                      <div className="swiper-slide" key={course.id}>
-                        <CourseCardList courseList={course} cardsNum={1} />
-                      </div>
-                    ))}
+                    {loadingBasicInfoState &&
+                      Array.from({ length: 2 }, (_, i) => (
+                        <div className="swiper-slide" key={i}>
+                          <CourseCardLoadingSkeleton />
+                        </div>
+                      ))}
+
+                    {!loadingBasicInfoState &&
+                      courses.map((course) => (
+                        <div className="swiper-slide" key={course.id}>
+                          <CourseCardList courseList={course} cardsNum={1} />
+                        </div>
+                      ))}
                   </div>
                 </div>
 
-                <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
+                <div>{!loadingBasicInfoState && courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
               </section>
 
               {/* section 3 - timetable */}
@@ -490,9 +500,17 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                {currentAvailableTime.length === 0 ? (
-                  <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
-                ) : (
+                {isLoadingAvailableTime && (
+                  <div className="placeholder-glow">
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                  </div>
+                )}
+                {!isLoadingAvailableTime && currentAvailableTime.length > 0 && (
                   <Timetable
                     availability={currentAvailableTime}
                     weekOffset={weekOffset}
@@ -504,6 +522,7 @@ export default function TutorBooking() {
                     handleBookingTimeslotsSelect={handleBookingTimeslotsSelect}
                   />
                 )}
+                {!isLoadingAvailableTime && currentAvailableTime.length === 0 && <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />}
               </section>
 
               {/* section 4 - student comment */}
@@ -532,11 +551,18 @@ export default function TutorBooking() {
                 {/* mobile */}
                 <div className="swiper tutor-card-swiper d-block d-lg-none">
                   <div className="swiper-wrapper mb-10 py-5">
-                    {recommendTutor.map((tutor) => (
-                      <div className="swiper-slide" key={tutor.id}>
-                        <TutorCard tutor={tutor} />
-                      </div>
-                    ))}
+                    {loadingRecommendTutorState &&
+                      Array.from({ length: 4 }, (_, i) => (
+                        <div className="swiper-slide" key={i}>
+                          <TutorCardLoadingSkeleton />
+                        </div>
+                      ))}
+                    {!loadingRecommendTutorState &&
+                      recommendTutor.map((tutor) => (
+                        <div className="swiper-slide" key={tutor.id}>
+                          <TutorCard tutor={tutor} />
+                        </div>
+                      ))}
                   </div>
                 </div>
               </section>
