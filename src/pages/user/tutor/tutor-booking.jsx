@@ -274,12 +274,12 @@ export default function TutorBooking() {
 
       <div className="tutor-booking">
         {/*  Main Content */}
-        <main className="container py-lg-13 py-7">
+        <main className="container py-lg-9 py-7">
           <div className="row">
             {/*  tutor information */}
             <div className="col-lg-8">
               {/*  section 1 - overview */}
-              <section className="section">
+              <section className="section position-relative">
                 {/*  tutor profile  */}
                 <div className="tutor-profile section-component">
                   <div className="flex-shrink-0">
@@ -302,6 +302,16 @@ export default function TutorBooking() {
                       </>
                     )}
                   </div>
+
+                  <p>
+                    <span
+                      className={`position-absolute top-0 end-0 me-5 mt-3 material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle`}
+                      role="button"
+                      style={{ backgroundColor: "#1e1e1e66" }}
+                    >
+                      favorite
+                    </span>
+                  </p>
                 </div>
                 {/*  tag list  */}
                 <div className="list-x-scroll py-2 section-component">
