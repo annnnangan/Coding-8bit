@@ -24,6 +24,7 @@ import TutorCardLoadingSkeleton from "@/components/tutor/TutorCardLoadingSkeleto
 import { updateFormData } from "../../../utils/slice/bookingSlice";
 import { tutorStats } from "../../../data/tutors";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
+import CourseCardLoadingSkeleton from "../../../components/course/CourseCardLoadingSkeleton";
 
 export default function TutorBooking() {
   const dispatch = useDispatch();
@@ -51,7 +52,7 @@ export default function TutorBooking() {
     expertise: "",
     rating: "",
     resume: { work_experience: [], education: [], certificates: [] },
-    statistics: {},
+    statistics: { student_count: 0, class_count: 0, video_count: 0 },
   });
 
   // useState - 講師的影片
@@ -145,6 +146,7 @@ export default function TutorBooking() {
           education: educationResult.data,
           certificates: certificateResult.data,
         },
+        statistics: { student_count: basicInfoResult.data.studentCount, class_count: basicInfoResult.data.classCount, video_count: basicInfoResult.data.videoCount },
       }));
 
       setCourses(videos.videos);
@@ -168,7 +170,6 @@ export default function TutorBooking() {
     setLoadingAvailableTime(true);
     try {
       if (accumulateAvailableTime.tutorId !== tutor_id) {
-        console.log("hello");
         const today = new Date();
         const baseDate = formatDateDash(today);
         const result = await tutorApi.getAvailability(tutor_id, baseDate);
@@ -447,15 +448,44 @@ export default function TutorBooking() {
                     </div>
                   </div>
                   {/* statistics */}
-                  <div className="row row-cols-2 row-cols-lg-5 g-3 mt-5">
-                    {tutorStats.map((item, index) => (
-                      <div className="col" key={index}>
-                        <div className="stat-overview-card">
-                          <h4 className="text-brand-03">{item.details}</h4>
-                          <p className="fs-7">{item.title}</p>
-                        </div>
+                  <div className="row row-cols-3 g-3 mt-5">
+                    <div className="col">
+                      <div className="stat-overview-card">
+                        {loadingBasicInfoState ? (
+                          <p className="placeholder-glow" style={{ width: "50%" }}>
+                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                          </p>
+                        ) : (
+                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.student_count}</h4>
+                        )}
+
+                        <p className="fs-7">學生</p>
                       </div>
-                    ))}
+                    </div>
+                    <div className="col">
+                      <div className="stat-overview-card">
+                        {loadingBasicInfoState ? (
+                          <p className="placeholder-glow" style={{ width: "50%" }}>
+                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                          </p>
+                        ) : (
+                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.class_count}</h4>
+                        )}
+                        <p className="fs-7">課堂</p>
+                      </div>
+                    </div>
+                    <div className="col">
+                      <div className="stat-overview-card">
+                        {loadingBasicInfoState ? (
+                          <p className="placeholder-glow" style={{ width: "50%" }}>
+                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                          </p>
+                        ) : (
+                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.video_count}</h4>
+                        )}
+                        <p className="fs-7">影片</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -464,7 +494,8 @@ export default function TutorBooking() {
               <section className="section">
                 <div className="section-component f-between-center">
                   <h4>講師影片</h4>
-                  {courses.length > 0 && (
+
+                  {!loadingBasicInfoState && courses.length > 0 && (
                     <NavLink to={`/tutor-info/${tutor_id}`} className="text-brand-03 d-flex slide-right-hover" data-show="false">
                       <p>更多</p>
                       <span className="material-symbols-outlined icon-fill">arrow_forward</span>
@@ -474,15 +505,23 @@ export default function TutorBooking() {
 
                 <div className="swiper freeTipShortsSwiper">
                   <div className="swiper-wrapper">
-                    {courses.map((course) => (
-                      <div className="swiper-slide" key={course.id}>
-                        <CourseCardList courseList={course} cardsNum={1} />
-                      </div>
-                    ))}
+                    {loadingBasicInfoState &&
+                      Array.from({ length: 2 }, (_, i) => (
+                        <div className="swiper-slide" key={i}>
+                          <CourseCardLoadingSkeleton />
+                        </div>
+                      ))}
+
+                    {!loadingBasicInfoState &&
+                      courses.map((course) => (
+                        <div className="swiper-slide" key={course.id}>
+                          <CourseCardList courseList={course} cardsNum={1} />
+                        </div>
+                      ))}
                   </div>
                 </div>
 
-                <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
+                <div>{!loadingBasicInfoState && courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
               </section>
 
               {/* section 3 - timetable */}
@@ -490,9 +529,17 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                {currentAvailableTime.length === 0 ? (
-                  <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
-                ) : (
+                {isLoadingAvailableTime && (
+                  <div className="placeholder-glow">
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
+                  </div>
+                )}
+                {!isLoadingAvailableTime && currentAvailableTime.length > 0 && (
                   <Timetable
                     availability={currentAvailableTime}
                     weekOffset={weekOffset}
@@ -504,6 +551,7 @@ export default function TutorBooking() {
                     handleBookingTimeslotsSelect={handleBookingTimeslotsSelect}
                   />
                 )}
+                {!isLoadingAvailableTime && currentAvailableTime.length === 0 && <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />}
               </section>
 
               {/* section 4 - student comment */}
@@ -521,22 +569,31 @@ export default function TutorBooking() {
                 </div>
 
                 {/* desktop */}
-                {loadingRecommendTutorState && (
+                {loadingRecommendTutorState ? (
                   <div className="row row-cols-lg-2 g-lg-4 d-none d-lg-flex">
                     {Array.from({ length: 4 }, (_, i) => (
                       <TutorCardLoadingSkeleton key={i} />
                     ))}
                   </div>
+                ) : (
+                  <TutorsCard tutorList={recommendTutor} cardsNum={2} />
                 )}
-                <TutorsCard tutorList={recommendTutor} cardsNum={2} />
+
                 {/* mobile */}
                 <div className="swiper tutor-card-swiper d-block d-lg-none">
                   <div className="swiper-wrapper mb-10 py-5">
-                    {recommendTutor.map((tutor) => (
-                      <div className="swiper-slide" key={tutor.id}>
-                        <TutorCard tutor={tutor} />
-                      </div>
-                    ))}
+                    {loadingRecommendTutorState &&
+                      Array.from({ length: 4 }, (_, i) => (
+                        <div className="swiper-slide" key={i}>
+                          <TutorCardLoadingSkeleton />
+                        </div>
+                      ))}
+                    {!loadingRecommendTutorState &&
+                      recommendTutor.map((tutor) => (
+                        <div className="swiper-slide" key={tutor.id}>
+                          <TutorCard tutor={tutor} />
+                        </div>
+                      ))}
                   </div>
                 </div>
               </section>
