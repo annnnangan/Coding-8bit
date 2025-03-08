@@ -172,6 +172,22 @@ const getTutorRatingStats = async (tutorId) => {
   return response.data.data;
 };
 
+/* ---------------------------------- 收藏 ---------------------------------- */
+const getTutorBookmark = async (tutorId) => {
+  const response = await apiClient.get(`/favorites/tutors/${tutorId}/is-favorite`);
+  return response.data.data.isFavorite;
+};
+
+const bookmarkTutor = async (tutorId) => {
+  const response = await apiClient.post(`/favorites/tutors/${tutorId}`);
+  return response.data.data;
+};
+
+const removeBookmarkTutor = async (tutorId) => {
+  const response = await apiClient.delete(`/favorites/tutors/${tutorId}`);
+  return response.data.data;
+};
+
 export default {
   getAllTutor,
   getTutorDetail,
@@ -198,4 +214,7 @@ export default {
   deleteSpecificDateAvailability,
   getTutorAllStudentComments,
   getTutorRatingStats,
+  getTutorBookmark,
+  bookmarkTutor,
+  removeBookmarkTutor,
 };

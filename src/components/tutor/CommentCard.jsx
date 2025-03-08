@@ -7,7 +7,10 @@ export default function CommentCard({ comment, isLoading = false }) {
       <div className="student-comment-card card p-4 h-100">
         {isLoading ? (
           <div className="d-flex w-100">
-            <span className="placeholder rounded-circle bg-brand-02 me-4" style={{ width: "48px", height: "48px" }}></span>
+            <div className="placeholder-glow">
+              <span className="placeholder rounded-circle bg-brand-02 me-4" style={{ width: "48px", height: "48px" }}></span>
+            </div>
+
             <div className="placeholder-glow d-flex flex-column flex-grow-1" style={{ width: "80%" }}>
               <span className="placeholder bg-brand-02 w-50 mb-1"></span>
               <span className="placeholder bg-brand-02 w-75 mb-1"></span>
