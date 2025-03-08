@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 import CommentCard from "../tutor/CommentCard";
 import CommentRatingStat from "./CommentRatingStat";
+import SectionFallback from "@/components/common/SectionFallback";
+
 import tutorApi from "@/api/tutorApi";
 
 export default function CommentsSection({ modal = false, tutorId }) {
@@ -61,17 +63,21 @@ export default function CommentsSection({ modal = false, tutorId }) {
       <section className="section student-comment">
         <div className="section-component f-between-center">
           <h4>學生評價</h4>
-          <a href="#" className="text-brand-03 d-flex slide-right-hover" data-bs-toggle="modal" data-bs-target="#studentCommentModal">
-            <p>更多</p>
-            <span className="material-symbols-outlined icon-fill">arrow_forward</span>
-          </a>
+
+          {!isLoadingComment && comments.length > 0 && (
+            <a href="#" className="text-brand-03 d-flex slide-right-hover" data-bs-toggle="modal" data-bs-target="#studentCommentModal">
+              <p>更多</p>
+              <span className="material-symbols-outlined icon-fill">arrow_forward</span>
+            </a>
+          )}
         </div>
 
+        {!isLoadingComment && comments.length === 0 && <SectionFallback materialIconName="reviews" fallbackText={`講師暫無學生評價`} />}
         <div className="row row-cols-lg-2 row-cols-1 g-lg-4 g-2">
-          <div className="col">{isLoadingRatingStats ? <CommentRatingStat isLoading={true} /> : <CommentRatingStat ratingStats={ratingStats} />}</div>
+          <div className="col">{isLoadingRatingStats ? <CommentRatingStat isLoading={true} /> : ratingStats.total_comment_count > 0 && <CommentRatingStat ratingStats={ratingStats} />}</div>
 
           {isLoadingComment && Array.from({ length: 3 }, (_, i) => <CommentCard key={i} isLoading={isLoadingComment} />)}
-          {!isLoadingComment && comments.map((comment) => <CommentCard comment={comment} key={comment.commentId} />)}
+          {!isLoadingComment && comments.length > 0 && comments.map((comment) => <CommentCard comment={comment} key={comment.commentId} />)}
         </div>
       </section>
     );
