@@ -74,6 +74,9 @@ export default function TutorBooking() {
   const [selectedBookingTimeslots, setSelectedBookingTimeslots] = useState({ date: "", hours: [] });
   const [modalError, setModalError] = useState();
 
+  // useState - Bookmark
+  const [isBookmark, setBookmark] = useState(false);
+
   /* -------------------------------- UI Initialization -------------------------------- */
   // modal
   const bookingModal = useRef(null);
@@ -152,6 +155,15 @@ export default function TutorBooking() {
     }
   };
 
+  const getTutorBookmark = async () => {
+    try {
+      const result = await tutorApi.getTutorBookmark(tutor_id);
+      setBookmark(result);
+    } catch (error) {
+      console.log("錯誤", error);
+    }
+  };
+
   const getAvailabilityData = async () => {
     setLoadingAvailableTime(true);
     try {
@@ -211,6 +223,7 @@ export default function TutorBooking() {
     //TODO 檢查這個老師是否存在，才可以繼續
     getTutorBasicData();
     getRecommendTutor();
+    getTutorBookmark();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutor_id]);
 
@@ -220,6 +233,25 @@ export default function TutorBooking() {
   }, [weekOffset, tutor_id]);
 
   /* -------------------------------- Click Function -------------------------------- */
+
+  // Bookmark Tutor
+  const handleTutorBookmark = async () => {
+    try {
+      if (isBookmark) {
+        await tutorApi.removeBookmarkTutor(tutor_id);
+      } else {
+        await tutorApi.bookmarkTutor(tutor_id);
+      }
+    } catch {
+      Swal.fire({
+        icon: "error",
+        title: `${!isBookmark ? "收藏導師失敗" : "取消收藏導師失敗"}`,
+      });
+    } finally {
+      getTutorBookmark();
+    }
+  };
+
   // 控制timetable的arrow
   const toNextWeek = async () => {
     setWeekOffset((prev) => prev + 1);
@@ -342,9 +374,10 @@ export default function TutorBooking() {
 
                   <p>
                     <span
-                      className={`position-absolute top-0 end-0 me-5 mt-3 material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle`}
+                      className={`position-absolute top-0 end-0 me-5 mt-5 material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle ${isBookmark ? "text-brand-01" : "text-gray-03"}`}
                       role="button"
                       style={{ backgroundColor: "#1e1e1e66" }}
+                      onClick={handleTutorBookmark}
                     >
                       favorite
                     </span>
