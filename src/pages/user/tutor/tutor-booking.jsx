@@ -569,14 +569,16 @@ export default function TutorBooking() {
                 </div>
 
                 {/* desktop */}
-                {loadingRecommendTutorState && (
+                {loadingRecommendTutorState ? (
                   <div className="row row-cols-lg-2 g-lg-4 d-none d-lg-flex">
                     {Array.from({ length: 4 }, (_, i) => (
                       <TutorCardLoadingSkeleton key={i} />
                     ))}
                   </div>
+                ) : (
+                  <TutorsCard tutorList={recommendTutor} cardsNum={2} />
                 )}
-                <TutorsCard tutorList={recommendTutor} cardsNum={2} />
+
                 {/* mobile */}
                 <div className="swiper tutor-card-swiper d-block d-lg-none">
                   <div className="swiper-wrapper mb-10 py-5">
