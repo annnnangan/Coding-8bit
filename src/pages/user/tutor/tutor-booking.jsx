@@ -37,6 +37,7 @@ export default function TutorBooking() {
   /* -------------------------------- useState -------------------------------- */
   // useState - Whole page loading
   const [loadingState, setLoadingState] = useState(true);
+
   // useState - 講師基本資料
   const [tutorBasicInfo, setTutorBasicInfo] = useState({
     User: {
@@ -54,6 +55,10 @@ export default function TutorBooking() {
 
   // useState - 講師的影片
   const [courses, setCourses] = useState([]);
+
+  // useState - 推薦老師
+  const [recommendTutor, setRecommendTutor] = useState([]);
+  const [loadingRecommendTutorState, setLoadingRecommendTutorState] = useState(true);
 
   // useState - 可預約時間
   const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
@@ -176,9 +181,24 @@ export default function TutorBooking() {
     }
   };
 
+  const getRecommendTutor = async () => {
+    setLoadingRecommendTutorState(true);
+    try {
+      const result = (await tutorApi.getAllTutor(1, "rating", "DESC", "", 20)).tutors;
+      const resultWithoutCurrentTutor = result.filter((tutor) => tutor.id !== tutor_id);
+      // randomly pick 4 tutor
+      setRecommendTutor(resultWithoutCurrentTutor.sort(() => Math.random() - 0.5).slice(0, 4));
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingRecommendTutorState(false);
+    }
+  };
+
   useEffect(() => {
     //TODO 檢查這個老師是否存在，才可以繼續
     getTutorBasicData();
+    getRecommendTutor();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -449,11 +469,11 @@ export default function TutorBooking() {
                 </div>
 
                 {/* desktop */}
-                <TutorsCard tutorList={recommendTutorData} cardsNum={2} />
+                <TutorsCard tutorList={recommendTutor} cardsNum={2} />
                 {/* mobile */}
                 <div className="swiper tutor-card-swiper d-block d-lg-none">
                   <div className="swiper-wrapper mb-10 py-5">
-                    {recommendTutorData.map((tutor) => (
+                    {recommendTutor.map((tutor) => (
                       <div className="swiper-slide" key={tutor.id}>
                         <TutorCard tutor={tutor} />
                       </div>
