@@ -313,7 +313,10 @@ export default function Home() {
         >
           <MainTitle longTitle={false} beforeTitle="訂閱方案" afterTitle="" />
           <div className="row mt-6 mt-lg-8">
-            <SubscriptionCard duration="monthly" />
+            <SubscriptionCard
+              duration="price_monthly"
+              setLoadingState={setLoadingState}
+            />
             <div className="f-center">
               <NavLink
                 to="/subscription-list"
