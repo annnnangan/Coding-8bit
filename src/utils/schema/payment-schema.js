@@ -20,7 +20,6 @@ const CreditCardSchema = z.object({
   userCreditCardNumber: z
     .string()
     .min(19, "信用卡號碼應為 16 位數（含空格）")
-    .max(19, "信用卡號碼應為 16 位數（含空格）")
     .regex(/^\d{4} \d{4} \d{4} \d{4}$/, "信用卡號碼格式錯誤")
     .refine((num) => luhnCheck(num), {
       message: "無效的信用卡號碼",

@@ -292,6 +292,7 @@ export default function VideoContent({
             >
               <div className="ps-5 pt-6">
                 <p
+                  className="domPurify-wrap"
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(courseList.description),
                   }}

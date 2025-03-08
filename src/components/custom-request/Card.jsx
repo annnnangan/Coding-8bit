@@ -50,11 +50,11 @@ export default function Card({ customCourse = {}, openModal, prevCourse }) {
               <h2>{customCourse.title}</h2>
             </div>
             <p
+              className="domPurify-wrap"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(customCourse.content),
               }}
-            >
-            </p>
+            ></p>
           </div>
         </div>
       </div>
