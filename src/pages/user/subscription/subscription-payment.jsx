@@ -93,8 +93,6 @@ export default function SubscriptionPayment() {
           duration === "price_monthly" ? endNextMonthDate : endNextYearDate,
       });
     }
-
-    // 第二步，根據剛剛的訂閱方案建立付款 (建立後預設是處理中，還需一個狀態變為付款成功的動作)
     if (currentStep === 2) {
       const isValid = await methods.trigger(step2Fields);
       if (!isValid) {
@@ -104,7 +102,7 @@ export default function SubscriptionPayment() {
         });
         return;
       }
-      await methods.handleSubmit(onSubmit)();
+      await addOrder();
     }
   };
 
@@ -117,8 +115,8 @@ export default function SubscriptionPayment() {
       const formattedData = res.data.reduce((acc, item) => {
         if (item.name !== "free") {
           acc[item.name] = {
-            price_monthly: item.price_monthly.toLocaleString(),
-            price_annually: item.price_annually.toLocaleString(),
+            price_monthly: item.price_monthly,
+            price_annually: item.price_annually,
           };
         }
         return acc;
@@ -140,7 +138,7 @@ export default function SubscriptionPayment() {
   const { userData } = useSelector((state) => state.auth);
 
   // 建立訂閱函式
-  const [subscriptionId, setSubscription] = useState("");
+  const [subscriptionId, setSubscriptionId] = useState("");
   const navigate = useNavigate();
   const addSubscription = async (subscriptionData) => {
     setLoadingState(true);
@@ -151,7 +149,7 @@ export default function SubscriptionPayment() {
         return;
       }
       const res = await subscriptionApi.addSubscription(subscriptionData);
-      setSubscription(res.data.id);
+      setSubscriptionId(res.data.id);
       setCurrentStep((currentStep) => currentStep + 1);
     } catch (error) {
       Swal.fire({
@@ -171,21 +169,38 @@ export default function SubscriptionPayment() {
       const orderData = {
         order_type: "subscription",
         target_id: subscriptionId,
-        amount: Number(prices[subscriptionPlan]?.[duration]),
+        amount: prices[subscriptionPlan]?.[duration],
       };
 
-      // 建立訂單
       const res = await orderApi.addOrder({
         user_id: userData.id,
         ...orderData,
       });
 
-      // 付款後，更改訂單與訂閱的狀態
+      updateOrderStatus(res.data.id, {
+        order_status: "paid",
+        ...orderData,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "付款失敗",
+        text: error.response?.data?.message || "發生未知錯誤",
+      });
+
+      await subscriptionApi.updateSubscription(subscriptionId, {
+        status: "cancelled",
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+  // 更新訂單狀態
+  const updateOrderStatus = async (orderId, orderData) => {
+    setLoadingState(true);
+    try {
       await Promise.all([
-        orderApi.updateOrder(res.data.id, {
-          order_status: "paid",
-          ...orderData,
-        }),
+        orderApi.updateOrder(orderId, orderData),
         subscriptionApi.updateSubscription(subscriptionId, {
           status: "active",
         }),
@@ -200,20 +215,15 @@ export default function SubscriptionPayment() {
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "付款失敗",
+        title: "訂單狀態更新失敗",
         text: error.response?.data?.message || "發生未知錯誤",
-      });
-      subscriptionApi.updateSubscription(subscriptionId, {
-        status: "cancelled",
       });
     } finally {
       setLoadingState(false);
     }
   };
 
-  const onSubmit = () => {
-    addOrder();
-  };
+  const onSubmit = () => {};
 
   // 初始化 - 取得方案價格
   useEffect(() => {
@@ -297,7 +307,9 @@ export default function SubscriptionPayment() {
                               <td className="border-0 text-end">
                                 <h4 className="fs-6 fs-lg-5 fw-medium py-10">
                                   NT${" "}
-                                  {prices[subscriptionPlan]?.[duration] || ""}
+                                  {prices[subscriptionPlan]?.[
+                                    duration
+                                  ].toLocaleString() || ""}
                                 </h4>
                               </td>
                             </tr>
@@ -312,7 +324,9 @@ export default function SubscriptionPayment() {
                               <td className="border-0 text-end">
                                 <h4 className="fs-2">
                                   NT${" "}
-                                  {prices[subscriptionPlan]?.[duration] || ""}
+                                  {prices[subscriptionPlan]?.[
+                                    duration
+                                  ].toLocaleString() || ""}
                                 </h4>
                               </td>
                             </tr>
