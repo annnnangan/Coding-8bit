@@ -51,8 +51,10 @@ export default function TutorBooking() {
     resume: { work_experience: [], education: [], certificates: [] },
     statistics: {},
   });
+
+  // useState - 講師的影片
   const [courses, setCourses] = useState([]);
-  const [comments, setComments] = useState([]);
+
   // useState - 可預約時間
   const [accumulateAvailableTime, setAccumulateAvailableTime] = useState([]); //儲存已fetch過的時間
   const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
@@ -269,12 +271,12 @@ export default function TutorBooking() {
         <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
       {/* {loadingState && <Loader />} */}
+
       <div className="tutor-booking">
         {/*  Main Content */}
         <main className="container py-lg-13 py-7">
           <div className="row">
             {/*  tutor information */}
-
             <div className="col-lg-8">
               {/*  section 1 - overview */}
               <section className="section">
@@ -401,7 +403,7 @@ export default function TutorBooking() {
                 <div>{courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
               </section>
 
-              {/* section 3 - timetable  */}
+              {/* section 3 - timetable */}
               <section className="section schedule">
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
@@ -423,7 +425,8 @@ export default function TutorBooking() {
               </section>
 
               {/* section 4 - student comment */}
-              <CommentsSection comments={comments} />
+
+              <CommentsSection modal={false} tutorId={tutor_id} />
 
               {/* section 5 - tutor recommendation */}
               <section className="section mb-0">
@@ -482,8 +485,7 @@ export default function TutorBooking() {
       </div>
 
       {/* Modal */}
-      {/* Modal - Service Select Modal */}
-
+      {/* Modal - Booking Modal */}
       <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
           <div className="modal-content px-3 py-2">
@@ -604,7 +606,7 @@ export default function TutorBooking() {
       </div>
 
       {/* Modal - Student Comment Modal */}
-      <CommentsSection comments={comments} modal={true} />
+      <CommentsSection modal={true} tutorId={tutor_id} />
 
       {/* Mobile sticky bottom CTA card */}
       <div className="mobile-bottom-cta d-lg-none sticky-bottom border border-2 border-brand-02 bg-white" style={{ borderRadius: "16px 16px 0px 0px" }}>
