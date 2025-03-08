@@ -81,7 +81,7 @@ export const router = createHashRouter([
 
       { path: "subscription-list", element: <SubscriptionList /> },
       {
-        path: "subscription/:subscriptionPlan/:duration",
+        path: "subscription/:subscriptionPlan/:duration/:planId",
         element: <SubscriptionPayment />,
       },
 
