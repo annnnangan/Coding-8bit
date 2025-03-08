@@ -52,7 +52,7 @@ export default function TutorBooking() {
     expertise: "",
     rating: "",
     resume: { work_experience: [], education: [], certificates: [] },
-    statistics: {},
+    statistics: { student_count: 0, class_count: 0, video_count: 0 },
   });
 
   // useState - 講師的影片
@@ -146,6 +146,7 @@ export default function TutorBooking() {
           education: educationResult.data,
           certificates: certificateResult.data,
         },
+        statistics: { student_count: basicInfoResult.data.studentCount, class_count: basicInfoResult.data.classCount, video_count: basicInfoResult.data.videoCount },
       }));
 
       setCourses(videos.videos);
@@ -169,7 +170,6 @@ export default function TutorBooking() {
     setLoadingAvailableTime(true);
     try {
       if (accumulateAvailableTime.tutorId !== tutor_id) {
-        console.log("hello");
         const today = new Date();
         const baseDate = formatDateDash(today);
         const result = await tutorApi.getAvailability(tutor_id, baseDate);
@@ -448,15 +448,44 @@ export default function TutorBooking() {
                     </div>
                   </div>
                   {/* statistics */}
-                  <div className="row row-cols-2 row-cols-lg-5 g-3 mt-5">
-                    {tutorStats.map((item, index) => (
-                      <div className="col" key={index}>
-                        <div className="stat-overview-card">
-                          <h4 className="text-brand-03">{item.details}</h4>
-                          <p className="fs-7">{item.title}</p>
-                        </div>
+                  <div className="row row-cols-3 g-3 mt-5">
+                    <div className="col">
+                      <div className="stat-overview-card">
+                        {loadingBasicInfoState ? (
+                          <p className="placeholder-glow" style={{ width: "50%" }}>
+                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                          </p>
+                        ) : (
+                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.student_count}</h4>
+                        )}
+
+                        <p className="fs-7">學生</p>
                       </div>
-                    ))}
+                    </div>
+                    <div className="col">
+                      <div className="stat-overview-card">
+                        {loadingBasicInfoState ? (
+                          <p className="placeholder-glow" style={{ width: "50%" }}>
+                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                          </p>
+                        ) : (
+                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.class_count}</h4>
+                        )}
+                        <p className="fs-7">課堂</p>
+                      </div>
+                    </div>
+                    <div className="col">
+                      <div className="stat-overview-card">
+                        {loadingBasicInfoState ? (
+                          <p className="placeholder-glow" style={{ width: "50%" }}>
+                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                          </p>
+                        ) : (
+                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.video_count}</h4>
+                        )}
+                        <p className="fs-7">影片</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </section>
