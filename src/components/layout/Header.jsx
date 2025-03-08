@@ -90,6 +90,14 @@ export default function Header() {
     }
   }, []);
 
+  const subscriptions = userData?.subscriptions || [];
+  const hasPremium = subscriptions.some(
+    (item) => item.plan_name === "premium" && item.status === "active"
+  );
+  const hasBasic = subscriptions.some(
+    (item) => item.plan_name === "basic" && item.status === "active"
+  );
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -109,7 +117,7 @@ export default function Header() {
 
       {isMenuOpen && <style>{`body { overflow: hidden; }`}</style>}
       <nav
-        className={`layout-nav-wrap navbar navbar-expand-lg navbar-light py-3 ${
+        className={`layout-nav-wrap navbar navbar-expand-lg navbar-light py-2 ${
           isMenuOpen ? "bg-white" : "bg-transparent"
         }`}
       >
@@ -227,19 +235,29 @@ export default function Header() {
                       )}
                     </div>
                     <div className="flex-grow-1">
+                      <small className="text-brand-03">
+                        {!hasPremium && !hasBasic ? (
+                          "free"
+                        ) : (
+                          <>
+                            {hasPremium && hasBasic && "premium"}
+                            {!hasPremium && hasBasic && "basic"}
+                          </>
+                        )}
+                      </small>
                       <p className="text-gray-01">{userData.username}</p>
                     </div>
                   </div>
                   {!userData?.roles?.includes("tutor") && (
-                      <li className="nav-item mt-2">
-                        <NavLink
-                          className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
-                          to="/tutor-apply"
-                        >
-                          成為老師
-                        </NavLink>
-                      </li>
-                    )}
+                    <li className="nav-item mt-2">
+                      <NavLink
+                        className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                        to="/tutor-apply"
+                      >
+                        成為老師
+                      </NavLink>
+                    </li>
+                  )}
                   {userData?.roles?.includes("tutor") && (
                     <li className="nav-item mt-2">
                       <button
@@ -345,6 +363,17 @@ export default function Header() {
                         )}
                       </div>
                       <div className="flex-grow-1">
+                        <small className="text-brand-03">
+                          {!hasPremium && !hasBasic ? (
+                            "free"
+                          ) : (
+                            <>
+                              {hasPremium && hasBasic && "premium"}
+                              {!hasPremium && hasBasic && "basic"}
+                            </>
+                          )}
+                        </small>
+
                         <p className="text-gray-01">{userData.username}</p>
                       </div>
                     </NavLink>
@@ -353,12 +382,12 @@ export default function Header() {
                       aria-labelledby="dropdownMenuLink"
                     >
                       {!userData?.roles?.includes("tutor") && (
-                          <li className="nav-item">
-                            <Link className="dropdown-item" to="/tutor-apply">
-                              成為老師
-                            </Link>
-                          </li>
-                        )}
+                        <li className="nav-item">
+                          <Link className="dropdown-item" to="/tutor-apply">
+                            成為老師
+                          </Link>
+                        </li>
+                      )}
                       {userData?.roles?.includes("tutor") && (
                         <li>
                           <button
