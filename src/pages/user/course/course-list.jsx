@@ -446,7 +446,7 @@ export default function CourseList() {
                               by {course.Tutor.User.username}
                             </p>
                             <p
-                              className="card-text fs-6 fs-lg-5 mt-2 mt-lg-4"
+                              className="card-text domPurify-wrap fs-6 fs-lg-5 mt-2 mt-lg-4"
                               dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(course.description),
                               }}

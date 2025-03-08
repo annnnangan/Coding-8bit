@@ -109,3 +109,15 @@ a {
 .rdp-root {
   --rdp-accent-color: var(--bs-brand-03); /* Correct usage of the CSS variable */
 }
+
+// 使用 domPurify 的文字表現
+.domPurify-wrap {
+  a {
+    display: inline-block;
+    text-decoration: underline;
+  }
+  
+  li {
+    list-style: auto;
+  }
+}
