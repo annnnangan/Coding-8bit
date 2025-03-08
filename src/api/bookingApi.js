@@ -33,7 +33,6 @@ const saveTutorNotes = async (bookingId, tutorNotes) => {
 
 // 學生後台 - 儲存學生評價
 const saveStudentComment = async (bookingId, studentComment) => {
-  console.log("api", studentComment);
   const response = await apiClient.put(`/booking/${bookingId}/comment`, studentComment);
   return response.data.data;
 };

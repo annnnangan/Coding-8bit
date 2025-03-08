@@ -152,7 +152,6 @@ const deleteSpecificDateAvailability = async (tutorId, date) => {
 
 // 講師頁面 - 學生評價
 const getTutorAllStudentComments = async ({ tutorId, page, limit, rating }) => {
-  console.log(tutorId, page, limit);
   const params = new URLSearchParams();
 
   if (page) params.append("page", page);
