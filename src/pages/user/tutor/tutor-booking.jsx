@@ -1,30 +1,29 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 
-import { Swiper } from "swiper";
-import { Autoplay, Navigation } from "swiper/modules";
 import * as bootstrap from "bootstrap";
 import Swal from "sweetalert2";
+import { Swiper } from "swiper";
+import { Autoplay, Navigation } from "swiper/modules";
 
-import tutorApi from "@/api/tutorApi";
 import courseApi from "@/api/courseApi";
+import tutorApi from "@/api/tutorApi";
 
+import SectionFallback from "@/components/common/SectionFallback";
 import ShowMoreButton from "@/components/common/ShowMoreButton";
-import TutorBookingResume from "@/components/tutor/TutorBookingResume";
-import TutorsCard from "@/components/tutor/TutorsCard";
-import TutorCard from "@/components/tutor/TutorCard";
 import CourseCardList from "@/components/course/CourseCardList";
 import CommentsSection from "@/components/tutor/CommentsSection";
-import SectionFallback from "@/components/common/SectionFallback";
 import Timetable from "@/components/tutor/Timetable";
+import TutorBookingResume from "@/components/tutor/TutorBookingResume";
+import TutorCard from "@/components/tutor/TutorCard";
 import TutorCardLoadingSkeleton from "@/components/tutor/TutorCardLoadingSkeleton";
+import TutorsCard from "@/components/tutor/TutorsCard";
 
-import { updateFormData } from "../../../utils/slice/bookingSlice";
-import { tutorStats } from "../../../data/tutors";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 import CourseCardLoadingSkeleton from "../../../components/course/CourseCardLoadingSkeleton";
+import { updateFormData } from "../../../utils/slice/bookingSlice";
 
 export default function TutorBooking() {
   const dispatch = useDispatch();
@@ -290,6 +289,13 @@ export default function TutorBooking() {
   // Bookmark Tutor
   const handleTutorBookmark = async () => {
     try {
+      if (!isAuth) {
+        Swal.fire({
+          icon: "error",
+          title: `請先登入`,
+        });
+        return;
+      }
       if (isBookmark) {
         await tutorApi.removeBookmarkTutor(tutor_id);
       } else {
