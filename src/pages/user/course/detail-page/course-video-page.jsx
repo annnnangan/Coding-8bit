@@ -113,7 +113,6 @@ export default function CourseVideoPage() {
           }
           errorLogged.current = true;
         }
-        console.log("錯誤，請洽詢客服人員");
       } finally {
         setLoadingState(false);
       }
