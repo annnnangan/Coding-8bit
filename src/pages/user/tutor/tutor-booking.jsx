@@ -328,11 +328,14 @@ export default function TutorBooking() {
     } else if (userData?.subscriptions.length === 0 || !userData.subscriptions) {
       // 檢查用戶是否為基本會員或高級會員
       Swal.fire({
-        icon: "error",
-        title: "請先訂閱為基本會員或高級會員",
-        text: "一對一教學預約服務僅限基本會員或高級會員",
+        title: "一對一教學預約服務僅限基本會員或高級會員唷",
+        showCancelButton: true,
+        confirmButtonText: "前往訂閱頁面",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/subscription-list");
+        }
       });
-      navigate(`/subscription-list`);
     } else {
       if (bookingModal.current) {
         bookingModal.current.show();
