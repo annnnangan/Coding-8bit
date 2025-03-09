@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useSelector } from "react-redux";
 
 // 第三方套件
 import { Modal } from "bootstrap";
@@ -30,6 +31,9 @@ export default function CourseDetailPage() {
   // 更多章節 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
+
+  // redux 使用者資訊
+  const userInfo = useSelector((state) => state.auth.userData);
 
   // 只會記錄一次錯誤訊息，防止重覆彈出 modal
   const errorLogged = useRef(false);
@@ -64,25 +68,29 @@ export default function CourseDetailPage() {
     setLoadingState(true);
 
     try {
-      const userSubscriptionsPlan = await userApi.getUserData();
-      if (userSubscriptionsPlan.subscriptions[0].plan_name === "free") {
-        const errObject = new Error("請升級訂閱方案方可觀看課程");
-        errObject.name = "SubscriptionError";
-        throw errObject;
-      }
-      const courseResult = await courseApi.getCourseDetail(id);
-      const chapterResult = await courseApi.getCourseChapter(id);
-      const otherCourseResult = await courseApi.getFrontTutorCourses({
-        tutorId: courseResult.tutor_id,
-      });
-      const relatedVideosResult = await courseApi.getFrontTutorVideos({
-        category: courseResult.category,
-      });
+      // 確保 userInfo 初始化之後才檢查登入
+      if (userInfo && Object.keys(userInfo).length > 0) {
+        const userSubscriptionsPlan = await userApi.getUserData();
+        if (userSubscriptionsPlan.subscriptions[0].plan_name === "free") {
+          const errObject = new Error("請升級訂閱方案方可觀看課程");
+          errObject.name = "SubscriptionError";
+          throw errObject;
+        }
 
-      setCourseList(courseResult);
-      setChapter(chapterResult);
-      setOtherVideos(filterOtherCourse(otherCourseResult.courses));
-      setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
+        const courseResult = await courseApi.getCourseDetail(id);
+        const chapterResult = await courseApi.getCourseChapter(id);
+        const otherCourseResult = await courseApi.getFrontTutorCourses({
+          tutorId: courseResult.tutor_id,
+        });
+        const relatedVideosResult = await courseApi.getFrontTutorVideos({
+          category: courseResult.category,
+        });
+
+        setCourseList(courseResult);
+        setChapter(chapterResult);
+        setOtherVideos(filterOtherCourse(otherCourseResult.courses));
+        setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
+      }
     } catch (error) {
       if (!errorLogged.current) {
         if (error.name === "SubscriptionError") {
@@ -106,7 +114,6 @@ export default function CourseDetailPage() {
         }
         errorLogged.current = true;
       }
-      console.log("錯誤，請洽詢客服人員");
     } finally {
       setLoadingState(false);
     }
