@@ -44,7 +44,7 @@ export default function LearningNeedForm({ setLoadingState }) {
   );
 
   // 上傳圖片函式
-  const [temData, setTemData] = useState({});
+  const [temImg, setTemImg] = useState([]);
   const imgUpload = async (e) => {
     const file = e.target.files?.[0];
 
@@ -58,11 +58,19 @@ export default function LearningNeedForm({ setLoadingState }) {
     }
 
     // 如果檔案大小大於 50MB
-    const MAX_FILE_SIZE_MB = 50;
+    const MAX_FILE_SIZE_MB = 5;
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       Swal.fire({
         icon: "error",
         title: `檔案過大，請選擇小於 ${MAX_FILE_SIZE_MB}MB 的檔案`,
+      });
+      return;
+    }
+
+    if (temImg.length > 4) {
+      Swal.fire({
+        icon: "error",
+        title: `最多只可以上傳五張圖片`,
       });
       return;
     }
@@ -94,12 +102,10 @@ export default function LearningNeedForm({ setLoadingState }) {
       });
 
       // 3. 更新狀態顯示圖片
-      setTemData((prevData) => {
-        return {
-          ...prevData,
-          cover_image: downloadUrl || filePath,
-        };
+      setTemImg((prevData) => {
+        return [...prevData, downloadUrl || filePath];
       });
+
       Swal.fire({
         icon: "success",
         title: "上傳成功",
@@ -119,10 +125,17 @@ export default function LearningNeedForm({ setLoadingState }) {
     setLoadingState(true);
     try {
       const result = await customRequestsApi.addCustomRequest(data);
-      await customRequestsApi.addCustomRequestImg({
-        request_id: result.data.id,
-        photo_url: temData.cover_image,
-      });
+
+      // 等所有圖片上傳完
+      await Promise.all(
+        temImg.map((cover_image) =>
+          customRequestsApi.addCustomRequestImg({
+            request_id: result.data.id,
+            photo_url: cover_image,
+          })
+        )
+      );
+
       Swal.fire({
         icon: "success",
         title: "新增成功",
@@ -166,7 +179,7 @@ export default function LearningNeedForm({ setLoadingState }) {
   // 表單提交
   const quillRef = useRef(null);
   const onSubmit = async (data) => {
-    if (temData.cover_image) {
+    if (temImg.length > 0) {
       const contentText = quillRef.current?.getEditor().getText();
 
       if (contentText) {
@@ -186,51 +199,69 @@ export default function LearningNeedForm({ setLoadingState }) {
     <>
       <div className="learning-need-form-wrap card-column">
         <h1>提出您的學習需求</h1>
-        <form className="mt-6 mt-lg-8" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
           <h4 className="fs-7 fw-normal text-gray-01 lh-base">
-            圖片<span className="text-danger">*</span>
+            圖片 (最多可以上傳五張)<span className="text-danger">*</span>
           </h4>
-          <div className="image-upload-wrapper mt-1">
-            <input
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              className="form-control p-0"
-              id="cover_image"
-              onChange={imgUpload}
-            />
-            <label
-              htmlFor="cover_image"
-              className="form-label image-upload-label mb-0"
-            >
-              <span className="material-symbols-outlined mb-2">imagesmode</span>
-              請上傳圖片，讓其他人更容易理解您的需求
-            </label>
-
+          <div className="d-flex flex-wrap gap-2 mt-1">
             {/* 上傳圖片後的樣子 */}
-            {temData.cover_image && (
-              <div className="img-wrapper border-0 p-0">
-                <img
-                  src={temData.cover_image}
-                  alt="course-cover_image"
-                  className="w-100 object-fit"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setTemData((prevData) => {
-                      return {
-                        ...prevData,
-                        cover_image: "",
-                      };
-                    })
-                  }
-                >
-                  <span className="material-symbols-outlined delete-icon">
-                    delete
-                  </span>
-                </button>
-              </div>
+            {temImg && (
+              <>
+                {temImg.map((img, index) => (
+                  <div className="image-upload-wrapper" key={index}>
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png"
+                      className="form-control p-0"
+                      id="cover_image"
+                      onChange={imgUpload}
+                    />
+                    <label
+                      htmlFor="cover_image"
+                      className="form-label image-upload-label mb-0"
+                    ></label>
+                    <div className="img-wrapper border-0 p-0">
+                      <img
+                        src={img}
+                        alt="course-cover_image"
+                        className="w-100 object-fit"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setTemImg((prevData) => {
+                            return prevData.filter((prevImg) => prevImg != img);
+                          })
+                        }
+                      >
+                        <span className="material-symbols-outlined delete-icon">
+                          delete
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
+            {/* 上傳一張圖片後，跑出可以新增下一張圖片的框框 */}
+            <div className="image-upload-wrapper">
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                className="form-control p-0"
+                id="cover_image"
+                onChange={imgUpload}
+              />
+              <label
+                htmlFor="cover_image"
+                className="form-label image-upload-label mb-0"
+              >
+                <span className="material-symbols-outlined mb-2">
+                  imagesmode
+                </span>
+                請上傳圖片，讓其他人更容易理解您的需求
+              </label>
+            </div>
           </div>
 
           <div className="mt-6 mt-lg-8">
