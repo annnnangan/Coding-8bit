@@ -6,10 +6,10 @@ import { determineMeetingLinkMessage } from "@/utils/booking-record-utils";
 import { serviceTypeMap } from "@/utils/schema/booking-schema";
 import { getDayOfWeekFromStringDate, formatHour } from "@/utils/timeFormatted-utils";
 
-export default function BookingCard({ role, booking, handleClick }) {
+export default function BookingCard({ role, booking, handleClick, type = "manage-booking" }) {
   return (
     <>
-      <div className="card cursor-pointer" onClick={handleClick}>
+      <div className={`card${type === "manage-booking" ? " cursor-pointer" : ""}`} onClick={handleClick}>
         <div className="card-body p-3">
           <div className="d-flex gap-3 gap-md-2">
             <div className="col-3 d-flex flex-column justify-content-center align-items-center bg-gray-04 p-2 p-lg-5 rounded-2">
@@ -23,6 +23,12 @@ export default function BookingCard({ role, booking, handleClick }) {
 
                   <BookingStatusBadge status={booking.status} />
                 </li>
+                {type === "dashboard" && (
+                  <li className="d-flex flex-wrap justify-content-between align-items-center mb-1">
+                    <p className="fs-7 text-gray-03">日期</p>
+                    <p className="text-gray-01">{booking.booking_date}</p>
+                  </li>
+                )}
                 <li className="d-flex flex-wrap justify-content-between align-items-center mb-1">
                   <p className="fs-7 text-gray-03">時間</p>
                   <p className="text-gray-01 d-none d-md-block">
@@ -54,6 +60,7 @@ export default function BookingCard({ role, booking, handleClick }) {
 
 BookingCard.propTypes = {
   role: PropTypes.oneOf(["tutor", "student"]),
+  type: PropTypes.oneOf(["dashboard", "manage-booking"]),
   booking: PropTypes.shape({
     booking_date: PropTypes.string.isRequired,
     tutor_name: PropTypes.string,

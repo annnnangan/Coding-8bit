@@ -31,8 +31,6 @@ export default function TutorPanel() {
         return { ...item, timeslots }; // convert hourly_availability to array and keep only true value
       });
 
-      console.log(formattedResult);
-
       setRecentBookings(formattedResult);
     } catch (error) {
       console.log("錯誤", error);
@@ -99,7 +97,7 @@ export default function TutorPanel() {
                   recentBookings.length > 0 &&
                   recentBookings.map((booking) => (
                     <div key={booking.id} className="col-12 col-md-6">
-                      <BookingCard role={"tutor"} booking={booking} handleClick={() => console.log("hello")} />
+                      <BookingCard role={"tutor"} booking={booking} type="dashboard" />
                     </div>
                   ))}
 
