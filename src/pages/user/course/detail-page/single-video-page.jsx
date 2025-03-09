@@ -1,7 +1,11 @@
 // react 相關套件
-import { useState, useEffect } from "react";
-import { useParams, NavLink } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useDispatch } from "react-redux";
+
+// 第三方套件
+import Swal from "sweetalert2";
 
 // API
 import courseApi from "@/api/courseApi";
@@ -12,12 +16,21 @@ import Loader from "@/components/common/Loader";
 
 // 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
+import { loginCheck } from "@/utils/slice/authSlice";
 
 export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
   const [relatedVideos, setRelatedVideos] = useState([]); // 相關影片
   const [loadingState, setLoadingState] = useState(true); // loading
+  const [swalShown, setSwalShown] = useState(false); // 狀態變數來追蹤是否已經顯示過 Swal 彈窗
+
   const { videoId } = useParams(); // 取得影片ID
+  const navigate = useNavigate(); // 用於導頁
+
+  const dispatch = useDispatch(); // redux dispatch
+
+  // 只會記錄一次錯誤訊息，防止重覆彈出 modal
+  const errorLogged = useRef(false);
 
   // 取得影片資料
   const [videoData, setVideoData] = useState({
@@ -47,14 +60,41 @@ export default function CourseVideoPage() {
 
   // 初始化取得資料
   const getData = async () => {
-    setLoadingState(true);
-    try {
-      const videoResult = await courseApi.getVideoDetail(videoId);
-      setVideoData(videoResult);
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
+    if (swalShown) return;
+
+    const isLoginStatus = await dispatch(loginCheck());
+    if (isLoginStatus.meta.requestStatus === "rejected") {
+      if (!errorLogged.current) {
+        setSwalShown(true);
+        Swal.fire({
+          title: "請先登入或註冊會員",
+          text: "趕緊加入觀賞優質課程吧",
+          icon: "error",
+          showCancelButton: true,
+          confirmButtonText: "註冊",
+          cancelButtonText: "登入",
+          allowOutsideClick: false,
+        }).then((result) => {
+          setSwalShown(false);
+          if (result.isConfirmed) {
+            navigate("/signup"); // 註冊
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            navigate("/login"); // 登入
+          }
+        });
+      }
+      errorLogged.current = true;
       setLoadingState(false);
+    } else {
+      setLoadingState(true);
+      try {
+        const videoResult = await courseApi.getVideoDetail(videoId);
+        setVideoData(videoResult);
+      } catch (error) {
+        console.log("錯誤", error);
+      } finally {
+        setLoadingState(false);
+      }
     }
   };
 
