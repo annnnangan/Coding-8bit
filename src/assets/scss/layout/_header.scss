@@ -19,8 +19,13 @@ $navbar-height-mobile: 56px;
       overflow-y: auto;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-      z-index: 999;
+      transition: opacity 0.8s ease, visibility 0s linear 0.5s;
+  
+      &.show {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.8s ease, visibility 0s linear;
+      }
     }
 
     @include mobile {
