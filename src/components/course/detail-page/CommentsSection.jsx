@@ -1,7 +1,6 @@
 // react 相關套件
 import ReactLoading from "react-loading";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 // 第三方套件
@@ -29,7 +28,6 @@ export default function CommentsSection({
   const [isSending, setIsSending] = useState(false); // 是否留言中
   const [isReply, setIsReply] = useState(false); // 是否回覆中
   const [errors, setErrors] = useState({}); // 錯誤訊息
-  const navigate = useNavigate(); // 用於導頁
 
   // redux 使用者資訊
   const userInfo = useSelector((state) => state.auth.userData);
