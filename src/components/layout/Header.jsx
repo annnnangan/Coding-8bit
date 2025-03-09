@@ -182,7 +182,40 @@ export default function Header() {
             }`}
           >
             <ul className="navbar-nav align-items-lg-center">
-              <li className="position-relative f-align-center d-lg-none">
+              <li className="f-center align-self-center ps-4 d-lg-none">
+                <div className="flex-shrink-0">
+                  {!userData.avatar_url ? (
+                    <img
+                      src="images/icon/user.png"
+                      alt="profile"
+                      className="object-fit-cover rounded-circle me-4"
+                      style={{ height: "48px", width: "48px" }}
+                    />
+                  ) : (
+                    <img
+                      src={userData.avatar_url}
+                      alt="profile"
+                      className="object-fit-cover rounded-circle me-4"
+                      style={{ height: "48px", width: "48px" }}
+                    />
+                  )}
+                </div>
+                <div className="flex-grow-1">
+                  <small className="text-brand-03">
+                    {!hasPremium && !hasBasic ? (
+                      "free"
+                    ) : (
+                      <>
+                        {(hasPremium && hasBasic) ||
+                          (hasPremium && !hasBasic && "premium")}
+                        {!hasPremium && hasBasic && "basic"}
+                      </>
+                    )}
+                  </small>
+                  <p className="text-gray-01">{userData.username}</p>
+                </div>
+              </li>
+              <li className="position-relative f-align-center mt-4 d-lg-none">
                 <input
                   type="search"
                   className="form-control nav-search-mobile"
@@ -215,51 +248,20 @@ export default function Header() {
               ))}
 
               {isAuth && (
-                <div className="d-lg-none">
-                  <div className="f-align-center ps-4 mt-2">
-                    <div className="flex-shrink-0">
-                      {!userData.avatar_url ? (
-                        <img
-                          src="images/icon/user.png"
-                          alt="profile"
-                          className="object-fit-cover rounded-circle me-4"
-                          style={{ height: "32px", width: "32px" }}
-                        />
-                      ) : (
-                        <img
-                          src={userData.avatar_url}
-                          alt="profile"
-                          className="object-fit-cover rounded-circle me-4"
-                          style={{ height: "32px", width: "32px" }}
-                        />
-                      )}
-                    </div>
-                    <div className="flex-grow-1">
-                      <small className="text-brand-03">
-                        {!hasPremium && !hasBasic ? (
-                          "free"
-                        ) : (
-                          <>
-                            {hasPremium && hasBasic && "premium"}
-                            {!hasPremium && hasBasic && "basic"}
-                          </>
-                        )}
-                      </small>
-                      <p className="text-gray-01">{userData.username}</p>
-                    </div>
-                  </div>
+                <>
+                  <hr className="d-lg-none mx-4" />
                   {!userData?.roles?.includes("tutor") && (
-                    <li className="nav-item mt-2">
+                    <li className="nav-item d-lg-none">
                       <NavLink
                         className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
                         to="/tutor-apply"
                       >
-                        成為老師
+                        成為講師
                       </NavLink>
                     </li>
                   )}
                   {userData?.roles?.includes("tutor") && (
-                    <li className="nav-item mt-2">
+                    <li className="nav-item d-lg-none mt-2">
                       <button
                         className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
                         aria-current="page"
@@ -267,13 +269,13 @@ export default function Header() {
                         onClick={roleToggle}
                       >
                         {userData.last_active_role === "student"
-                          ? "切換成老師身分"
+                          ? "切換成講師身分"
                           : "切換成學生身分"}
                       </button>
                     </li>
                   )}
 
-                  <li className="nav-item">
+                  <li className="nav-item d-lg-none">
                     {userData?.roles?.includes("tutor") ? (
                       <NavLink
                         className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
@@ -294,7 +296,7 @@ export default function Header() {
                       </NavLink>
                     )}
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-lg-none">
                     {userData?.roles?.includes("tutor") ? (
                       <NavLink
                         className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
@@ -315,16 +317,20 @@ export default function Header() {
                       </NavLink>
                     )}
                   </li>
-                  <li className="nav-item">
+                  <li className="nav-item d-lg-none fixed-bottom">
+                    <hr className="mx-4" />
                     <button
                       type="button"
-                      className="nav-link underline-hover w-100 d-inline-flex link-gray-02"
+                      className="nav-link underline-hover w-100 d-inline-flex ps-6 pb-6 link-gray-02"
                       onClick={signout}
                     >
+                      <span className="material-symbols-outlined me-2">
+                        logout
+                      </span>
                       登出
                     </button>
                   </li>
-                </div>
+                </>
               )}
 
               <li className="nav-item nav-bottom-btn ms-lg-10 dropdown">
@@ -368,7 +374,8 @@ export default function Header() {
                             "free"
                           ) : (
                             <>
-                              {hasPremium && hasBasic && "premium"}
+                              {(hasPremium && hasBasic) ||
+                                (hasPremium && !hasBasic && "premium")}
                               {!hasPremium && hasBasic && "basic"}
                             </>
                           )}
@@ -384,7 +391,7 @@ export default function Header() {
                       {!userData?.roles?.includes("tutor") && (
                         <li className="nav-item">
                           <Link className="dropdown-item" to="/tutor-apply">
-                            成為老師
+                            成為講師
                           </Link>
                         </li>
                       )}
@@ -396,7 +403,7 @@ export default function Header() {
                             onClick={roleToggle}
                           >
                             {userData.last_active_role === "student"
-                              ? "切換成老師身分"
+                              ? "切換成講師身分"
                               : "切換成學生身分"}
                           </button>
                         </li>
