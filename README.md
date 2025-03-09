@@ -25,6 +25,12 @@
 ## Development Guide
 <a href="https://hackmd.io/qRg-uB1fRwm8eiczTjfoPA?view">Development Guide Link</a>
 
+## 測試用帳號
+已通過所有權限的現成帳號，可直接拿來登入測試
+
+帳號：test123@gmail.com
+</br>密碼：Test@1234
+
 ## 使用技術
 * **前端框架**：React + Vite
 * **後端技術**：Node.js
@@ -47,6 +53,8 @@
 * clsx
 * React Datepicker
 * DOMPurify
+* react-rating-stars-component (評分星星)
+* react-medium-image-zoom (圖片放大)
 
 ## 資料夾結構
 
@@ -172,6 +180,8 @@ git push -u origin main // 僅限第一次輸入，往後只需要輸入 git pus
 
 * 主導專題進度規劃與環境建置： MY
 * 後端開發： 詹姆士
+* 簡報製作： anna
+* 資料建構： 詹姆士、Chia Pin
 * 教練： Antonio
 * UI / UX 設計師： F Selina
 

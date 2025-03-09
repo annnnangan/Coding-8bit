@@ -121,3 +121,8 @@ a {
     list-style: auto;
   }
 }
+
+// react-medium-image-zoom 縮小 btn
+[data-rmiz-btn-zoom], [data-rmiz-btn-unzoom] {
+  padding: 6px;
+}
