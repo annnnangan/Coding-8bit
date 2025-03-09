@@ -167,7 +167,7 @@ const getTutorAllStudentComments = async ({ tutorId, page, limit, rating }) => {
 
 // 講師頁面 - 學生評價的統計
 const getTutorRatingStats = async (tutorId) => {
-  const response = await apiClient.get(`/comment/tutors/${tutorId}/rating-stats`);
+  const response = await apiClient.get(`/tutor-rating-review/${tutorId}`);
   return response.data.data;
 };
 

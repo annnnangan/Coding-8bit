@@ -11,7 +11,7 @@ export default function CommentsSection({ modal = false, tutorId }) {
   const [isLoadingRatingStats, setLoadingRatingStatsState] = useState(false);
   const [isLoadingComment, setLoadingCommentState] = useState(false);
   const [ratingStats, setRatingStats] = useState({
-    rating: 0,
+    average_rating: 0,
     total_comment_count: 0,
     rating_distribute: {
       5: 0,
@@ -72,10 +72,9 @@ export default function CommentsSection({ modal = false, tutorId }) {
           )}
         </div>
 
-        {!isLoadingComment && comments.length === 0 && <SectionFallback materialIconName="reviews" fallbackText={`講師暫無學生評價`} />}
         <div className="row row-cols-lg-2 row-cols-1 g-lg-4 g-2">
           <div className="col">{isLoadingRatingStats ? <CommentRatingStat isLoading={true} /> : ratingStats.total_comment_count > 0 && <CommentRatingStat ratingStats={ratingStats} />}</div>
-
+          {!isLoadingComment && comments.length === 0 && <SectionFallback materialIconName="reviews" fallbackText={`講師暫無學生評價`} />}
           {isLoadingComment && Array.from({ length: 3 }, (_, i) => <CommentCard key={i} isLoading={isLoadingComment} />)}
           {!isLoadingComment && comments.length > 0 && comments.map((comment) => <CommentCard comment={comment} key={comment.commentId} />)}
         </div>
