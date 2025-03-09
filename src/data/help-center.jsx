@@ -41,10 +41,10 @@ export const contactInfo = [
     title: "信箱",
     content: (
       <a
-        href="mailto:custommadesite@gmail.com"
+        href="mailto:coding8bit@gmail.com"
         className="underline-hover d-inline-block"
       >
-        custommadesite@gmail.com
+        coding8bit@gmail.com
       </a>
     ),
   },
@@ -52,7 +52,7 @@ export const contactInfo = [
     id: 3,
     icon: "pin_drop",
     title: "地址",
-    content: "100台北市中正區重慶南路一段102號",
+    content: "100 台北市中正區重慶南路一段102號",
   },
 ];
 

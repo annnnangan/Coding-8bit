@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import MainTitle from "../../components/MainTitle";
-import Form from "../../components/help-center/Form";
+import MainTitle from "@/components/MainTitle";
+import Form from "@/components/help-center/Form";
 
-import { faqData, contactInfo, socialLinks } from "../../data/help-center";
+import { faqData, contactInfo, socialLinks } from "@/data/help-center";
 
 export default function HelpCenter() {
   return (
