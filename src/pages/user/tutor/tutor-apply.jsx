@@ -83,6 +83,13 @@ export default function TutorApply() {
     /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
     "$1"
   );
+  const subscriptions = userData?.subscriptions || [];
+  const hasPremium = subscriptions.some(
+    (item) => item.plan_name === "premium" && item.status === "active"
+  );
+  const hasBasic = subscriptions.some(
+    (item) => item.plan_name === "basic" && item.status === "active"
+  );
 
   // 初始化 - 取得使用者資料
   useEffect(() => {
@@ -128,7 +135,9 @@ export default function TutorApply() {
           {currentStep === 1 && (
             <>
               <h1 className="text-brand-03 mt-8">成為講師</h1>
-              <p className="fs-5 mt-3">立即加入講師的一員，即可享有以下功能</p>
+              <p className="fs-5 mt-3">
+                如果您是基本會員，即可加入講師，享有以下功能
+              </p>
               <div className="tutor-apply-info-wrap">
                 <ul className="fs-6 fs-md-5 mt-8 mt-lg-12">
                   <li className="f-align-center mt-4 mt-lg-4">
@@ -162,22 +171,32 @@ export default function TutorApply() {
                     </p>
                   </li>
                 </ul>
-                <div className="f-end-center mt-8 mt-lg-13">
-                  <NavLink
-                    to="/"
-                    className="btn btn-outline-brand-03 border-1 rounded-2 f-align-center px-md-11"
-                  >
-                    取消
-                  </NavLink>
-                  <button
-                    className="btn btn-brand-03 rounded-2 slide-right-hover f-align-center ms-4 px-md-10"
-                    onClick={toNextStep}
-                  >
-                    前往填寫講師個人資料
-                    <span className="material-symbols-outlined icon-fill fs-4 ms-1">
-                      arrow_forward
-                    </span>
-                  </button>
+                <div className="mt-8 mt-lg-13">
+                  {!hasPremium && !hasBasic && (
+                    <div className="text-end mb-1">
+                      <small className="fs-7 text-brand-03">
+                        訂閱基本會員後即可申請成為講師
+                      </small>
+                    </div>
+                  )}
+                  <div className="f-end-center">
+                    <NavLink
+                      to="/"
+                      className="btn btn-outline-brand-03 border-1 rounded-2 f-align-center px-md-11"
+                    >
+                      取消
+                    </NavLink>
+                    <button
+                      className="btn btn-brand-03 rounded-2 slide-right-hover f-align-center ms-4 px-md-10"
+                      disabled={!hasPremium && !hasBasic}
+                      onClick={toNextStep}
+                    >
+                      前往填寫講師個人資料
+                      <span className="material-symbols-outlined icon-fill fs-4 ms-1">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </>

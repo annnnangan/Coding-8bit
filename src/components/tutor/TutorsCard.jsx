@@ -25,7 +25,7 @@ TutorsCard.propTypes = {
       id: PropTypes.string.isRequired,
       slogan: PropTypes.string,
       expertise: PropTypes.string,
-      rating: PropTypes.string.isRequired,
+      rating: PropTypes.string,
       hourly_rate: PropTypes.string.isRequired,
       isFavorite: PropTypes.bool,
       user: PropTypes.shape({
