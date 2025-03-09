@@ -2,7 +2,7 @@
 import ReactLoading from "react-loading";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 // 第三方套件
 import PropTypes from "prop-types";
@@ -15,7 +15,6 @@ import courseApi from "@/api/courseApi";
 // 工具
 import { formatDateToTaiwanStyle } from "@/utils/timeFormatted-utils";
 import { countReplies, reduceComments } from "@/utils/countReplies-utils";
-import { getUserData, loginCheck } from "@/utils/slice/authSlice";
 
 export default function CommentsSection({
   comments,
@@ -30,7 +29,6 @@ export default function CommentsSection({
   const [isSending, setIsSending] = useState(false); // 是否留言中
   const [isReply, setIsReply] = useState(false); // 是否回覆中
   const [errors, setErrors] = useState({}); // 錯誤訊息
-  const dispatch = useDispatch(); // redux 分發
   const navigate = useNavigate(); // 用於導頁
 
   // redux 使用者資訊
@@ -170,6 +168,25 @@ export default function CommentsSection({
     }
   };
 
+  // Swal 訊息框
+  const swalMessageHandle = (message) => {
+    Swal.fire({
+      title: message,
+      text: "趕緊加入觀賞優質課程吧",
+      icon: "error",
+      showCancelButton: true,
+      confirmButtonText: "註冊",
+      cancelButtonText: "登入",
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/signup"); // 註冊
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        navigate("/login"); // 登入
+      }
+    });
+  };
+
   // 整理留言
   useEffect(() => {
     if (comments && Array.isArray(comments)) {
@@ -181,31 +198,14 @@ export default function CommentsSection({
 
   // 留言取完再取得使用者資訊，避免重整時 redux 丟失導致判斷是否登入錯誤
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        await dispatch(loginCheck()).unwrap();
-        dispatch(getUserData());
-      } catch (error) {
-        Swal.fire({
-          title: "還不是我們的會員嗎？",
-          text: "趕緊加入觀賞優質課程吧",
-          icon: "error",
-          showCancelButton: true,
-          confirmButtonText: "註冊",
-          cancelButtonText: "登入",
-          allowOutsideClick: false,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/signup"); // 註冊
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            navigate("/login"); // 登入
-          }
-        });
-      }
-    };
-
-    checkLoginStatus();
-  }, [userComments]);
+    // 確保 userInfo 初始化之後才檢查登入
+    if (userInfo && Object.keys(userInfo).length > 0) {
+      return;
+    } else if (Object.keys(userInfo).length === 0) {
+      // 如果 userInfo 為空，表示未登入，彈出 Swal 詢問框
+      swalMessageHandle("還不是我們的會員嗎？");
+    }
+  }, [userInfo, navigate]);
 
   return (
     <>
@@ -217,7 +217,7 @@ export default function CommentsSection({
             src={
               userInfo.avatar_url
                 ? userInfo.avatar_url
-                : "/public/images/icon/user.png"
+                : "/images/icon/user.png"
             }
             alt="當前使用者頭像"
           />
@@ -369,7 +369,7 @@ export default function CommentsSection({
                                   src={
                                     item.User.avatar_url
                                       ? item.User.avatar_url
-                                      : "/public/images/icon/user.png"
+                                      : "/images/icon/user.png"
                                   }
                                   alt="留言回覆者頭像"
                                 />

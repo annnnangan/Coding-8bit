@@ -86,6 +86,12 @@ const deleteFavoriteVideo = async (videoId) => {
   return response.data;
 };
 
+// 前台 - 移除收藏導師
+const deleteFavoriteTutor = async (tutorId) => {
+  const response = await apiClient.delete(`/favorites/tutors/${tutorId}`);
+  return response;
+};
+
 // 前台 - 取得單一影片評分
 const getStarRatingVideo = async (videoId) => {
   const response = await apiClient.get(`/ratings/videos/${videoId}/is-rated`);
@@ -177,6 +183,18 @@ const deleteVideo = async (videoId) => {
   return response;
 };
 
+// 後台 - 使用者取得收藏影片
+const getAllFavoriteVideo = async () => {
+  const response = await apiClient.get(`/favorites/videos`);
+  return response.data;
+};
+
+// 後台 - 使用者取得收藏老師
+const getAllFavoriteTutor = async () => {
+  const response = await apiClient.get(`/favorites/tutors`);
+  return response.data;
+};
+
 export default {
   getAllCourses,
   getAllVideos,
@@ -192,6 +210,7 @@ export default {
   getFavoriteVideo,
   postFavoriteVideo,
   deleteFavoriteVideo,
+  deleteFavoriteTutor,
   getStarRatingVideo,
   postRatingVideo,
   getFrontTutorCourses,
@@ -207,4 +226,6 @@ export default {
   addVideo,
   updateVideo,
   deleteVideo,
+  getAllFavoriteVideo,
+  getAllFavoriteTutor,
 };
