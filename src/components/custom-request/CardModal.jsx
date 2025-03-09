@@ -6,6 +6,8 @@ const ReactQuill = lazy(() => import("react-quill-new"));
 import PropTypes from "prop-types";
 import DOMPurify from "dompurify";
 import Swal from "sweetalert2";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 import customRequestsApi from "@/api/customRequestsApi";
 
@@ -189,15 +191,38 @@ export default function CardModal({
                     <small id="modalDate" className="text-muted d-block mb-3">
                       {formatDateToTaiwanStyle(temCustomCourse?.createdAt)}
                     </small>
-                    {temCustomCourse?.CustomRequestPhotos?.map((photo) => (
-                      <img
-                        id="modalPhoto"
-                        src={photo.photo_url}
-                        alt="相關照片"
-                        className="img-fluid mb-3"
-                        key={photo.id}
-                      />
-                    ))}
+                    <div className="f-center justify-content-lg-start gap-2">
+                      {temCustomCourse?.CustomRequestPhotos?.slice(0, 2).map(
+                        (photo) => (
+                          <Zoom key={photo.id}>
+                            <img
+                              id="modalPhoto"
+                              src={photo.photo_url}
+                              alt="相關照片"
+                              className="img-fluid object-cover-fit"
+                              style={{ width: "300px", height: "200px" }}
+                            />
+                          </Zoom>
+                        )
+                      )}
+                    </div>
+                    {temCustomCourse?.CustomRequestPhotos?.length >= 3 && (
+                      <div className="f-center justify-content-lg-start mt-1 gap-2">
+                        {temCustomCourse?.CustomRequestPhotos?.slice(2, 5).map(
+                          (photo) => (
+                            <Zoom key={photo.id}>
+                              <img
+                                id="modalPhoto"
+                                src={photo.photo_url}
+                                alt="相關照片"
+                                className="img-fluid object-cover-fit"
+                                style={{ width: "300px", height: "200px" }}
+                              />
+                            </Zoom>
+                          )
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {isAuth && userData?.roles?.includes("tutor") && (

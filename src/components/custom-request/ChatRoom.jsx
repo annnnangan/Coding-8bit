@@ -30,17 +30,12 @@ export default function ChatRoom() {
         sessionId = crypto.randomUUID();
         localStorage.setItem("chatSessionId", sessionId);
       }
-      console.log({
-        message: answer,
-        sessionId: sessionId,
-      });
 
       // 發送 API 請求
       const response = await customRequestsApi.postChat({
         message: answer,
         sessionId: sessionId,
       });
-      console.log("API 回應:", response);
 
       // 紀錄機器人回應內容
       setBotResponses((prev) => [

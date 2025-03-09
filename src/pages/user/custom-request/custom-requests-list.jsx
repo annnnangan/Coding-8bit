@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserData } from "@/utils/slice/authSlice";
+import { loginCheck, getUserData } from "@/utils/slice/authSlice";
 import { Helmet } from "react-helmet-async";
 
 import * as bootstrap from "bootstrap";
@@ -55,6 +55,16 @@ export default function CustomRequestsList() {
         .filter((item) => item.status === "active").length > 0
     ) {
       navigate("/add-learning-need");
+    } else if (!userData.id) {
+      Swal.fire({
+        title: "請先登入",
+        showCancelButton: true,
+        confirmButtonText: "前往登入頁面",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
     }
   };
 
@@ -95,7 +105,7 @@ export default function CustomRequestsList() {
     }
   };
 
-  /* -------------------------------------- header & footer  start ---------------------------------------- */
+  /* -------------------------------------- header & footer START ---------------------------------------- */
   // header & footer 變化
   const [isFooterHidden, setIsFooterHidden] = useState(false);
   const mainContentRef = useRef(null);
@@ -199,7 +209,7 @@ export default function CustomRequestsList() {
     };
   }, [customCourseList]);
 
-  /* -------------------------------------- header & footer  end ---------------------------------------- */
+  /* -------------------------------------- header & footer END ---------------------------------------- */
 
   // modal
   const [temCustomCourse, setTemCustomCourse] = useState({});
@@ -232,7 +242,18 @@ export default function CustomRequestsList() {
     if (isAuth) {
       dispatch(getUserData());
     }
-  }, [customCourseList[0]?.id]);
+  }, [isAuth]);
+
+  useEffect(() => {
+    const token =
+      document.cookie.replace(
+        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
+      ) || null;
+    if (token) {
+      dispatch(loginCheck());
+    }
+  }, []);
 
   // 初始化 - 取得資料
   useEffect(() => {
@@ -470,8 +491,7 @@ export default function CustomRequestsList() {
                 onClick={toAddLearningNeedPage}
               >
                 <span className="add-icon material-symbols-outlined icon-fill">
-                  {" "}
-                  add{" "}
+                  add
                 </span>
               </button>
               <span className="fs-md-5 fs-6 text-gray-02 d-block mt-2">
