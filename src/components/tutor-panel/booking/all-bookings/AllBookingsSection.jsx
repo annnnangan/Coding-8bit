@@ -46,7 +46,6 @@ export default function AllBookingsSection({ role }) {
       }
 
       if (role === "student") {
-        console.log("user id in function", studentId);
         result = (await bookingApi.getStudentBookings({ studentId, status: activeTab, startDate, endDate, serviceType })).bookings;
       }
 
@@ -84,7 +83,6 @@ export default function AllBookingsSection({ role }) {
 
   useEffect(() => {
     if ((role === "tutor" && tutorId) || (role === "student" && studentId)) {
-      console.log("user id", studentId);
       getBookingListData({ activeTab, startDate: debounceDateRange?.from, endDate: debounceDateRange?.to, serviceType });
     }
 

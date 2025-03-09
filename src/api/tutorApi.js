@@ -152,7 +152,6 @@ const deleteSpecificDateAvailability = async (tutorId, date) => {
 
 // 講師頁面 - 學生評價
 const getTutorAllStudentComments = async ({ tutorId, page, limit, rating }) => {
-  console.log(tutorId, page, limit);
   const params = new URLSearchParams();
 
   if (page) params.append("page", page);
@@ -169,6 +168,22 @@ const getTutorAllStudentComments = async ({ tutorId, page, limit, rating }) => {
 // 講師頁面 - 學生評價的統計
 const getTutorRatingStats = async (tutorId) => {
   const response = await apiClient.get(`/comment/tutors/${tutorId}/rating-stats`);
+  return response.data.data;
+};
+
+/* ---------------------------------- 收藏 ---------------------------------- */
+const getTutorBookmark = async (tutorId) => {
+  const response = await apiClient.get(`/favorites/tutors/${tutorId}/is-favorite`);
+  return response.data.data.isFavorite;
+};
+
+const bookmarkTutor = async (tutorId) => {
+  const response = await apiClient.post(`/favorites/tutors/${tutorId}`);
+  return response.data.data;
+};
+
+const removeBookmarkTutor = async (tutorId) => {
+  const response = await apiClient.delete(`/favorites/tutors/${tutorId}`);
   return response.data.data;
 };
 
@@ -198,4 +213,7 @@ export default {
   deleteSpecificDateAvailability,
   getTutorAllStudentComments,
   getTutorRatingStats,
+  getTutorBookmark,
+  bookmarkTutor,
+  removeBookmarkTutor,
 };

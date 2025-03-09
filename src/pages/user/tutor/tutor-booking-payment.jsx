@@ -50,15 +50,24 @@ export default function TutorBookingPayment() {
   const bookingStep1FormData = useSelector((state) => state.booking);
   const { tutor_id, tutor_name, booking_date, timeslots, service_type, price } = bookingStep1FormData;
 
-  console.log("tutor booking payment", { tutor_id, tutor_name, booking_date, timeslots, service_type, price });
-
   useEffect(() => {
     if (!isAuth) {
+      // 檢查用戶是否已登入
       Swal.fire({
         icon: "error",
         title: "請先登入",
       });
       navigate(`/login`);
+    }
+
+    if (userData?.subscriptions.length === 0 || !userData.subscriptions) {
+      // 檢查用戶是否為基本會員或高級會員
+      Swal.fire({
+        icon: "error",
+        title: "請先訂閱為基本會員或高級會員",
+        text: "一對一教學預約服務僅限基本會員或高級會員",
+      });
+      navigate(`/subscription-list`);
     }
 
     if (!tutor_id || !tutor_name || !booking_date || !timeslots || !service_type || !price) {
@@ -70,7 +79,7 @@ export default function TutorBookingPayment() {
       const redirectTo = tutor_id ? `/tutor/${tutor_id}` : "/tutor-list";
       navigate(redirectTo);
     }
-  }, [isAuth, tutor_id, tutor_name, booking_date, timeslots, service_type, price, navigate]);
+  }, [isAuth, userData, tutor_id, tutor_name, booking_date, timeslots, service_type, price, navigate]);
 
   const methods = useForm({
     resolver: zodResolver(BookingSchema),

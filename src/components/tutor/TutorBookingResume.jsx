@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import SectionFallback from "@/components/common/SectionFallback";
 
 export default function TutorBookingResume({ resume }) {
   return (
@@ -26,6 +27,12 @@ export default function TutorBookingResume({ resume }) {
       <div className="col-md-9 col-7">
         <div className="tab-content" id="nav-tabContent">
           <div className="tab-pane fade show active" id="list-work-experience" role="tabpanel" aria-labelledby="list-work-experience-list">
+            {resume.work_experience.length === 0 && (
+              <div className="my-8">
+                <SectionFallback materialIconName="work" fallbackText="講師暫無填寫工作經歷" />
+              </div>
+            )}
+
             {resume.work_experience.map((item) => (
               <div className="d-md-flex mb-5" key={item.id}>
                 <p className="date me-5 ">
@@ -40,22 +47,33 @@ export default function TutorBookingResume({ resume }) {
             ))}
           </div>
           <div className="tab-pane fade" id="list-education" role="tabpanel" aria-labelledby="list-education-list">
-            {resume.education.map((item) => (
-              <div className="d-md-flex mb-5" key={item.id}>
-                <p className="date me-5">
-                  {item.start_year} - {item.end_year}
-                </p>
-                <div>
-                  <p className="fw-bold">{item.school_name}</p>
-                  <p className="text-gray-03 ">
-                    {item.major}
-                    {item.degree}
-                  </p>
-                </div>
+            {resume.education.length === 0 ? (
+              <div className="my-8">
+                <SectionFallback materialIconName="school" fallbackText="講師暫無填寫學歷" />
               </div>
-            ))}
+            ) : (
+              resume.education.map((item) => (
+                <div className="d-md-flex mb-5" key={item.id}>
+                  <p className="date me-5">
+                    {item.start_year} - {item.end_year}
+                  </p>
+                  <div>
+                    <p className="fw-bold">{item.school_name}</p>
+                    <p className="text-gray-03 ">
+                      {item.major}
+                      {item.degree}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
           <div className="tab-pane fade" id="list-certificate" role="tabpanel" aria-labelledby="list-certificate-list">
+            {resume.certificates.length === 0 && (
+              <div className="my-8">
+                <SectionFallback materialIconName="license" fallbackText="講師暫無填寫證書" />
+              </div>
+            )}
             {resume.certificates.map((item, index) => (
               <div className="d-md-flex mb-5" key={index}>
                 <p className="date me-5">{item.issued_date}</p>
