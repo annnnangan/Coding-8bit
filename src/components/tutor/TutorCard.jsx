@@ -1,31 +1,27 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
 import Swal from "sweetalert2";
 
 import tutorApi from "@/api/tutorApi";
 
 export default function TutorCard({ tutor }) {
+  // redux - 檢查用戶是否已登入
+  const { isAuth } = useSelector((state) => state.auth);
   /* ---------------------------------- 收藏導師 ---------------------------------- */
   const [isBookmark, setBookmark] = useState(tutor.is_favorite);
 
-  const getTutorBookmark = async () => {
-    try {
-      const result = await tutorApi.getTutorBookmark(tutor.id);
-      setBookmark(result);
-    } catch (error) {
-      console.log("錯誤", error);
-    }
-  };
-
-  useEffect(() => {
-    getTutorBookmark();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutor.id]);
-
   const handleTutorBookmark = async () => {
     try {
+      if (!isAuth) {
+        Swal.fire({
+          icon: "error",
+          title: `請先登入`,
+        });
+        return;
+      }
       if (isBookmark) {
         await tutorApi.removeBookmarkTutor(tutor.id);
       } else {
