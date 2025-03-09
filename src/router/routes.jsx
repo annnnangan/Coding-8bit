@@ -54,6 +54,7 @@ import StudentPanel from "../pages/student/student-panel";
 import StudentManageCustomRequests from "../pages/student/custom-request/student-manage-custom-requests";
 import StudentProfile from "../pages/student/student-profile";
 import StudentManageBooking from "../pages/student/bookings/student-manage-bookings";
+import StudentFavorites from "../pages/student/student-favorites";
 
 export const router = createHashRouter([
   {
@@ -138,6 +139,7 @@ export const router = createHashRouter([
 
       { path: "profile", element: <StudentProfile /> },
       { path: "booking", element: <StudentManageBooking /> },
+      { path: "favorites", element: <StudentFavorites /> },
     ],
   },
   { path: "*", element: <NotFound /> },

@@ -21,6 +21,11 @@ const menuItems = [
     href: "/student-panel/booking",
   },
   {
+    icon: "bookmarks",
+    name: "我的收藏",
+    href: "/student-panel/favorites",
+  },
+  {
     icon: "auto_stories",
     name: "學習需求管理",
     href: "/student-panel/custom-request",
