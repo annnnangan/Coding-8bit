@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import FormInput from "../common/FormInput";
+import FormInput from "@/components/common/FormInput";
 
 export default function Form() {
   // Zod 驗證規則

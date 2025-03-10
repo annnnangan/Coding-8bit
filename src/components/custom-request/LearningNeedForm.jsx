@@ -2,17 +2,16 @@ import { useState, useEffect, useRef, lazy, Suspense, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 
-import PropTypes from "prop-types";
-
 const ReactQuill = lazy(() => import("react-quill-new"));
+import PropTypes from "prop-types";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormInput from "../common/FormInput";
 import Swal from "sweetalert2";
 import axios from "axios";
 
 import customRequestsApi from "@/api/customRequestsApi";
 
+import FormInput from "@/components/common/FormInput";
 import Loader from "@/components/common/Loader";
 
 import { categories } from "@/data/courses";

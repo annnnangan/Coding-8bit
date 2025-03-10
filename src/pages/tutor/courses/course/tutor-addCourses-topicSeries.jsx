@@ -4,8 +4,8 @@ import { Helmet } from "react-helmet-async";
 import Swal from "sweetalert2";
 
 import AddContent from "@/components/tutor-panel/course/add/AddContent";
-import Loader from "@/components/common/Loader";
 import AddChapter from "@/components/tutor-panel/course/add/AddChapter";
+import Loader from "@/components/common/Loader";
 
 export default function TutorManageAddTopicSeries() {
   // loading

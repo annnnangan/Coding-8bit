@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import {
   convertSecondsToTime,
   formatDate,
-} from "../../../../utils/timeFormatted-utils";
+} from "@/utils/timeFormatted-utils";
 
 export default function TopicSeriesList({ course, deleteCourse }) {
   return (

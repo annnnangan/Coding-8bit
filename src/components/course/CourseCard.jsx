@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 import PropTypes from "prop-types";
 
-import { convertSecondsToTime } from "../../utils/timeFormatted-utils";
+import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 
 const courseCategoryMap = {
   topicSeries: "主題式課程影片",

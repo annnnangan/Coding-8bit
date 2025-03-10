@@ -4,8 +4,8 @@ import * as bootstrap from "bootstrap";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 
-import userApi from "../../../api/userApi";
-import tutorApi from "../../../api/tutorApi";
+import userApi from "@/api/userApi";
+import tutorApi from "@/api/tutorApi";
 
 export default function EducationSection({ userData, setLoadingState }) {
   const [education, setEducation] = useState([]);

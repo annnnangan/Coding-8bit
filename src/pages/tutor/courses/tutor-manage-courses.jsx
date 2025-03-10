@@ -11,8 +11,8 @@ import courseApi from "@/api/courseApi";
 import TopicSeriesList from "@/components/tutor-panel/course/course-list/TopicSeriesList";
 import CustomLearningList from "@/components/tutor-panel/course/course-list/CustomLearningList";
 import FreeTipShortsList from "@/components/tutor-panel/course/course-list/FreeTipShortsList";
-import Loader from "@/components/common/Loader";
 import Pagination from "@/components/layout/Pagination";
+import Loader from "@/components/common/Loader";
 
 export default function TutorManageCourses() {
   // loading
