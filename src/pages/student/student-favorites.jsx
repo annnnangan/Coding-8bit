@@ -163,10 +163,10 @@ function StudentFavorites() {
               aria-labelledby="profile-tab"
             >
               <div className="container tutor-style">
-                <div className="row">
+                <div className="grid-container">
                   {favoriteTutor.map((tutor, index) => (
                     <div
-                      className="card p-lg-5 p-md-4 p-4 img-hover-enlarge col-md-6 col-xl-4 col-12"
+                      className="card p-lg-5 p-md-4 p-4 img-hover-enlarge"
                       style={{ boxShadow: "0px 25px 50px -12px #0000001F" }}
                       key={index}
                     >
@@ -214,16 +214,17 @@ function StudentFavorites() {
                               .slice(0, 3)
                               .map((skill, index) => (
                                 <div
-                                  className="d-inline-block me-1"
+                                  className="d-inline-block me-1 mb-1"
                                   key={index}
                                 >
-                                  <span className="tag tag-brand-02 fs-8">
+                                  <span className="d-inline-block tag tag-brand-02 fs-8">
                                     {skill.trim()}
                                   </span>
                                 </div>
                               ))}
                           </div>
                         )}
+
                         <div className="mb-lg-6 mb-5 mt-auto">
                           <p className="text-gray-02 fs-7 fs-lg-6">
                             每小時收費
@@ -235,17 +236,18 @@ function StudentFavorites() {
                             )}
                           </h2>
                         </div>
+
                         <div className="position-relative">
                           <span
                             className="favorite material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle
-                             text-brand-01
-                            "
+                           text-brand-01"
                             role="button"
                             onClick={() => deleteFavoriteTutor(tutor.Tutor.id)}
                           >
                             favorite
                           </span>
                         </div>
+
                         <NavLink
                           to={`/tutor/${tutor.Tutor.User.id}`}
                           className="btn btn-brand-03 w-100 slide-right-hover"
