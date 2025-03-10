@@ -5,7 +5,6 @@ import { Helmet } from "react-helmet-async";
 import Swal from "sweetalert2";
 
 import authApi from "@/api/authApi";
-import Loader from "@/components/common/Loader";
 
 const { VITE_API_BASE } = import.meta.env;
 
@@ -114,7 +113,6 @@ export default function Login() {
       <Helmet>
         <title>Coding∞bit ｜ 登入</title>
       </Helmet>
-      {loadingState && <Loader />}
 
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="login-section bg">
@@ -208,6 +206,13 @@ export default function Login() {
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
                         arrow_forward
                       </span>
+                      {loadingState && (
+                        <span
+                          className="spinner-border text-brand-01 ms-2"
+                          style={{ width: "20px", height: "20px" }}
+                          role="status"
+                        ></span>
+                      )}
                     </button>
                   </form>
                   <div className="divider-label d-flex align-items-center mt-6 mt-lg-8">

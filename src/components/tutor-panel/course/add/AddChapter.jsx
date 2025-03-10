@@ -5,7 +5,7 @@ import * as bootstrap from "bootstrap";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 
-import courseApi from "../../../../api/courseApi";
+import courseApi from "@/api/courseApi";
 
 export default function AddChapter({ newCourseId, setLoadingState }) {
   const [temChapterList, setTemChapterList] = useState({});

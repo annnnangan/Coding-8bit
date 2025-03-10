@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
-import SignupForm from "../../../components/auth/SignupForm";
+import SignupForm from "@/components/auth/SignupForm";
 
 export default function Signup() {
   const [isVerifying, setIsVerifying] = useState(false);

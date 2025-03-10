@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import BackendPanelMenu from "../../components/layout/BackendPanelMenu";
+import BackendPanelMenu from "@/components/layout/BackendPanelMenu";
 
 export default function StudentPanelMenu({ children }) {
   return (

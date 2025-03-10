@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+
 import SectionFallback from "@/components/common/SectionFallback";
 
 export default function TutorBookingResume({ resume }) {

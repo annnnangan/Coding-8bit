@@ -7,6 +7,7 @@ import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 
 import courseApi from "@/api/courseApi";
+
 import CourseCardList from "@/components/course/CourseCardList";
 import MainTitle from "@/components/MainTitle";
 import Loader from "@/components/common/Loader";

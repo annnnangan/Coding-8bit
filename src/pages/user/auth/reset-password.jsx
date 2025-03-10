@@ -7,9 +7,9 @@ import Swal from "sweetalert2";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import FormInput from "../../..//components/common/FormInput";
-import Loader from "../../../components/common/Loader";
-import authApi from "../../../api/authApi";
+import authApi from "@/api/authApi";
+
+import FormInput from "@/components/common/FormInput";
 
 export default function ResetPassword() {
   // loading
@@ -102,7 +102,6 @@ export default function ResetPassword() {
       <Helmet>
         <title>Coding∞bit ｜ 重設密碼</title>
       </Helmet>
-      {loadingState && <Loader />}
 
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="forgot-password-section bg">
@@ -186,6 +185,13 @@ export default function ResetPassword() {
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
                         arrow_forward
                       </span>
+                      {loadingState && (
+                        <span
+                          className="spinner-border text-brand-01 ms-2"
+                          style={{ width: "20px", height: "20px" }}
+                          role="status"
+                        ></span>
+                      )}
                     </button>
                   </form>
                 </div>

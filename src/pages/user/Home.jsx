@@ -9,16 +9,16 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import AOS from "aos";
 
 // Api
-import courseApi from "../../api/courseApi";
+import courseApi from "@/api/courseApi";
 
 // 元件
-import MainTitle from "../../components/MainTitle";
-import CourseCardList from "../../components/course/CourseCardList";
-import SubscriptionCard from "../../components/subscription/SubscriptionCard";
-import Loader from "../../components/common/Loader";
+import MainTitle from "@/components/MainTitle";
+import CourseCardList from "@/components/course/CourseCardList";
+import SubscriptionCard from "@/components/subscription/SubscriptionCard";
+import Loader from "@/components/common/Loader";
 
 // 內建資料引入
-import { bannerData, featureData, stepsData } from "../../data/home";
+import { bannerData, featureData, stepsData } from "@/data/home";
 
 export default function Home() {
   // loading

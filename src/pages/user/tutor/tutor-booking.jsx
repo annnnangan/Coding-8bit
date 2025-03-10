@@ -22,8 +22,8 @@ import TutorCardLoadingSkeleton from "@/components/tutor/TutorCardLoadingSkeleto
 import TutorsCard from "@/components/tutor/TutorsCard";
 
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
-import CourseCardLoadingSkeleton from "../../../components/course/CourseCardLoadingSkeleton";
-import { updateFormData } from "../../../utils/slice/bookingSlice";
+import CourseCardLoadingSkeleton from "@/components/course/CourseCardLoadingSkeleton";
+import { updateFormData } from "@/utils/slice/bookingSlice";
 
 export default function TutorBooking() {
   const dispatch = useDispatch();

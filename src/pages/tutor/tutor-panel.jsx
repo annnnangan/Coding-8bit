@@ -4,14 +4,15 @@ import { useSelector } from "react-redux";
 
 import { Swiper } from "swiper";
 
+import bookingApi from "@/api/bookingApi";
+
 import DashboardSection from "@/components/common/DashboardSection";
 import SectionFallback from "@/components/common/SectionFallback";
 import CourseCard from "@/components/course/CourseCard";
-import BookingCard from "../../components/common/booking-record/BookingCard";
-import BookingCardLoadingSkeleton from "../../components/common/booking-record/BookingCardLoadingSkeleton";
+import BookingCard from "@/components/common/booking-record/BookingCard";
+import BookingCardLoadingSkeleton from "@/components/common/booking-record/BookingCardLoadingSkeleton";
 
-import bookingApi from "@/api/bookingApi";
-import { dashboardRecommendCourseList } from "../../data/courses";
+import { dashboardRecommendCourseList } from "@/data/courses";
 
 export default function TutorPanel() {
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
