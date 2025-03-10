@@ -30,7 +30,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
     }
 
     // 如果檔案大小大於 50MB
-    const MAX_FILE_SIZE_MB = 50;
+    const MAX_FILE_SIZE_MB = 5;
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       Swal.fire({
         icon: "error",
@@ -118,6 +118,10 @@ export default function ProfileContent({ userData, setLoadingState }) {
   // 切換個人資料編輯狀態
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const handleEditProfile = () => {
+    setTemProfile({
+      username: userData.username,
+      avatar_url: userData.avatar_url,
+    })
     setIsEditingProfile((prev) => (prev = !prev));
   };
 
@@ -163,11 +167,28 @@ export default function ProfileContent({ userData, setLoadingState }) {
 
             {/* 預覽圖片 */}
             {temProfile.avatar_url && (
-              <img
-                src={temProfile.avatar_url}
-                alt="profile-avatar_url"
-                className="w-100 object-fit"
-              />
+              <div className="img-wrapper rounded-circle border-0 p-0">
+                <img
+                  src={temProfile.avatar_url}
+                  alt="profile-avatar_url"
+                  className="object-fit h-100"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTemProfile((prevData) => {
+                      return {
+                        ...prevData,
+                        avatar_url: "",
+                      };
+                    })
+                  }
+                >
+                  <span className="material-symbols-outlined delete-icon">
+                    delete
+                  </span>
+                </button>
+              </div>
             )}
 
             {/* 未編輯的樣子 */}
@@ -202,6 +223,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
                 type="text"
                 name="暱稱"
                 className="form-control fw-bold"
+                defaultValue={temProfile.username}
                 placeholder="請輸入暱稱"
                 onChange={handleProfile}
               />
