@@ -15,7 +15,7 @@ export const BuyerForm = () => {
         <div className="col-lg-6">
           <FormInput style="payInput" register={register} errors={errors} id="buyerName" labelText="姓名" type="text" />
         </div>
-        <div className="col-lg-6">
+        <div className="col-lg-6 mt-4 mt-lg-0">
           <FormInput style="payInput" register={register} errors={errors} id="buyerTel" labelText="電話" type="tel" />
         </div>
       </div>

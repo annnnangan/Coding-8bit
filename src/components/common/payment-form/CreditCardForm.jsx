@@ -43,7 +43,6 @@ export const CreditCardForm = () => {
           </label>
           <input
             type="text"
-            inputMode="numeric"
             className={`form-control rounded-1 border-0 bg-light mt-1 ${errors?.creditCardExpiration && "is-invalid"}`}
             id="creditCardExpiration"
             placeholder="MM / YY"
