@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
@@ -59,7 +59,7 @@ export default function TutorCard({ tutor }) {
 
         {/*  dynamic tag loop*/}
         {tutor.expertise && (
-          <div className="mb-5">
+          <div className="d-flex mb-5">
             {tutor.expertise
               .trim()
               .split(",")
@@ -104,7 +104,7 @@ TutorCard.propTypes = {
     id: PropTypes.string.isRequired,
     slogan: PropTypes.string.isRequired,
     expertise: PropTypes.string.isRequired,
-    rating: PropTypes.string,
+    rating: PropTypes.number,
     hourly_rate: PropTypes.string.isRequired,
     is_favorite: PropTypes.bool,
     user: PropTypes.shape({
