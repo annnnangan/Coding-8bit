@@ -100,7 +100,7 @@ export default function Footer() {
             </a>
           </li>
           <li className="ms-3">
-            <a href="#" className="icon-hover">
+            <a href="mailto:coding8bit@gmail.com" className="icon-hover">
               <img src="images/icon/icon-mail-purple.svg" alt="icon-ins" />
             </a>
           </li>

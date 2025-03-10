@@ -3,6 +3,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import courseApi from "@/api/courseApi";
+
 import CourseCardList from "@/components/course/CourseCardList";
 import Pagination from "@/components/layout/Pagination";
 import Loader from "@/components/common/Loader";

@@ -4,15 +4,15 @@ import { NavLink } from "react-router-dom";
 
 import { Swiper } from "swiper";
 
-import CourseCard from "../../components/course/CourseCard";
-import DashboardSection from "../../components/common/DashboardSection";
-import NavLinkButton from "../../components/common/NavLinkButton";
-import AvatarWithFallback from "../../components/common/AvatarWithFallback";
-import BookingCard from "../../components/common/booking-record/BookingCard";
+import CourseCard from "@/components/course/CourseCard";
+import DashboardSection from "@/components/common/DashboardSection";
+import NavLinkButton from "@/components/common/NavLinkButton";
+import AvatarWithFallback from "@/components/common/AvatarWithFallback";
+import BookingCard from "@/components/common/booking-record/BookingCard";
 
-import { dashboardContinueToWatchCourseList, dashboardRecommendCourseList } from "../../data/courses";
-import { userBookedTutor } from "../../data/tutors";
-import { userBookingData } from "../../data/bookings";
+import { dashboardContinueToWatchCourseList, dashboardRecommendCourseList } from "@/data/courses";
+import { userBookedTutor } from "@/data/tutors";
+import { userBookingData } from "@/data/bookings";
 
 
 export default function StudentPanel() {

@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 
-import authApi from "../../../api/authApi";
-import Loader from "../../../components/common/Loader";
+import authApi from "@/api/authApi";
 
 export default function ForgotPassword() {
   // loading
@@ -15,23 +14,28 @@ export default function ForgotPassword() {
 
   // 傳送忘記密碼郵件函式
   const [email, setEmail] = useState("");
+  const [countdown, setCountdown] = useState(0);
   const sendEmail = async () => {
+    if (!email) {
+      Swal.fire({
+        icon: "warning",
+        title: "請輸入電子郵件",
+      });
+      return;
+    }
+
     setLoadingState(true);
     try {
-      await authApi.sendForgotPasswordEmail({
-        email: email,
-      });
+      await authApi.sendForgotPasswordEmail({ email });
       Swal.fire({
         icon: "success",
         title: "已傳送重設密碼的連結至您的電子信箱",
         text: "請至信箱確認信件",
       });
 
-      // 防止用戶不斷點擊
+      // 開始倒數計時
       setIsClick(false);
-      setTimeout(() => {
-        setIsClick(true);
-      }, 60000);
+      setCountdown(60);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -43,6 +47,19 @@ export default function ForgotPassword() {
     }
   };
 
+  // 倒數計時 useEffect
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+
+      return () => clearTimeout(timer); // 清除計時器
+    } else {
+      setIsClick(true); // 倒數結束後恢復按鈕可用
+    }
+  }, [countdown]);
+
   const handleEmail = (e) => {
     setEmail(e.target.value);
   };
@@ -52,7 +69,6 @@ export default function ForgotPassword() {
       <Helmet>
         <title>Coding∞bit ｜ 忘記密碼</title>
       </Helmet>
-      {loadingState && <Loader />}
 
       <style>{`body { background-color: #c0c4df; }`}</style>
       <main className="forgot-password-section bg">
@@ -93,10 +109,17 @@ export default function ForgotPassword() {
                       onClick={sendEmail}
                       disabled={!isClick}
                     >
-                      發送驗證信
+                      {isClick ? "發送驗證信" : `請稍候重試 (${countdown}s)`}
                       <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
                         arrow_forward
                       </span>
+                      {loadingState && (
+                        <span
+                          className="spinner-border text-brand-01 ms-2"
+                          style={{ width: "20px", height: "20px" }}
+                          role="status"
+                        ></span>
+                      )}
                     </button>
                   </form>
                 </div>

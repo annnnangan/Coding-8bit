@@ -9,12 +9,12 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import PropTypes from "prop-types";
 
-import courseApi from "../../../../api/courseApi";
-import userApi from "../../../../api/userApi";
+import courseApi from "@/api/courseApi";
+import userApi from "@/api/userApi";
 
-import FormInput from "../../../common/FormInput";
+import FormInput from "@/components/common/FormInput";
 
-import { categories } from "../../../../data/courses";
+import { categories } from "@/data/courses";
 
 const { VITE_API_BASE } = import.meta.env;
 

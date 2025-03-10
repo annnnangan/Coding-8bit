@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import {
   convertSecondsToTime,
   formatDate,
-} from "../../../../utils/timeFormatted-utils";
+} from "@/utils/timeFormatted-utils";
 
 export default function FreeTipShortsList({ course, deleteCourse }) {
   return (
@@ -16,7 +16,8 @@ export default function FreeTipShortsList({ course, deleteCourse }) {
             <img
               src={course.cover_image}
               alt="course-image"
-              className="w-100"
+              className="object-fit w-100"
+              style={{height: '72px'}}
             />
             <span className="position-absolute py-1 px-2 rounded-1 fs-7 related-video-duration">
               {convertSecondsToTime(course.duration)}

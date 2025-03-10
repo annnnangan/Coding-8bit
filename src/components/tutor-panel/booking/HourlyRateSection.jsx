@@ -6,10 +6,10 @@ import Swal from "sweetalert2";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import tutorApi from "@/api/tutorApi";
+
 import FormInput from "@/components/common/FormInput";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
-
-import tutorApi from "@/api/tutorApi";
 
 const schema = z.object({
   hourly_rate: z
