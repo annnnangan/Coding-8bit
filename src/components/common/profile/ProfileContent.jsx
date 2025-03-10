@@ -199,13 +199,13 @@ export default function ProfileContent({ userData, setLoadingState }) {
                   <img
                     src={userData.avatar_url}
                     alt="profile-avatar_url"
-                    className="w-100 object-fit"
+                    className="w-100 object-fit rounded-circle"
                   />
                 ) : (
                   <img
                     src="images/icon/user.png"
                     alt="profile-avatar_url"
-                    className="w-100 object-fit"
+                    className="w-100 object-fit rounded-circle"
                   />
                 )}
               </>

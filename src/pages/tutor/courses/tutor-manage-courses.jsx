@@ -127,7 +127,13 @@ export default function TutorManageCourses() {
             icon: "success",
             title: "刪除成功",
           });
-          getData();
+          if (type === "topicSeries") {
+            getData("topicSeries");
+          } else if (type === "customLearning") {
+            getData("customLearning");
+          } else {
+            getData("freeTipShorts");
+          }
         } catch (error) {
           Swal.fire({
             icon: "error",
@@ -271,7 +277,7 @@ export default function TutorManageCourses() {
             </li>
           ))}
         </ul>
-        <div className="table-list tab-content " id="courseCategoryTab">
+        <div className="table-list tab-content" id="courseCategoryTab">
           {courseCategory.map((item, index) => (
             <div
               className={`tab-pane ${
@@ -283,78 +289,147 @@ export default function TutorManageCourses() {
               key={index}
             >
               <div className="table-wrap mt-6 mt-lg-8">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>
-                        {item.category === "topicSeries"
-                          ? "課程名稱"
-                          : "影片名稱"}
-                      </th>
-                      <th>類別</th>
-                      <th>瀏覽權限</th>
-                      <th>上傳日期</th>
-                      <th>觀看數</th>
-                      <th>評價</th>
-                      <th>操作</th>
-                    </tr>
-                  </thead>
-                  {item.category === "topicSeries" &&
-                    courses.topicSeries.map((course) => (
-                      <TopicSeriesList
-                        course={course}
-                        key={course.id}
-                        deleteCourse={deleteCourse}
-                      />
-                    ))}
-                  {item.category === "customLearning" &&
-                    courses.customLearning.map((course) => (
-                      <CustomLearningList
-                        course={course}
-                        key={course.id}
-                        deleteCourse={deleteCourse}
-                      />
-                    ))}
-                  {item.category === "freeTipShorts" &&
-                    courses.freeTipShorts.map((course) => (
-                      <FreeTipShortsList
-                        course={course}
-                        key={course.id}
-                        deleteCourse={deleteCourse}
-                      />
-                    ))}
-                </table>
+                {/* 主題系列課程 */}
+                {item.category === "topicSeries" ? (
+                  courses.topicSeries.length > 0 ? (
+                    <>
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>課程名稱</th>
+                            <th>類別</th>
+                            <th>瀏覽權限</th>
+                            <th>上傳日期</th>
+                            <th>觀看數</th>
+                            <th>評價</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        {courses.topicSeries.map((course) => (
+                          <TopicSeriesList
+                            course={course}
+                            key={course.id}
+                            deleteCourse={deleteCourse}
+                          />
+                        ))}
+                      </table>
+                    </>
+                  ) : (
+                    <p className="f-center flex-column text-center text-gray-03 pt-4">
+                      <span className="material-symbols-outlined mb-2">
+                        animated_images
+                      </span>
+                      <span>- 暫無影片 -</span>
+                    </p>
+                  )
+                ) : null}
+
+                {/* 客製化學習需求 */}
+                {item.category === "customLearning" ? (
+                  courses.customLearning.length > 0 ? (
+                    <>
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>影片名稱</th>
+                            <th>類別</th>
+                            <th>瀏覽權限</th>
+                            <th>上傳日期</th>
+                            <th>觀看數</th>
+                            <th>評價</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        {courses.customLearning.map((course) => (
+                          <CustomLearningList
+                            course={course}
+                            key={course.id}
+                            deleteCourse={deleteCourse}
+                          />
+                        ))}
+                      </table>
+                    </>
+                  ) : (
+                    <p className="f-center flex-column text-center text-gray-03 pt-4">
+                      <span className="material-symbols-outlined mb-2">
+                        animated_images
+                      </span>
+                      <span>- 暫無影片 -</span>
+                    </p>
+                  )
+                ) : null}
+
+                {/* 免費技術短片 */}
+                {item.category === "freeTipShorts" ? (
+                  courses.freeTipShorts.length > 0 ? (
+                    <>
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>影片名稱</th>
+                            <th>類別</th>
+                            <th>瀏覽權限</th>
+                            <th>上傳日期</th>
+                            <th>觀看數</th>
+                            <th>評價</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        {courses.freeTipShorts.map((course) => (
+                          <FreeTipShortsList
+                            course={course}
+                            key={course.id}
+                            deleteCourse={deleteCourse}
+                          />
+                        ))}
+                      </table>
+                    </>
+                  ) : (
+                    <p className="f-center flex-column text-center text-gray-03 pt-4">
+                      <span className="material-symbols-outlined mb-2">
+                        animated_images
+                      </span>
+                      <span>- 暫無影片 -</span>
+                    </p>
+                  )
+                ) : null}
+
                 {/* 頁碼 */}
-                {item.category === "topicSeries" && (
-                  <div className="tutor-manage-course-pagination-wrap">
-                    <Pagination
-                      pageData={pageData?.topicSeries}
-                      type="topicSeries"
-                      getData={getData}
-                    />
-                  </div>
-                )}
+                {item.category === "topicSeries" &&
+                  courses.topicSeries.length > 0 && (
+                    <div className="tutor-manage-course-pagination-wrap">
+                      <Pagination
+                        pageData={pageData?.topicSeries}
+                        type="topicSeries"
+                        getData={getData}
+                      />
+                    </div>
+                  )}
 
-                {item.category === "customLearning" && (
-                  <div className="tutor-manage-course-pagination-wrap">
-                    <Pagination
-                      pageData={pageData?.customLearning}
-                      type="customLearning"
-                      getData={getData}
-                    />
-                  </div>
-                )}
+                {item.category === "customLearning" &&
+                  courses.customLearning.length > 0 && (
+                    <div className="tutor-manage-course-pagination-wrap">
+                      <Pagination
+                        pageData={pageData?.customLearning}
+                        type="customLearning"
+                        getData={getData}
+                      />
+                    </div>
+                  )}
 
-                {item.category === "freeTipShorts" && (
-                  <div className="tutor-manage-course-pagination-wrap">
-                    <Pagination
-                      pageData={pageData?.freeTipShorts}
-                      type="freeTipShorts"
-                      getData={getData}
-                    />
-                  </div>
-                )}
+                {item.category === "freeTipShorts" &&
+                  courses.freeTipShorts.length > 0 && (
+                    <div className="tutor-manage-course-pagination-wrap">
+                      <Pagination
+                        pageData={pageData?.freeTipShorts}
+                        type="freeTipShorts"
+                        getData={getData}
+                      />
+                    </div>
+                  )}
               </div>
             </div>
           ))}
