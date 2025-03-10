@@ -3,9 +3,9 @@ import { Helmet } from "react-helmet-async";
 
 import axios from "axios";
 
-import ResetPassword from "../../components/common/profile/ResetPassword";
-import ProfileContent from "../../components/common/profile/ProfileContent";
-import Loader from "../../components/common/Loader";
+import ResetPassword from "@/components/common/profile/ResetPassword";
+import ProfileContent from "@/components/common/profile/ProfileContent";
+import Loader from "@/components/common/Loader";
 
 export default function StudentProfile() {
   // loading

@@ -4,8 +4,9 @@ import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
 
-import authApi from "../../../api/authApi";
-import Loader from "../../../components/common/Loader";
+import authApi from "@/api/authApi";
+
+import Loader from "@/components/common/Loader";
 
 export default function ActivateSuccess() {
   // loading

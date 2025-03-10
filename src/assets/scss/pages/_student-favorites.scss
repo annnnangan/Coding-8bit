@@ -41,11 +41,31 @@
   }
 
   .tutor-style {
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+    }
+
     .favorite {
       background-color: rgb(226 220 220 / 40%);
       right: 0;
       bottom: 10px;
     }
-  }
+    .tag{
 
+    }
+
+    @media (max-width: 1440px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(1, 1fr);
+      }
+    }
+  }
 }

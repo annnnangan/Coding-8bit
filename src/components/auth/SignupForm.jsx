@@ -6,10 +6,9 @@ import PropTypes from "prop-types";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import authApi from "../../api/authApi";
-import FormInput from "../common/FormInput";
-import Loader from "../common/Loader";
+import authApi from "@/api/authApi";
 
+import FormInput from "@/components/common/FormInput";
 
 export default function SignupForm({ setIsVerifying }) {
   // loading
@@ -83,8 +82,6 @@ export default function SignupForm({ setIsVerifying }) {
 
   return (
     <>
-      {loadingState && <Loader />}
-
       <form className="mt-6 mt-lg-11" onSubmit={handleSubmit(onSubmit)}>
         <div className="position-relative">
           <FormInput
@@ -162,6 +159,13 @@ export default function SignupForm({ setIsVerifying }) {
           <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
             arrow_forward
           </span>
+          {loadingState && (
+            <span
+              className="spinner-border text-brand-01 ms-2"
+              style={{ width: "20px", height: "20px" }}
+              role="status"
+            ></span>
+          )}
         </button>
       </form>
     </>

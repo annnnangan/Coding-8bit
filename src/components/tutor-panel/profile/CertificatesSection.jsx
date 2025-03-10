@@ -4,7 +4,7 @@ import * as bootstrap from "bootstrap";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 
-import tutorApi from "../../../api/tutorApi";
+import tutorApi from "@/api/tutorApi";
 
 export default function CertificatesSection({ userData, setLoadingState }) {
   const [certificates, setCertificates] = useState([]);

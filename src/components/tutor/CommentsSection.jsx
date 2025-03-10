@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 
-import CommentCard from "../tutor/CommentCard";
+import CommentCard from "@/components/tutor/CommentCard";
 import CommentRatingStat from "./CommentRatingStat";
 import SectionFallback from "@/components/common/SectionFallback";
 
