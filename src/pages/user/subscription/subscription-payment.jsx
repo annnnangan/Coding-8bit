@@ -12,7 +12,6 @@ import orderApi from "@/api/orderApi";
 
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 import PaymentStepSection1 from "@/components/subscription/PaymentStepSection1";
-import PaymentStepSection3 from "@/components/subscription/PaymentStepSection3";
 import Loader from "@/components/common/Loader";
 
 import { PaymentSchema } from "@/utils/schema/payment-schema";
@@ -170,12 +169,7 @@ export default function SubscriptionPayment() {
       });
 
       addPay(res.data.id);
-      console.log(res.data.id);
 
-      // updateOrderStatus(res.data.id, {
-      //   order_status: "paid",
-      //   ...orderData,
-      // });
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -190,35 +184,38 @@ export default function SubscriptionPayment() {
   const addPay = async (orderId) => {
     setLoadingState(true);
     try {
-      // 1. 呼叫後端 API 取得藍新金流參數
-      const response = await orderApi.addPay(orderId, window.location.href);
+      // 設定前端跳轉的網址
+      const returnUrl = `https://coding-8bit.site/#/subscription/subscription-paymentResult`;
+  
+      // 呼叫 API 取得藍新金流參數
+      const response = await orderApi.addPay(orderId, returnUrl);
+  
       // 取得必要的付款資訊
-      const payGatewayUrl = response.PayGateWay; // 付款網址
       const transactionId = response.transactionId;
 
-      // 導向新頁面，並將資訊放入 URL 參數
-      window.location.href = `https://35c4-118-150-117-51.ngrok-free.app/#/subscription/subscription-paymentResult/?gateway=${encodeURIComponent(
-        payGatewayUrl
-      )}&transactionId=${transactionId}&subscriptionPlan=${subscriptionPlan}&duration=${duration}&orderId=${orderId}`;
-
-      const paymentInfo = response;
-
-      console.log("取得的付款資訊:", paymentInfo);
-
-      // 2. 創建隱藏的表單，填入參數
+      // 必要資料存入 sessionStorage 給付款完成頁用
+      sessionStorage.setItem("transactionId", transactionId);
+      sessionStorage.setItem("subscriptionId", subscriptionId);
+      sessionStorage.setItem("subscriptionPlan", subscriptionPlan);
+      sessionStorage.setItem("duration", duration);
+      sessionStorage.setItem("formattedToday", formattedToday);
+      sessionStorage.setItem("formattedNextMonth", formattedNextMonth);
+      sessionStorage.setItem("formattedNextYear", formattedNextYear);
+  
+      // 創建表單並跳轉到藍新付款頁
       const form = document.createElement("form");
       form.method = "POST";
-      form.action = paymentInfo.PayGateWay;
+      form.action = response.PayGateWay;
       form.style.display = "none";
-
-      // 3. 設定藍新金流所需的參數
+  
+      // 藍新金流參數
       const params = [
-        { name: "MerchantID", value: paymentInfo.MerchantID },
-        { name: "TradeInfo", value: paymentInfo.TradeInfo },
-        { name: "TradeSha", value: paymentInfo.TradeSha },
-        { name: "Version", value: paymentInfo.Version },
+        { name: "MerchantID", value: response.MerchantID },
+        { name: "TradeInfo", value: response.TradeInfo },
+        { name: "TradeSha", value: response.TradeSha },
+        { name: "Version", value: response.Version },
       ];
-
+  
       params.forEach(({ name, value }) => {
         const input = document.createElement("input");
         input.type = "hidden";
@@ -226,11 +223,10 @@ export default function SubscriptionPayment() {
         input.value = value;
         form.appendChild(input);
       });
-
+  
       document.body.appendChild(form);
-
-      // 4. 自動提交表單，跳轉至藍新付款頁面
-      form.submit();
+      form.submit(); // ✅ 跳轉到藍新金流
+  
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -241,6 +237,7 @@ export default function SubscriptionPayment() {
       setLoadingState(false);
     }
   };
+  
 
   // // 更新訂單狀態
   // const updateOrderStatus = async (orderId, orderData) => {
@@ -433,16 +430,6 @@ export default function SubscriptionPayment() {
                 </div>
               </div>
             </>
-          )}
-          {currentStep === 3 && (
-            <PaymentStepSection3
-              prices={prices}
-              duration={duration}
-              subscriptionPlan={subscriptionPlan}
-              formattedToday={formattedToday}
-              formattedNextMonth={formattedNextMonth}
-              formattedNextYear={formattedNextYear}
-            />
           )}
         </form>
       </FormProvider>

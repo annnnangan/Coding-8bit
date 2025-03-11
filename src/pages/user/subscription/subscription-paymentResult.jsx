@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
@@ -14,71 +14,20 @@ export default function SubscriptionPaymentResult() {
   // loading
   const [loadingState, setLoadingState] = useState(false);
 
-  // 取得路由中的值
-  const [searchParams] = useSearchParams();
-  
-  const gateway = searchParams.get("gateway");
-  const transactionId = searchParams.get("transactionId");
-  const duration = searchParams.get("duration");
-  const orderId = searchParams.get("orderId");
-
-  const [formattedToday, setFormattedToday] = useState("");
-  const [formattedNextMonth, setFormattedNextMonth] = useState("");
-  const [formattedNextYear, setFormattedNextYear] = useState("");
-
   const [payResult, setPayResult] = useState([]);
   const [isPaid, setIsPaid] = useState(false);
   const [isPending, setIsPending] = useState(true);
-  const checkPaymentStatus = async (transactionId) => {
+
+  const checkPaymentStatus = async (transactionId, subscriptionId) => {
     setLoadingState(true);
     try {
-      const today = new Date();
-      const nextMonth = new Date();
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
-
-      const startDate = today
-        .toLocaleDateString("zh-TW", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\//g, "-");
-      setFormattedToday(startDate);
-
-      // 下個月的日期
-      const endNextMonthDate = nextMonth
-        .toLocaleDateString("zh-TW", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\//g, "-");
-      setFormattedNextMonth(endNextMonthDate);
-
-      // 明年的日期
-      const nextYear = new Date();
-      nextYear.setFullYear(nextYear.getFullYear() + 1);
-      const endNextYearDate = nextYear
-        .toLocaleDateString("zh-TW", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\//g, "-");
-
-      setFormattedNextYear(endNextYearDate);
-
       const response = await orderApi.checkPayResult(transactionId);
       setPayResult(response);
-      const transaction = response.data;
+      const transaction = response;
 
       if (transaction.status === "completed" || transaction.status === "paid") {
-        Swal.fire({
-          title: "付款成功",
-          icon: "success",
-        });
         setIsPaid(true);
-        updateOrderStatus();
+        updateOrderStatus(subscriptionId);
       } else {
         Swal.fire({
           icon: "warning",
@@ -99,25 +48,16 @@ export default function SubscriptionPaymentResult() {
   };
 
   // 更新訂單狀態
-  const updateOrderStatus = async () => {
+  const updateOrderStatus = async (subscriptionId) => {
     setLoadingState(true);
     try {
-      await Promise.all([
-        orderApi.updateOrder(orderId, {
-          order_type: subscriptionPlan,
-          target_id: subscriptionId,
-          amount: payResult.amount,
-          order_status: "paid",
-        }),
-        subscriptionApi.updateSubscription(subscriptionId, {
-          status: "active",
-        }),
-      ]);
-
-      Swal.fire({
-        title: "付款成功",
-        icon: "success",
-      });
+      await subscriptionApi.updateSubscription(subscriptionId, {
+        status: "active",
+      }),
+        Swal.fire({
+          title: "付款成功",
+          icon: "success",
+        });
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -129,12 +69,26 @@ export default function SubscriptionPaymentResult() {
     }
   };
 
+  // 取用付款頁存下來的資料
+  const [subscriptionPlan, setSubscriptionPlan] = useState("");
+  const [duration, setDuration] = useState("");
+  const [formattedToday, setFormattedToday] = useState("");
+  const [formattedNextMonth, setFormattedNextMonth] = useState("");
+  const [formattedNextYear, setFormattedNextYear] = useState("");
+
   useEffect(() => {
-    if (gateway) {
-      document.getElementById("newebpay-form").submit();
-      checkPaymentStatus(transactionId);
-    }
-  }, [gateway]);
+    setSubscriptionPlan(sessionStorage.getItem("subscriptionPlan"));
+    setDuration(sessionStorage.getItem("duration"));
+    setFormattedToday(sessionStorage.getItem("formattedToday"));
+    setFormattedNextMonth(sessionStorage.getItem("formattedNextMonth"));
+    setFormattedNextYear(sessionStorage.getItem("formattedNextYear"));
+
+    checkPaymentStatus(
+      sessionStorage.getItem("transactionId"),
+      sessionStorage.getItem("subscriptionId")
+    );
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -146,7 +100,7 @@ export default function SubscriptionPaymentResult() {
         <>
           {isPaid ? (
             <PaymentStepSection3
-              prices={payResult.amount}
+              price={Number(payResult.amount)}
               duration={duration}
               subscriptionPlan={subscriptionPlan}
               formattedToday={formattedToday}
