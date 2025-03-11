@@ -10,7 +10,6 @@ import Swal from "sweetalert2";
 import subscriptionApi from "@/api/subscriptionApi";
 import orderApi from "@/api/orderApi";
 
-import { CreditCardForm } from "@/components/common/payment-form/CreditCardForm";
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 import PaymentStepSection1 from "@/components/subscription/PaymentStepSection1";
 import PaymentStepSection3 from "@/components/subscription/PaymentStepSection3";
@@ -18,14 +17,7 @@ import Loader from "@/components/common/Loader";
 
 import { PaymentSchema } from "@/utils/schema/payment-schema";
 
-const step2Fields = [
-  "buyerEmail",
-  "buyerName",
-  "buyerTel",
-  "userCreditCardNumber",
-  "creditCardExpiration",
-  "creditCardCvc",
-];
+const step2Fields = ["buyerEmail", "buyerName", "buyerTel"];
 
 export default function SubscriptionPayment() {
   // loading
@@ -177,51 +169,106 @@ export default function SubscriptionPayment() {
         ...orderData,
       });
 
-      updateOrderStatus(res.data.id, {
-        order_status: "paid",
-        ...orderData,
-      });
+      addPay(res.data.id);
+      console.log(res.data.id);
+
+      // updateOrderStatus(res.data.id, {
+      //   order_status: "paid",
+      //   ...orderData,
+      // });
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "付款失敗",
         text: error.response?.data?.message || "發生未知錯誤",
       });
-
-      await subscriptionApi.updateSubscription(subscriptionId, {
-        status: "cancelled",
-      });
     } finally {
       setLoadingState(false);
     }
   };
-  // 更新訂單狀態
-  const updateOrderStatus = async (orderId, orderData) => {
+  // 建立藍新金流
+  const addPay = async (orderId) => {
     setLoadingState(true);
     try {
-      await Promise.all([
-        orderApi.updateOrder(orderId, orderData),
-        subscriptionApi.updateSubscription(subscriptionId, {
-          status: "active",
-        }),
-      ]);
+      // 1. 呼叫後端 API 取得藍新金流參數
+      const response = await orderApi.addPay(orderId, window.location.href);
+      // 取得必要的付款資訊
+      const payGatewayUrl = response.PayGateWay; // 付款網址
+      const transactionId = response.transactionId;
 
-      Swal.fire({
-        title: "付款成功",
-        icon: "success",
+      // 導向新頁面，並將資訊放入 URL 參數
+      window.location.href = `https://35c4-118-150-117-51.ngrok-free.app/#/subscription/subscription-paymentResult/?gateway=${encodeURIComponent(
+        payGatewayUrl
+      )}&transactionId=${transactionId}&subscriptionPlan=${subscriptionPlan}&duration=${duration}&orderId=${orderId}`;
+
+      const paymentInfo = response;
+
+      console.log("取得的付款資訊:", paymentInfo);
+
+      // 2. 創建隱藏的表單，填入參數
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = paymentInfo.PayGateWay;
+      form.style.display = "none";
+
+      // 3. 設定藍新金流所需的參數
+      const params = [
+        { name: "MerchantID", value: paymentInfo.MerchantID },
+        { name: "TradeInfo", value: paymentInfo.TradeInfo },
+        { name: "TradeSha", value: paymentInfo.TradeSha },
+        { name: "Version", value: paymentInfo.Version },
+      ];
+
+      params.forEach(({ name, value }) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
       });
 
-      setCurrentStep(3);
+      document.body.appendChild(form);
+
+      // 4. 自動提交表單，跳轉至藍新付款頁面
+      form.submit();
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "訂單狀態更新失敗",
+        title: "付款失敗",
         text: error.response?.data?.message || "發生未知錯誤",
       });
     } finally {
       setLoadingState(false);
     }
   };
+
+  // // 更新訂單狀態
+  // const updateOrderStatus = async (orderId, orderData) => {
+  //   setLoadingState(true);
+  //   try {
+  //     await Promise.all([
+  //       orderApi.updateOrder(orderId, orderData),
+  //       subscriptionApi.updateSubscription(subscriptionId, {
+  //         status: "active",
+  //       }),
+  //     ]);
+
+  //     Swal.fire({
+  //       title: "付款成功",
+  //       icon: "success",
+  //     });
+
+  //     setCurrentStep(3);
+  //   } catch (error) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "訂單狀態更新失敗",
+  //       text: error.response?.data?.message || "發生未知錯誤",
+  //     });
+  //   } finally {
+  //     setLoadingState(false);
+  //   }
+  // };
 
   const onSubmit = () => {};
 
@@ -282,7 +329,21 @@ export default function SubscriptionPayment() {
                       </div>
                       <div className="input-card card shadow rounded-2 p-6 p-lg-10 mt-6">
                         <h2 className="fs-5 fs-lg-3">付款方式</h2>
-                        <CreditCardForm />
+                        <div className="form-check mt-6">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="pay-with"
+                            id="creditCard"
+                            defaultChecked
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="creditCard"
+                          >
+                            藍新金流
+                          </label>
+                        </div>
                       </div>
                     </div>
 
@@ -336,7 +397,7 @@ export default function SubscriptionPayment() {
                           className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100 mt-8"
                           onClick={toNextStep}
                         >
-                          立即付款
+                          前往付款
                           <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
                             arrow_forward
                           </span>
