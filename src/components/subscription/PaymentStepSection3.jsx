@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
 
 export default function PaymentStepSection3({
-  prices,
+  price,
   duration,
   subscriptionPlan,
   formattedToday,
@@ -38,7 +38,7 @@ export default function PaymentStepSection3({
                       </th>
                       <td className="border-0 text-end">
                         <h3 className="fs-5 fs-lg-4 pt-6">
-                          NT$ {Number(prices[subscriptionPlan]?.[duration]).toLocaleString() || ""}
+                          NT$ {price.toFixed(0)}
                         </h3>
                       </td>
                     </tr>
@@ -89,7 +89,7 @@ export default function PaymentStepSection3({
 }
 
 PaymentStepSection3.propTypes = {
-  prices: PropTypes.object.isRequired,
+  price: PropTypes.number.isRequired,
   duration: PropTypes.oneOf(["price_monthly", "price_annually"]).isRequired,
   subscriptionPlan: PropTypes.string.isRequired,
   formattedToday: PropTypes.string.isRequired,
