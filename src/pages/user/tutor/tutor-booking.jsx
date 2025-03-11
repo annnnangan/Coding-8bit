@@ -601,17 +601,8 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                {isLoadingAvailableTime && (
-                  <div className="placeholder-glow">
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                  </div>
-                )}
-                {!isLoadingAvailableTime && currentAvailableTime.length > 0 && (
+
+                {currentAvailableTime.length > 0 && (
                   <Timetable
                     availability={currentAvailableTime}
                     weekOffset={weekOffset}
