@@ -12,7 +12,23 @@ const updateOrder = async (id, orderData) => {
   return response.data;
 };
 
+// 建立付款
+const addPay = async (orderId, url) => {
+  const response = await apiClient.post(`/payment/orders/${orderId}/pay`, {
+    "frontendReturnUrl": url
+  });
+  return response.data.data;
+};
+
+// 查詢付款結果
+const checkPayResult = async (transactionId) => {
+  const response = await apiClient.get(`/payment/transactions/${transactionId}`);
+  return response.data.data;
+};
+
 export default {
   addOrder,
-  updateOrder
+  updateOrder,
+  addPay,
+  checkPayResult
 };
