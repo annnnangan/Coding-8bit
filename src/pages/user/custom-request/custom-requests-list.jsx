@@ -294,7 +294,7 @@ export default function CustomRequestsList() {
               </div>
               {/* 下拉霸 */}
               <div className="d-flex column-gap-4 pe-lg-6 order-lg-2 order-1 ms-xl-auto">
-                <div className="dropdown">
+                <div className="dropdown dropdown-menu-end">
                   <button
                     className="btn btn-outline-brand-03 dropdown-toggle"
                     type="button"
@@ -309,7 +309,7 @@ export default function CustomRequestsList() {
                       order === "ASC" &&
                       "建立時間(舊到新)"}
                   </button>
-                  <ul className="dropdown-menu" aria-labelledby="sortDropdown">
+                  <ul className="dropdown-menu mt-1" aria-labelledby="sortDropdown">
                     <li>
                       <button
                         type="button"
@@ -336,7 +336,7 @@ export default function CustomRequestsList() {
                     </li>
                   </ul>
                 </div>
-                <div className="dropdown">
+                <div className="dropdown dropdown-menu-end">
                   <button
                     className="btn btn-outline-brand-03 dropdown-toggle"
                     type="button"
@@ -347,7 +347,7 @@ export default function CustomRequestsList() {
                     {filterCategory}
                   </button>
                   <div
-                    className="dropdown-menu p-0"
+                    className="dropdown-menu p-0 mt-1"
                     aria-labelledby="formatDropdown"
                     style={{ width: "250px" }}
                   >
