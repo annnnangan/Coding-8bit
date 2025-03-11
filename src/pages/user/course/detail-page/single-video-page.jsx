@@ -101,7 +101,9 @@ export default function CourseVideoPage() {
   // 監聽 videoData 的變化
   useEffect(() => {
     // 在 videoData 更新後調用過濾函數
-    if (videoData.course_id) {
+    console.log(videoData);
+    
+    if (videoData.id) {
       const fetchOtherVideos = async () => {
         const otherCourseResult = await courseApi.getFrontTutorCourses({
           tutorId: videoData.tutor_id,
@@ -113,9 +115,10 @@ export default function CourseVideoPage() {
         const relatedVideosResult = await courseApi.getFrontTutorVideos({
           category: videoData.category,
         });
+        
         setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
       };
-
+      
       fetchOtherVideos();
       fetchRelatedVideos();
     }
