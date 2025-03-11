@@ -201,7 +201,7 @@ export default function Home() {
             {stepsData.map((step, index) => (
               <Fragment key={step.id}>
                 <div className="text-center position-relative">
-                  <h4 className="step-num text-brand-01">{step.id}</h4>
+                  <h3 className="step-num text-brand-01">{step.id}</h3>
                   <div className="step-item py-6">
                     <div className="step-img-wrap">
                       <img
@@ -211,7 +211,7 @@ export default function Home() {
                       />
                     </div>
                     <div className="mt-4">
-                      <h5 className="text-gray-01 fw-medium">{step.title}</h5>
+                      <h4 className="text-gray-01 fs-5 fw-medium">{step.title}</h4>
                       <p className="mt-2">{step.description}</p>
                     </div>
                   </div>
