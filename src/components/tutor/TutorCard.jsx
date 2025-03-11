@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -42,7 +42,10 @@ export default function TutorCard({ tutor }) {
         <div className="mb-5 f-between-start">
           <div className="f-center">
             {/* dynamic tutor profile */}
-            <img src={tutor.user.avatar_url ? tutor.user.avatar_url : "images/icon/user.png"} className="object-cover-fit rounded-circle me-2" width="45" height="45" alt="tutor-avatar" />
+            <div className="flex-shrink-0">
+              <img src={tutor.user.avatar_url ? tutor.user.avatar_url : "images/icon/user.png"} className="object-cover-fit rounded-circle me-2" width="45" height="45" alt="tutor-avatar" />
+            </div>
+
             <div>
               {/*  dynamic tutor name */}
               <h5 className="card-title fw-medium text-gray-01 fs-lg-6 fs-5 mb-1">{tutor.user.username}</h5>

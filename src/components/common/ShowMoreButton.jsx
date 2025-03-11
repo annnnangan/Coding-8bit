@@ -13,7 +13,15 @@ export default function ShowMoreBtn({ text, initialShow = false, maxCharacter = 
 
   return (
     <>
-      <p className="tab-details">{displayedText}</p>
+      {displayedText
+        .replace(/\\n/g, "\n")
+        .split("\n")
+        .map((line, index) => (
+          <p key={index} className="tab-details">
+            {line}
+            <br></br>
+          </p>
+        ))}
       {text.length > maxCharacter && (
         <div className="d-flex align-items-center py-3" role="button" onClick={handleClick}>
           <p className="text-brand-03">{isShow ? "更少" : "更多"}</p>

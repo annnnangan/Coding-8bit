@@ -2,8 +2,8 @@ import PropTypes from "prop-types";
 
 export default function CommentRatingStat({ ratingStats, isLoading = false }) {
   /* -------------------------- Calculate rating star ------------------------- */
-  const decimalRating = Math.round((ratingStats?.rating % 1) * 10) / 10;
-  const fullStars = Math.floor(ratingStats?.rating) + (decimalRating >= 0.8 && 1); // Number of full stars
+  const decimalRating = Math.round((ratingStats?.average_rating % 1) * 10) / 10;
+  const fullStars = Math.floor(ratingStats?.average_rating) + (decimalRating >= 0.8 && 1); // Number of full stars
   const hasHalfStar = decimalRating >= 0.3 && decimalRating < 0.8; // Show half star if decimal is between 0.3 and 0.8
   const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0); // Remaining empty stars
 
@@ -18,7 +18,7 @@ export default function CommentRatingStat({ ratingStats, isLoading = false }) {
       ) : (
         <div className="row justify-content-center">
           <div className="col-lg-5 f-center flex-column">
-            <h4 className="text-brand-03 mb-2">{ratingStats.rating}</h4>
+            <h4 className="text-brand-03 mb-2">{Number(ratingStats.average_rating).toFixed(1)}</h4>
             <div className="f-center mb-2">
               {isLoading && (
                 <div className="placeholder-glow" style={{ width: "40%" }}>
@@ -62,7 +62,7 @@ export default function CommentRatingStat({ ratingStats, isLoading = false }) {
 
 CommentRatingStat.propTypes = {
   ratingStats: PropTypes.shape({
-    rating: PropTypes.number.isRequired,
+    average_rating: PropTypes.number.isRequired,
     total_comment_count: PropTypes.number.isRequired,
     rating_distribute: PropTypes.shape({
       1: PropTypes.number.isRequired,
