@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, NavLink } from "react-router-dom";
+import { useSearchParams, NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";
@@ -15,14 +15,12 @@ export default function SubscriptionPaymentResult() {
   const [loadingState, setLoadingState] = useState(false);
 
   // 取得路由中的值
-  const {
-    gateway,
-    transactionId,
-    subscriptionPlan,
-    duration,
-    orderId,
-    subscriptionId,
-  } = useParams();
+  const [searchParams] = useSearchParams();
+  
+  const gateway = searchParams.get("gateway");
+  const transactionId = searchParams.get("transactionId");
+  const duration = searchParams.get("duration");
+  const orderId = searchParams.get("orderId");
 
   const [formattedToday, setFormattedToday] = useState("");
   const [formattedNextMonth, setFormattedNextMonth] = useState("");
