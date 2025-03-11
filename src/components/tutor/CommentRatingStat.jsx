@@ -18,7 +18,7 @@ export default function CommentRatingStat({ ratingStats, isLoading = false }) {
       ) : (
         <div className="row justify-content-center">
           <div className="col-lg-5 f-center flex-column">
-            <h4 className="text-brand-03 mb-2">{ratingStats.average_rating}</h4>
+            <h4 className="text-brand-03 mb-2">{Number(ratingStats.average_rating).toFixed(1)}</h4>
             <div className="f-center mb-2">
               {isLoading && (
                 <div className="placeholder-glow" style={{ width: "40%" }}>

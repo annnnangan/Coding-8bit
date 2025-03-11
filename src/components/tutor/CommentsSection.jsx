@@ -36,11 +36,12 @@ export default function CommentsSection({ modal = false, tutorId }) {
     }
   };
 
-  const getStudentComments = async (limit = 3, page = 1) => {
+  const getStudentComments = async () => {
     setLoadingCommentState(true); // Show loading state before fetching data
     try {
-      const result = await tutorApi.getTutorAllStudentComments({ tutorId, limit, page });
-      setComments(result.data);
+      const result = await tutorApi.getTutorAllStudentComments({ tutorId });
+
+      setComments(result);
     } catch (error) {
       console.error("錯誤", error);
     } finally {
@@ -51,7 +52,7 @@ export default function CommentsSection({ modal = false, tutorId }) {
   useEffect(() => {
     getRatingStats();
     if (modal) {
-      getStudentComments(5);
+      getStudentComments();
     } else {
       getStudentComments();
     }
