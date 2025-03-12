@@ -119,13 +119,13 @@ export default function CourseDetailPage() {
               text: "輕鬆升級，詳情請至訂閱了解",
               icon: "error",
               showCancelButton: true,
-              confirmButtonText: "立馬升級！",
+              confirmButtonText: "手刀升級！",
               cancelButtonText: "回首頁",
               allowOutsideClick: false,
             }).then((result) => {
               setSwalShown(false);
               if (result.isConfirmed) {
-                navigate("/subscription-list"); // 立馬升級
+                navigate("/subscription-list"); // 手刀升級
               } else if (result.dismiss === Swal.DismissReason.cancel) {
                 navigate("/"); // 返回首頁
               }
