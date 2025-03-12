@@ -122,7 +122,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
     setTemProfile({
       username: userData.username,
       avatar_url: userData.avatar_url,
-    })
+    });
     setIsEditingProfile((prev) => (prev = !prev));
   };
 
@@ -168,11 +168,11 @@ export default function ProfileContent({ userData, setLoadingState }) {
 
             {/* 預覽圖片 */}
             {temProfile.avatar_url && (
-              <div className="img-wrapper rounded-circle border-0 p-0">
+              <div className="img-wrapper h-100 rounded-circle border-0 p-0">
                 <img
                   src={temProfile.avatar_url}
                   alt="profile-avatar_url"
-                  className="object-fit h-100"
+                  className="object-fit-cover h-100 w-100"
                 />
                 <button
                   type="button"
@@ -196,17 +196,22 @@ export default function ProfileContent({ userData, setLoadingState }) {
             {!isEditingProfile && (
               <>
                 {userData.avatar_url ? (
-                  <img
-                    src={userData.avatar_url}
-                    alt="profile-avatar_url"
-                    className="w-100 object-fit rounded-circle"
-                  />
+                  <div className="h-100 rounded-circle overflow-hidden">
+                    <img
+                      src={userData.avatar_url}
+                      alt="profile-avatar_url"
+                      className="object-fit-cover w-100 h-100"
+                    />
+                  </div>
                 ) : (
+                  <div className="h-100 rounded-circle overflow-hidden">
                   <img
                     src="images/icon/user.png"
                     alt="profile-avatar_url"
-                    className="w-100 object-fit rounded-circle"
+                    className="object-fit-cover w-100 h-100"
                   />
+                  </div>
+
                 )}
               </>
             )}

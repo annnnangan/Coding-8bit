@@ -21,7 +21,6 @@ export default function TutorManageEditTopicSeries() {
       });
       return result;
     } catch (error) {
-      console.error(error);
       Swal.fire({
         icon: "error",
         title: error.response?.message || "發生錯誤，請稍後再試",

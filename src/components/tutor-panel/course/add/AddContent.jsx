@@ -113,7 +113,7 @@ export default function AddContent({
       message: "請選擇瀏覽權限",
     }),
     category: z.string().min(1, "請選擇工具與語言"),
-    tags: z.string().min(1, "請輸入關鍵字"),
+    tag: z.string().min(1, "請輸入關鍵字"),
   });
 
   // 表單驗證
@@ -314,7 +314,7 @@ export default function AddContent({
             <FormInput
               register={register}
               errors={errors}
-              id="tags"
+              id="tag"
               labelText="關鍵字 (請用半型逗號隔開)"
               type="text"
             />

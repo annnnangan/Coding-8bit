@@ -290,6 +290,22 @@
   }
 }
 
+.customLearning-card-image {
+  height: 400px;
+
+  @include lg-pc {
+    height: 360px;
+  }
+
+  @include pad {
+    height: 280px;
+  }
+
+  @include mobile {
+    height: 200px;
+  }
+}
+
 /* topicSeries & customLearning & freeTipShorts page*/
 .topicSeries-header-section,
 .customLearning-header-section,
