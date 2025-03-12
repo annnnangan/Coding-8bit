@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -16,14 +16,14 @@ export default function TutorManageAddVideo() {
   const [loadingState, setLoadingState] = useState(false);
 
   // 依路由決定此頁顯示分類
-  const { type } = useParams();
+  const { type, courseId } = useParams();
 
   // 影片上傳函式
   const [temVideoData, setTemVideoData] = useState("");
   const videoUpload = async (e) => {
     const file = e.target.files?.[0];
 
-    // 如果沒有選擇圖片檔案
+    // 如果沒有選擇檔案
     if (!file) {
       Swal.fire({
         icon: "warning",
@@ -83,10 +83,9 @@ export default function TutorManageAddVideo() {
       const { filePath } = uploadData.data;
 
       // 2. 將檔案上傳到取得的預簽名
-      const res = await axios.post(
-        `${VITE_API_BASE}/upload/get-video-url`,
-        { filePath: filePath }
-      );
+      const res = await axios.post(`${VITE_API_BASE}/upload/get-video-url`, {
+        filePath: filePath,
+      });
 
       // 3. 更新狀態，儲存影片網址與時長
       if (res.data.videoUrl) {
@@ -121,7 +120,13 @@ export default function TutorManageAddVideo() {
         icon: "success",
         title: "影片新增成功",
       });
-      navigate(-1);
+
+      if (type === "topicSeries") {
+        navigate(`/tutor-panel/course/topicSeries/${courseId}/edit`);
+      } else {
+        navigate(-1);
+      }
+
       return result;
     } catch (error) {
       console.error(error);
@@ -133,6 +138,14 @@ export default function TutorManageAddVideo() {
       setLoadingState(false);
     }
   };
+
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
+  }, [temVideoData.video_url]);
 
   return (
     <>
@@ -177,11 +190,9 @@ export default function TutorManageAddVideo() {
                 {/* 預覽上傳的影片 */}
                 {temVideoData.video_url && (
                   <div className="video-preview">
-                    <video
-                      src={temVideoData.video_url}
-                      controls
-                      className="w-100"
-                    ></video>
+                    <video ref={videoRef} controls className="w-100">
+                      <source src={temVideoData.video_url} type="video/mp4" />
+                    </video>
                   </div>
                 )}
               </div>

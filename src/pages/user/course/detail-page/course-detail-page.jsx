@@ -171,8 +171,8 @@ export default function CourseDetailPage() {
           <VideoContent
             courseList={courseList}
             courseTutor={courseList.tutor_id}
-            videoUrl={chapter.length > 0 ? chapter[0]?.Videos[0].video_url : ""}
-            introductionVideoId={chapter[0]?.Videos[0].id}
+            videoUrl={chapter.length > 0 ? chapter[0]?.Videos[0]?.video_url : ""}
+            introductionVideoId={chapter[0]?.Videos[0]?.id}
           />
           <aside className="col-lg-5 col-xl-4">
             {/* 章節影片 */}
