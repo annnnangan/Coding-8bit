@@ -354,7 +354,9 @@
 // 講師其他影片清單設定
 .other-videos-list {
   .other-video-image {
-    max-width: 136px;
+    width: 136px;
+    height: 80px;
+    object-fit: cover;
   }
 
   .other-video-title {
