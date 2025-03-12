@@ -391,7 +391,7 @@ export default function CourseList() {
                 id="customLearning"
                 role="tablist"
               >
-                {customLearningCourseList.map((course, index) => (
+                {customLearningCourseList.slice(0, 6).map((course, index) => (
                   <li role="presentation" key={course.id}>
                     <a
                       href="#"
@@ -416,7 +416,7 @@ export default function CourseList() {
                 className="customLearning-card-wrap tab-content border-0 py-6"
                 id="customLearningContent"
               >
-                {customLearningCourseList.map((course, index) => (
+                {customLearningCourseList.slice(0, 6).map((course, index) => (
                   <div
                     className={`tab-pane bg-white fade ${
                       index === activeTab ? "show active" : "mt-6 mt-lg-0"
@@ -434,7 +434,7 @@ export default function CourseList() {
                         <div className="overflow-hidden img-wrapper rounded position-relative">
                           <img
                             src={course.cover_image}
-                            className="card-img-top cover-img rounded"
+                            className="customLearning-card-image card-img-top cover-img rounded"
                             alt="course-image"
                           />
                         </div>
