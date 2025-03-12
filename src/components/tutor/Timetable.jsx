@@ -1,6 +1,7 @@
 import { useState } from "react";
-
 import PropTypes from "prop-types";
+
+import SectionFallback from "@/components/common/SectionFallback";
 
 import { getDayOfWeekFromStringDate, formatHour, formatDate, removeYearFromDate } from "@/utils/timeFormatted-utils";
 
@@ -14,6 +15,8 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
       openBookingModal();
     }
   };
+
+  const isWeekAvailable = availability.filter((date) => date.hours.length > 0).length > 0 ? true : false;
 
   return (
     <>
@@ -44,7 +47,6 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
             </div>
           </>
         )}
-
         <div className="row row-cols-7 available-date-time g-0 flex-nowrap">
           {availability.map((item) => {
             const availableTimes = item.hours.filter((time) => time.available); // Only available times
@@ -75,6 +77,7 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
             );
           })}
         </div>
+        {!isWeekAvailable && <SectionFallback materialIconName="event_busy" fallbackText="此星期暫無可預約時間" />}
       </div>
 
       {/* Show More Button */}
