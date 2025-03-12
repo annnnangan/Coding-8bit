@@ -113,10 +113,10 @@ export default function CourseVideoPage() {
         const relatedVideosResult = await courseApi.getFrontTutorVideos({
           category: videoData.category,
         });
-        
+
         setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
       };
-      
+
       fetchOtherVideos();
       fetchRelatedVideos();
     }
@@ -212,11 +212,16 @@ export default function CourseVideoPage() {
                   style={{ marginBottom: "22px" }}
                 >
                   <h4 className="tutor-related-video-title">相關影片</h4>
-                  <div className="f-align-center show-more-button mouse-pointer-style slide-right-hover">
-                    <span className="me-1">更多</span>
-                    <span className="material-symbols-outlined">
-                      arrow_forward
-                    </span>
+                  <div className="f-align-center mouse-pointer-style slide-right-hover">
+                    <NavLink
+                      to={`/course?video_type=freeTipShorts`}
+                      className="d-flex justify-content-between chapter-item show-more-button"
+                    >
+                      <span className="me-1">更多</span>
+                      <span className="material-symbols-outlined">
+                        arrow_forward
+                      </span>
+                    </NavLink>
                   </div>
                 </div>
                 <ul className="related-videos-list">

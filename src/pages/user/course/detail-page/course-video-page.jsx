@@ -91,6 +91,7 @@ export default function CourseVideoPage() {
         setLoadingState(false);
       } else {
         setLoadingState(true);
+
         if (!errorLogged.current) {
           try {
             const userSubscriptionsPlan = await userApi.getUserData();
@@ -99,6 +100,7 @@ export default function CourseVideoPage() {
               errObject.name = "SubscriptionError";
               throw errObject;
             }
+
             const courseResult = await courseApi.getCourseDetail(id);
             const videoResult = await courseApi.getVideoDetail(videoId);
             const chapterResult = await courseApi.getCourseChapter(id);

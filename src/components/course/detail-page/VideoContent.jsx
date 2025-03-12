@@ -104,10 +104,8 @@ export default function VideoContent({
     return Object.keys(userInfo).length === 0 ? true : false;
   };
 
-  //初始化判斷是否禁用留言輸入框
-  useEffect(() => {
-    if (checkToken()) return;
-
+  // 取得留言、收藏、評分狀態
+  const getcomment = async () => {
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
@@ -130,11 +128,12 @@ export default function VideoContent({
       getStarRatingStatus();
       getCourseCommentsHandle();
     }
-  }, [introductionVideoId || paramsVideoId]);
+  };
 
   // 取得影片播放 URL
   useEffect(() => {
     if (checkToken()) return;
+    getcomment();
     const fetchVideoSrc = async () => {
       const tokenUrl = await getTokenToPlay(videoUrl);
       setVideoSrc(tokenUrl);
