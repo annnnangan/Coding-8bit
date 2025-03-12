@@ -235,15 +235,17 @@ export default function VideoContent({
         </ul>
       </div>
       <div className="author-content d-flex mb-10">
-        <img
-          className="author-image rounded-5 me-4"
-          src={
-            courseList.Tutor.User.avatar_url
-              ? courseList.Tutor.User.avatar_url
-              : "images/icon/user.png"
-          }
-          alt="tutor-avatar-image"
-        />
+        <div className="author-image me-4">
+          <img
+            className="rounded-5 w-100 h-100 object-cover"
+            src={
+              courseList.Tutor.User.avatar_url
+                ? courseList.Tutor.User.avatar_url
+                : "images/icon/user.png"
+            }
+            alt="tutor-avatar-image"
+          />
+        </div>
         <div>
           <NavLink to={`/tutor-info/${courseTutor}`}>
             <h2 className="author-name mb-2">

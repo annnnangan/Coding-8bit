@@ -180,21 +180,23 @@ export default function CommentsSection({
       {/* <Loader/> */}
       <section className="video-comments pt-6">
         <div className="d-flex align-items-center py-4 mb-6">
-          <img
-            className="user-comment-picture me-3"
-            src={
-              userInfo.avatar_url
-                ? userInfo.avatar_url
-                : "/images/icon/user.png"
-            }
-            alt="當前使用者頭像"
-          />
+          <div className="user-comment-picture me-3">
+            <img
+              className="w-100 h-100 object-cover"
+              src={
+                userInfo.avatar_url
+                  ? userInfo.avatar_url
+                  : "/images/icon/user.png"
+              }
+              alt="當前使用者頭像"
+            />
+          </div>
           <input
             type="text"
             placeholder={disableInputComment ? "課程尚未開放" : "留言..."}
             name="user-comment"
             id="user-comment"
-            className={`user-comment w-100 py-2 ${
+            className={`user-comment py-2 ${
               errors.commentText ? "input-error" : ""
             }`}
             style={{ cursor: disableInputComment ? "not-allowed" : "" }}
@@ -228,11 +230,13 @@ export default function CommentsSection({
           {userComments.map((userComment, index) => (
             <li className="mb-6" key={userComment.id}>
               <div className="user-content d-flex mb-3">
-                <img
-                  className="user-image me-4"
-                  src={userComment.User.avatar_url}
-                  alt="留言者頭像"
-                />
+                <div className="user-image me-4">
+                  <img
+                    className="w-100 h-100 object-cover"
+                    src={userComment.User.avatar_url}
+                    alt="留言者頭像"
+                  />
+                </div>
                 <div className="d-flex justify-content-between align-items-center flex-fill">
                   <div className="f-column">
                     <span className="user-name mb-2">

@@ -76,6 +76,7 @@
 .author-content {
   .author-image {
     width: 48px;
+    height: 48px;
   }
 
   .author-name {
@@ -124,12 +125,13 @@
 
     .user-comment-picture {
       height: 40px;
-      max-width: 40px;
-      object-fit: cover;
+      width: 40px;
       border-radius: 88px;
+      overflow: hidden;
     }
 
     .user-comment {
+      flex-grow: 1;
       border: none;
       outline: none;
       border-bottom: 1px solid $gray-03;
@@ -158,9 +160,9 @@
   .user-content {
     .user-image {
       height: 40px;
-      max-width: 40px;
-      object-fit: cover;
+      width: 40px;
       border-radius: 88px;
+      overflow: hidden;
     }
 
     .user-name {
