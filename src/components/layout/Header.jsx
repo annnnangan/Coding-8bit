@@ -182,39 +182,42 @@ export default function Header() {
             }`}
           >
             <ul className="navbar-nav align-items-lg-center">
-              <li className="f-center align-self-center ps-4 d-lg-none">
-                <div className="flex-shrink-0">
-                  {!userData.avatar_url ? (
-                    <img
-                      src="images/icon/user.png"
-                      alt="profile"
-                      className="object-fit-cover rounded-circle me-4"
-                      style={{ height: "48px", width: "48px" }}
-                    />
-                  ) : (
-                    <img
-                      src={userData.avatar_url}
-                      alt="profile"
-                      className="object-fit-cover rounded-circle me-4"
-                      style={{ height: "48px", width: "48px" }}
-                    />
-                  )}
-                </div>
-                <div className="flex-grow-1">
-                  <small className="text-brand-03">
-                    {!hasPremium && !hasBasic ? (
-                      "free"
+              {userData?.id && (
+                <li className="f-center align-self-center ps-4 d-lg-none">
+                  <div className="flex-shrink-0">
+                    {!userData.avatar_url ? (
+                      <img
+                        src="images/icon/user.png"
+                        alt="profile"
+                        className="object-fit-cover rounded-circle me-4"
+                        style={{ height: "48px", width: "48px" }}
+                      />
                     ) : (
-                      <>
-                        {(hasPremium && hasBasic) ||
-                          (hasPremium && !hasBasic && "premium")}
-                        {!hasPremium && hasBasic && "basic"}
-                      </>
+                      <img
+                        src={userData.avatar_url}
+                        alt="profile"
+                        className="object-fit-cover rounded-circle me-4"
+                        style={{ height: "48px", width: "48px" }}
+                      />
                     )}
-                  </small>
-                  <p className="text-gray-01">{userData.username}</p>
-                </div>
-              </li>
+                  </div>
+                  <div className="flex-grow-1">
+                    <small className="text-brand-03">
+                      {!hasPremium && !hasBasic ? (
+                        "free"
+                      ) : (
+                        <>
+                          {(hasPremium && hasBasic) ||
+                            (hasPremium && !hasBasic && "premium")}
+                          {!hasPremium && hasBasic && "basic"}
+                        </>
+                      )}
+                    </small>
+                    <p className="text-gray-01">{userData.username}</p>
+                  </div>
+                </li>
+              )}
+
               <li className="position-relative f-align-center mt-4 d-lg-none">
                 <input
                   type="search"
