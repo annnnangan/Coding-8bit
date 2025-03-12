@@ -18,25 +18,29 @@ export default function Footer() {
             <li className="f-align-center mt-2">
               <p className="fs-7 lh-sm">本網站僅供作品參考，並非真實營運販售</p>
             </li>
-            <li className="f-align-center mt-2">
-              <p className="fs-7 lh-sm">
-                Copyright@2025 Coding∞bit 保留所有權利·
+            <li className="mt-2">
+              <div>
+                <p className="fs-7 lh-sm">
+                  Copyright@2025 Coding∞bit 保留所有權利
+                </p>
+              </div>
+              <div className="f-align-items mt-2 mt-g-0">
                 <a
                   href="https://coding-8bit.site/PrivacyPolicy.html"
                   target="_blank"
-                  className="underline-hover d-inline"
+                  className="fs-7 underline-hover d-inline"
                 >
                   隱私權政策
-                </a>{" "}
-                |{" "}
+                </a>
+                <span className="ms-1">|</span>
                 <a
                   href="https://coding-8bit.site/TermsOfService.html"
                   target="_blank"
-                  className="underline-hover d-inline"
+                  className="fs-7 underline-hover d-inline ms-1"
                 >
                   使用條款
                 </a>
-              </p>
+              </div>
             </li>
           </ul>
         </div>
