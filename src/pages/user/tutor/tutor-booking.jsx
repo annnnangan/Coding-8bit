@@ -149,12 +149,13 @@ export default function TutorBooking() {
   const getTutorBasicData = async () => {
     setLoadingBasicInfoState(true);
     try {
-      const [basicInfoResult, experienceResult, educationResult, certificateResult, videos] = await Promise.all([
+      const [basicInfoResult, experienceResult, educationResult, certificateResult, courseVideos, singleVideos] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
         tutorApi.getExp(tutor_id),
         tutorApi.getEdu(tutor_id),
         tutorApi.getCertificate(tutor_id),
-        courseApi.getTutorVideosInBooking(tutor_id),
+        courseApi.getTutorCourses(tutor_id, 1),
+        courseApi.getTutorVideos(tutor_id, "customLearning", 1),
       ]);
 
       setTutorBasicInfo((prev) => ({
@@ -168,7 +169,8 @@ export default function TutorBooking() {
         },
         statistics: { student_count: basicInfoResult.data.studentCount, class_count: basicInfoResult.data.classCount, video_count: basicInfoResult.data.videoCount },
       }));
-      setCourses(videos.videos);
+
+      setCourses([...courseVideos.courses, ...singleVideos.videos]);
     } catch (error) {
       console.log("錯誤", error);
     } finally {
@@ -585,7 +587,7 @@ export default function TutorBooking() {
                     {!loadingBasicInfoState &&
                       courses.map((course) => (
                         <div className="swiper-slide" key={course.id}>
-                          <CourseCardList courseList={course} cardsNum={1} />
+                          {course.video_type === "topicSeries" ? <CourseCardList courseList={course} cardsNum={1} /> : <CourseCardList courseList={course} cardsNum={1} type="singleVideo" />}
                         </div>
                       ))}
                   </div>
@@ -599,17 +601,8 @@ export default function TutorBooking() {
                 <div className="section-component f-between-center">
                   <h4>時間表</h4>
                 </div>
-                {isLoadingAvailableTime && (
-                  <div className="placeholder-glow">
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                    <span className="placeholder bg-brand-02 col-12 mb-1"></span>
-                  </div>
-                )}
-                {!isLoadingAvailableTime && currentAvailableTime.length > 0 && (
+
+                {currentAvailableTime.length > 0 && (
                   <Timetable
                     availability={currentAvailableTime}
                     weekOffset={weekOffset}

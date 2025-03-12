@@ -27,6 +27,7 @@ const AddLearningNeedPage = lazy(() => import("../pages/user/custom-request/add-
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";
+import SubscriptionPaymentResult from "../pages/user/subscription/subscription-paymentResult";
 
 import TutorList from "../pages/user/tutor/tutor-list";
 import TutorBooking from "../pages/user/tutor/tutor-booking";
@@ -84,6 +85,10 @@ export const router = createHashRouter([
       {
         path: "subscription/:subscriptionPlan/:duration/:planId",
         element: <SubscriptionPayment />,
+      },
+      {
+        path: "subscription/subscription-paymentResult",
+        element: <SubscriptionPaymentResult />,
       },
 
       { path: "tutor-list", element: <TutorList /> },

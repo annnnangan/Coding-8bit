@@ -30,26 +30,26 @@ const menuItems = [
     name: "學習需求管理",
     href: "/student-panel/custom-request",
   },
-  {
-    icon: "equalizer",
-    name: "數據與趨勢",
-    href: "/student-panel/statistics",
-  },
-  {
-    icon: "notifications_active",
-    name: "個人化通知",
-    href: "/student-panel/notification",
-  },
+  // {
+  //   icon: "equalizer",
+  //   name: "數據與趨勢",
+  //   href: "/student-panel/statistics",
+  // },
+  // {
+  //   icon: "notifications_active",
+  //   name: "個人化通知",
+  //   href: "/student-panel/notification",
+  // },
   {
     icon: "person",
     name: "個人資料管理",
     href: "/student-panel/profile",
   },
-  {
-    icon: "paid",
-    name: "財務管理",
-    href: "/student-panel/finance",
-  },
+  // {
+  //   icon: "paid",
+  //   name: "財務管理",
+  //   href: "/student-panel/finance",
+  // },
 ];
 
 StudentPanelMenu.propTypes = {

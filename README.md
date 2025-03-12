@@ -28,7 +28,7 @@
 ## 測試用帳號
 已通過所有權限的現成帳號，可直接拿來登入測試
 
-帳號：test123@gmail.com
+帳號：custommadesite@gmail.com
 </br>密碼：Test@1234
 
 ## 使用技術

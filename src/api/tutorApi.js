@@ -151,15 +151,13 @@ const deleteSpecificDateAvailability = async (tutorId, date) => {
 /* ---------------------------------- 評價和評分 ---------------------------------- */
 
 // 講師頁面 - 學生評價
-const getTutorAllStudentComments = async ({ tutorId, page, limit, rating }) => {
+const getTutorAllStudentComments = async ({ tutorId, rating }) => {
   const params = new URLSearchParams();
 
-  if (page) params.append("page", page);
-  if (limit) params.append("limit", limit);
   if (rating) params.append("rating", rating);
 
   const queryString = params.toString();
-  const url = queryString ? `/comment/tutors/${tutorId}/comments?${queryString}` : `/comment/tutors/${tutorId}/comments`;
+  const url = queryString ? `/tutor-rating-review/${tutorId}/comments?${queryString}` : `/tutor-rating-review/${tutorId}/comments`;
 
   const response = await apiClient.get(url);
   return response.data.data;
@@ -167,7 +165,7 @@ const getTutorAllStudentComments = async ({ tutorId, page, limit, rating }) => {
 
 // 講師頁面 - 學生評價的統計
 const getTutorRatingStats = async (tutorId) => {
-  const response = await apiClient.get(`/comment/tutors/${tutorId}/rating-stats`);
+  const response = await apiClient.get(`/tutor-rating-review/${tutorId}`);
   return response.data.data;
 };
 
