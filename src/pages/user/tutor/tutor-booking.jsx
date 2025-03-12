@@ -14,12 +14,13 @@ import tutorApi from "@/api/tutorApi";
 import SectionFallback from "@/components/common/SectionFallback";
 import ShowMoreButton from "@/components/common/ShowMoreButton";
 import CourseCardList from "@/components/course/CourseCardList";
-import CommentsSection from "@/components/tutor/CommentsSection";
 import Timetable from "@/components/tutor/Timetable";
 import TutorBookingResume from "@/components/tutor/TutorBookingResume";
 import TutorCard from "@/components/tutor/TutorCard";
 import TutorCardLoadingSkeleton from "@/components/tutor/TutorCardLoadingSkeleton";
 import TutorsCard from "@/components/tutor/TutorsCard";
+import CommentCard from "@/components/tutor/CommentCard";
+import CommentRatingStat from "@/components/tutor/CommentRatingStat";
 
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 import CourseCardLoadingSkeleton from "@/components/course/CourseCardLoadingSkeleton";
@@ -79,14 +80,42 @@ export default function TutorBooking() {
   // useState - Bookmark
   const [isBookmark, setBookmark] = useState(false);
 
+  // useState - Comment
+  const [isLoadingRatingStats, setLoadingRatingStatsState] = useState(false);
+  const [isLoadingComment, setLoadingCommentState] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [ratingStats, setRatingStats] = useState({
+    average_rating: 0,
+    total_comment_count: 0,
+    rating_distribute: {
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
+    },
+  });
+
+  const [modalPage, setModalPage] = useState(2);
+  const [hasMoreComments, setHasMoreComments] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [modalComments, setModalComments] = useState([]);
+
   /* -------------------------------- UI Initialization -------------------------------- */
   // modal
   const bookingModal = useRef(null);
   const bookingModalRef = useRef(null);
 
+  const commentModal = useRef(null);
+  const commentModalRef = useRef(null);
+
   useEffect(() => {
     if (bookingModalRef.current) {
       bookingModal.current = new bootstrap.Modal(bookingModalRef.current, { backdrop: "static" });
+    }
+
+    if (commentModalRef.current) {
+      commentModal.current = new bootstrap.Modal(commentModalRef.current, { backdrop: "static" });
     }
   }, [tutor_id]);
 
@@ -130,12 +159,8 @@ export default function TutorBooking() {
   const checkIsValidTutor = async () => {
     setLoadingBasicInfoState(true);
     try {
-      const [isTutorExist, businessHours] = await Promise.all([tutorApi.getTutorDetail(tutor_id), tutorApi.getAllDayOfWeekAvailability(tutor_id)]);
-      if (businessHours.length === 0) {
-        throw new Error("沒有設定預約時間");
-      }
-    } catch (error) {
-      console.log(error);
+      await Promise.all([tutorApi.getTutorDetail(tutor_id)]);
+    } catch {
       Swal.fire({
         icon: "error",
         title: "此講師不存在",
@@ -241,6 +266,49 @@ export default function TutorBooking() {
     }
   };
 
+  const getRatingStats = async () => {
+    setLoadingRatingStatsState(true);
+    try {
+      const result = await tutorApi.getTutorRatingStats(tutor_id);
+      setRatingStats(result);
+    } catch (error) {
+      console.log("錯誤", error);
+    } finally {
+      setLoadingRatingStatsState(false);
+    }
+  };
+
+  const getStudentComments = async (page = 1, limit = 3) => {
+    setLoadingCommentState(true); // Show loading state before fetching data
+    try {
+      const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
+      setComments(result.data);
+    } catch (error) {
+      console.error("錯誤", error);
+    } finally {
+      setLoadingCommentState(false);
+    }
+  };
+
+  const getModalStudentComments = async (page, limit) => {
+    if (isFetchingMore) return; // Prevent multiple calls
+    setIsFetchingMore(true);
+    try {
+      const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
+
+      if (result.data.length > 0) {
+        setModalComments((prevComments) => [...prevComments, ...result.data]); // Append new comments
+        setModalPage(page + 1);
+      } else {
+        setHasMoreComments(false); // No more data to load
+      }
+    } catch (error) {
+      console.error("錯誤", error);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       /* ------------------ Reset Everything when tutor id changes ----------------- */
@@ -269,14 +337,31 @@ export default function TutorBooking() {
       setSelectedBookingTimeslots({ date: "", hours: [] });
       setModalError(undefined);
       setBookmark(false);
+      setComments([]);
+      setModalComments([]);
+      setRatingStats({
+        average_rating: 0,
+        total_comment_count: 0,
+        rating_distribute: {
+          5: 0,
+          4: 0,
+          3: 0,
+          2: 0,
+          1: 0,
+        },
+      });
 
-      /* ------------------ Check if Tutor Exists ----------------- */
-      await checkIsValidTutor();
+      if (tutor_id) {
+        /* ------------------ Check if Tutor Exists ----------------- */
+        await checkIsValidTutor();
 
-      /* ------------------ Fetch Data ----------------- */
-      getTutorBasicData();
-      getRecommendTutor();
-      getTutorBookmark();
+        /* ------------------ Fetch Data ----------------- */
+        getTutorBasicData();
+        getRecommendTutor();
+        getTutorBookmark();
+        getRatingStats();
+        getStudentComments();
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tutor_id]);
@@ -400,14 +485,48 @@ export default function TutorBooking() {
     });
   };
 
-  /* -------------------------------- Login Validation -------------------------------- */
+  const openCommentModal = () => {
+    if (commentModal.current) {
+      if (modalComments.length === 0) {
+        getModalStudentComments(1, 10);
+      }
+
+      commentModal.current.show();
+    }
+  };
+
+  /* -------------------------------- Comment Modal Infinite Scroll -------------------------------- */
+  const commentModalBodyRef = useRef(null);
+
+  const handleScroll = () => {
+    if (!commentModalBodyRef.current || !hasMoreComments || isFetchingMore) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = commentModalBodyRef.current;
+
+    if (scrollTop + clientHeight >= scrollHeight) {
+      console.log("modal page", modalPage);
+      getModalStudentComments(modalPage, 10);
+    }
+  };
+
+  useEffect(() => {
+    if (commentModalBodyRef.current) {
+      commentModalBodyRef.current.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (commentModalBodyRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        commentModalBodyRef.current.removeEventListener("scroll", handleScroll);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalPage, hasMoreComments]);
 
   return (
     <>
       <Helmet>
         <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
       </Helmet>
-
       <div className="tutor-booking">
         {/*  Main Content */}
         <main className="container py-lg-9 py-7">
@@ -619,7 +738,26 @@ export default function TutorBooking() {
 
               {/* section 4 - student comment */}
 
-              <CommentsSection modal={false} tutorId={tutor_id} />
+              <section className="section student-comment">
+                <div className="section-component f-between-center">
+                  <h4>學生評價</h4>
+
+                  {!isLoadingComment && comments.length > 0 && (
+                    <p className="text-brand-03 d-flex slide-right-hover cursor-pointer" onClick={openCommentModal}>
+                      更多
+                      <span className="material-symbols-outlined icon-fill">arrow_forward</span>
+                    </p>
+                  )}
+                </div>
+
+                <div className="row row-cols-lg-2 row-cols-1 g-lg-4 g-2">
+                  <div className="col">{isLoadingRatingStats ? <CommentRatingStat isLoading={true} /> : ratingStats.total_comment_count > 0 && <CommentRatingStat ratingStats={ratingStats} />}</div>
+
+                  {isLoadingComment && Array.from({ length: 3 }, (_, i) => <CommentCard key={i} isLoading={isLoadingComment} />)}
+                  {!isLoadingComment && comments.length > 0 && comments.map((comment) => <CommentCard comment={comment} key={comment.commentId} />)}
+                </div>
+                {!isLoadingComment && comments.length === 0 && <SectionFallback materialIconName="reviews" fallbackText={`講師暫無學生評價`} />}
+              </section>
 
               {/* section 5 - tutor recommendation */}
               <section className="section mb-0">
@@ -692,7 +830,6 @@ export default function TutorBooking() {
           </div>
         </main>
       </div>
-
       {/* Modal */}
       {/* Modal - Booking Modal */}
       <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
@@ -815,7 +952,45 @@ export default function TutorBooking() {
       </div>
 
       {/* Modal - Student Comment Modal */}
-      <CommentsSection modal={true} tutorId={tutor_id} />
+      <div className="modal fade student-comment-modal" id="commentModal" tabIndex="-1" ref={commentModalRef}>
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0 pb-0">
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={() => {
+                  commentModal.current.hide();
+                }}
+              ></button>
+            </div>
+            <div className="modal-body overflow-y-scroll" ref={commentModalBodyRef}>
+              <h4 className="modal-title fs-md-2 fs-3 text-center mb-8">學生評價</h4>
+              <div className="row flex-column mb-6">
+                <div className="col mb-2">
+                  <CommentRatingStat ratingStats={ratingStats} />
+                </div>
+
+                <div className="row flex-column g-2 mb-2">
+                  {modalComments?.map((comment) => (
+                    <CommentCard comment={comment} key={comment.commentId} />
+                  ))}
+                </div>
+
+                {isFetchingMore && (
+                  <div className="d-flex justify-content-center align-items-center">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Mobile sticky bottom CTA card */}
       <div className="mobile-bottom-cta d-lg-none sticky-bottom border border-2 border-brand-02 bg-white" style={{ borderRadius: "16px 16px 0px 0px" }}>
