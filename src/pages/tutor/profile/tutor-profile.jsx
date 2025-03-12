@@ -184,7 +184,7 @@ export default function TutorProfile() {
                               <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
-                              <div className="fs-5 mb-2 fw-medium" dangerouslySetInnerHTML={{ __html: tutorData.about.replace(/\n/g, "<br>") }} />
+                              <div className="fs-5 mb-2 fw-medium" dangerouslySetInnerHTML={{ __html: tutorData.about?.replace(/\n/g, "<br>") }} />
                             ) : (
                               <textarea
                                 className="form-control fw-bold"
