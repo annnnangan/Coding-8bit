@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 
 export default function CommentRatingStat({ ratingStats, isLoading = false }) {
-  console.log(ratingStats);
   /* -------------------------- Calculate rating star ------------------------- */
   const decimalRating = Math.round((ratingStats?.average_rating % 1) * 10) / 10;
   const fullStars = Math.floor(ratingStats?.average_rating) + (decimalRating >= 0.8 && 1); // Number of full stars
