@@ -8,6 +8,12 @@ import { utils } from "./utils";
 export default function Card({ customCourse = {}, openModal, prevCourse }) {
   const isMobile = window.innerWidth <= 576;
 
+  // 移除底色
+  const cleanContent = DOMPurify.sanitize(customCourse?.content).replace(
+    /style=["'][^"']*background[^"']*["']/gi, 
+    ""
+  );
+
   // 判斷是否為當天的第一個 Card（只顯示一次日期）
   const isFirstOfDate =
     !prevCourse ||
@@ -49,12 +55,7 @@ export default function Card({ customCourse = {}, openModal, prevCourse }) {
               )}
               <h2>{customCourse.title}</h2>
             </div>
-            <p
-              className="domPurify-wrap"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(customCourse.content),
-              }}
-            ></p>
+            <p className="domPurify-wrap" dangerouslySetInnerHTML={{ __html: cleanContent }}></p>
           </div>
         </div>
       </div>

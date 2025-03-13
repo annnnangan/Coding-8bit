@@ -75,7 +75,7 @@ export default function TutorManageAddVideo() {
   const videoUpload = async (e) => {
     const file = e.target.files?.[0];
 
-    // 如果沒有選擇圖片檔案
+    // 如果沒有選擇檔案
     if (!file) {
       Swal.fire({
         icon: "warning",

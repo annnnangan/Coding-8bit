@@ -316,9 +316,9 @@ export default function CardModal({
                                         )}
 
                                         <li>
-                                          <a className="dropdown-item" href="#">
+                                          <button type="button" className="dropdown-item" href="#">
                                             舉報
-                                          </a>
+                                          </button>
                                         </li>
                                       </ul>
                                     </div>

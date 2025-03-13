@@ -28,7 +28,7 @@ export default function CommentCard({ comment, isLoading = false }) {
             <div className="d-flex flex-column flex-grow-1">
               <h6 className="mb-2 text-gray-01 fw-medium">{comment?.username}</h6>
               <p className="comment-details mb-1">{comment?.comment}</p>
-              {/* <p className="timestamp text-gray-03 fs-7 mt-auto">{formatDateDash(comment?.createdAt)}</p> */}
+              <p className="timestamp text-gray-03 fs-7 mt-auto">{formatDateDash(comment?.comment_at)}</p>
             </div>
           </div>
         )}
@@ -42,6 +42,7 @@ CommentCard.propTypes = {
     username: PropTypes.string.isRequired,
     avatar_url: PropTypes.string.isRequired,
     comment: PropTypes.string.isRequired,
+    comment_at: PropTypes.string.isRequired,
   }),
   isLoading: PropTypes.bool,
 };
