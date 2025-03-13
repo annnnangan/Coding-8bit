@@ -52,7 +52,7 @@ const getVideoPermission = async (url) => {
 
 // 取得單一課程的留言
 const getCourseComments = async (id) => {
-  const response = await apiClient.get(`/comment/videos/${id}/comments`);
+  const response = await apiClient.get(`/comment/videos/${id}/comments?limit=100`);
   return response.data.data.data;
 };
 
