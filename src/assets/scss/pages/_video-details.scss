@@ -76,6 +76,7 @@
 .author-content {
   .author-image {
     width: 48px;
+    height: 48px;
   }
 
   .author-name {
@@ -124,12 +125,13 @@
 
     .user-comment-picture {
       height: 40px;
-      max-width: 40px;
-      object-fit: cover;
+      width: 40px;
       border-radius: 88px;
+      overflow: hidden;
     }
 
     .user-comment {
+      flex-grow: 1;
       border: none;
       outline: none;
       border-bottom: 1px solid $gray-03;
@@ -158,9 +160,9 @@
   .user-content {
     .user-image {
       height: 40px;
-      max-width: 40px;
-      object-fit: cover;
+      width: 40px;
       border-radius: 88px;
+      overflow: hidden;
     }
 
     .user-name {
@@ -226,9 +228,9 @@
       .tutor-content {
         .tutor-image {
           height: 40px;
-          max-width: 40px;
-          object-fit: cover;
+          width: 40px;
           border-radius: 88px;
+          overflow: hidden;
         }
 
         .tutor-name {
@@ -352,7 +354,9 @@
 // 講師其他影片清單設定
 .other-videos-list {
   .other-video-image {
-    max-width: 136px;
+    width: 136px;
+    height: 80px;
+    object-fit: cover;
   }
 
   .other-video-title {

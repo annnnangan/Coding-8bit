@@ -101,7 +101,7 @@ export default function CourseVideoPage() {
   // 監聽 videoData 的變化
   useEffect(() => {
     // 在 videoData 更新後調用過濾函數
-    if (videoData.course_id) {
+    if (videoData.id) {
       const fetchOtherVideos = async () => {
         const otherCourseResult = await courseApi.getFrontTutorCourses({
           tutorId: videoData.tutor_id,
@@ -113,6 +113,7 @@ export default function CourseVideoPage() {
         const relatedVideosResult = await courseApi.getFrontTutorVideos({
           category: videoData.category,
         });
+
         setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
       };
 
@@ -142,6 +143,7 @@ export default function CourseVideoPage() {
             videoUrl={videoData?.video_url}
             courseList={videoData}
             paramsVideoId={videoId}
+            page="single-video"
           />
           <aside className="col-lg-5 col-xl-4">
             {/* 講師其他影片 */}
@@ -211,11 +213,16 @@ export default function CourseVideoPage() {
                   style={{ marginBottom: "22px" }}
                 >
                   <h4 className="tutor-related-video-title">相關影片</h4>
-                  <div className="f-align-center show-more-button mouse-pointer-style slide-right-hover">
-                    <span className="me-1">更多</span>
-                    <span className="material-symbols-outlined">
-                      arrow_forward
-                    </span>
+                  <div className="f-align-center mouse-pointer-style slide-right-hover">
+                    <NavLink
+                      to={`/course?video_type=freeTipShorts`}
+                      className="d-flex justify-content-between chapter-item show-more-button"
+                    >
+                      <span className="me-1">更多</span>
+                      <span className="material-symbols-outlined">
+                        arrow_forward
+                      </span>
+                    </NavLink>
                   </div>
                 </div>
                 <ul className="related-videos-list">

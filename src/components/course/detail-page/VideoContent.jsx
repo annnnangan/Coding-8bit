@@ -1,7 +1,7 @@
 // react 相關套件
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 // 第三方套件
 import PropTypes from "prop-types";
@@ -11,10 +11,14 @@ import { Modal } from "bootstrap";
 
 // API
 import courseApi from "@/api/courseApi";
+import userApi from "@/api/userApi";
 
 // 組件
 import CommentsSection from "./CommentsSection";
 import StarRating from "./StarRating";
+
+// 工具
+import { loginCheck } from "@/utils/slice/authSlice";
 
 export default function VideoContent({
   videoUrl,
@@ -22,31 +26,20 @@ export default function VideoContent({
   courseTutor,
   introductionVideoId,
   paramsVideoId,
+  page,
 }) {
   const [comments, setComments] = useState([]); // 留言
   const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
   const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
   const [starRating, setStarRating] = useState(false); // 是否評分影片
   const [videoSrc, setVideoSrc] = useState(""); // 影片 URL
-
-  // redux 使用者資訊
-  const userInfo = useSelector((state) => state.auth.userData);
+  const [userSubscriptionsPlan, setUserSubscriptionsPlan] = useState(false); // 使用者訂閱方案
+  const [showIcon, setShowIcon] = useState(false); // 是否顯示評分/觀看 icon
+  const dispatch = useDispatch(); // redux dispatch
 
   // 評分 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
-
-  // 取得課程留言
-  const getCourseCommentsHandle = async () => {
-    try {
-      const commentsResult = await courseApi.getCourseComments(
-        introductionVideoId || paramsVideoId
-      );
-      setComments(commentsResult);
-    } catch (error) {
-      console.error("getCourseCommentsHandle error", error);
-    }
-  };
 
   // 控制收藏課程
   const handleFavorite = async (videoId) => {
@@ -99,15 +92,8 @@ export default function VideoContent({
     return tokenUrl;
   };
 
-  // 檢查是否有登入
-  const checkToken = () => {
-    return Object.keys(userInfo).length === 0 ? true : false;
-  };
-
-  //初始化判斷是否禁用留言輸入框
-  useEffect(() => {
-    if (checkToken()) return;
-
+  // 取得留言、收藏、評分狀態
+  const getComment = async () => {
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
@@ -126,22 +112,67 @@ export default function VideoContent({
         resRating.isRated ? setStarRating(true) : setStarRating(false);
       };
 
+      const getCourseCommentsHandle = async () => {
+        try {
+          const commentsResult = await courseApi.getCourseComments(
+            introductionVideoId || paramsVideoId
+          );
+          setComments(commentsResult);
+        } catch (error) {
+          console.error("getCourseCommentsHandle error", error);
+        }
+      };
+      
       getFavoriteVideoStatus();
       getStarRatingStatus();
       getCourseCommentsHandle();
     }
-  }, [introductionVideoId || paramsVideoId]);
+  };
+
+  // 判斷是否登入
+  const isLogin = async () => {
+    const isLoginStatus = await dispatch(loginCheck());
+    if (isLoginStatus.meta.requestStatus === "rejected") {
+      setShowIcon(false);
+      return false;
+    }
+    return true;
+  };
 
   // 取得影片播放 URL
   useEffect(() => {
-    if (checkToken()) return;
-    const fetchVideoSrc = async () => {
-      const tokenUrl = await getTokenToPlay(videoUrl);
-      setVideoSrc(tokenUrl);
-    };
+    const initialize = async () => {
+      if (!(await isLogin())) return;
+      const fetchVideoSrc = async () => {
+        const tokenUrl = await getTokenToPlay(videoUrl);
+        setVideoSrc(tokenUrl);
+      };
+      const localUser = async () => {
+        const userSubscription = await userApi.getUserData();
+        setUserSubscriptionsPlan(
+          userSubscription.subscriptions.length === 0 ? false : true
+        );
+      };
 
-    fetchVideoSrc();
+      localUser();
+      getComment();
+      fetchVideoSrc();
+    };
+    initialize();
   }, [videoUrl]);
+
+  // 先判斷訂閱方案，再判斷是否顯示評分/觀看 icon
+  useEffect(() => {
+    if (userSubscriptionsPlan) {
+      setShowIcon(true);
+    } else {
+      if (page === "course-detail" || page === "course-video") {
+        setShowIcon(false);
+      } else {
+        setShowIcon(true);
+      }
+    }
+  }, [page, userSubscriptionsPlan]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
@@ -166,25 +197,32 @@ export default function VideoContent({
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
       <div className="d-flex mb-sm-6 mb-2">
         <div className="f-align-center">
-          <div className="f-align-center py-2 ps-0">
-            <span className="view-count me-1 fs-5 material-symbols-outlined">
-              visibility
-            </span>
-            <data
-              value={courseList.view_count}
-              className="fs-7 data-view-count"
-            >
-              {Number(courseList.view_count).toLocaleString()}
-            </data>
-          </div>
-          <div className="f-align-center py-2 px-4">
-            <span className="rating-score me-1 fs-5 material-symbols-outlined icon-fill">
-              kid_star
-            </span>
-            <data value={courseList.rating} className="fs-7 data-rating-score">
-              {Number(courseList.rating).toFixed(1)}
-            </data>
-          </div>
+          {showIcon && (
+            <>
+              <div className="f-align-center py-2 ps-0">
+                <span className="view-count me-1 fs-5 material-symbols-outlined">
+                  visibility
+                </span>
+                <data
+                  value={courseList.view_count}
+                  className="fs-7 data-view-count"
+                >
+                  {Number(courseList.view_count).toLocaleString()}
+                </data>
+              </div>
+              <div className="f-align-center py-2 px-4">
+                <span className="rating-score me-1 fs-5 material-symbols-outlined icon-fill">
+                  kid_star
+                </span>
+                <data
+                  value={courseList.rating}
+                  className="fs-7 data-rating-score"
+                >
+                  {Number(courseList.rating).toFixed(1)}
+                </data>
+              </div>{" "}
+            </>
+          )}
         </div>
         <div className="ms-auto">
           <div className="f-align-center">
@@ -229,21 +267,25 @@ export default function VideoContent({
       </div>
       <div className="mb-sm-6 mb-5">
         <ul className="d-flex flex-wrap gap-2">
-          <li className="tag-label btn btn-brand-03 py-2 px-4 mouse-pointer-style">
-            <h3>{courseList.category}</h3>
-          </li>
+          {showIcon && (
+            <li className="tag-label btn btn-brand-03 py-2 px-4 mouse-pointer-style">
+              <h3>{courseList.category}</h3>
+            </li>
+          )}
         </ul>
       </div>
       <div className="author-content d-flex mb-10">
-        <img
-          className="author-image rounded-5 me-4"
-          src={
-            courseList.Tutor.User.avatar_url
-              ? courseList.Tutor.User.avatar_url
-              : "images/icon/user.png"
-          }
-          alt="tutor-avatar-image"
-        />
+        <div className="author-image me-4">
+          <img
+            className="rounded-5 w-100 h-100 object-cover"
+            src={
+              courseList.Tutor.User.avatar_url
+                ? courseList.Tutor.User.avatar_url
+                : "images/icon/user.png"
+            }
+            alt="tutor-avatar-image"
+          />
+        </div>
         <div>
           <NavLink to={`/tutor-info/${courseTutor}`}>
             <h2 className="author-name mb-2">
@@ -374,4 +416,5 @@ VideoContent.propTypes = {
   introductionVideoId: PropTypes.string,
   courseTutor: PropTypes.string,
   paramsVideoId: PropTypes.string,
+  page: PropTypes.string,
 };

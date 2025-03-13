@@ -20,13 +20,13 @@ export default function CommentsSection({
   videoId,
   disableInputComment,
 }) {
-  const [replyText, setReplyText] = useState(""); // 回覆輸入
+  const [replyText, setReplyText] = useState({}); // 回覆輸入
   const [commentText, setCommentText] = useState(""); // 留言輸入
   const [userComments, setUserComments] = useState([]); // 留言
   const [replyCount, setReplyCount] = useState({}); // 回覆數
   const [showReplyBox, setShowReplyBox] = useState({}); // 是否顯示回覆輸入框
   const [isSending, setIsSending] = useState(false); // 是否留言中
-  const [isReply, setIsReply] = useState(false); // 是否回覆中
+  const [isReplying, setIsReplying] = useState({}); // 是否回覆中
   const [errors, setErrors] = useState({}); // 錯誤訊息
 
   // redux 使用者資訊
@@ -140,11 +140,13 @@ export default function CommentsSection({
 
   // 回覆
   const replyComment = async (commentId) => {
-    if (validateReply(replyText) && replyText.trim() !== "" && !isReply) {
-      setIsReply(true);
+    const replyContent = replyText[commentId];
+
+    if (validateReply(replyContent) && replyContent.trim() !== "") {
+      setIsReplying((prev) => ({ ...prev, [commentId]: true })); // 只設置當前留言為 "回覆中"
       try {
         const data = {
-          content: replyText,
+          content: replyContent,
           parent_id: commentId,
         };
         await courseApi.postCourseComments(videoId, data);
@@ -156,12 +158,18 @@ export default function CommentsSection({
           reduceComments(reloadComments);
         setUserComments(parentComments.reverse());
         setReplyCount(countReplies(childComments));
-        setReplyText("");
-        setIsReply(false);
+
+        setReplyText((prev) => ({
+          ...prev,
+          [commentId]: "",
+        }));
+
         setShowReplyBox((prev) => ({
           ...prev,
           [commentId]: false,
         }));
+
+        setIsReplying((prev) => ({ ...prev, [commentId]: false })); // 只讓當前留言結束 "回覆中"
       }
     }
   };
@@ -180,21 +188,23 @@ export default function CommentsSection({
       {/* <Loader/> */}
       <section className="video-comments pt-6">
         <div className="d-flex align-items-center py-4 mb-6">
-          <img
-            className="user-comment-picture me-3"
-            src={
-              userInfo.avatar_url
-                ? userInfo.avatar_url
-                : "/images/icon/user.png"
-            }
-            alt="當前使用者頭像"
-          />
+          <div className="user-comment-picture me-3">
+            <img
+              className="w-100 h-100 object-cover"
+              src={
+                userInfo.avatar_url
+                  ? userInfo.avatar_url
+                  : "/images/icon/user.png"
+              }
+              alt="當前使用者頭像"
+            />
+          </div>
           <input
             type="text"
             placeholder={disableInputComment ? "課程尚未開放" : "留言..."}
             name="user-comment"
             id="user-comment"
-            className={`user-comment w-100 py-2 ${
+            className={`user-comment py-2 ${
               errors.commentText ? "input-error" : ""
             }`}
             style={{ cursor: disableInputComment ? "not-allowed" : "" }}
@@ -228,11 +238,13 @@ export default function CommentsSection({
           {userComments.map((userComment, index) => (
             <li className="mb-6" key={userComment.id}>
               <div className="user-content d-flex mb-3">
-                <img
-                  className="user-image me-4"
-                  src={userComment.User.avatar_url}
-                  alt="留言者頭像"
-                />
+                <div className="user-image me-4">
+                  <img
+                    className="w-100 h-100 object-cover"
+                    src={userComment.User.avatar_url}
+                    alt="留言者頭像"
+                  />
+                </div>
                 <div className="d-flex justify-content-between align-items-center flex-fill">
                   <div className="f-column">
                     <span className="user-name mb-2">
@@ -269,21 +281,25 @@ export default function CommentsSection({
                       type="text"
                       placeholder="回覆留言"
                       name="reply-comment"
-                      id="reply-comment"
+                      id={`reply-comment-${userComment.id}`} // 確保 ID 唯一
                       className={`w-100 reply-comment p-2 me-2 ${
                         errors.replyText ? "input-error" : ""
                       }`}
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
+                      value={replyText[userComment.id] || ""} // 確保每個留言有自己的內容
+                      onChange={(e) => {
+                        setReplyText((prev) => ({
+                          ...prev,
+                          [userComment.id]: e.target.value,
+                        }));
+                      }}
                     />
                     <div>
-                      {!isReply && (
+                      {!isReplying[userComment.id] ? (
                         <i
                           className="bi bi-reply fs-4 p-2 reply-icon-color"
                           onClick={() => replyComment(userComment.id)}
                         ></i>
-                      )}
-                      {isReply && (
+                      ) : (
                         <div className="p-2">
                           <ReactLoading
                             type={"spin"}
@@ -332,15 +348,17 @@ export default function CommentsSection({
                           {replyCount[userComment.id].map((item) => (
                             <div className="tutor-content mb-6" key={item.id}>
                               <div className="d-flex mb-3">
-                                <img
-                                  className="tutor-image me-4"
-                                  src={
-                                    item.User.avatar_url
-                                      ? item.User.avatar_url
-                                      : "/images/icon/user.png"
-                                  }
-                                  alt="留言回覆者頭像"
-                                />
+                                <div className="tutor-image me-4">
+                                  <img
+                                    className="w-100 h-100 object-cover"
+                                    src={
+                                      item.User.avatar_url
+                                        ? item.User.avatar_url
+                                        : "/images/icon/user.png"
+                                    }
+                                    alt="留言回覆者頭像"
+                                  />
+                                </div>
                                 <div className="d-flex justify-content-between align-items-center flex-fill">
                                   <div className="f-column">
                                     <span className="tutor-name mb-2">

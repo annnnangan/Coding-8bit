@@ -119,13 +119,13 @@ export default function CourseDetailPage() {
               text: "輕鬆升級，詳情請至訂閱了解",
               icon: "error",
               showCancelButton: true,
-              confirmButtonText: "立馬升級！",
+              confirmButtonText: "手刀升級！",
               cancelButtonText: "回首頁",
               allowOutsideClick: false,
             }).then((result) => {
               setSwalShown(false);
               if (result.isConfirmed) {
-                navigate("/subscription-list"); // 立馬升級
+                navigate("/subscription-list"); // 手刀升級
               } else if (result.dismiss === Swal.DismissReason.cancel) {
                 navigate("/"); // 返回首頁
               }
@@ -173,6 +173,7 @@ export default function CourseDetailPage() {
             courseTutor={courseList.tutor_id}
             videoUrl={chapter.length > 0 ? chapter[0]?.Videos[0]?.video_url : ""}
             introductionVideoId={chapter[0]?.Videos[0]?.id}
+            page="course-detail"
           />
           <aside className="col-lg-5 col-xl-4">
             {/* 章節影片 */}
