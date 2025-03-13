@@ -1,7 +1,7 @@
 // react 相關套件
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 // 第三方套件
 import PropTypes from "prop-types";
@@ -16,6 +16,9 @@ import userApi from "@/api/userApi";
 // 組件
 import CommentsSection from "./CommentsSection";
 import StarRating from "./StarRating";
+
+// 工具
+import { loginCheck } from "@/utils/slice/authSlice";
 
 export default function VideoContent({
   videoUrl,
@@ -32,25 +35,11 @@ export default function VideoContent({
   const [videoSrc, setVideoSrc] = useState(""); // 影片 URL
   const [userSubscriptionsPlan, setUserSubscriptionsPlan] = useState(false); // 使用者訂閱方案
   const [showIcon, setShowIcon] = useState(false); // 是否顯示評分/觀看 icon
-
-  // redux 使用者資訊
-  const userInfo = useSelector((state) => state.auth.userData);
+  const dispatch = useDispatch(); // redux dispatch
 
   // 評分 modal
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
-
-  // 取得課程留言
-  const getCourseCommentsHandle = async () => {
-    try {
-      const commentsResult = await courseApi.getCourseComments(
-        introductionVideoId || paramsVideoId
-      );
-      setComments(commentsResult);
-    } catch (error) {
-      console.error("getCourseCommentsHandle error", error);
-    }
-  };
 
   // 控制收藏課程
   const handleFavorite = async (videoId) => {
@@ -103,11 +92,6 @@ export default function VideoContent({
     return tokenUrl;
   };
 
-  // 檢查是否有登入
-  const checkToken = () => {
-    return Object.keys(userInfo).length === 0 ? true : false;
-  };
-
   // 取得留言、收藏、評分狀態
   const getComment = async () => {
     videoUrl === ""
@@ -128,29 +112,53 @@ export default function VideoContent({
         resRating.isRated ? setStarRating(true) : setStarRating(false);
       };
 
+      const getCourseCommentsHandle = async () => {
+        try {
+          const commentsResult = await courseApi.getCourseComments(
+            introductionVideoId || paramsVideoId
+          );
+          setComments(commentsResult);
+        } catch (error) {
+          console.error("getCourseCommentsHandle error", error);
+        }
+      };
+      
       getFavoriteVideoStatus();
       getStarRatingStatus();
       getCourseCommentsHandle();
     }
   };
 
+  // 判斷是否登入
+  const isLogin = async () => {
+    const isLoginStatus = await dispatch(loginCheck());
+    if (isLoginStatus.meta.requestStatus === "rejected") {
+      setShowIcon(false);
+      return false;
+    }
+    return true;
+  };
+
   // 取得影片播放 URL
   useEffect(() => {
-    if (checkToken()) return;
-    const fetchVideoSrc = async () => {
-      const tokenUrl = await getTokenToPlay(videoUrl);
-      setVideoSrc(tokenUrl);
-    };
-    const localUser = async () => {
-      const userSubscription = await userApi.getUserData();
-      setUserSubscriptionsPlan(
-        userSubscription.subscriptions.length === 0 ? false : true
-      );
-    };
+    const initialize = async () => {
+      if (!(await isLogin())) return;
+      const fetchVideoSrc = async () => {
+        const tokenUrl = await getTokenToPlay(videoUrl);
+        setVideoSrc(tokenUrl);
+      };
+      const localUser = async () => {
+        const userSubscription = await userApi.getUserData();
+        setUserSubscriptionsPlan(
+          userSubscription.subscriptions.length === 0 ? false : true
+        );
+      };
 
-    localUser();
-    getComment();
-    fetchVideoSrc();
+      localUser();
+      getComment();
+      fetchVideoSrc();
+    };
+    initialize();
   }, [videoUrl]);
 
   // 先判斷訂閱方案，再判斷是否顯示評分/觀看 icon
@@ -164,7 +172,7 @@ export default function VideoContent({
         setShowIcon(true);
       }
     }
-  }, [page]);
+  }, [page, userSubscriptionsPlan]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
