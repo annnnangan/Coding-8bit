@@ -11,6 +11,7 @@ import { Modal } from "bootstrap";
 
 // API
 import courseApi from "@/api/courseApi";
+import userApi from "@/api/userApi";
 
 // 組件
 import CommentsSection from "./CommentsSection";
@@ -22,12 +23,15 @@ export default function VideoContent({
   courseTutor,
   introductionVideoId,
   paramsVideoId,
+  page,
 }) {
   const [comments, setComments] = useState([]); // 留言
   const [disableInputComment, setDisableInputComment] = useState(false); // 是否禁用留言輸入框
   const [favoriteVideo, setFavoriteVideo] = useState(false); // 是否收藏影片
   const [starRating, setStarRating] = useState(false); // 是否評分影片
   const [videoSrc, setVideoSrc] = useState(""); // 影片 URL
+  const [userSubscriptionsPlan, setUserSubscriptionsPlan] = useState(false); // 使用者訂閱方案
+  const [showIcon, setShowIcon] = useState(false); // 是否顯示評分/觀看 icon
 
   // redux 使用者資訊
   const userInfo = useSelector((state) => state.auth.userData);
@@ -105,7 +109,7 @@ export default function VideoContent({
   };
 
   // 取得留言、收藏、評分狀態
-  const getcomment = async () => {
+  const getComment = async () => {
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
@@ -133,14 +137,34 @@ export default function VideoContent({
   // 取得影片播放 URL
   useEffect(() => {
     if (checkToken()) return;
-    getcomment();
     const fetchVideoSrc = async () => {
       const tokenUrl = await getTokenToPlay(videoUrl);
       setVideoSrc(tokenUrl);
     };
+    const localUser = async () => {
+      const userSubscription = await userApi.getUserData();
+      setUserSubscriptionsPlan(
+        userSubscription.subscriptions.length === 0 ? false : true
+      );
+    };
 
+    localUser();
+    getComment();
     fetchVideoSrc();
   }, [videoUrl]);
+
+  // 先判斷訂閱方案，再判斷是否顯示評分/觀看 icon
+  useEffect(() => {
+    if (userSubscriptionsPlan) {
+      setShowIcon(true);
+    } else {
+      if (page === "course-detail" || page === "course-video") {
+        setShowIcon(false);
+      } else {
+        setShowIcon(true);
+      }
+    }
+  }, [page]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
@@ -165,7 +189,7 @@ export default function VideoContent({
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
       <div className="d-flex mb-sm-6 mb-2">
         <div className="f-align-center">
-          {!checkToken() && (
+          {showIcon && (
             <>
               <div className="f-align-center py-2 ps-0">
                 <span className="view-count me-1 fs-5 material-symbols-outlined">
@@ -235,7 +259,7 @@ export default function VideoContent({
       </div>
       <div className="mb-sm-6 mb-5">
         <ul className="d-flex flex-wrap gap-2">
-          {!checkToken() && (
+          {showIcon && (
             <li className="tag-label btn btn-brand-03 py-2 px-4 mouse-pointer-style">
               <h3>{courseList.category}</h3>
             </li>
@@ -384,4 +408,5 @@ VideoContent.propTypes = {
   introductionVideoId: PropTypes.string,
   courseTutor: PropTypes.string,
   paramsVideoId: PropTypes.string,
+  page: PropTypes.string,
 };

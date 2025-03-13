@@ -143,6 +143,7 @@ export default function CourseVideoPage() {
             videoUrl={videoData?.video_url}
             courseList={videoData}
             paramsVideoId={videoId}
+            page="single-video"
           />
           <aside className="col-lg-5 col-xl-4">
             {/* 講師其他影片 */}
