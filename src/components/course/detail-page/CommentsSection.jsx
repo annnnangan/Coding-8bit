@@ -348,15 +348,17 @@ export default function CommentsSection({
                           {replyCount[userComment.id].map((item) => (
                             <div className="tutor-content mb-6" key={item.id}>
                               <div className="d-flex mb-3">
-                                <img
-                                  className="tutor-image me-4"
-                                  src={
-                                    item.User.avatar_url
-                                      ? item.User.avatar_url
-                                      : "/images/icon/user.png"
-                                  }
-                                  alt="留言回覆者頭像"
-                                />
+                                <div className="tutor-image me-4">
+                                  <img
+                                    className="w-100 h-100 object-cover"
+                                    src={
+                                      item.User.avatar_url
+                                        ? item.User.avatar_url
+                                        : "/images/icon/user.png"
+                                    }
+                                    alt="留言回覆者頭像"
+                                  />
+                                </div>
                                 <div className="d-flex justify-content-between align-items-center flex-fill">
                                   <div className="f-column">
                                     <span className="tutor-name mb-2">

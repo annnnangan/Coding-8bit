@@ -228,9 +228,9 @@
       .tutor-content {
         .tutor-image {
           height: 40px;
-          max-width: 40px;
-          object-fit: cover;
+          width: 40px;
           border-radius: 88px;
+          overflow: hidden;
         }
 
         .tutor-name {
