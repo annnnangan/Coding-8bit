@@ -165,25 +165,32 @@ export default function VideoContent({
       <h1 className="fs-2 mb-4 video-title">{courseList.title}</h1>
       <div className="d-flex mb-sm-6 mb-2">
         <div className="f-align-center">
-          <div className="f-align-center py-2 ps-0">
-            <span className="view-count me-1 fs-5 material-symbols-outlined">
-              visibility
-            </span>
-            <data
-              value={courseList.view_count}
-              className="fs-7 data-view-count"
-            >
-              {Number(courseList.view_count).toLocaleString()}
-            </data>
-          </div>
-          <div className="f-align-center py-2 px-4">
-            <span className="rating-score me-1 fs-5 material-symbols-outlined icon-fill">
-              kid_star
-            </span>
-            <data value={courseList.rating} className="fs-7 data-rating-score">
-              {Number(courseList.rating).toFixed(1)}
-            </data>
-          </div>
+          {!checkToken() && (
+            <>
+              <div className="f-align-center py-2 ps-0">
+                <span className="view-count me-1 fs-5 material-symbols-outlined">
+                  visibility
+                </span>
+                <data
+                  value={courseList.view_count}
+                  className="fs-7 data-view-count"
+                >
+                  {Number(courseList.view_count).toLocaleString()}
+                </data>
+              </div>
+              <div className="f-align-center py-2 px-4">
+                <span className="rating-score me-1 fs-5 material-symbols-outlined icon-fill">
+                  kid_star
+                </span>
+                <data
+                  value={courseList.rating}
+                  className="fs-7 data-rating-score"
+                >
+                  {Number(courseList.rating).toFixed(1)}
+                </data>
+              </div>{" "}
+            </>
+          )}
         </div>
         <div className="ms-auto">
           <div className="f-align-center">
@@ -228,9 +235,11 @@ export default function VideoContent({
       </div>
       <div className="mb-sm-6 mb-5">
         <ul className="d-flex flex-wrap gap-2">
-          <li className="tag-label btn btn-brand-03 py-2 px-4 mouse-pointer-style">
-            <h3>{courseList.category}</h3>
-          </li>
+          {!checkToken() && (
+            <li className="tag-label btn btn-brand-03 py-2 px-4 mouse-pointer-style">
+              <h3>{courseList.category}</h3>
+            </li>
+          )}
         </ul>
       </div>
       <div className="author-content d-flex mb-10">
