@@ -32,7 +32,7 @@ export default function AddLearningNeedPage() {
         title: "成為高級會員後即可提出客製化學習需求",
         showCancelButton: false,
         confirmButtonText: "確定",
-      })
+      });
       navigate(-1);
     }
   }, [userData.id]);
@@ -152,7 +152,7 @@ export default function AddLearningNeedPage() {
       </div>
 
       {/* 聊天室 */}
-      <ChatRoom />
+      {userData.username && <ChatRoom username={userData.username} />}
     </>
   );
 }
