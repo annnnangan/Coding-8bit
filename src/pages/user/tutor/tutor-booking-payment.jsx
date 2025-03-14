@@ -162,16 +162,16 @@ export default function TutorBookingPayment() {
       const transactionId = response.transactionId;
 
       // 必要資料存入 sessionStorage 給付款完成頁用
+
       const bookingDetails = {
         transactionId: transactionId,
-        tutor_name: data.booking.tutor_name,
-        booking_date: data.booking_date,
-        service_type: data.service_type,
+        tutor_name: tutor_name,
+        booking_date: data.booking.booking_date,
+        service_type: data.booking.service_type,
         hourly_availability: data.booking.timeslots,
-        source_code_url: data.source_code_url,
-        instruction_details: data.instruction_details,
+        source_code_url: data.booking.source_code_url,
+        instruction_details: data.booking.instruction_details,
       };
-
       // Store the object in sessionStorage
       sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
 
