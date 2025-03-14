@@ -56,6 +56,7 @@ import StudentManageCustomRequests from "../pages/student/custom-request/student
 import StudentProfile from "../pages/student/student-profile";
 import StudentManageBooking from "../pages/student/bookings/student-manage-bookings";
 import StudentFavorites from "../pages/student/student-favorites";
+import BookingPaymentResult from "../pages/user/tutor/tutor-booking-payment-result";
 
 export const router = createHashRouter([
   {
@@ -96,6 +97,10 @@ export const router = createHashRouter([
       {
         path: "tutor-booking-payment",
         element: <TutorBookingPayment />,
+      },
+      {
+        path: "tutor-booking-payment-result",
+        element: <BookingPaymentResult />,
       },
       { path: "tutor-info/:id", element: <TutorInfo /> },
       { path: "tutor-apply", element: <TutorApply /> },
