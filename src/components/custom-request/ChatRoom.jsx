@@ -43,7 +43,6 @@ export default function ChatRoom({ username }) {
         message: answer,
         sessionId: sessionId,
       });
-      console.log(response);
 
       if (response.function_call && response.function_call.result.is_complete) {
         const { title, tag, level, content, category } =
