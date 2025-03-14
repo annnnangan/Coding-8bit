@@ -1,13 +1,20 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+import PropTypes from "prop-types";
+import Swal from "sweetalert2";
+import * as bootstrap from "bootstrap";
 
 import customRequestsApi from "@/api/customRequestsApi";
 
-export default function ChatRoom() {
+export default function ChatRoom({ username }) {
   // loading (區域)
   const [placeLoadingState, setPlaceLoadingState] = useState(false);
 
+  const navigate = useNavigate();
+
   // 與機器人問答
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState(`你好，我是 ${username}`);
   const [userResponses, setUserResponses] = useState([]);
   const [botResponses, setBotResponses] = useState([]);
   const postAnswer = async () => {
@@ -36,6 +43,32 @@ export default function ChatRoom() {
         message: answer,
         sessionId: sessionId,
       });
+      console.log(response);
+
+      if (response.function_call && response.function_call.result.is_complete) {
+        const { title, tag, level, content, category } =
+          response.function_call.result.data;
+
+        await customRequestsApi.addCustomRequest({
+          title,
+          tag,
+          level,
+          content,
+          category,
+        });
+
+        Swal.fire({
+          icon: "success",
+          title: "新增成功",
+        });
+
+        // 關閉畫布
+        const offCanvasElement = document.getElementById("offcanvasRight");
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(offCanvasElement);
+        bsOffcanvas.hide();
+
+        navigate("/custom-requests-list");
+      }
 
       // 紀錄機器人回應內容
       setBotResponses((prev) => [
@@ -68,8 +101,44 @@ export default function ChatRoom() {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [sortedResponses]); // 每次 sortedResponses 更新就滾動
+
+  // 畫布一旦顯示出來就執行聊天機器人
+  const [hasExecuted, setHasExecuted] = useState(false);
+  const offCanvasRef = useRef(null);
+
+  const handleOpen = async () => {
+    if (username) {
+      await postAnswer();
+      setHasExecuted(true);
+    }
+  };   
+
+  useEffect(() => {
+    const offCanvasElement = offCanvasRef.current;
+
+    const handleShowEvent = async () => {
+      if (!hasExecuted) {
+        await handleOpen()
+      }
+    };
+
+    if (offCanvasElement) {
+      offCanvasElement.addEventListener("shown.bs.offcanvas", handleShowEvent);
+    }
+
+    return () => {
+      if (offCanvasElement) {
+        offCanvasElement.removeEventListener(
+          "shown.bs.offcanvas",
+          handleShowEvent
+        );
+      }
+    };
+  }, [hasExecuted]);
+
   return (
     <div
+      ref={offCanvasRef}
       className="chat-room offcanvas offcanvas-end"
       tabIndex="-1"
       id="offcanvasRight"
@@ -87,28 +156,23 @@ export default function ChatRoom() {
         ></button>
       </div>
       <div className="offcanvas-body position-relative px-4 px-lg-8">
-      <div
-            className="d-flex align-items-center pe-8"
-          >
-            <div className="flex-shrink-0 align-self-start">
+        {/* <div className="d-flex align-items-center pe-8">
+          <div className="flex-shrink-0 align-self-start">
             <img
-                  src="images/deco/robot-avatar.svg"
-                  alt="user-image"
-                  className="user-page-header-img rounded-circle"
-                />
-            </div>
-            <ul
-              className="flex-grow-1 ms-4 ms-lg-6"
-            >
-              <li
-                className="bg-white rounded-5 py-3 px-5 mb-6 mb-lg-8"
-              >
-                <p className="fs-7 fs-lg-6">
-                  哈囉你好^_^ 我是建立需求小幫手~請在輸入框輸入內容與我開始進行對話。
-                </p>
-              </li>
-            </ul>
+              src="images/deco/robot-avatar.svg"
+              alt="user-image"
+              className="user-page-header-img rounded-circle"
+            />
           </div>
+          <ul className="flex-grow-1 ms-4 ms-lg-6">
+            <li className="bg-white rounded-5 py-3 px-5 mb-6 mb-lg-8">
+              <p className="fs-7 fs-lg-6">
+                哈囉你好^_^
+                我是建立需求小幫手~請在輸入框輸入內容與我開始進行對話。
+              </p>
+            </li>
+          </ul>
+        </div> */}
 
         {sortedResponses.map((res, index) => (
           <div
@@ -195,3 +259,6 @@ export default function ChatRoom() {
     </div>
   );
 }
+ChatRoom.propTypes = {
+  username: PropTypes.string.isRequired,
+};
