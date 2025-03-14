@@ -81,7 +81,6 @@ export default function BookingPaymentResult() {
 
   useEffect(() => {
     const storedBookingDetails = JSON.parse(sessionStorage.getItem("bookingDetails"));
-    console.log("storedBookingDetails", storedBookingDetails);
     setBookingSuccessResult(storedBookingDetails);
     checkPaymentStatus(storedBookingDetails.transactionId);
   }, []);
