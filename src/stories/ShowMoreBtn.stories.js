@@ -4,6 +4,7 @@ import ShowMoreBtn from "@/components/common/ShowMoreButton";
 export default {
   title: "Show More Button",
   component: ShowMoreBtn,
+  tags: ["autodocs"],
 };
 
 //Define different case below

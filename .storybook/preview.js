@@ -1,5 +1,6 @@
 /** @type { import('@storybook/react').Preview } */
 import "../src/assets/scss/all.scss";
+
 const preview = {
   parameters: {
     controls: {
