@@ -13,11 +13,12 @@ import FormSubmitButton from "@/components/common/FormSubmitButton";
 
 import { BookingSchema } from "@/utils/schema/booking-schema";
 import { serviceTypeMap } from "@/utils/schema/booking-schema";
-import { formatDate, convertDecimalTimeslotsToArray } from "@/utils/timeFormatted-utils";
+import { formatDate } from "@/utils/timeFormatted-utils";
 import { updateFormData } from "@/utils/slice/bookingSlice";
 import { formatHour } from "@/utils/timeFormatted-utils";
+
 import bookingApi from "@/api/bookingApi";
-import tutorApi from "@/api/tutorApi";
+import orderApi from "@/api/orderApi";
 
 const stepFields = [
   {
@@ -26,7 +27,7 @@ const stepFields = [
   },
   {
     step: 2,
-    field: ["buyerEmail", "buyerName", "buyerTel", "userCreditCardNumber", "creditCardExpiration", "creditCardCvc"],
+    field: ["buyerEmail", "buyerName", "buyerTel"],
   },
 ];
 
@@ -123,6 +124,90 @@ export default function TutorBookingPayment() {
     }
   };
 
+  // 建立訂單函式
+  const addOrder = async (bookingId) => {
+    try {
+      const orderData = {
+        order_type: "booking",
+        target_id: bookingId,
+        amount: price,
+      };
+
+      const res = await orderApi.addOrder({
+        user_id: userData.id,
+        ...orderData,
+      });
+
+      const orderId = res.data.id;
+
+      return orderId;
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "付款失敗",
+        text: error.response?.data?.message || "發生未知錯誤",
+      });
+    }
+  };
+  // 建立藍新金流
+  const addPay = async (orderId, data) => {
+    try {
+      // 設定前端跳轉的網址
+      const returnUrl = `https://coding-8bit.site/#/tutor-booking-payment-result`;
+
+      // 呼叫 API 取得藍新金流參數
+      const response = await orderApi.addPay(orderId, returnUrl);
+
+      // 取得必要的付款資訊
+      const transactionId = response.transactionId;
+
+      // 必要資料存入 sessionStorage 給付款完成頁用
+      const bookingDetails = {
+        transactionId: transactionId,
+        tutor_name: data.booking.tutor_name,
+        booking_date: data.booking_date,
+        service_type: data.service_type,
+        hourly_availability: data.booking.timeslots,
+        source_code_url: data.source_code_url,
+        instruction_details: data.instruction_details,
+      };
+
+      // Store the object in sessionStorage
+      sessionStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+
+      // 創建表單並跳轉到藍新付款頁
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = response.PayGateWay;
+      form.style.display = "none";
+
+      // 藍新金流參數
+      const params = [
+        { name: "MerchantID", value: response.MerchantID },
+        { name: "TradeInfo", value: response.TradeInfo },
+        { name: "TradeSha", value: response.TradeSha },
+        { name: "Version", value: response.Version },
+      ];
+
+      params.forEach(({ name, value }) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit(); // ✅ 跳轉到藍新金流
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "付款失敗",
+        text: error.response?.data?.message || "發生未知錯誤",
+      });
+    }
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -135,15 +220,10 @@ export default function TutorBookingPayment() {
       const bookingData = { ...bookingWithoutTimeslots, hourly_availability: formatTimeslots, student_id: userData.id };
 
       const result = await bookingApi.addBooking(bookingData);
+      const bookingId = result.id;
 
-      const convertedHourlyAvailability = convertDecimalTimeslotsToArray(result.hourly_availability);
-
-      const tutorNameFromAPI = (await tutorApi.getTutorDetail(result.tutor_id)).data.User.username;
-
-      const formattedResult = { ...result, tutor_name: tutorNameFromAPI, hourly_availability: convertedHourlyAvailability };
-
-      setBookingSuccessResult(formattedResult);
-      setCurrentStep((currentStep) => currentStep + 1);
+      const orderId = await addOrder(bookingId);
+      await addPay(orderId, data);
     } catch (error) {
       console.dir(error);
       const redirectUrl = tutor_id ? `/tutor/${tutor_id}` : "/";
@@ -366,9 +446,15 @@ export default function TutorBookingPayment() {
                         <h2 className="fs-5 fs-lg-3">預約人資訊</h2>
                         <BuyerForm />
                       </div>
+
                       <div className="input-card card shadow rounded-2 p-6 p-lg-10 mt-6">
                         <h2 className="fs-5 fs-lg-3">付款方式</h2>
-                        <CreditCardForm />
+                        <div className="form-check mt-6">
+                          <input className="form-check-input" type="radio" name="pay-with" id="creditCard" defaultChecked />
+                          <label className="form-check-label" htmlFor="creditCard">
+                            藍新金流
+                          </label>
+                        </div>
                       </div>
                     </div>
 
@@ -424,137 +510,6 @@ export default function TutorBookingPayment() {
                           withSlideRightAnimation={true}
                           handleClick={toNextStep}
                         />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {currentStep === 3 && (
-                <>
-                  <div className="f-center mt-8">
-                    <h1 className="fs-2 fs-lg-1 text-brand-03 f-align-center">
-                      <span className="material-symbols-outlined icon-fill display-3 text-brand-03 me-5">check_circle </span>
-                      付款成功
-                    </h1>
-                  </div>
-                  <div className="row f-center">
-                    <div className="col-md-8 col-xxl-6 mt-10 mt-lg-11">
-                      <div className="card shadow rounded-2 p-6 p-lg-10">
-                        <h2 className="fs-5 fs-lg-4 w-bolder">預約詳細資訊</h2>
-
-                        {/* 詳細預約內容 */}
-                        <div className="mt-6">
-                          <div className="row row-cols-md-2">
-                            <div className="mb-md-12 mb-6">
-                              <label htmlFor="tutor" className="form-label">
-                                <h3 className="fs-6 fw-medium">預約老師</h3>
-                              </label>
-                              <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="tutor" defaultValue={bookingSuccessResult.tutor_name} disabled />
-                            </div>
-                            <div className="mb-md-12 mb-6">
-                              <label htmlFor="bookingType" className="form-label">
-                                <h3 className="fs-6 fw-medium">預約類型</h3>
-                              </label>
-                              <input
-                                type="text"
-                                className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
-                                id="bookingType"
-                                defaultValue={serviceTypeMap[bookingSuccessResult.service_type]}
-                                disabled
-                              />
-                            </div>
-                            <div className="mb-md-5 mb-6">
-                              <label htmlFor="booking_date" className="form-label">
-                                <h3 className="fs-6 fw-medium">預約日期</h3>
-                              </label>
-                              <input
-                                type="text"
-                                className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
-                                id="booking_date"
-                                defaultValue={formatDate(bookingSuccessResult.booking_date)}
-                                disabled
-                              />
-                            </div>
-                            <div className="mb-md-5 mb-6">
-                              <label htmlFor="timeSlot" className="form-label">
-                                <h3 className="fs-6 fw-medium">預約時段</h3>
-                              </label>
-                              <div className="d-flex flex-wrap gap-1">
-                                {bookingSuccessResult.hourly_availability.map((time) => (
-                                  <input
-                                    key={time}
-                                    type="text"
-                                    className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
-                                    id="timeSlot"
-                                    value={`${formatHour(time)} - ${formatHour(time + 1)}`}
-                                    disabled
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <hr />
-
-                          <div className="mt-10">
-                            {service_type === "codeReview" ? (
-                              <>
-                                <div className="mb-8">
-                                  <label htmlFor="source_code_url" className="form-label">
-                                    希望接受檢視的程式碼儲存庫
-                                  </label>
-                                  <input
-                                    className="form-control border-0 bg-white p-0 rounded-0 text-gray-02 h-100"
-                                    id="source_code_URL"
-                                    defaultValue={bookingSuccessResult.source_code_url}
-                                    disabled
-                                  />
-                                </div>
-                                <div>
-                                  <label htmlFor="userInput" className="form-label">
-                                    希望接受指導的項目
-                                  </label>
-                                  <textarea
-                                    className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
-                                    id="userInput"
-                                    style={{ resize: "none" }}
-                                    rows="5"
-                                    defaultValue={bookingSuccessResult.instruction_details}
-                                    disabled
-                                  />
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div>
-                                  <label htmlFor="userInput" className="form-label">
-                                    希望接受指導的項目
-                                  </label>
-                                  <textarea
-                                    className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
-                                    id="userInput"
-                                    style={{ resize: "none" }}
-                                    rows="5"
-                                    defaultValue={bookingSuccessResult.instruction_details}
-                                    disabled
-                                  />
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 提醒 */}
-                        <div className="mt-6 alert bg-brand-02 f-center" role="alert">
-                          <span className="material-symbols-outlined me-2"> info </span>
-                          {service_type === "codeReview" ? "檢視結果將於預約時間結束時回覆。" : "會議連結將於預約時間前一天發送至您的電子信箱。"}
-                        </div>
-
-                        {/* Button */}
-                        <NavLink to="/" className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100">
-                          回到首頁
-                          <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1"> arrow_forward </span>
-                        </NavLink>
                       </div>
                     </div>
                   </div>

@@ -38,5 +38,4 @@ const BuyerSchema = z.object({
 
 export const PaymentSchema = z.object({
   ...BuyerSchema.shape,
-  ...CreditCardSchema.shape,
 });
