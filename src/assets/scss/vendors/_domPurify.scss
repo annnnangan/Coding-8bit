@@ -1,0 +1,65 @@
+// 使用 domPurify 的文字表現
+.domPurify-wrap {
+  a {
+    display: inline-block;
+    text-decoration: underline;
+  }
+  
+  li, ol {
+    list-style: auto;
+  }
+}
+.domPurify-markdown-style {
+  line-height: 1.6;
+
+  ul, ol {
+    padding: 16px;
+  }
+
+  li  {
+    padding-left: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  code {
+    background-color: #f1f1f1;
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--brand-02);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--gray-02);
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+  }
+
+  table th,
+  table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+}
+

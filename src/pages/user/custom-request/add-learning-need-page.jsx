@@ -54,7 +54,7 @@ export default function AddLearningNeedPage() {
       </Helmet>
       {loadingState && <TransparentLoader />}
 
-      <AddLearningNeedRobot />
+      {userData.username && <AddLearningNeedRobot />}
 
       <div className="add-learning-need-section">
         <div className="container">

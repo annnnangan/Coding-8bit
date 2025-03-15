@@ -329,7 +329,7 @@ export default function CardModal({
                                       __html: DOMPurify.sanitize(res.content),
                                     }}
                                   ></p>
-                                  <div className="d-flex align-items-center">
+                                  {/* <div className="d-flex align-items-center">
                                     <button
                                       className="btn btn-sm btn-light me-2 like-button d-flex align-items-center"
                                       data-response-id="r1"
@@ -341,7 +341,7 @@ export default function CardModal({
                                         {res.likes}
                                       </span>
                                     </button>
-                                  </div>
+                                  </div> */}
                                 </div>
                               </div>
                             ))}

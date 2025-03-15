@@ -24,6 +24,12 @@ const addCustomRequestImg = async (data) => {
   return response.data.data;
 };
 
+// 更新需求列表
+const updateCustomRequest = async (id, data) => {
+  const response = await apiClient.put(`/custom-requests/${id}`, data);
+  return response.data;
+};
+
 // 刪除需求列表
 const deleteCustomRequest = async (id) => {
   const response = await apiClient.delete(`/custom-requests/${id}`);
@@ -60,6 +66,7 @@ export default {
   getUserCustomRequests,
   addCustomRequest,
   addCustomRequestImg,
+  updateCustomRequest,
   deleteCustomRequest,
   getRequestsResponse,
   addRequestsResponse,

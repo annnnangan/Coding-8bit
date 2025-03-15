@@ -128,10 +128,20 @@
   
   .offcanvas-body {
     overflow-y: auto;
-    padding-bottom: 156px;
+    padding-bottom: 100px;
   }
 
   .offcanvas-footer button {
     white-space: nowrap;
+  }
+
+  .robot-img {
+    width: 48px;
+    height: 48px;
+
+    @include mobile {
+      width: 36px;
+      height: 36px;
+    }
   }
 }

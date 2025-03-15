@@ -18,6 +18,9 @@
 @import "./utils/pagination.scss";
 @import "./utils/animate.scss";
 @import "./vendors/swiper.scss";
+@import "./vendors/domPurify.scss";
+@import "./vendors/react-medium-image-zoom.scss";
+@import "./vendors/ReactDayPicker.scss";
 
 @import "./base/font.scss";
 
@@ -25,6 +28,7 @@
 @import "./layout/footer.scss";
 @import "./layout/stat-overview-card.scss";
 @import "./layout/tutor-booking-resume.scss";
+@import "./layout/loader.scss";
 
 @import "./components/subscription-card.scss";
 @import "./components/course-card.scss";
@@ -33,7 +37,6 @@
 @import "./components/upload-btn.scss";
 @import "./components/star-rating.scss";
 
-@import "./layout/loader.scss";
 @import "./pages/video-details";
 @import "./pages/index.scss";
 @import "./pages/tutor-booking.scss";

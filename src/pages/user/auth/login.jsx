@@ -221,19 +221,6 @@ export default function Login() {
                     <hr />
                   </div>
                   <a
-                    href={`${VITE_API_BASE}/auth/line`}
-                    type="button"
-                    className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-6 mt-lg-8"
-                  >
-                    <img
-                      src="images/icon/icons-line.svg"
-                      alt="icon-google"
-                      className="me-3"
-                      style={{ width: "20px", height: "20px" }}
-                    />
-                    使用 Line 登入
-                  </a>
-                  <a
                     href={`${VITE_API_BASE}/auth/google`}
                     type="button"
                     className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-2"
@@ -244,6 +231,32 @@ export default function Login() {
                       className="me-3"
                     />
                     使用 Google 登入
+                  </a>
+                  <a
+                    href={`${VITE_API_BASE}/auth/line`}
+                    type="button"
+                    className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-2"
+                  >
+                    <img
+                      src="images/icon/icons-line.svg"
+                      alt="icon-google"
+                      className="me-3"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                    使用 Line 登入
+                  </a>
+                  <a
+                    href={`${VITE_API_BASE}/auth/github`}
+                    type="button"
+                    className="btn btn-brand-02 border-1 rounded-1 w-100 f-center mt-2"
+                  >
+                    <img
+                      src="images/icon/icons-github.svg"
+                      alt="icon-google"
+                      className="me-3"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                    使用 GitHub 登入
                   </a>
 
                   <div className="f-end-center mt-6 mt-lg-8">
