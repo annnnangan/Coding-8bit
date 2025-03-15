@@ -225,7 +225,7 @@ export default function SubscriptionPayment() {
       });
   
       document.body.appendChild(form);
-      form.submit(); // ✅ 跳轉到藍新金流
+      form.submit(); // 跳轉到藍新金流
   
     } catch (error) {
       Swal.fire({
@@ -237,35 +237,6 @@ export default function SubscriptionPayment() {
       setLoadingState(false);
     }
   };
-  
-
-  // // 更新訂單狀態
-  // const updateOrderStatus = async (orderId, orderData) => {
-  //   setLoadingState(true);
-  //   try {
-  //     await Promise.all([
-  //       orderApi.updateOrder(orderId, orderData),
-  //       subscriptionApi.updateSubscription(subscriptionId, {
-  //         status: "active",
-  //       }),
-  //     ]);
-
-  //     Swal.fire({
-  //       title: "付款成功",
-  //       icon: "success",
-  //     });
-
-  //     setCurrentStep(3);
-  //   } catch (error) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "訂單狀態更新失敗",
-  //       text: error.response?.data?.message || "發生未知錯誤",
-  //     });
-  //   } finally {
-  //     setLoadingState(false);
-  //   }
-  // };
 
   const onSubmit = () => {};
 
