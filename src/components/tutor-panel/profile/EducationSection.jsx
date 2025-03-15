@@ -24,6 +24,7 @@ export default function EducationSection({ userData, setLoadingState }) {
 
   const openModal = (edu, type) => {
     if (type === "edit") {
+      setIsCurrentlyEdu(edu.end_year === 9999);
       setModalType("edit");
       setTemEducation(edu);
       setUpdateDataId(edu.id);
@@ -59,6 +60,9 @@ export default function EducationSection({ userData, setLoadingState }) {
     }));
   };
 
+  // 在學狀態處理
+  const [isCurrentlyEdu, setIsCurrentlyEdu] = useState(false);
+
   // 獲取資料
   const [tutorId, setTutorId] = useState("");
   const getData = async () => {
@@ -86,6 +90,7 @@ export default function EducationSection({ userData, setLoadingState }) {
       await tutorApi.addEdu(tutorId, {
         ...temEducation,
         tutor_id: tutorId,
+        end_year: isCurrentlyEdu ? 9999 : temEducation.end_year,
       });
       setTemEducation({});
       Swal.fire({
@@ -110,7 +115,14 @@ export default function EducationSection({ userData, setLoadingState }) {
   const updateData = async () => {
     setLoadingState(true);
     try {
-      await tutorApi.updateEdu(tutorId, temEducation, updateDataId);
+      await tutorApi.updateEdu(
+        tutorId,
+        {
+          ...temEducation,
+          end_year: isCurrentlyEdu ? 9999 : temEducation.end_year,
+        },
+        updateDataId
+      );
       Swal.fire({
         icon: "success",
         title: "修改成功",
@@ -186,34 +198,36 @@ export default function EducationSection({ userData, setLoadingState }) {
             </tr>
           </thead>
           <tbody className="align-middle">
-            {education?.map((education) => (
-              <tr key={education.id}>
-                <td>{education.school_name}</td>
-                <td>{education.major}</td>
-                <td>{education.degree}</td>
-                <td>{education.start_year}</td>
-                <td>{education.end_year}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-brand-03"
-                    onClick={() => {
-                      openModal(education, "edit");
-                    }}
-                  >
-                    編輯
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger rounded-2 px-1 py-1 ms-1"
-                    onClick={() => deleteData(education.id)}
-                  >
-                    <span className="material-symbols-outlined fs-6">
-                      delete
-                    </span>
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {education
+              ?.sort((a, b) => a.start_year - b.start_year)
+              .map((education) => (
+                <tr key={education.id}>
+                  <td>{education.school_name}</td>
+                  <td>{education.major}</td>
+                  <td>{education.degree}</td>
+                  <td>{education.start_year}</td>
+                  <td>{education.end_year === 9999 ? "-" : education.end_year}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-brand-03"
+                      onClick={() => {
+                        openModal(education, "edit");
+                      }}
+                    >
+                      編輯
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger rounded-2 px-1 py-1 ms-1"
+                      onClick={() => deleteData(education.id)}
+                    >
+                      <span className="material-symbols-outlined fs-6">
+                        delete
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -248,13 +262,30 @@ export default function EducationSection({ userData, setLoadingState }) {
             </div>
             <div className="modal-body">
               <form>
+              <div className="form-check mb-3">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="isCurrentlyEduCheckbox"
+                      checked={isCurrentlyEdu}
+                      onChange={(e) => {
+                        setIsCurrentlyEdu(e.target.checked);
+                      }}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="isCurrentlyEduCheckbox"
+                    >
+                      仍在學中
+                    </label>
+                  </div>
                 <div className="mb-3">
                   <label htmlFor="school_name" className="form-label">
                     學校名稱
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     id="school_name"
                     placeholder="七角大學"
                     value={temEducation.school_name ?? ""}
@@ -267,7 +298,7 @@ export default function EducationSection({ userData, setLoadingState }) {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     placeholder="資訊工程系"
                     id="major"
                     value={temEducation.major ?? ""}
@@ -280,7 +311,7 @@ export default function EducationSection({ userData, setLoadingState }) {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     placeholder="學士"
                     id="degree"
                     value={temEducation.degree ?? ""}
@@ -289,30 +320,32 @@ export default function EducationSection({ userData, setLoadingState }) {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="edu-start_year" className="form-label">
-                    在職年份
+                    入學年份
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     placeholder="2017"
                     id="edu-start_year"
                     value={temEducation.start_year ?? ""}
                     onChange={(e) => handleEduChange(e, "start_year")}
                   />
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="edu-end_year" className="form-label">
-                    離職年份
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="2020"
-                    id="edu-end_year"
-                    value={temEducation.end_year ?? ""}
-                    onChange={(e) => handleEduChange(e, "end_year")}
-                  />
-                </div>
+                {!isCurrentlyEdu && (
+                  <div className="mb-3">
+                    <label htmlFor="edu-end_year" className="form-label">
+                      畢業年份
+                    </label>
+                    <input
+                      type="text"
+                      className="profile-input form-control"
+                      placeholder="2020"
+                      id="edu-end_year"
+                      value={temEducation.end_year ?? ""}
+                      onChange={(e) => handleEduChange(e, "end_year")}
+                    />
+                  </div>
+                )}
               </form>
             </div>
             <div className="modal-footer">
