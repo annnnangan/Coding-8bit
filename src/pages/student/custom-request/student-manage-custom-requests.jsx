@@ -41,6 +41,30 @@ export default function StudentManageCustomRequests() {
     }
   };
 
+  // 更新需求
+  const updateRequest = async (id, request, isCompleted) => {
+    setLoadingState(true);
+    try {
+      await customRequestsApi.updateCustomRequest(id, {
+        ...request,
+        isCompleted: isCompleted,
+      });
+      Swal.fire({
+        icon: "success",
+        title: "修改成功",
+      });
+      getData();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error?.response?.data?.message,
+      });
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
   // 刪除需求
   const deleteRequest = async (id) => {
     Swal.fire({
@@ -128,7 +152,6 @@ export default function StudentManageCustomRequests() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th></th>
                     <th>需求標題</th>
                     <th>類別</th>
                     <th>上傳時間</th>
@@ -138,25 +161,30 @@ export default function StudentManageCustomRequests() {
                 <tbody>
                   {customRequestList.map((request) => (
                     <tr className="align-middle" key={request.id}>
-                      <td>
-                        <div className="cover_image-wrap position-relative">
-                          {request?.CustomRequestPhotos[0]?.image_url && (
-                            <img
-                              src={request?.CustomRequestPhotos[0]?.image_url}
-                              alt="request-image"
-                              className="w-100"
-                            />
-                          )}
-                        </div>
-                      </td>
                       <td>{request.title}</td>
                       <td>{request.category}</td>
                       <td>{formatDateToTaiwanStyle(request.createdAt)}</td>
                       <td>
-                        <div>
+                        <div className="f-column">
                           <button
                             type="button"
-                            className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0"
+                            className={`btn border-0 d-inline-flex f-align-center p-0 ${
+                              request.isCompleted
+                                ? "link-danger"
+                                : "link-success"
+                            }`}
+                            onClick={() =>
+                              updateRequest(request.id, request, !request.isCompleted)
+                            }
+                          >
+                            <span className="material-symbols-outlined me-1">
+                              {request.isCompleted ? "warning" : "check_circle"}
+                            </span>
+                            {request.isCompleted ? "改為未解決" : "改為已解決"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn link-brand-03 border-0 d-inline-flex f-align-center p-0 mt-1"
                             onClick={() => openModal(request)}
                           >
                             <span className="material-symbols-outlined me-1">
