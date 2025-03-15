@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import SectionFallback from "@/components/common/SectionFallback";
 
 export default function TutorBookingResume({ resume }) {
+  console.log(resume.work_experience);
   return (
     <div className="row tutor-booking-resume">
       <div className="col-md-3 col-5">
@@ -36,9 +37,7 @@ export default function TutorBookingResume({ resume }) {
 
             {resume.work_experience.map((item) => (
               <div className="d-md-flex mb-5" key={item.id}>
-                <p className="date me-5 ">
-                  {item.start_year} - {item.end_year}
-                </p>
+                <p className="date me-5 ">{item.end_year == "9999" ? `${item.start_year} - 現在` : `${item.start_year} - ${item.end_year}`}</p>
 
                 <div>
                   <p className="fw-bold ">{item.position}</p>
