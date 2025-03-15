@@ -10,7 +10,7 @@ export default function Card({ customCourse = {}, openModal, prevCourse }) {
 
   // 移除底色
   const cleanContent = DOMPurify.sanitize(customCourse?.content).replace(
-    /style=["'][^"']*background[^"']*["']/gi, 
+    /style=["'][^"']*background[^"']*["']/gi,
     ""
   );
 
@@ -55,7 +55,10 @@ export default function Card({ customCourse = {}, openModal, prevCourse }) {
               )}
               <h2>{customCourse.title}</h2>
             </div>
-            <p className="domPurify-wrap" dangerouslySetInnerHTML={{ __html: cleanContent }}></p>
+            <div
+              className="card-text domPurify-wrap"
+              dangerouslySetInnerHTML={{ __html: cleanContent }}
+            />
           </div>
         </div>
       </div>
