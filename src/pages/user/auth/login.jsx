@@ -87,7 +87,6 @@ export default function Login() {
   }, []);
 
   // 初始化 - 第三方登入確認身分
-
   const paramToken = searchParams.get("token");
   useEffect(() => {
     if (paramToken) {
@@ -107,6 +106,15 @@ export default function Login() {
       }, 100);
     }
   }, []);
+
+  // 初始化 - 接 GitHub 若重複登入帳號顯示訊息
+  const error = searchParams.get("error");
+  useEffect(() => {
+    if (error) {
+      Swal.fire(decodeURIComponent(error)); // 解析中文
+    }
+  }, []);
+  
 
   return (
     <>
