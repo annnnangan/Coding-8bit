@@ -350,8 +350,6 @@
 
   // 卡片標題
   .card-title {
-    display: flex;
-    align-items: center;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1; /* 限制最多顯示 1 行 */
