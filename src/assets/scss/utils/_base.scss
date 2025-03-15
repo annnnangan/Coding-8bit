@@ -104,25 +104,3 @@ a {
 .cursor-pointer {
   cursor: pointer;
 }
-
-//React Day Picker Color
-.rdp-root {
-  --rdp-accent-color: var(--bs-brand-03); /* Correct usage of the CSS variable */
-}
-
-// 使用 domPurify 的文字表現
-.domPurify-wrap {
-  a {
-    display: inline-block;
-    text-decoration: underline;
-  }
-  
-  li {
-    list-style: auto;
-  }
-}
-
-// react-medium-image-zoom 縮小 btn
-[data-rmiz-btn-zoom], [data-rmiz-btn-unzoom] {
-  padding: 6px;
-}

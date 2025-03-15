@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import * as bootstrap from "bootstrap";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 
 import customRequestsApi from "@/api/customRequestsApi";
 
@@ -86,6 +88,13 @@ export default function ChatRoom({ username }) {
     setAnswer(e.target.value);
   };
 
+  // 按下 enter 可以發送訊息
+  const handlePostAnswer = (e) => {
+    if (e.key === "Enter") {
+      postAnswer();
+    }
+  };
+
   // 合併使用者與機器人的回應，然後按順序交替顯示
   const combinedResponses = [
     ...userResponses.map((res) => ({ ...res, type: "user" })),
@@ -110,14 +119,14 @@ export default function ChatRoom({ username }) {
       await postAnswer();
       setHasExecuted(true);
     }
-  };   
+  };
 
   useEffect(() => {
     const offCanvasElement = offCanvasRef.current;
 
     const handleShowEvent = async () => {
       if (!hasExecuted) {
-        await handleOpen()
+        await handleOpen();
       }
     };
 
@@ -155,60 +164,54 @@ export default function ChatRoom({ username }) {
         ></button>
       </div>
       <div className="offcanvas-body position-relative px-4 px-lg-8">
-        {/* <div className="d-flex align-items-center pe-8">
-          <div className="flex-shrink-0 align-self-start">
-            <img
-              src="images/deco/robot-avatar.svg"
-              alt="user-image"
-              className="user-page-header-img rounded-circle"
-            />
-          </div>
-          <ul className="flex-grow-1 ms-4 ms-lg-6">
-            <li className="bg-white rounded-5 py-3 px-5 mb-6 mb-lg-8">
-              <p className="fs-7 fs-lg-6">
-                哈囉你好^_^
-                我是建立需求小幫手~請在輸入框輸入內容與我開始進行對話。
-              </p>
-            </li>
-          </ul>
-        </div> */}
-
-        {sortedResponses.map((res, index) => (
-          <div
-            className={`d-flex align-items-center ${
-              res.type === "user" ? "f-end-center" : "pe-8"
-            }`}
-            key={index}
-          >
-            <div className="flex-shrink-0 align-self-start">
-              {res.type === "bot" && (
-                <img
-                  src="images/deco/robot-avatar.svg"
-                  alt="user-image"
-                  className="user-page-header-img rounded-circle"
-                />
-              )}
-            </div>
-            <div ref={endOfMessagesRef} />
-            <ul
-              className={`flex-grow-1 ms-4 ms-lg-6 ${
-                res.type === "user" ? "text-end" : ""
-              }`}
-            >
-              <li
-                className={`${
-                  res.type === "user"
-                    ? "bg-brand-02 d-inline-block text-start"
-                    : "bg-white"
-                } rounded-5 py-3 px-5 mb-6 mb-lg-8`}
+        {sortedResponses.map(
+          (res, index) =>
+            index !== 0 && (
+              <div
+                className={`d-flex align-items-center ${
+                  res.type === "user" ? "f-end-center" : "pe-8"
+                }`}
+                key={index}
               >
-                <p className="fs-7 fs-lg-6">
-                  {res.type === "user" ? res.userResponse : res.botResponse}
-                </p>
-              </li>
-            </ul>
-          </div>
-        ))}
+                <div className="flex-shrink-0 align-self-start">
+                  {res.type === "bot" && (
+                    <img
+                      src="images/deco/robot-avatar.svg"
+                      alt="robot-image"
+                      className="robot-img rounded-circle"
+                    />
+                  )}
+                </div>
+                <div ref={endOfMessagesRef} />
+                <ul
+                  className={`flex-grow-1 ms-4 ms-lg-6 ${
+                    res.type === "user" ? "text-end" : ""
+                  }`}
+                >
+                  <li
+                    className={`${
+                      res.type === "user"
+                        ? "bg-brand-02 d-inline-block text-start"
+                        : "bg-white"
+                    } rounded-5 py-3 px-5 mb-6 mb-lg-8`}
+                  >
+                    <div
+                      className="domPurify-wrap domPurify-markdown-style"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          marked.parse(
+                            res.type === "user"
+                              ? res.userResponse
+                              : res.botResponse
+                          )
+                        ),
+                      }}
+                    />
+                  </li>
+                </ul>
+              </div>
+            )
+        )}
         {placeLoadingState && (
           <div className="f-align-center">
             <span
@@ -230,6 +233,7 @@ export default function ChatRoom({ username }) {
           name="answer"
           value={answer}
           onChange={handleAnswer}
+          onKeyDown={handlePostAnswer}
         />
         <button
           type="button"
