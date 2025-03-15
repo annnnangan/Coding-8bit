@@ -22,6 +22,7 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
 
   const openModal = (exp, type) => {
     if (type === "edit") {
+      setIsCurrentlyJob(exp.end_year === 9999);
       setModalType("edit");
       setTemExperience(exp);
       setUpdateDataId(exp.id);
@@ -56,6 +57,9 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
     }));
   };
 
+  // 在職狀態處理
+  const [isCurrentlyJob, setIsCurrentlyJob] = useState(false);
+
   // 獲取資料
   const [tutorId, setTutorId] = useState("");
   const getData = async () => {
@@ -83,6 +87,7 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
       await tutorApi.addExp(tutorId, {
         ...temExperience,
         tutor_id: tutorId,
+        end_year: isCurrentlyJob ? 9999 : temExperience.end_year,
       });
       setTemExperience({});
       Swal.fire({
@@ -107,7 +112,14 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
   const updateData = async () => {
     setLoadingState(true);
     try {
-      await tutorApi.updateExp(tutorId, temExperience, updateDataId);
+      await tutorApi.updateExp(
+        tutorId,
+        {
+          ...temExperience,
+          end_year: isCurrentlyJob ? 9999 : temExperience.end_year,
+        },
+        updateDataId
+      );
       Swal.fire({
         icon: "success",
         title: "修改成功",
@@ -177,39 +189,43 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
               <tr>
                 <th>公司名稱</th>
                 <th>職稱</th>
-                <th>在職年份</th>
+                <th>入職年份</th>
                 <th>離職年份</th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody className="align-middle">
-              {workExperiences?.map((experience) => (
-                <tr key={experience.id}>
-                  <td>{experience.company}</td>
-                  <td>{experience.position}</td>
-                  <td>{experience.start_year}</td>
-                  <td>{experience.end_year}</td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-brand-03"
-                      onClick={() => {
-                        openModal(experience, "edit");
-                      }}
-                    >
-                      編輯
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger rounded-2 px-1 py-1 ms-1"
-                      onClick={() => deleteData(experience.id)}
-                    >
-                      <span className="material-symbols-outlined fs-6">
-                        delete
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {workExperiences
+                ?.sort((a, b) => a.start_year - b.start_year)
+                .map((experience) => (
+                  <tr key={experience.id}>
+                    <td>{experience.company}</td>
+                    <td>{experience.position}</td>
+                    <td>{experience.start_year}</td>
+                    <td>
+                      {experience.end_year === 9999 ? "-" : experience.end_year}
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-brand-03"
+                        onClick={() => {
+                          openModal(experience, "edit");
+                        }}
+                      >
+                        編輯
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger rounded-2 px-1 py-1 ms-1"
+                        onClick={() => deleteData(experience.id)}
+                      >
+                        <span className="material-symbols-outlined fs-6">
+                          delete
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -244,13 +260,30 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
               </div>
               <div className="modal-body">
                 <form>
+                  <div className="form-check mb-3">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="isCurrentlyJobCheckbox"
+                      checked={isCurrentlyJob}
+                      onChange={(e) => {
+                        setIsCurrentlyJob(e.target.checked);
+                      }}
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="isCurrentlyJobCheckbox"
+                    >
+                      仍在職中
+                    </label>
+                  </div>
                   <div className="mb-3">
                     <label htmlFor="company" className="form-label">
                       公司名稱
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="profile-input form-control"
                       id="company"
                       placeholder="七角股份有限公司"
                       value={temExperience.company ?? ""}
@@ -263,7 +296,7 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="profile-input form-control"
                       placeholder="前端工程師"
                       id="position"
                       value={temExperience.position ?? ""}
@@ -272,30 +305,32 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
                   </div>
                   <div className="mb-3">
                     <label htmlFor="start_year" className="form-label">
-                      在職年份
+                      入職年份
                     </label>
                     <input
                       type="text"
-                      className="form-control"
+                      className="profile-input form-control"
                       placeholder="2017"
                       id="start_year"
                       value={temExperience.start_year ?? ""}
                       onChange={(e) => handleExpChange(e, "start_year")}
                     />
                   </div>
-                  <div className="mb-3">
-                    <label htmlFor="end_year" className="form-label">
-                      離職年份
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="2020"
-                      id="end_year"
-                      value={temExperience.end_year ?? ""}
-                      onChange={(e) => handleExpChange(e, "end_year")}
-                    />
-                  </div>
+                  {!isCurrentlyJob && (
+                    <div className="mb-3">
+                      <label htmlFor="end_year" className="form-label">
+                        離職年份
+                      </label>
+                      <input
+                        type="text"
+                        className="profile-input form-control"
+                        placeholder="2020"
+                        id="end_year"
+                        value={temExperience.end_year ?? ""}
+                        onChange={(e) => handleExpChange(e, "end_year")}
+                      />
+                    </div>
+                  )}
                 </form>
               </div>
               <div className="modal-footer">
@@ -333,6 +368,6 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
   );
 }
 WorkExperienceSection.propTypes = {
-    userData: PropTypes.object.isRequired,
+  userData: PropTypes.object.isRequired,
   setLoadingState: PropTypes.func.isRequired,
 };

@@ -179,7 +179,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
             </tr>
           </thead>
           <tbody className="align-middle">
-            {certificates?.map((certificate) => (
+            {certificates?.sort((a, b) => a.start_year - b.start_year).map((certificate) => (
               <tr key={certificate.id}>
                 <td>{certificate.title}</td>
                 <td>{certificate.issuer}</td>
@@ -245,7 +245,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     id="title"
                     placeholder="JLPT N1"
                     value={temCertificates.title}
@@ -258,7 +258,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     placeholder="日本台灣交流協會"
                     id="issuer"
                     value={temCertificates.issuer}
@@ -271,7 +271,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="profile-input form-control"
                     placeholder="2021"
                     id="issued_date"
                     value={temCertificates.issued_date}
