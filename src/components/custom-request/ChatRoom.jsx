@@ -34,10 +34,10 @@ export default function ChatRoom({ username }) {
     try {
       setPlaceLoadingState(true);
 
-      let sessionId = localStorage.getItem("chatSessionId");
+      let sessionId = sessionStorage.getItem("chatSessionId");
       if (!sessionId) {
         sessionId = crypto.randomUUID();
-        localStorage.setItem("chatSessionId", sessionId);
+        sessionStorage.setItem("chatSessionId", sessionId);
       }
 
       // 發送 API 請求
