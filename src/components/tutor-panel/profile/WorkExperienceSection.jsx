@@ -25,6 +25,12 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
       setIsCurrentlyJob(exp.end_year === 9999);
       setModalType("edit");
       setTemExperience(exp);
+      if (exp.end_year === 9999) {
+        setTemExperience((prev) => ({
+          ...prev,
+          end_year: "",
+        }));
+      }
       setUpdateDataId(exp.id);
     } else {
       setModalType("add");

@@ -47,13 +47,13 @@ export default function Card({ customCourse = {}, openModal, prevCourse }) {
         </div>
         <div className="card-front">
           <div className="card-content">
-            <div className="card-title">
+            <div className="f-align-center">
               {customCourse.isCompleted && (
-                <span className="material-symbols-outlined icon-fill text-brand-03">
+                <span className="material-symbols-outlined icon-fill text-brand-03 me-2">
                   check_circle
                 </span>
               )}
-              <h2>{customCourse.title}</h2>
+              <h2 className="card-title">{customCourse.title}</h2>
             </div>
             <div
               className="card-text domPurify-wrap"

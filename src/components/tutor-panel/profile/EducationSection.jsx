@@ -27,6 +27,12 @@ export default function EducationSection({ userData, setLoadingState }) {
       setIsCurrentlyEdu(edu.end_year === 9999);
       setModalType("edit");
       setTemEducation(edu);
+      if (edu.end_year === 9999) {
+        setTemEducation((prev) => ({
+          ...prev,
+          end_year: "",
+        }));
+      }
       setUpdateDataId(edu.id);
     } else {
       setModalType("add");
