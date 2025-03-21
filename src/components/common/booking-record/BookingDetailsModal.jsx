@@ -1,26 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 
 import * as bootstrap from "bootstrap";
+import DOMPurify from "dompurify";
 import PropTypes from "prop-types";
 import ReactQuill from "react-quill-new";
-import DOMPurify from "dompurify";
-import Swal from "sweetalert2";
 import ReactStars from "react-rating-stars-component";
+import Swal from "sweetalert2";
 
-import AvatarWithFallback from "../AvatarWithFallback";
-import BookingStatusBadge from "./BookingStatusBadge";
-import ShowMoreBtn from "../ShowMoreButton";
 import SectionFallback from "@/components/common/SectionFallback";
+import AvatarWithFallback from "../AvatarWithFallback";
+import ShowMoreBtn from "../ShowMoreButton";
+import BookingStatusBadge from "./BookingStatusBadge";
 
 import bookingApi from "@/api/bookingApi";
-import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
 import { determineMeetingLinkMessage } from "@/utils/booking-record-utils";
+import { serviceTypeMap } from "@/utils/schema/booking-schema";
+import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BookingDetailsModal({ role, booking, isOpen, setOpenModal }) {
   const [loadingState, setLoadingState] = useState(false);
   const [submittingState, setSubmittingState] = useState(false);
-  const [isOpenRescheduleModal, setOpenRescheduleModal] = useState(false);
 
   const [activeTab, setActiveTab] = useState("tutorNotes");
 
@@ -183,7 +182,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
   return (
     <>
       <div id="bookingDetailsModal" className="modal" ref={bookingDetailsModalRef}>
-        <div className="modal-dialog modal-dialog-centered modal-lg text text-break">
+        <div className="modal-dialog modal-dialog-centered modal-lg text-break text">
           <div className="modal-content border-0 shadow px-3 py-5">
             <div className="modal-header border-bottom-0">
               <div className="d-flex align-items-center justify-content-center gap-2">
@@ -194,42 +193,42 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                 />
                 <BookingStatusBadge status={booking.status} />
               </div>
-              <button type="button" className="btn-close d-flex" aria-label="Close" onClick={handleCloseModal} style={{ marginTop: "-50px" }}></button>
+              <button type="button" className="d-flex btn-close" aria-label="Close" onClick={handleCloseModal} style={{ marginTop: "-50px" }}></button>
             </div>
 
             <div className="modal-body">
-              <ul className="d-flex flex-column align-items-start mb-3 gap-4">
+              <ul className="d-flex flex-column align-items-start gap-4 mb-3">
                 <li className="f-center gap-2">
-                  <span className="material-symbols-outlined text-brand-03">calendar_today</span>
+                  <span className="text-brand-03 material-symbols-outlined">calendar_today</span>
                   <p>{formatDateDash(booking.booking_date)}</p>
                 </li>
                 <li className="f-center gap-2">
-                  <span className="material-symbols-outlined text-brand-03">schedule</span>
+                  <span className="text-brand-03 material-symbols-outlined">schedule</span>
                   <p>{booking.timeslots.map((time) => `${formatHour(time)} - ${formatHour(time + 1)}`).join(" / ")}</p>
                 </li>
                 <li className="f-center gap-2">
-                  <span className="material-symbols-outlined text-brand-03">link</span>
+                  <span className="text-brand-03 material-symbols-outlined">link</span>
                   <p>{determineMeetingLinkMessage(booking.service_type, booking.status, booking.meeting_link)}</p>
                 </li>
 
                 <li className="f-center gap-2">
-                  <span className="material-symbols-outlined text-brand-03">local_library</span>
+                  <span className="text-brand-03 material-symbols-outlined">local_library</span>
                   <p>{serviceTypeMap[booking.service_type]}</p>
                 </li>
                 {booking.service_type === "codeReview" && (
                   <li>
-                    <p className="fs-6 fs-md-5 fw-medium fw-md-bold mb-2">程式庫連結</p>
+                    <p className="fs-6 fs-md-5 fw-md-bold fw-medium mb-2">程式庫連結</p>
                     <p>{booking.source_code_url}</p>
                   </li>
                 )}
 
                 <li>
-                  <p className="fs-6 fs-md-5 fw-medium fw-md-bold mb-2">希望接受指導的項目</p>
+                  <p className="fs-6 fs-md-5 fw-md-bold fw-medium mb-2">希望接受指導的項目</p>
                   <ShowMoreBtn text={booking.instruction_details} maxCharacter={50} />
                 </li>
               </ul>
 
-              <ul className="nav nav-tabs mt-2 mb-4 border-bottom border-gray-03">
+              <ul className="nav nav-tabs border-bottom border-gray-03 mb-4 mt-2">
                 <li className="nav-item cursor-pointer">
                   <p className={`nav-link${activeTab === "tutorNotes" ? " active rounded-top-3" : ""}`} onClick={() => setActiveTab("tutorNotes")}>
                     導師筆記
@@ -249,13 +248,13 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     <>
                       {!loadingState && (
                         <div className="d-flex justify-content-end gap-2">
-                          <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditTutorNotes}>
+                          <p className="d-flex d-inline-block justify-content-end text-brand-03 cursor-pointer fs-7 fw-medium mb-3" onClick={handleEditTutorNotes}>
                             {!submittingState && (isEditTutorNotes ? "儲存筆記" : "修改筆記")}
                           </p>
 
                           {!submittingState && isEditTutorNotes && (
                             <p
-                              className="fs-7 text-brand-03 fw-medium cursor-pointer mb-3"
+                              className="text-brand-03 cursor-pointer fs-7 fw-medium mb-3"
                               onClick={() => {
                                 setIsEditTutorNotes(false);
                                 setEditError({ tutorNotes: "", studentComment: "" });
@@ -269,7 +268,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
                       {submittingState && (
                         <div className="d-flex justify-content-end">
-                          <div className="spinner-border text-primary spinner-border-sm " role="status">
+                          <div className="text-primary spinner-border spinner-border-sm" role="status">
                             <span className="visually-hidden">Loading...</span>
                           </div>
                         </div>
@@ -281,8 +280,8 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     !submittingState &&
                     (loadingState ? (
                       <p className="placeholder-glow">
-                        <span className="placeholder bg-brand-01 col-8 rounded-2"></span>
-                        <span className="placeholder bg-brand-01 col-8 rounded-2"></span>
+                        <span className="col-8 bg-brand-01 rounded-2 placeholder"></span>
+                        <span className="col-8 bg-brand-01 rounded-2 placeholder"></span>
                       </p>
                     ) : (
                       <div
@@ -320,8 +319,8 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     <>
                       {loadingState && (
                         <p className="placeholder-glow">
-                          <span className="placeholder bg-brand-01 col-8 rounded-2"></span>
-                          <span className="placeholder bg-brand-01 col-8 rounded-2"></span>
+                          <span className="col-8 bg-brand-01 rounded-2 placeholder"></span>
+                          <span className="col-8 bg-brand-01 rounded-2 placeholder"></span>
                         </p>
                       )}
 
@@ -342,12 +341,12 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     <>
                       {!hasStudentComment && (
                         <div className="d-flex justify-content-end gap-2">
-                          <p className="d-inline-block d-flex justify-content-end fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={handleEditStudentComment}>
+                          <p className="d-flex d-inline-block justify-content-end text-brand-03 cursor-pointer fs-7 fw-medium mb-3" onClick={handleEditStudentComment}>
                             {!submittingState && (isEditStudentComment ? "儲存評論" : "新增評論")}
                           </p>
 
                           {!submittingState && isEditStudentComment && (
-                            <p className="fs-7 text-brand-03 fw-medium cursor-pointer mb-3" onClick={() => setIsEditStudentComment(false)}>
+                            <p className="text-brand-03 cursor-pointer fs-7 fw-medium mb-3" onClick={() => setIsEditStudentComment(false)}>
                               取消評論
                             </p>
                           )}
@@ -384,7 +383,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
             {/* <div className="modal-footer border-top-0 mt-3">
               <button
-                className="col btn btn-outline-brand-03 fs-6 f-center gap-2"
+                className="col btn btn-outline-brand-03 f-center fs-6 gap-2"
                 type="button"
                 onClick={() => {
                   setOpenModal(false);
@@ -394,7 +393,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                 <span className="material-symbols-outlined">edit_calendar</span> 改期
               </button>
               <button
-                className="col btn btn-outline-brand-03 fs-6 f-center gap-2"
+                className="col btn btn-outline-brand-03 f-center fs-6 gap-2"
                 type="button"
                 onClick={() => {
                   setOpenModal(false);

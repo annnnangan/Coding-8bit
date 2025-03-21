@@ -71,6 +71,7 @@ export default function TutorBooking() {
   const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
 
   // useState - 控制預約Modal的內容的useState - 第一頁: timetable / 第二頁: 選擇服務
+  // eslint-disable-next-line no-unused-vars
   const [isBookingModalOpen, setBookingModalOpen] = useState(false);
   const [currentModalStep, setCurrentModalStep] = useState(1);
   const [selectedServiceType, setSelectedServiceType] = useState();
@@ -529,37 +530,37 @@ export default function TutorBooking() {
       </Helmet>
       <div className="tutor-booking">
         {/*  Main Content */}
-        <main className="container py-lg-9 py-7">
+        <main className="container py-7 py-lg-9">
           <div className="row">
             {/*  tutor information */}
             <div className="col-lg-8">
               {/*  section 1 - overview */}
-              <section className="section position-relative">
+              <section className="position-relative section">
                 {/*  tutor profile  */}
-                <div className="tutor-profile section-component">
+                <div className="section-component tutor-profile">
                   <div className="flex-shrink-0">
                     {loadingBasicInfoState ? (
                       <p className="placeholder-glow">
-                        <span className="placeholder rounded-circle bg-brand-02 me-4" style={{ width: "64px", height: "64px" }}></span>
+                        <span className="bg-brand-02 rounded-circle me-4 placeholder" style={{ width: "64px", height: "64px" }}></span>
                       </p>
                     ) : (
-                      <img src={tutorBasicInfo.User.avatar_url || "images/icon/user.png"} alt="profile" className="object-fit-cover rounded-circle me-6" />
+                      <img src={tutorBasicInfo.User.avatar_url || "images/icon/user.png"} alt="profile" className="rounded-circle me-6 object-fit-cover" />
                     )}
                   </div>
                   <div className="flex-grow-1">
                     {loadingBasicInfoState ? (
                       <>
                         <p className="placeholder-glow">
-                          <span className="placeholder bg-brand-02 col-7 placeholder-lg"></span>
+                          <span className="col-7 bg-brand-02 placeholder placeholder-lg"></span>
                         </p>
                         <p className="placeholder-glow">
-                          <span className="placeholder bg-brand-02 col-4"></span>
+                          <span className="col-4 bg-brand-02 placeholder"></span>
                         </p>
                       </>
                     ) : (
                       <>
-                        <h2 className="mb-2 fs-lg-2 fs-4">{tutorBasicInfo.User.username}</h2>
-                        <p className="fs-lg-5 fs-6 text-gray-02">{tutorBasicInfo.slogan}</p>
+                        <h2 className="fs-4 fs-lg-2 mb-2">{tutorBasicInfo.User.username}</h2>
+                        <p className="text-gray-02 fs-6 fs-lg-5">{tutorBasicInfo.slogan}</p>
                       </>
                     )}
                   </div>
@@ -579,11 +580,11 @@ export default function TutorBooking() {
                 <div className="list-x-scroll py-2 section-component">
                   {loadingBasicInfoState ? (
                     <p className="placeholder-glow">
-                      <span className="placeholder bg-brand-02 col-8"></span>
+                      <span className="col-8 bg-brand-02 placeholder"></span>
                     </p>
                   ) : (
                     tutorBasicInfo.expertise.split(",").map((item) => (
-                      <p href="#" className="tag tag-brand-02 fs-8 me-3" key={item}>
+                      <p href="#" className="fs-8 me-3 tag tag-brand-02" key={item}>
                         {item}
                       </p>
                     ))
@@ -591,7 +592,7 @@ export default function TutorBooking() {
                 </div>
                 {/*  tab  */}
                 <div className="section-component">
-                  <ul className="nav nav-tabs mb-6 list-x-scroll flex-nowrap" id="myTab" role="tablist">
+                  <ul className="flex-nowrap list-x-scroll nav nav-tabs mb-6" id="myTab" role="tablist">
                     <li className="nav-item" role="presentation">
                       <button
                         className="nav-link active"
@@ -623,28 +624,28 @@ export default function TutorBooking() {
                     </li>
                   </ul>
                   <div className="tab-content" id="myTabContent">
-                    <div className="tab-pane fade show active" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
+                    <div className="active fade show tab-pane" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
                       {loadingBasicInfoState ? (
                         <p className="placeholder-glow">
-                          <span className="placeholder bg-brand-02 col-12"></span>
-                          <span className="placeholder bg-brand-02 col-12"></span>
-                          <span className="placeholder bg-brand-02 col-12"></span>
+                          <span className="col-12 bg-brand-02 placeholder"></span>
+                          <span className="col-12 bg-brand-02 placeholder"></span>
+                          <span className="col-12 bg-brand-02 placeholder"></span>
                         </p>
                       ) : (
                         <ShowMoreButton text={tutorBasicInfo.about} />
                       )}
                     </div>
-                    <div className="tab-pane fade" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
+                    <div className="fade tab-pane" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
                       <TutorBookingResume resume={tutorBasicInfo.resume} />
                     </div>
                   </div>
                   {/* statistics */}
-                  <div className="row row-cols-3 g-3 mt-5">
+                  <div className="g-3 row row-cols-3 mt-5">
                     <div className="col">
                       <div className="stat-overview-card">
                         {loadingBasicInfoState ? (
                           <p className="placeholder-glow" style={{ width: "50%" }}>
-                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                            <span className="col-12 bg-brand-02 placeholder placeholder-lg"></span>
                           </p>
                         ) : (
                           <h4 className="text-brand-03">{tutorBasicInfo.statistics.student_count}</h4>
@@ -657,7 +658,7 @@ export default function TutorBooking() {
                       <div className="stat-overview-card">
                         {loadingBasicInfoState ? (
                           <p className="placeholder-glow" style={{ width: "50%" }}>
-                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                            <span className="col-12 bg-brand-02 placeholder placeholder-lg"></span>
                           </p>
                         ) : (
                           <h4 className="text-brand-03">{tutorBasicInfo.statistics.class_count}</h4>
@@ -669,7 +670,7 @@ export default function TutorBooking() {
                       <div className="stat-overview-card">
                         {loadingBasicInfoState ? (
                           <p className="placeholder-glow" style={{ width: "50%" }}>
-                            <span className="placeholder bg-brand-02 col-12 placeholder-lg"></span>
+                            <span className="col-12 bg-brand-02 placeholder placeholder-lg"></span>
                           </p>
                         ) : (
                           <h4 className="text-brand-03">{tutorBasicInfo.statistics.video_count}</h4>
@@ -683,18 +684,18 @@ export default function TutorBooking() {
 
               {/* section 2 - video list */}
               <section className="section">
-                <div className="section-component f-between-center">
+                <div className="f-between-center section-component">
                   <h4>講師影片</h4>
 
                   {!loadingBasicInfoState && courses.length > 0 && (
-                    <NavLink to={`/tutor-info/${tutor_id}`} className="text-brand-03 d-flex slide-right-hover" data-show="false">
+                    <NavLink to={`/tutor-info/${tutor_id}`} className="d-flex text-brand-03 slide-right-hover" data-show="false">
                       <p>更多</p>
-                      <span className="material-symbols-outlined icon-fill">arrow_forward</span>
+                      <span className="icon-fill material-symbols-outlined">arrow_forward</span>
                     </NavLink>
                   )}
                 </div>
 
-                <div className="swiper freeTipShortsSwiper">
+                <div className="freeTipShortsSwiper swiper">
                   <div className="swiper-wrapper">
                     {loadingBasicInfoState &&
                       Array.from({ length: 2 }, (_, i) => (
@@ -716,8 +717,8 @@ export default function TutorBooking() {
               </section>
 
               {/* section 3 - timetable */}
-              <section className="section schedule">
-                <div className="section-component f-between-center">
+              <section className="schedule section">
+                <div className="f-between-center section-component">
                   <h4>時間表</h4>
                 </div>
 
@@ -739,18 +740,18 @@ export default function TutorBooking() {
               {/* section 4 - student comment */}
 
               <section className="section student-comment">
-                <div className="section-component f-between-center">
+                <div className="f-between-center section-component">
                   <h4>學生評價</h4>
 
                   {!isLoadingComment && comments.length > 0 && (
-                    <p className="text-brand-03 d-flex slide-right-hover cursor-pointer" onClick={openCommentModal}>
+                    <p className="d-flex text-brand-03 cursor-pointer slide-right-hover" onClick={openCommentModal}>
                       更多
-                      <span className="material-symbols-outlined icon-fill">arrow_forward</span>
+                      <span className="icon-fill material-symbols-outlined">arrow_forward</span>
                     </p>
                   )}
                 </div>
 
-                <div className="row row-cols-lg-2 row-cols-1 g-lg-4 g-2">
+                <div className="g-2 g-lg-4 row row-cols-1 row-cols-lg-2">
                   <div className="col">{isLoadingRatingStats ? <CommentRatingStat isLoading={true} /> : ratingStats.total_comment_count > 0 && <CommentRatingStat ratingStats={ratingStats} />}</div>
 
                   {isLoadingComment && Array.from({ length: 3 }, (_, i) => <CommentCard key={i} isLoading={isLoadingComment} />)}
@@ -760,18 +761,18 @@ export default function TutorBooking() {
               </section>
 
               {/* section 5 - tutor recommendation */}
-              <section className="section mb-0">
-                <div className="section-component f-between-center">
+              <section className="mb-0 section">
+                <div className="f-between-center section-component">
                   <h4>推薦講師</h4>
-                  <NavLink to="/tutor-list" className="text-brand-03 d-flex slide-right-hover">
+                  <NavLink to="/tutor-list" className="d-flex text-brand-03 slide-right-hover">
                     <p>更多</p>
-                    <span className="material-symbols-outlined icon-fill">arrow_forward</span>
+                    <span className="icon-fill material-symbols-outlined">arrow_forward</span>
                   </NavLink>
                 </div>
 
                 {/* desktop */}
                 {loadingRecommendTutorState ? (
-                  <div className="row row-cols-lg-2 g-lg-4 d-none d-lg-flex">
+                  <div className="d-lg-flex d-none g-lg-4 row row-cols-lg-2">
                     {Array.from({ length: 4 }, (_, i) => (
                       <TutorCardLoadingSkeleton key={i} />
                     ))}
@@ -781,8 +782,8 @@ export default function TutorBooking() {
                 )}
 
                 {/* mobile */}
-                <div className="swiper tutor-card-swiper d-block d-lg-none">
-                  <div className="swiper-wrapper mb-10 py-5">
+                <div className="d-block d-lg-none swiper tutor-card-swiper">
+                  <div className="mb-10 py-5 swiper-wrapper">
                     {loadingRecommendTutorState &&
                       Array.from({ length: 4 }, (_, i) => (
                         <div className="swiper-slide" key={i}>
@@ -802,15 +803,15 @@ export default function TutorBooking() {
 
             {/* Desktop right CTA card */}
             <div className="col-lg-4 d-lg-block d-none">
-              <div className="desktop-cta-card card p-lg-6 p-4 sticky-top">
+              <div className="card p-4 p-lg-6 desktop-cta-card sticky-top">
                 <div className="card-body p-0">
-                  <div className="mb-lg-6 mb-5">
+                  <div className="mb-5 mb-lg-6">
                     <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
-                    <h2 className="text-brand-03 fs-lg-2 fs-3">
+                    <h2 className="text-brand-03 fs-3 fs-lg-2">
                       NT ${" "}
                       {loadingBasicInfoState ? (
                         <span className="placeholder-glow">
-                          <span className="placeholder bg-brand-02 col-2"></span>
+                          <span className="col-2 bg-brand-02 placeholder"></span>
                         </span>
                       ) : (
                         tutorBasicInfo.hourly_rate
@@ -818,7 +819,7 @@ export default function TutorBooking() {
                     </h2>
                   </div>
 
-                  <button className="btn slide-right-hover btn-brand-03 w-100" onClick={openBookingModal}>
+                  <button className="btn btn-brand-03 w-100 slide-right-hover" onClick={openBookingModal}>
                     <p className="f-center me-1">
                       立即預約
                       <span className="material-symbols-outlined">arrow_forward</span>
@@ -832,7 +833,7 @@ export default function TutorBooking() {
       </div>
       {/* Modal */}
       {/* Modal - Booking Modal */}
-      <div className="modal fade booking-modal" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
+      <div className="modal booking-modal fade" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
           <div className="modal-content px-3 py-2">
             <div className="modal-header border-0 pb-0">
@@ -844,7 +845,7 @@ export default function TutorBooking() {
                     setModalError();
                   }}
                 >
-                  <span className="material-symbols-outlined icon-fill fs-7">arrow_back_ios</span>返回
+                  <span className="fs-7 icon-fill material-symbols-outlined">arrow_back_ios</span>返回
                 </button>
               )}
 
@@ -864,7 +865,7 @@ export default function TutorBooking() {
             <div className="modal-body pt-0">
               {currentModalStep === 1 && (
                 <>
-                  <h4 className="modal-title fs-md-2 fs-3 text-center mb-3" id="bookingModalLabel">
+                  <h4 className="modal-title text-center fs-3 fs-md-2 mb-3" id="bookingModalLabel">
                     請選擇預約日期和時間
                   </h4>
                   {selectedBookingTimeslots.date && (
@@ -902,13 +903,13 @@ export default function TutorBooking() {
 
               {currentModalStep === 2 && (
                 <>
-                  <h4 className="modal-title fs-md-2 fs-3 text-center mb-3" id="bookingModalLabel">
+                  <h4 className="modal-title text-center fs-3 fs-md-2 mb-3" id="bookingModalLabel">
                     請選擇預約項目
                   </h4>
-                  <div className="row row-cols-md-2 g-4 flex-column flex-md-row">
+                  <div className="flex-column flex-md-row g-4 row row-cols-md-2">
                     <div className="col service-card">
                       <div
-                        className="h-100 border-0 cursor-pointer"
+                        className="border-0 h-100 cursor-pointer"
                         onClick={() => {
                           setSelectedServiceType("courseSession");
                         }}
@@ -927,7 +928,7 @@ export default function TutorBooking() {
                           setSelectedServiceType("codeReview");
                         }}
                       >
-                        <div className="f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100">
+                        <div className="flex-column bg-gray-04 h-100 rounded-2 f-center px-5 py-8 slide-up-hover">
                           <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
                           <img src="images/deco/Illustration-8.png" alt="code-review-illustration" />
                           <p className="text-center mb-auto">您需要於預約時繳交GitHub Repo， 提供想接受檢視的程式碼， 講師會於預約時間內進行程式碼檢視服務， 並且於時間結束時回覆檢視後的結果。</p>
@@ -939,7 +940,7 @@ export default function TutorBooking() {
               )}
             </div>
 
-            <div className="modal-footer p-0 border-top-0">
+            <div className="modal-footer border-top-0 p-0">
               <div className="d-flex flex-column align-items-end">
                 {modalError && <p className="text-danger mb-3">{modalError}</p>}
                 <button type="button" className="btn btn-secondary fs-7 fs-md-6 py-2" onClick={toNextModalStep}>
@@ -967,21 +968,21 @@ export default function TutorBooking() {
               ></button>
             </div>
             <div className="modal-body overflow-y-scroll" ref={commentModalBodyRef}>
-              <h4 className="modal-title fs-md-2 fs-3 text-center mb-8">學生評價</h4>
-              <div className="row flex-column mb-6">
+              <h4 className="modal-title text-center fs-3 fs-md-2 mb-8">學生評價</h4>
+              <div className="flex-column row mb-6">
                 <div className="col mb-2">
                   <CommentRatingStat ratingStats={ratingStats} />
                 </div>
 
-                <div className="row flex-column g-2 mb-2">
+                <div className="flex-column g-2 row mb-2">
                   {modalComments?.map((comment) => (
                     <CommentCard comment={comment} key={comment.commentId} />
                   ))}
                 </div>
 
                 {isFetchingMore && (
-                  <div className="d-flex justify-content-center align-items-center">
-                    <div className="spinner-border text-primary" role="status">
+                  <div className="d-flex align-items-center justify-content-center">
+                    <div className="text-primary spinner-border" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
@@ -993,15 +994,15 @@ export default function TutorBooking() {
       </div>
 
       {/* Mobile sticky bottom CTA card */}
-      <div className="mobile-bottom-cta d-lg-none sticky-bottom border border-2 border-brand-02 bg-white" style={{ borderRadius: "16px 16px 0px 0px" }}>
-        <div className="pt-4 pb-6 px-4">
+      <div className="d-lg-none bg-white border border-2 border-brand-02 mobile-bottom-cta sticky-bottom" style={{ borderRadius: "16px 16px 0px 0px" }}>
+        <div className="pb-6 pt-4 px-4">
           <div className="f-between-center">
             <div>
               <p className="text-gray-02 fs-7 fs-lg-6">每小時收費</p>
-              <h2 className="text-brand-03 fs-lg-2 fs-3">NT ${tutorBasicInfo.hourly_rate}</h2>
+              <h2 className="text-brand-03 fs-3 fs-lg-2">NT ${tutorBasicInfo.hourly_rate}</h2>
             </div>
 
-            <button className="btn slide-right-hover btn-brand-03" onClick={openBookingModal}>
+            <button className="btn btn-brand-03 slide-right-hover" onClick={openBookingModal}>
               <p className="f-center me-1">
                 立即預約
                 <span className="material-symbols-outlined">arrow_forward</span>
