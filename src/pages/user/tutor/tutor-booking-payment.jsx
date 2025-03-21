@@ -1,21 +1,18 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormProvider, useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 
-import { CreditCardForm } from "@/components/common/payment-form/CreditCardForm";
-import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
+import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 
-import { BookingSchema } from "@/utils/schema/booking-schema";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
-import { formatDate } from "@/utils/timeFormatted-utils";
+import { BookingSchema, serviceTypeMap } from "@/utils/schema/booking-schema";
 import { updateFormData } from "@/utils/slice/bookingSlice";
-import { formatHour } from "@/utils/timeFormatted-utils";
+import { formatDate, formatHour } from "@/utils/timeFormatted-utils";
 
 import bookingApi from "@/api/bookingApi";
 import orderApi from "@/api/orderApi";
@@ -35,15 +32,6 @@ export default function TutorBookingPayment() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setLoading] = useState(false);
-  const [bookingSuccessResult, setBookingSuccessResult] = useState({
-    tutor_id: "",
-    tutor_name: "",
-    booking_date: "",
-    service_type: "",
-    hourly_availability: [],
-    source_code_url: "",
-    instruction_details: "",
-  });
 
   // 建立Dispatch 來修改 RTK的State
   const dispatch = useDispatch();
@@ -248,14 +236,14 @@ export default function TutorBookingPayment() {
         <div className="container">
           {/* Step Tracking */}
           <div className="tracking">
-            <div className="row row-cols-lg-5 row-cols-3 g-5 justify-content-center">
+            <div className="g-5 row row-cols-3 row-cols-lg-5 justify-content-center">
               <div className={currentStep === 1 ? "text-brand-03" : "text-brand-02"}>
                 <div className={`d-flex border-bottom ${currentStep === 1 ? "border-brand-03" : "border-brand-02"} border-5 ps-0 rounded-1 pb-1`}>
                   <div className="d-flex align-items-center">
-                    <span className="material-symbols-outlined icon-fill fs-3 me-2 d-none d-sm-block"> shopping_cart </span>
+                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2"> shopping_cart </span>
                     <div>
                       <p className="fs-8">Step 1/3</p>
-                      <p className="fw-semibold fs-8 fs-lg-6">確認預約資訊</p>
+                      <p className="fs-8 fs-lg-6 fw-semibold">確認預約資訊</p>
                     </div>
                   </div>
                 </div>
@@ -263,10 +251,10 @@ export default function TutorBookingPayment() {
               <div className={currentStep === 2 ? "text-brand-03" : "text-brand-02"}>
                 <div className={`d-flex border-bottom ${currentStep === 2 ? "border-brand-03" : "border-brand-02"} border-5 ps-0 rounded-1 pb-1`}>
                   <div className="d-flex align-items-center mb-auto">
-                    <span className="material-symbols-outlined icon-fill fs-3 me-2 d-none d-sm-block"> credit_card </span>
+                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2"> credit_card </span>
                     <div>
                       <p className="fs-8">Step 2/3</p>
-                      <p className="fw-semibold fs-8 fs-lg-6">確認付款</p>
+                      <p className="fs-8 fs-lg-6 fw-semibold">確認付款</p>
                     </div>
                   </div>
                 </div>
@@ -274,10 +262,10 @@ export default function TutorBookingPayment() {
               <div className={currentStep === 3 ? "text-brand-03" : "text-brand-02"}>
                 <div className={`d-flex border-bottom ${currentStep === 3 ? "border-brand-03" : "border-brand-02"} border-5 ps-0 rounded-1 pb-1`}>
                   <div className="d-flex align-items-center mb-auto">
-                    <span className="material-symbols-outlined icon-fill fs-3 me-2 d-none d-sm-block"> check_circle </span>
+                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2"> check_circle </span>
                     <div>
                       <p className="fs-8">Step 3/3</p>
-                      <p className="fw-semibold fs-8 fs-lg-6">付款結果</p>
+                      <p className="fs-8 fs-lg-6 fw-semibold">付款結果</p>
                     </div>
                   </div>
                 </div>
@@ -292,29 +280,29 @@ export default function TutorBookingPayment() {
                   <div className="row mt-8 mt-lg-12">
                     {/* 表單 */}
                     <div className="col-lg-7">
-                      <div className="input-card card shadow rounded-2 p-6 p-lg-10">
+                      <div className="card input-card p-6 p-lg-10 rounded-2 shadow">
                         <h2 className="fs-5 fs-lg-3 mb-5">預約資訊</h2>
 
                         <div className="row row-cols-md-2">
-                          <div className="mb-md-12 mb-6">
+                          <div className="mb-6 mb-md-12">
                             <label htmlFor="tutor" className="form-label">
                               <h3 className="fs-6 fw-medium">預約老師</h3>
                             </label>
-                            <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="tutor" value={tutor_name} disabled />
+                            <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="tutor" value={tutor_name} disabled />
                           </div>
-                          <div className="mb-md-12 mb-6">
+                          <div className="mb-6 mb-md-12">
                             <label htmlFor="service_type" className="form-label">
                               <h3 className="fs-6 fw-medium">預約類型</h3>
                             </label>
-                            <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="service_type" value={serviceTypeMap[service_type]} disabled />
+                            <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="service_type" value={serviceTypeMap[service_type]} disabled />
                           </div>
-                          <div className="mb-md-5 mb-6">
+                          <div className="mb-6 mb-md-5">
                             <label htmlFor="booking_date" className="form-label">
                               <h3 className="fs-6 fw-medium">預約日期</h3>
                             </label>
-                            <input type="text" className="form-control border-0 bg-white p-0 rounded-0 text-gray-02" id="booking_date" value={formatDate(booking_date)} disabled />
+                            <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="booking_date" value={formatDate(booking_date)} disabled />
                           </div>
-                          <div className="mb-md-5 mb-6">
+                          <div className="mb-6 mb-md-5">
                             <label htmlFor="timeSlot" className="form-label">
                               <h3 className="fs-6 fw-medium">預約時段</h3>
                             </label>
@@ -323,7 +311,7 @@ export default function TutorBookingPayment() {
                                 <input
                                   key={time}
                                   type="text"
-                                  className="form-control border-0 bg-white p-0 rounded-0 text-gray-02"
+                                  className="form-control bg-white border-0 p-0 rounded-0 text-gray-02"
                                   id="timeSlot"
                                   value={`${formatHour(time)} - ${formatHour(time + 1)}`}
                                   disabled
@@ -374,8 +362,8 @@ export default function TutorBookingPayment() {
                     </div>
 
                     {/* 電腦版明細卡片 */}
-                    <div className="col-lg-5 d-none d-lg-block">
-                      <div className="input-card card shadow rounded-2 p-6 p-lg-10">
+                    <div className="col-lg-5 d-lg-block d-none">
+                      <div className="card input-card p-6 p-lg-10 rounded-2 shadow">
                         <h2 className="fs-5 fs-lg-3">預約明細</h2>
                         <table className="table mt-8">
                           <tbody>
@@ -404,7 +392,7 @@ export default function TutorBookingPayment() {
 
                         <div className="d-flex justify-content-end">
                           <input type="text" className="form-control border-0 border-bottom rounded-0" id="discountCode" placeholder="輸入折扣碼" style={{ width: "30%" }} />
-                          <button className="btn border-0 p-0 text-gray-03 border-bottom rounded-0" type="submit">
+                          <button className="btn border-0 border-bottom p-0 rounded-0 text-gray-03" type="submit">
                             <span className="material-symbols-outlined"> near_me </span>
                           </button>
                         </div>
@@ -442,12 +430,12 @@ export default function TutorBookingPayment() {
                 <>
                   <div className="row mt-8 mt-lg-12">
                     <div className="col-lg-7">
-                      <div className="input-card card shadow rounded-2 p-6 p-lg-10">
+                      <div className="card input-card p-6 p-lg-10 rounded-2 shadow">
                         <h2 className="fs-5 fs-lg-3">預約人資訊</h2>
                         <BuyerForm />
                       </div>
 
-                      <div className="input-card card shadow rounded-2 p-6 p-lg-10 mt-6">
+                      <div className="card input-card p-6 p-lg-10 rounded-2 shadow mt-6">
                         <h2 className="fs-5 fs-lg-3">付款方式</h2>
                         <div className="form-check mt-6">
                           <input className="form-check-input" type="radio" name="pay-with" id="creditCard" defaultChecked />
@@ -459,8 +447,8 @@ export default function TutorBookingPayment() {
                     </div>
 
                     {/* 電腦版明細卡片 */}
-                    <div className="col-lg-5 d-none d-lg-block">
-                      <div className="input-card card shadow rounded-2 p-6 p-lg-10">
+                    <div className="col-lg-5 d-lg-block d-none">
+                      <div className="card input-card p-6 p-lg-10 rounded-2 shadow">
                         <h2 className="fs-5 fs-lg-3">預約明細</h2>
                         <table className="table mt-8">
                           <tbody>
@@ -522,11 +510,11 @@ export default function TutorBookingPayment() {
 
       {/* 手機版明細卡片 */}
       {currentStep !== 3 && (
-        <div className="sticky-bottom bg-white border-top d-lg-none px-4 py-5">
+        <div className="d-lg-none bg-white border-top px-4 py-5 sticky-bottom">
           <div className="f-between-center">
             <div>
               <h4 className="fs-6 fs-lg-5 fw-medium">小計</h4>
-              <h4 className="text-brand-03 fs-lg-2 fs-3 mt-1">NT$ {price}</h4>
+              <h4 className="text-brand-03 fs-3 fs-lg-2 mt-1">NT$ {price}</h4>
             </div>
 
             <FormSubmitButton
