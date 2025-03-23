@@ -1,5 +1,5 @@
 // react 相關套件
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -40,26 +40,32 @@ export default function CourseVideoPage() {
   });
 
   // 過濾同講師無章節or相同課程
-  const filterOtherCourse = (others) => {
-    return others.filter(
-      (other) =>
-        other.CourseChapters &&
-        other.CourseChapters.length > 0 &&
-        other.id !== videoData.course_id
-    );
-  };
+  const filterOtherCourse = useCallback(
+    (others) => {
+      return others.filter(
+        (other) =>
+          other.CourseChapters &&
+          other.CourseChapters.length > 0 &&
+          other.id !== videoData.course_id
+      );
+    },
+    [videoData.course_id]
+  );
 
   // 過濾同課程的影片並取 6 支影片
-  const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo
-      .filter((related) => {
-        return related.course_id !== videoData.course_id;
-      })
-      .slice(0, 6);
-  };
+  const filterRelatedVideo = useCallback(
+    (relatedVideo) => {
+      return relatedVideo
+        .filter((related) => {
+          return related.course_id !== videoData.course_id;
+        })
+        .slice(0, 6);
+    },
+    [videoData.course_id]
+  );
 
   // 初始化取得資料
-  const getData = async () => {
+  const getData = useCallback(async () => {
     if (swalShown) return;
 
     const isLoginStatus = await dispatch(loginCheck());
@@ -96,7 +102,7 @@ export default function CourseVideoPage() {
         setLoadingState(false);
       }
     }
-  };
+  }, [dispatch, navigate, swalShown, videoId]);
 
   // 監聽 videoData 的變化
   useEffect(() => {
@@ -120,12 +126,12 @@ export default function CourseVideoPage() {
       fetchOtherVideos();
       fetchRelatedVideos();
     }
-  }, [videoData]);
+  }, [videoData, filterOtherCourse, filterRelatedVideo]);
 
   // 初始化
   useEffect(() => {
     getData();
-  }, [videoId]);
+  }, [videoId, getData]);
 
   return (
     <>

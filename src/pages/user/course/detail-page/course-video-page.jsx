@@ -1,5 +1,5 @@
 // reacr 相關套件
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -45,21 +45,27 @@ export default function CourseVideoPage() {
   });
 
   // 過濾同講師無章節or相同課程
-  const filterOtherCourse = (others) => {
-    return others.filter(
-      (other) =>
-        other.CourseChapters &&
-        other.CourseChapters.length > 0 &&
-        other.id !== id
-    );
-  };
+  const filterOtherCourse = useCallback(
+    (others) => {
+      return others.filter(
+        (other) =>
+          other.CourseChapters &&
+          other.CourseChapters.length > 0 &&
+          other.id !== id
+      );
+    },
+    [id]
+  );
 
   // 過濾同課程的影片並取 6 支影片
-  const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo
-      .filter((related) => related.course_id !== id)
-      .slice(0, 6);
-  };
+  const filterRelatedVideo = useCallback(
+    (relatedVideo) => {
+      return relatedVideo
+        .filter((related) => related.course_id !== id)
+        .slice(0, 6);
+    },
+    [id]
+  );
 
   // 初始化取得資料
   useEffect(() => {
@@ -150,7 +156,16 @@ export default function CourseVideoPage() {
       }
     };
     getData();
-  }, [videoId]);
+  }, [
+    dispatch,
+    filterOtherCourse,
+    filterRelatedVideo,
+    id,
+    navigate,
+    swalShown,
+    videoData.category,
+    videoId,
+  ]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {

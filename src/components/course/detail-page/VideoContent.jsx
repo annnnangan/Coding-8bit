@@ -1,5 +1,5 @@
 // react 相關套件
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
@@ -93,7 +93,7 @@ export default function VideoContent({
   };
 
   // 取得留言、收藏、評分狀態
-  const getComment = async () => {
+  const getComment = useCallback(async () => {
     videoUrl === ""
       ? setDisableInputComment(true)
       : setDisableInputComment(false);
@@ -122,22 +122,22 @@ export default function VideoContent({
           console.error("getCourseCommentsHandle error", error);
         }
       };
-      
+
       getFavoriteVideoStatus();
       getStarRatingStatus();
       getCourseCommentsHandle();
     }
-  };
+  }, [videoUrl, introductionVideoId, paramsVideoId]);
 
   // 判斷是否登入
-  const isLogin = async () => {
+  const isLogin = useCallback(async () => {
     const isLoginStatus = await dispatch(loginCheck());
     if (isLoginStatus.meta.requestStatus === "rejected") {
       setShowIcon(false);
       return false;
     }
     return true;
-  };
+  }, [dispatch]);
 
   // 取得影片播放 URL
   useEffect(() => {
@@ -159,7 +159,7 @@ export default function VideoContent({
       fetchVideoSrc();
     };
     initialize();
-  }, [videoUrl]);
+  }, [videoUrl, isLogin, getComment]);
 
   // 先判斷訂閱方案，再判斷是否顯示評分/觀看 icon
   useEffect(() => {
