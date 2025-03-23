@@ -1,5 +1,5 @@
 // react 相關套件
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -45,24 +45,30 @@ export default function CourseDetailPage() {
   });
 
   // 過濾同講師無章節or相同課程
-  const filterOtherCourse = (others) => {
-    return others.filter(
-      (other) =>
-        other.CourseChapters &&
-        other.CourseChapters.length > 0 &&
-        other.id !== id
-    );
-  };
+  const filterOtherCourse = useCallback(
+    (others) => {
+      return others.filter(
+        (other) =>
+          other.CourseChapters &&
+          other.CourseChapters.length > 0 &&
+          other.id !== id
+      );
+    },
+    [id]
+  );
 
   // 過濾同課程的影片並取 6 支影片
-  const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo
-      .filter((related) => related.course_id !== id)
-      .slice(0, 6);
-  };
+  const filterRelatedVideo = useCallback(
+    (relatedVideo) => {
+      return relatedVideo
+        .filter((related) => related.course_id !== id)
+        .slice(0, 6);
+    },
+    [id]
+  );
 
   // 取得初始化資料
-  const getData = async () => {
+  const getData = useCallback(async () => {
     if (swalShown) return;
 
     const isLoginStatus = await dispatch(loginCheck());
@@ -139,12 +145,19 @@ export default function CourseDetailPage() {
     }
 
     setLoadingState(false);
-  };
+  }, [
+    dispatch,
+    id,
+    navigate,
+    swalShown,
+    filterOtherCourse,
+    filterRelatedVideo,
+  ]);
 
   // 初始化
   useEffect(() => {
     getData();
-  }, [id]);
+  }, [id, getData]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {
@@ -171,7 +184,9 @@ export default function CourseDetailPage() {
           <VideoContent
             courseList={courseList}
             courseTutor={courseList.tutor_id}
-            videoUrl={chapter.length > 0 ? chapter[0]?.Videos[0]?.video_url : ""}
+            videoUrl={
+              chapter.length > 0 ? chapter[0]?.Videos[0]?.video_url : ""
+            }
             introductionVideoId={chapter[0]?.Videos[0]?.id}
             page="course-detail"
           />
@@ -306,10 +321,15 @@ export default function CourseDetailPage() {
                 >
                   <h4 className="tutor-related-video-title">相關影片</h4>
                   <div className="f-align-center show-more-button mouse-pointer-style slide-right-hover">
-                    <span className="me-1">更多</span>
-                    <span className="material-symbols-outlined">
-                      arrow_forward
-                    </span>
+                    <NavLink
+                      to={`/course?video_type=freeTipShorts`}
+                      className="d-flex justify-content-between chapter-item show-more-button"
+                    >
+                      <span className="me-1">更多</span>
+                      <span className="material-symbols-outlined">
+                        arrow_forward
+                      </span>
+                    </NavLink>
                   </div>
                 </div>
                 <ul className="related-videos-list">

@@ -13,7 +13,7 @@ import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
 function StudentFavorites() {
   const [favoriteVideo, setFavoriteVideo] = useState([]); // 收藏影片陣列
   const [favoriteTutor, setFavoriteTutor] = useState([]); // 收藏講師陣列
-  const [isgetData, setIsGetData] = useState(false); // 是否留言中
+  const [isGetData, setIsGetData] = useState(false); // 是否留言中
 
   // 獲取所有收藏影片
   const getFavoriteVideo = async () => {
@@ -265,7 +265,7 @@ function StudentFavorites() {
                 </div>
               </div>
             </div>
-            {isgetData && (
+            {isGetData && (
               <div
                 className="d-flex justify-content-center align-items-center"
                 style={{
