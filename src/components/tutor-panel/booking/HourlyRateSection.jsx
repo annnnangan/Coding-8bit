@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 
@@ -23,7 +23,7 @@ export default function HourlyRateSection() {
   const [hourlyRate, setHourlyRate] = useState(0);
   const [loadingState, setLoadingState] = useState(false);
 
-  const getTutorHourlyRate = async () => {
+  const getTutorHourlyRate = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await tutorApi.getTutorDetail(tutorId);
@@ -33,7 +33,7 @@ export default function HourlyRateSection() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [tutorId]);
 
   const {
     register,
@@ -50,8 +50,7 @@ export default function HourlyRateSection() {
     reset({
       hourly_rate: hourlyRate,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hourlyRate, reset]);
+  }, [getTutorHourlyRate, hourlyRate, reset]);
 
   const onSubmit = async (data) => {
     try {

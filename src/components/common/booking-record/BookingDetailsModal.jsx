@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 import * as bootstrap from "bootstrap";
 import DOMPurify from "dompurify";
@@ -72,7 +72,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
   /* ---------------------------------- Data from API --------------------------------- */
 
-  const getTutorNotesAndStudentComment = async () => {
+  const getTutorNotesAndStudentComment = useCallback(async () => {
     setHasStudentComment();
     setTutorNotesInput("");
     setTutorNotes("");
@@ -91,14 +91,13 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [booking.id]);
 
   useEffect(() => {
     if (booking.id) {
       getTutorNotesAndStudentComment();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, booking.id]);
+  }, [isOpen, booking.id, getTutorNotesAndStudentComment]);
 
   /* ---------------------------------- Edit Tutor Notes / Student Comment --------------------------------- */
 

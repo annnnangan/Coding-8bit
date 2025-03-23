@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
@@ -35,67 +35,68 @@ export default function AllBookingsSection({ role }) {
 
   /* ---------------------------- Get Data From API --------------------------- */
 
-  const getBookingListData = async ({ activeTab, startDate, endDate, serviceType }) => {
-    setLoadingState(true);
+  const getBookingListData = useCallback(
+    async ({ activeTab, startDate, endDate, serviceType }) => {
+      setLoadingState(true);
 
-    try {
-      let result;
+      try {
+        let result;
 
-      if (role === "tutor") {
-        result = (await bookingApi.getTutorBookings({ tutorId, status: activeTab, startDate, endDate, serviceType })).bookings;
-      }
-
-      if (role === "student") {
-        result = (await bookingApi.getStudentBookings({ studentId, status: activeTab, startDate, endDate, serviceType })).bookings;
-      }
-
-      // Group booking data from API by yyyy-mm
-      const formatData = result.reduce((acc, item) => {
-        const date = new Date(item.booking_date);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-
-        // Filter only true timeslots (booked timeslots)
-        const timeslots = Object.keys(item.hourly_availability)
-          .filter((hour) => item.hourly_availability[hour])
-          .map(Number);
-
-        // eslint-disable-next-line no-unused-vars
-        const { hourly_availability, ...dataWithoutHourlyAvailability } = item;
-
-        const key = `${year}-${month}`; // Group key
-
-        if (!acc[key]) {
-          acc[key] = [];
+        if (role === "tutor") {
+          result = (await bookingApi.getTutorBookings({ tutorId, status: activeTab, startDate, endDate, serviceType })).bookings;
         }
 
-        acc[key].push({ ...dataWithoutHourlyAvailability, timeslots });
-        return acc;
-      }, {});
+        if (role === "student") {
+          result = (await bookingApi.getStudentBookings({ studentId, status: activeTab, startDate, endDate, serviceType })).bookings;
+        }
 
-      setBookingListData(formatData);
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
-      setLoadingState(false);
-    }
-  };
+        // Group booking data from API by yyyy-mm
+        const formatData = result.reduce((acc, item) => {
+          const date = new Date(item.booking_date);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+
+          // Filter only true timeslots (booked timeslots)
+          const timeslots = Object.keys(item.hourly_availability)
+            .filter((hour) => item.hourly_availability[hour])
+            .map(Number);
+
+          // eslint-disable-next-line no-unused-vars
+          const { hourly_availability, ...dataWithoutHourlyAvailability } = item;
+
+          const key = `${year}-${month}`; // Group key
+
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+
+          acc[key].push({ ...dataWithoutHourlyAvailability, timeslots });
+          return acc;
+        }, {});
+
+        setBookingListData(formatData);
+      } catch (error) {
+        console.log("錯誤", error);
+      } finally {
+        setLoadingState(false);
+      }
+    },
+    [role, studentId, tutorId]
+  );
 
   useEffect(() => {
     if ((role === "tutor" && tutorId) || (role === "student" && studentId)) {
       getBookingListData({ activeTab, startDate: debounceDateRange?.from, endDate: debounceDateRange?.to, serviceType });
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, tutorId, serviceType, debounceDateRange, studentId]);
+  }, [activeTab, tutorId, serviceType, debounceDateRange, studentId, role, getBookingListData]);
 
   /* ---------------------------- Click Handler --------------------------- */
   // Set debounce for date range selection
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedSetSelectedDateRange = useCallback(
-    debounce((range) => {
-      setDebounceDateRange(range);
-    }, 1000),
+  const debouncedSetSelectedDateRange = useMemo(
+    () =>
+      debounce((range) => {
+        setDebounceDateRange(range);
+      }, 1000),
     []
   );
 
