@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
@@ -21,25 +21,28 @@ export default function StudentManageCustomRequests() {
   // 取得需求資料函式
   const [customRequestList, setCustomRequestList] = useState([]);
   const [pageData, setPageData] = useState({});
-  const getData = async (page = 1) => {
-    setLoadingState(true);
-    try {
-      const result = await customRequestsApi.getUserCustomRequests(
-        userData.id,
-        page
-      );
-      setCustomRequestList(result.requests);
-      setPageData(result.pagination);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "取得資料失敗",
-        text: error?.response?.data?.message,
-      });
-    } finally {
-      setLoadingState(false);
-    }
-  };
+  const getData = useCallback(
+    async (page = 1) => {
+      setLoadingState(true);
+      try {
+        const result = await customRequestsApi.getUserCustomRequests(
+          userData.id,
+          page
+        );
+        setCustomRequestList(result.requests);
+        setPageData(result.pagination);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error?.response?.data?.message,
+        });
+      } finally {
+        setLoadingState(false);
+      }
+    },
+    [userData.id]
+  );
 
   // 更新需求
   const updateRequest = async (id, request, isCompleted) => {
@@ -116,7 +119,7 @@ export default function StudentManageCustomRequests() {
     if (isAuth) {
       getData();
     }
-  }, [userData.id]);
+  }, [userData.id, isAuth, getData]);
 
   return (
     <>
@@ -174,7 +177,11 @@ export default function StudentManageCustomRequests() {
                                 : "link-success"
                             }`}
                             onClick={() =>
-                              updateRequest(request.id, request, !request.isCompleted)
+                              updateRequest(
+                                request.id,
+                                request,
+                                !request.isCompleted
+                              )
                             }
                           >
                             <span className="material-symbols-outlined me-1">

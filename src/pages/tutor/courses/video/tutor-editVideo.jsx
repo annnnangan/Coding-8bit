@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -25,7 +25,7 @@ export default function TutorManageAddVideo() {
   // 取得影片資料 (主題式系列課程)
   const [chapterVideoData, setChapterVideoData] = useState();
   const [videoId, setVideoId] = useState("");
-  const getChapter = async () => {
+  const getChapter = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await courseApi.getCourseChapter(courseId);
@@ -47,11 +47,11 @@ export default function TutorManageAddVideo() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [courseId, id]);
 
   // 取得影片資料 (客製化學習需求影片、實用技術短影片)
   const [videoData, setVideoData] = useState();
-  const getData = async () => {
+  const getData = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await courseApi.getVideoDetail(id);
@@ -68,7 +68,7 @@ export default function TutorManageAddVideo() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [id]);
 
   // 影片上傳函式
   const [temVideoData, setTemVideoData] = useState("");
@@ -190,7 +190,7 @@ export default function TutorManageAddVideo() {
     } else {
       getData();
     }
-  }, []);
+  }, [getChapter, getData, type]);
 
   return (
     <>

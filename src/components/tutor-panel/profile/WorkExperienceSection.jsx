@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import * as bootstrap from "bootstrap";
 import Swal from "sweetalert2";
@@ -68,7 +68,7 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
 
   // 獲取資料
   const [tutorId, setTutorId] = useState("");
-  const getData = async () => {
+  const getData = useCallback(async () => {
     setLoadingState(true);
     try {
       const { tutor_id } = userData;
@@ -84,7 +84,7 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [setLoadingState, userData]);
 
   // 新增資料
   const addData = async () => {
@@ -183,7 +183,7 @@ export default function WorkExperienceSection({ userData, setLoadingState }) {
     if (userData.tutor_id) {
       getData();
     }
-  }, [userData.tutor_id]);
+  }, [userData.tutor_id, getData]);
 
   return (
     <>

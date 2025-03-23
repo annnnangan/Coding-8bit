@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import PropTypes from "prop-types";
@@ -36,7 +36,7 @@ export default function SubscriptionCard({ duration, setLoadingState }) {
 
   // 取得所有方案
   const [plans, setPlans] = useState([]);
-  const getPlans = async () => {
+  const getPlans = useCallback(async () => {
     setLoadingState(true);
     try {
       const res = await subscriptionApi.getPlans();
@@ -50,10 +50,11 @@ export default function SubscriptionCard({ duration, setLoadingState }) {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [setLoadingState]);
+
   useEffect(() => {
     getPlans();
-  }, []);
+  }, [getPlans]);
 
   return (
     <>

@@ -164,7 +164,7 @@ export default function EditCourseVideoContent({
         cover_image: chapterVideoData?.cover_image || "",
       };
     });
-  }, [chapterVideoData]);
+  }, [chapterVideoData, setValue]);
 
   return (
     <div className="col-xxl-6">

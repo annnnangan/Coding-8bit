@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Controller } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -33,7 +33,7 @@ export default function AddCourseVideoContent({
   const { courseId } = useParams();
 
   // 取得章節資料
-  const getChapter = async () => {
+  const getChapter = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await courseApi.getCourseChapter(courseId);
@@ -47,7 +47,7 @@ export default function AddCourseVideoContent({
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [courseId, id, setLoadingState, setValue]);
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});
@@ -176,7 +176,7 @@ export default function AddCourseVideoContent({
 
   useEffect(() => {
     getChapter();
-  }, []);
+  }, [getChapter]);
 
   return (
     <div className="col-xxl-6">

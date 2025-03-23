@@ -427,7 +427,7 @@ export default function CourseList() {
                     key={course.id}
                   >
                     <NavLink
-                      to={`/video/:id`}
+                      to={`/video/${course.id}`}
                       className="course-card card-column"
                     >
                       <div className="card border-0 img-hover-enlarge h-100">

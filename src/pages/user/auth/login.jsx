@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -43,7 +43,7 @@ export default function Login() {
   };
 
   // 驗證身分
-  const loginCheck = async () => {
+  const loginCheck = useCallback(async () => {
     setLoadingState(true);
     try {
       await authApi.loginCheck();
@@ -59,7 +59,7 @@ export default function Login() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -84,7 +84,7 @@ export default function Login() {
     if (token) {
       loginCheck();
     }
-  }, []);
+  }, [loginCheck]);
 
   // 初始化 - 第三方登入確認身分
   const paramToken = searchParams.get("token");
@@ -105,7 +105,7 @@ export default function Login() {
         }
       }, 100);
     }
-  }, []);
+  }, [loginCheck, paramToken]);
 
   // 初始化 - 接 GitHub 若重複登入帳號顯示訊息
   const error = searchParams.get("error");
@@ -113,8 +113,7 @@ export default function Login() {
     if (error) {
       Swal.fire(decodeURIComponent(error)); // 解析中文
     }
-  }, []);
-  
+  }, [error]);
 
   return (
     <>

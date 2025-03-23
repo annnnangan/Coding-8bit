@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData } from "@/utils/slice/authSlice";
 
@@ -33,24 +33,27 @@ export default function CardModal({
 
   // 取得留言函式
   const [response, setResponse] = useState([]);
-  const getResponse = async (id) => {
-    setLoadingState(true);
-    try {
-      const result = await customRequestsApi.getRequestsResponse(id);
-      setResponse(result);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "取得留言失敗",
-        text: error?.response?.data?.message,
-      });
-    } finally {
-      setLoadingState(false);
-    }
-  };
+  const getResponse = useCallback(
+    async (id) => {
+      setLoadingState(true);
+      try {
+        const result = await customRequestsApi.getRequestsResponse(id);
+        setResponse(result);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "取得留言失敗",
+          text: error?.response?.data?.message,
+        });
+      } finally {
+        setLoadingState(false);
+      }
+    },
+    [setLoadingState]
+  );
 
   // 新增留言函式
-  const addResponse = async () => {
+  const addResponse = useCallback(async () => {
     setLoadingState(true);
     try {
       await customRequestsApi.addRequestsResponse(temCustomCourse.id, {
@@ -71,16 +74,18 @@ export default function CardModal({
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [setLoadingState, temCustomCourse.id, value, getResponse]);
 
   // 刪除單一留言
-  const deleteResponse = async (id) => {
-    Swal.fire({
-      title: "確定要刪除嗎？",
-      showCancelButton: true,
-      confirmButtonText: "刪除",
-      denyButtonText: "不要刪除",
-    }).then(async (result) => {
+  const deleteResponse = useCallback(
+    async (id) => {
+      const result = await Swal.fire({
+        title: "確定要刪除嗎？",
+        showCancelButton: true,
+        confirmButtonText: "刪除",
+        denyButtonText: "不要刪除",
+      });
+
       if (result.isConfirmed) {
         setLoadingState(true);
         try {
@@ -100,8 +105,9 @@ export default function CardModal({
           setLoadingState(false);
         }
       }
-    });
-  };
+    },
+    [setLoadingState, temCustomCourse.id, getResponse]
+  );
 
   useEffect(() => {
     if (isAuth) {
@@ -110,7 +116,7 @@ export default function CardModal({
     if (temCustomCourse.id) {
       getResponse(temCustomCourse.id);
     }
-  }, [temCustomCourse.id]);
+  }, [temCustomCourse.id, isAuth, dispatch, getResponse]);
 
   return (
     <>
@@ -316,7 +322,10 @@ export default function CardModal({
                                         )}
 
                                         <li>
-                                          <button type="button" className="dropdown-item" href="#">
+                                          <button
+                                            type="button"
+                                            className="dropdown-item"
+                                          >
                                             舉報
                                           </button>
                                         </li>

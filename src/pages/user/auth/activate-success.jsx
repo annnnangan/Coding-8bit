@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -20,7 +20,7 @@ export default function ActivateSuccess() {
 
   // 啟用帳號函式
   const [isActive, setIsActive] = useState(false);
-  const activateAccount = async () => {
+  const activateAccount = useCallback(async () => {
     setLoadingState(true);
     try {
       await authApi.activateAccount(token);
@@ -40,7 +40,7 @@ export default function ActivateSuccess() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [navigate, token]);
 
   // 初始化 - 確認有無 token
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function ActivateSuccess() {
     } else {
       activateAccount();
     }
-  }, []);
+  }, [activateAccount, navigate, token]);
 
   return (
     <>

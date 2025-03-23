@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import * as bootstrap from "bootstrap";
 import Swal from "sweetalert2";
@@ -71,7 +71,7 @@ export default function EducationSection({ userData, setLoadingState }) {
 
   // 獲取資料
   const [tutorId, setTutorId] = useState("");
-  const getData = async () => {
+  const getData = useCallback(async () => {
     setLoadingState(true);
     try {
       const { tutor_id } = await userApi.getUserData();
@@ -87,7 +87,7 @@ export default function EducationSection({ userData, setLoadingState }) {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [setLoadingState]);
 
   // 新增資料
   const addData = async () => {
@@ -186,7 +186,7 @@ export default function EducationSection({ userData, setLoadingState }) {
     if (userData.tutor_id) {
       getData();
     }
-  }, [userData.tutor_id]);
+  }, [userData.tutor_id, getData]);
 
   return (
     <section className="tutor-manage-profile-education-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4">
@@ -212,7 +212,9 @@ export default function EducationSection({ userData, setLoadingState }) {
                   <td>{education.major}</td>
                   <td>{education.degree}</td>
                   <td>{education.start_year}</td>
-                  <td>{education.end_year === 9999 ? "-" : education.end_year}</td>
+                  <td>
+                    {education.end_year === 9999 ? "-" : education.end_year}
+                  </td>
                   <td>
                     <button
                       className="btn btn-sm btn-brand-03"
@@ -268,23 +270,23 @@ export default function EducationSection({ userData, setLoadingState }) {
             </div>
             <div className="modal-body">
               <form>
-              <div className="form-check mb-3">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="isCurrentlyEduCheckbox"
-                      checked={isCurrentlyEdu}
-                      onChange={(e) => {
-                        setIsCurrentlyEdu(e.target.checked);
-                      }}
-                    />
-                    <label
-                      className="form-check-label"
-                      htmlFor="isCurrentlyEduCheckbox"
-                    >
-                      仍在學中
-                    </label>
-                  </div>
+                <div className="form-check mb-3">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="isCurrentlyEduCheckbox"
+                    checked={isCurrentlyEdu}
+                    onChange={(e) => {
+                      setIsCurrentlyEdu(e.target.checked);
+                    }}
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="isCurrentlyEduCheckbox"
+                  >
+                    仍在學中
+                  </label>
+                </div>
                 <div className="mb-3">
                   <label htmlFor="school_name" className="form-label">
                     學校名稱

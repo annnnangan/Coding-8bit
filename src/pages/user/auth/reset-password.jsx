@@ -95,7 +95,7 @@ export default function ResetPassword() {
       });
       navigate("/forgot-password");
     }
-  }, []);
+  }, [navigate, token]);
 
   return (
     <>

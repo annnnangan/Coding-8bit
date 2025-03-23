@@ -97,7 +97,7 @@ export default function TutorApply() {
       dispatch(getUserData());
       setLoadingState(false);
     }
-  }, [isAuth]);
+  }, [isAuth, dispatch, token]);
 
   // 初始化 - 驗證身分
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function TutorApply() {
     } else {
       setLoadingState(false);
     }
-  }, []);
+  }, [dispatch, token]);
 
   return (
     <>

@@ -1,5 +1,4 @@
 import { createHashRouter } from "react-router-dom";
-import { lazy } from "react";
 
 // Layout
 import UserLayout from "../router/UserLayout";
@@ -23,7 +22,7 @@ import CourseVideoPage from "../pages/user/course/detail-page/course-video-page"
 import SingleVideoPage from "../pages/user/course/detail-page/single-video-page";
 
 import CustomRequestsList from "../pages/user/custom-request/custom-requests-list";
-const AddLearningNeedPage = lazy(() => import("../pages/user/custom-request/add-learning-need-page"));
+import AddLearningNeedPage from "../pages/user/custom-request/add-learning-need-page";
 
 import SubscriptionList from "../pages/user/subscription/subscription-list";
 import SubscriptionPayment from "../pages/user/subscription/subscription-payment";

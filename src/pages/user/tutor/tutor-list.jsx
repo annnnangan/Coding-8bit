@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -34,27 +34,6 @@ export default function TutorList() {
     }
   };
 
-  // 取得資料函式
-  const [tutorsList, setTutorsList] = useState([]);
-  const [pageData, setPageData] = useState({});
-  const getTutorsData = async (currentPage = 1) => {
-    setLoadingState(true);
-    try {
-      const tutorResult = await tutorApi.getAllTutor(
-        currentPage,
-        sortBy,
-        order,
-        search
-      );
-      setTutorsList(tutorResult.tutors);
-      setPageData(tutorResult.pagination);
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
-      setLoadingState(false);
-    }
-  };
-
   // 搜尋與篩選功能
   const [sortBy, setSortBy] = useState("rating");
   const [order, setOrder] = useState("DESC");
@@ -66,6 +45,30 @@ export default function TutorList() {
       setSearch(sanitizedSearch);
     }
   };
+
+  // 取得資料函式
+  const [tutorsList, setTutorsList] = useState([]);
+  const [pageData, setPageData] = useState({});
+  const getTutorsData = useCallback(
+    async (currentPage = 1) => {
+      setLoadingState(true);
+      try {
+        const tutorResult = await tutorApi.getAllTutor(
+          currentPage,
+          sortBy,
+          order,
+          search
+        );
+        setTutorsList(tutorResult.tutors);
+        setPageData(tutorResult.pagination);
+      } catch (error) {
+        console.log("錯誤", error);
+      } finally {
+        setLoadingState(false);
+      }
+    },
+    [search, sortBy, order]
+  );
 
   // title 打字機效果
   const [titleText, setTitleText] = useState("程式卡關？");
@@ -90,7 +93,7 @@ export default function TutorList() {
   // 初始化 - 取得資料
   useEffect(() => {
     getTutorsData();
-  }, [search, sortBy, order]);
+  }, [getTutorsData]);
 
   return (
     <>

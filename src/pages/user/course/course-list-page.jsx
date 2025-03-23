@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -19,45 +19,6 @@ export default function CourseListPage() {
   const video_type = searchParams.get("video_type");
   const parmSearch = searchParams.get("search");
 
-  // 取得課程資料函式
-  const [courseList, setCourseList] = useState([]);
-  const [pageData, setPageData] = useState({});
-  const getCoursesData = async (currentPage = 1) => {
-    setLoadingState(true);
-    if (video_type !== "topicSeries") {
-      try {
-        const result = await courseApi.getAllVideos(
-          video_type,
-          currentPage,
-          sortBy,
-          order,
-          search
-        );
-        setCourseList(result.videos);
-        setPageData(result.pagination);
-      } catch (error) {
-        console.log("錯誤", error);
-      } finally {
-        setLoadingState(false);
-      }
-    } else {
-      try {
-        const result = await courseApi.getAllCourses(
-          currentPage,
-          sortBy,
-          order,
-          search
-        );
-        setCourseList(result.courses);
-        setPageData(result.pagination);
-      } catch (error) {
-        console.log("錯誤", error);
-      } finally {
-        setLoadingState(false);
-      }
-    }
-  };
-
   // 搜尋與篩選功能
   const [sortBy, setSortBy] = useState("rating");
   const [order, setOrder] = useState("DESC");
@@ -69,6 +30,48 @@ export default function CourseListPage() {
       setSearch(sanitizedSearch);
     }
   };
+
+  // 取得課程資料函式
+  const [courseList, setCourseList] = useState([]);
+  const [pageData, setPageData] = useState({});
+  const getCoursesData = useCallback(
+    async (currentPage = 1) => {
+      setLoadingState(true);
+      if (video_type !== "topicSeries") {
+        try {
+          const result = await courseApi.getAllVideos(
+            video_type,
+            currentPage,
+            sortBy,
+            order,
+            search
+          );
+          setCourseList(result.videos);
+          setPageData(result.pagination);
+        } catch (error) {
+          console.log("錯誤", error);
+        } finally {
+          setLoadingState(false);
+        }
+      } else {
+        try {
+          const result = await courseApi.getAllCourses(
+            currentPage,
+            sortBy,
+            order,
+            search
+          );
+          setCourseList(result.courses);
+          setPageData(result.pagination);
+        } catch (error) {
+          console.log("錯誤", error);
+        } finally {
+          setLoadingState(false);
+        }
+      }
+    },
+    [search, sortBy, order, video_type]
+  );
 
   // title 判斷
   let pageTitle = "Coding∞bit ｜ ";
@@ -90,7 +93,7 @@ export default function CourseListPage() {
   // 監聽變化戳取得資料 API
   useEffect(() => {
     getCoursesData();
-  }, [search, sortBy, order]);
+  }, [getCoursesData]);
 
   return (
     <>

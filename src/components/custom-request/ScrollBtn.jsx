@@ -1,21 +1,24 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 import PropTypes from "prop-types";
 
-export default function ScrollBtn({ containerRef, limit, setLimit }) {
+export default function ScrollBtn({ containerRef, setLimit }) {
   const leftButtonRef = useRef(null);
   const rightButtonRef = useRef(null);
 
   // 滾動相關功能
-  const handleScroll = (direction) => {
-    if (!containerRef.current) return;
-    containerRef.current.scrollBy({
-      left: direction === "left" ? -200 : 200,
-      behavior: "smooth",
-    });
-  };
+  const handleScroll = useCallback(
+    (direction) => {
+      if (!containerRef.current) return;
+      containerRef.current.scrollBy({
+        left: direction === "left" ? -200 : 200,
+        behavior: "smooth",
+      });
+    },
+    [containerRef]
+  );
 
-  const addScrollFunctionality = () => {
+  const addScrollFunctionality = useCallback(() => {
     const wishPool = containerRef.current;
     if (!wishPool) return;
 
@@ -66,12 +69,12 @@ export default function ScrollBtn({ containerRef, limit, setLimit }) {
       wishPool.removeEventListener("mouseup", handleMouseLeaveOrUp);
       wishPool.removeEventListener("mousemove", handleMouseMove);
     };
-  };
+  }, [containerRef]);
 
   const debounceTimeoutRef = useRef(null); // 用來儲存計時器 ID
   const coolDownTime = 5000; // 設置冷卻時間
 
-  const updateScrollButtonVisibility = () => {
+  const updateScrollButtonVisibility = useCallback(() => {
     const wishPool = containerRef.current;
     const leftButton = leftButtonRef.current;
     const rightButton = rightButtonRef.current;
@@ -129,7 +132,7 @@ export default function ScrollBtn({ containerRef, limit, setLimit }) {
         }
       }
     }
-  };
+  }, [setLimit, containerRef]);
 
   useEffect(() => {
     // 增加滑鼠拖動和滾動功能
@@ -146,22 +149,21 @@ export default function ScrollBtn({ containerRef, limit, setLimit }) {
       cleanupScrollEvents();
       window.removeEventListener("resize", updateScrollButtonVisibility);
     };
-  }, []);
+  }, [addScrollFunctionality, updateScrollButtonVisibility]);
 
   useEffect(() => {
-    if (containerRef.current) {
-      updateScrollButtonVisibility();
+    const wishPool = containerRef.current;
+    if (!wishPool) return;
 
-      const handleScroll = () => updateScrollButtonVisibility();
-      containerRef.current.addEventListener("scroll", handleScroll);
+    updateScrollButtonVisibility();
 
-      return () => {
-        if (containerRef.current) {
-          containerRef.current.removeEventListener("scroll", handleScroll);
-        }
-      };
-    }
-  }, [limit]);
+    const handleScroll = () => updateScrollButtonVisibility();
+    wishPool.addEventListener("scroll", handleScroll);
+
+    return () => {
+      wishPool.removeEventListener("scroll", handleScroll);
+    };
+  }, [updateScrollButtonVisibility, containerRef]);
 
   return (
     <div className="navigationArrows d-none d-lg-flex">
@@ -191,6 +193,5 @@ ScrollBtn.propTypes = {
   containerRef: PropTypes.shape({
     current: PropTypes.instanceOf(Element),
   }).isRequired,
-  limit: PropTypes.number.isRequired,
   setLimit: PropTypes.func.isRequired,
 };

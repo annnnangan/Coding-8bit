@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -49,58 +49,61 @@ export default function TutorInfo() {
     customLearning: {},
     freeTipShorts: {},
   });
-  const getCoursesData = async (category, page = 1) => {
-    setLoadingState(true);
-    try {
-      let newData = {};
+  const getCoursesData = useCallback(
+    async (category, page = 1) => {
+      setLoadingState(true);
+      try {
+        let newData = {};
 
-      if (category === "topicSeries") {
-        const topicSeriesCourses = await courseApi.getTutorCourses(id, page);
-        newData = {
-          courses: topicSeriesCourses.courses,
-          pagination: topicSeriesCourses.pagination,
-        };
-      } else if (category === "customLearning") {
-        const customLearningCourses = await courseApi.getTutorVideos(
-          id,
-          "customLearning",
-          page
-        );
-        newData = {
-          courses: customLearningCourses.videos,
-          pagination: customLearningCourses.pagination,
-        };
-      } else if (category === "freeTipShorts") {
-        const freeTipShortsCourses = await courseApi.getTutorVideos(
-          id,
-          "freeTipShorts",
-          page
-        );
-        newData = {
-          courses: freeTipShortsCourses.videos,
-          pagination: freeTipShortsCourses.pagination,
-        };
+        if (category === "topicSeries") {
+          const topicSeriesCourses = await courseApi.getTutorCourses(id, page);
+          newData = {
+            courses: topicSeriesCourses.courses,
+            pagination: topicSeriesCourses.pagination,
+          };
+        } else if (category === "customLearning") {
+          const customLearningCourses = await courseApi.getTutorVideos(
+            id,
+            "customLearning",
+            page
+          );
+          newData = {
+            courses: customLearningCourses.videos,
+            pagination: customLearningCourses.pagination,
+          };
+        } else if (category === "freeTipShorts") {
+          const freeTipShortsCourses = await courseApi.getTutorVideos(
+            id,
+            "freeTipShorts",
+            page
+          );
+          newData = {
+            courses: freeTipShortsCourses.videos,
+            pagination: freeTipShortsCourses.pagination,
+          };
+        }
+
+        setCourses((prevCourses) => ({
+          ...prevCourses,
+          [category]: newData.courses,
+        }));
+
+        setPageData((prevPageData) => ({
+          ...prevPageData,
+          [category]: newData.pagination,
+        }));
+      } catch (error) {
+        console.log("錯誤", error);
+      } finally {
+        setLoadingState(false);
       }
-
-      setCourses((prevCourses) => ({
-        ...prevCourses,
-        [category]: newData.courses,
-      }));
-
-      setPageData((prevPageData) => ({
-        ...prevPageData,
-        [category]: newData.pagination,
-      }));
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
-      setLoadingState(false);
-    }
-  };
+    },
+    [id]
+  );
 
   // 取得講師資料
   const [tutorData, setTutorData] = useState({ User: {} });
-  const getTutorData = async () => {
+  const getTutorData = useCallback(async () => {
     setLoadingState(true);
     try {
       const tutorResult = await tutorApi.getTutorDetail(id);
@@ -110,7 +113,7 @@ export default function TutorInfo() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [id]);
 
   // 初始化 - 取得資料
   useEffect(() => {
@@ -118,7 +121,7 @@ export default function TutorInfo() {
     getCoursesData("topicSeries");
     getCoursesData("customLearning");
     getCoursesData("freeTipShorts");
-  }, []);
+  }, [getTutorData, getCoursesData]);
   return (
     <>
       <Helmet>
