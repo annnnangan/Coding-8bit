@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Link, NavLink, useParams } from "react-router-dom";
 
 import * as bootstrap from "bootstrap";
@@ -16,7 +16,7 @@ export default function EditChapter({ setLoadingState }) {
   });
 
   // 取得章節資料
-  const getChapter = async () => {
+  const getChapter = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await courseApi.getCourseChapter(id);
@@ -29,7 +29,7 @@ export default function EditChapter({ setLoadingState }) {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [id, setLoadingState]);
 
   // 新增章節
   const addChapter = async (data) => {
@@ -117,7 +117,7 @@ export default function EditChapter({ setLoadingState }) {
   // 初始化 - 取得資料
   useEffect(() => {
     getChapter();
-  }, []);
+  }, [getChapter]);
 
   return (
     <div className="col-xxl-8">

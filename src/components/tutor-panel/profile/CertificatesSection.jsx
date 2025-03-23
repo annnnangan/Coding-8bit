@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import * as bootstrap from "bootstrap";
 import Swal from "sweetalert2";
@@ -56,7 +56,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
 
   // 獲取資料
   const [tutorId, setTutorId] = useState("");
-  const getData = async () => {
+  const getData = useCallback(async () => {
     setLoadingState(true);
     try {
       const { tutor_id } = userData;
@@ -72,7 +72,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [setLoadingState, userData]);
 
   // 新增資料
   const addData = async () => {
@@ -163,7 +163,7 @@ export default function CertificatesSection({ userData, setLoadingState }) {
     if (userData.tutor_id) {
       getData();
     }
-  }, [userData.tutor_id]);
+  }, [userData.tutor_id, getData]);
 
   return (
     <section className="tutor-manage-profile-certificates-wrap bg-white rounded-3 px-4 px-md-10 py-4 py-md-6 mt-4">
@@ -179,32 +179,34 @@ export default function CertificatesSection({ userData, setLoadingState }) {
             </tr>
           </thead>
           <tbody className="align-middle">
-            {certificates?.sort((a, b) => a.start_year - b.start_year).map((certificate) => (
-              <tr key={certificate.id}>
-                <td>{certificate.title}</td>
-                <td>{certificate.issuer}</td>
-                <td>{certificate.issued_date}</td>
-                <td>
-                  <button
-                    className="btn btn-sm btn-brand-03"
-                    onClick={() => {
-                      openModal(certificate, "edit");
-                    }}
-                  >
-                    編輯
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger rounded-2 px-1 py-1 ms-1"
-                    onClick={() => deleteData(certificate.id)}
-                  >
-                    <span className="material-symbols-outlined fs-6">
-                      delete
-                    </span>
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {certificates
+              ?.sort((a, b) => a.start_year - b.start_year)
+              .map((certificate) => (
+                <tr key={certificate.id}>
+                  <td>{certificate.title}</td>
+                  <td>{certificate.issuer}</td>
+                  <td>{certificate.issued_date}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-brand-03"
+                      onClick={() => {
+                        openModal(certificate, "edit");
+                      }}
+                    >
+                      編輯
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger rounded-2 px-1 py-1 ms-1"
+                      onClick={() => deleteData(certificate.id)}
+                    >
+                      <span className="material-symbols-outlined fs-6">
+                        delete
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

@@ -35,17 +35,17 @@ export default function AddLearningNeedPage() {
       });
       navigate(-1);
     }
-  }, [userData.id]);
+  }, [userData.id, navigate, userData.subscriptions]);
 
   useEffect(() => {
     if (isAuth) {
       dispatch(getUserData());
     }
-  }, [isAuth]);
+  }, [isAuth, dispatch]);
 
   useEffect(() => {
     dispatch(loginCheck());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>

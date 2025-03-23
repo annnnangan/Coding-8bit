@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Controller } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -35,7 +35,7 @@ export default function EditContent({
 
   // 取得資料函式
   const { id } = useParams();
-  const getData = async () => {
+  const getData = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await courseApi.getCourseDetail(id);
@@ -57,7 +57,7 @@ export default function EditContent({
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [id, setLoadingState, setValue]);
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});
@@ -202,7 +202,7 @@ export default function EditContent({
     if (type === "topicSeries") {
       getData();
     }
-  }, []);
+  }, [getData, type]);
 
   useEffect(() => {
     setValue("title", videoData?.title || "");
@@ -216,7 +216,7 @@ export default function EditContent({
         cover_image: videoData?.cover_image || "",
       };
     });
-  }, [videoData]);
+  }, [videoData, setValue]);
 
   return (
     <div className={type === "topicSeries" ? "col-lg-8" : "col-xxl-6"}>

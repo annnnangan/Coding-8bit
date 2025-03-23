@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import PropTypes from "prop-types";
@@ -19,7 +19,7 @@ export default function ChatRoom({ username }) {
   const [answer, setAnswer] = useState(`你好，我是 ${username}`);
   const [userResponses, setUserResponses] = useState([]);
   const [botResponses, setBotResponses] = useState([]);
-  const postAnswer = async () => {
+  const postAnswer = useCallback(async () => {
     if (!answer.trim()) return;
 
     // 紀錄使用者回應內容
@@ -81,7 +81,7 @@ export default function ChatRoom({ username }) {
     } finally {
       setPlaceLoadingState(false);
     }
-  };
+  }, [answer, navigate, botResponses.length, userResponses.length]);
 
   // 輸入框狀態更新
   const handleAnswer = (e) => {
@@ -108,18 +108,18 @@ export default function ChatRoom({ username }) {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [sortedResponses]); // 每次 sortedResponses 更新就滾動
+  }, [userResponses, botResponses]); // 每次 sortedResponses 更新就滾動
 
   // 畫布一旦顯示出來就執行聊天機器人
   const [hasExecuted, setHasExecuted] = useState(false);
   const offCanvasRef = useRef(null);
 
-  const handleOpen = async () => {
+  const handleOpen = useCallback(async () => {
     if (username) {
       await postAnswer();
       setHasExecuted(true);
     }
-  };
+  }, [username, postAnswer]);
 
   useEffect(() => {
     const offCanvasElement = offCanvasRef.current;
@@ -142,7 +142,7 @@ export default function ChatRoom({ username }) {
         );
       }
     };
-  }, [hasExecuted]);
+  }, [hasExecuted, handleOpen]);
 
   return (
     <div

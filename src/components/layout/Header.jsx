@@ -79,7 +79,7 @@ export default function Header() {
       dispatch(getUserData());
       setLoadingState(false);
     }
-  }, [isAuth]);
+  }, [dispatch, token]);
 
   // 初始化 - 驗證身分
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function Header() {
     } else {
       setLoadingState(false);
     }
-  }, []);
+  }, [dispatch, token]);
 
   const subscriptions = userData?.subscriptions || [];
   const hasPremium = subscriptions.some(

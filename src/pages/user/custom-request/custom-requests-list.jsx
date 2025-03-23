@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginCheck, getUserData } from "@/utils/slice/authSlice";
@@ -68,9 +68,23 @@ export default function CustomRequestsList() {
     }
   };
 
+  // 搜尋與篩選功能
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [order, setOrder] = useState("DESC");
+  const [filterCategory, setFilterCategory] = useState("請選擇類別");
+  const [limit, setLimit] = useState(8);
+
+  const [search, setSearch] = useState("");
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      const sanitizedSearch = e.target.value.trim();
+      setSearch(sanitizedSearch);
+    }
+  };
+
   // 取得需求資料函式
   const [customCourseList, setCustomCourseList] = useState([]);
-  const getData = async () => {
+  const getData = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await customRequestsApi.getAllCustomRequests(
@@ -89,21 +103,7 @@ export default function CustomRequestsList() {
     } finally {
       setLoadingState(false);
     }
-  };
-
-  // 搜尋與篩選功能
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [order, setOrder] = useState("DESC");
-  const [filterCategory, setFilterCategory] = useState("請選擇類別");
-  const [limit, setLimit] = useState(8);
-
-  const [search, setSearch] = useState("");
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      const sanitizedSearch = e.target.value.trim();
-      setSearch(sanitizedSearch);
-    }
-  };
+  }, [sortBy, order, search, limit]);
 
   /* -------------------------------------- header & footer START ---------------------------------------- */
   // header & footer 變化
@@ -112,19 +112,43 @@ export default function CustomRequestsList() {
   const headerRef = useRef(null);
   const footerRef = useRef(null);
 
-  // 計算並更新 mainContent 的 padding
-  const adjustMainContentPadding = () => {
+  // 滾動按鈕顯示狀態更新
+  const updateScrollButtonVisibility = useCallback(() => {
+    if (!containerRef.current) return;
+  }, []);
+
+  // 調整內容區域的 padding
+  const adjustMainContentPadding = useCallback(() => {
     if (!mainContentRef.current || !headerRef.current || !footerRef.current)
       return;
 
     const headerHeight = headerRef.current.offsetHeight || 0;
-    const footerHeight = isFooterHidden
-      ? 0
-      : footerRef.current.offsetHeight || 0;
+    const footerHeight = footerRef.current.offsetHeight || 0;
 
     mainContentRef.current.style.paddingTop = `${headerHeight}px`;
     mainContentRef.current.style.paddingBottom = `${footerHeight}px`;
-  };
+  }, []);
+
+  // 卡片隨機擺放
+  const applyRandomPositioning = useCallback(() => {
+    if (window.innerWidth <= 576) return;
+
+    const cards = document.querySelectorAll(".card-wrapper");
+    const maxOffset = 20;
+
+    cards.forEach((card) => {
+      const [randomX, randomY] = [Math.random() - 0.5, Math.random() - 0.5].map(
+        (n) => n * 2 * maxOffset
+      );
+
+      Object.assign(card.style, {
+        position: "relative",
+        left: `${randomX}px`,
+        top: `${randomY}px`,
+        transition: "all 0.5s ease",
+      });
+    });
+  }, []);
 
   // 切換 Footer 顯示/隱藏
   const toggleFooter = () => {
@@ -137,7 +161,7 @@ export default function CustomRequestsList() {
     return () => {
       window.removeEventListener("resize", adjustMainContentPadding);
     };
-  }, [isFooterHidden]);
+  }, [adjustMainContentPadding]);
 
   // 監聽 DOM 變化
   useEffect(() => {
@@ -145,7 +169,7 @@ export default function CustomRequestsList() {
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, []);
+  }, [adjustMainContentPadding]);
 
   // 更新 body 的 class
   useEffect(() => {
@@ -155,48 +179,17 @@ export default function CustomRequestsList() {
       document.body.classList.remove("footer-hidden");
     }
     adjustMainContentPadding();
-  }, [isFooterHidden]);
-
-  // 初始化 - 計算 padding
-  useEffect(() => {
-    adjustMainContentPadding();
-  }, [isFooterHidden]);
+  }, [isFooterHidden, adjustMainContentPadding]);
 
   useEffect(() => {
-    function applyRandomPositioning() {
-      if (window.innerWidth <= 576) return;
-
-      const cards = document.querySelectorAll(".card-wrapper");
-      const maxOffset = 20;
-
-      cards.forEach((card) => {
-        const [randomX, randomY] = [
-          Math.random() - 0.5,
-          Math.random() - 0.5,
-        ].map((n) => n * 2 * maxOffset);
-        Object.assign(card.style, {
-          position: "relative",
-          left: `${randomX}px`,
-          top: `${randomY}px`,
-          transition: "all 0.5s ease",
-        });
-      });
-    }
-
-    function updateScrollButtonVisibility() {
-      if (!containerRef.current) return;
-      // 在這裡執行 scrollManager.updateScrollButtonVisibility() 的邏輯
-    }
-
     function initWishPool() {
       applyRandomPositioning();
-      setTimeout(applyRandomPositioning, 100); // 讓卡片隨機分佈
-      updateScrollButtonVisibility(); // 更新滾動按鈕
+      setTimeout(applyRandomPositioning, 100);
+      updateScrollButtonVisibility();
     }
 
     initWishPool();
 
-    // 監聽滾動事件
     const container = containerRef.current;
     if (container) {
       container.addEventListener("scroll", updateScrollButtonVisibility);
@@ -207,7 +200,7 @@ export default function CustomRequestsList() {
         container.removeEventListener("scroll", updateScrollButtonVisibility);
       }
     };
-  }, [customCourseList]);
+  }, [customCourseList, applyRandomPositioning, updateScrollButtonVisibility]);
 
   /* -------------------------------------- header & footer END ---------------------------------------- */
 
@@ -242,7 +235,7 @@ export default function CustomRequestsList() {
     if (isAuth) {
       dispatch(getUserData());
     }
-  }, [isAuth]);
+  }, [isAuth, dispatch]);
 
   useEffect(() => {
     const token =
@@ -253,12 +246,23 @@ export default function CustomRequestsList() {
     if (token) {
       dispatch(loginCheck());
     }
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    const token =
+      document.cookie.replace(
+        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
+        "$1"
+      ) || null;
+    if (token) {
+      dispatch(loginCheck());
+    }
+  }, [dispatch]);
 
   // 初始化 - 取得資料
   useEffect(() => {
     getData();
-  }, [search, sortBy, order, limit]);
+  }, [getData]);
 
   return (
     <>
@@ -277,11 +281,7 @@ export default function CustomRequestsList() {
             <div className="d-flex flex-column flex-lg-row align-items-lg-center flex-wrap position-relative pe-lg-10 row-gap-4">
               {/* 導覽 & 搜尋框 */}
               <div className="d-flex align-items-center">
-                <ScrollBtn
-                  containerRef={containerRef}
-                  limit={limit}
-                  setLimit={setLimit}
-                />
+                <ScrollBtn containerRef={containerRef} setLimit={setLimit} />
                 <div className="searchInput pe-10">
                   <input
                     type="search"
@@ -309,7 +309,10 @@ export default function CustomRequestsList() {
                       order === "ASC" &&
                       "建立時間(舊到新)"}
                   </button>
-                  <ul className="dropdown-menu mt-1" aria-labelledby="sortDropdown">
+                  <ul
+                    className="dropdown-menu mt-1"
+                    aria-labelledby="sortDropdown"
+                  >
                     <li>
                       <button
                         type="button"

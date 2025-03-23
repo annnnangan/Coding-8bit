@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +30,7 @@ export default function TutorProfile() {
     slogan: "",
     about: "",
   });
-  const getData = async () => {
+  const getData = useCallback(async () => {
     try {
       const result = await tutorApi.getTutorDetail(userData.tutor_id);
       setTutorId(userData.tutor_id);
@@ -40,7 +40,7 @@ export default function TutorProfile() {
     } finally {
       setLoadingState(false);
     }
-  };
+  }, [userData.tutor_id]);
 
   // 更新資料的狀態
   const handleAboutChange = (e, field) => {
@@ -92,7 +92,7 @@ export default function TutorProfile() {
       });
       navigate("/");
     }
-  }, [userData.roles]);
+  }, [userData.roles, getData, navigate]);
 
   return (
     <>
@@ -106,14 +106,37 @@ export default function TutorProfile() {
       <main className="container-fluid">
         <h1 className="fs-4 fs-lg-2">個人資料</h1>
 
-        <ul className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-6" id="tutorProfileTab" role="tablist">
+        <ul
+          className="nav nav-tabs border-bottom border-gray-03 mt-4 mt-lg-6"
+          id="tutorProfileTab"
+          role="tablist"
+        >
           <li className="nav-item" role="presentation">
-            <button className="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabIndex="-1">
+            <button
+              className="nav-link active"
+              id="profile-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#profile"
+              type="button"
+              role="tab"
+              aria-controls="profile"
+              aria-selected="false"
+              tabIndex="-1"
+            >
               帳戶與個人資料
             </button>
           </li>
           <li className="nav-item" role="presentation">
-            <button className="nav-link" id="aboutMe-tab" data-bs-toggle="tab" data-bs-target="#aboutMe" type="button" role="tab" aria-controls="aboutMe" aria-selected="true">
+            <button
+              className="nav-link"
+              id="aboutMe-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#aboutMe"
+              type="button"
+              role="tab"
+              aria-controls="aboutMe"
+              aria-selected="true"
+            >
               自我介紹與經歷
             </button>
           </li>
@@ -122,17 +145,33 @@ export default function TutorProfile() {
         <div className="row">
           <div className="col">
             <div className="tab-content" id="tutorProfileTabContent">
-              <div className="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+              <div
+                className="tab-pane fade show active"
+                id="profile"
+                role="tabpanel"
+                aria-labelledby="profile-tab"
+              >
                 <div className="row pt-2 pt-md-10">
                   <div className="col-md-5">
-                    <ResetPassword userData={userData} setLoadingState={setLoadingState} />
+                    <ResetPassword
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
                   </div>
                   <div className="col-md-7">
-                    <ProfileContent userData={userData} setLoadingState={setLoadingState} />
+                    <ProfileContent
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
                   </div>
                 </div>
               </div>
-              <div className="tab-pane fade" id="aboutMe" role="tabpanel" aria-labelledby="aboutMe-tab">
+              <div
+                className="tab-pane fade"
+                id="aboutMe"
+                role="tabpanel"
+                aria-labelledby="aboutMe-tab"
+              >
                 <div className="row pt-2 pt-md-10">
                   <div className="col-xxl-5">
                     {/* 關於我 */}
@@ -146,7 +185,9 @@ export default function TutorProfile() {
                               <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
-                              <p className="fs-5 mb-2 fw-medium">{tutorData.expertise}</p>
+                              <p className="fs-5 mb-2 fw-medium">
+                                {tutorData.expertise}
+                              </p>
                             ) : (
                               <input
                                 id="expertise"
@@ -155,7 +196,9 @@ export default function TutorProfile() {
                                 className="form-control fw-bold"
                                 placeholder="請輸入專長，以半形逗號隔開 (ex.Vue,React,JavaScript)"
                                 value={temTutorData.expertise}
-                                onChange={(e) => handleAboutChange(e, "expertise")}
+                                onChange={(e) =>
+                                  handleAboutChange(e, "expertise")
+                                }
                               />
                             )}
                           </div>
@@ -165,7 +208,9 @@ export default function TutorProfile() {
                               <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
-                              <p className="fs-5 mb-2 fw-medium">{tutorData.slogan}</p>
+                              <p className="fs-5 mb-2 fw-medium">
+                                {tutorData.slogan}
+                              </p>
                             ) : (
                               <input
                                 id="slogan"
@@ -184,7 +229,15 @@ export default function TutorProfile() {
                               <span className="text-danger">*</span>
                             </label>
                             {!isEditingAboutMe ? (
-                              <div className="fs-5 mb-2 fw-medium" dangerouslySetInnerHTML={{ __html: tutorData.about?.replace(/\n/g, "<br>") }} />
+                              <div
+                                className="fs-5 mb-2 fw-medium"
+                                dangerouslySetInnerHTML={{
+                                  __html: tutorData.about?.replace(
+                                    /\n/g,
+                                    "<br>"
+                                  ),
+                                }}
+                              />
                             ) : (
                               <textarea
                                 className="form-control fw-bold"
@@ -199,14 +252,32 @@ export default function TutorProfile() {
                           </div>
                         </div>
 
-                        <button className={`btn btn-brand-03 rounded-2 mt-md-4 ${isEditingAboutMe && "d-none"}`} type="button" onClick={handleEditAboutMe}>
+                        <button
+                          className={`btn btn-brand-03 rounded-2 mt-md-4 ${
+                            isEditingAboutMe && "d-none"
+                          }`}
+                          type="button"
+                          onClick={handleEditAboutMe}
+                        >
                           編輯
                         </button>
                         <div>
-                          <button className={`btn btn-brand-03 rounded-2 mt-md-4 ${!isEditingAboutMe && "d-none"}`} type="button" onClick={updateAboutData}>
+                          <button
+                            className={`btn btn-brand-03 rounded-2 mt-md-4 ${
+                              !isEditingAboutMe && "d-none"
+                            }`}
+                            type="button"
+                            onClick={updateAboutData}
+                          >
                             更新個人資料
                           </button>
-                          <button type="submit" className={`btn btn-outline-none rounded-2 mt-2 mt-md-4 ms-2 ${!isEditingAboutMe && "d-none"}`} onClick={handleEditAboutMe}>
+                          <button
+                            type="submit"
+                            className={`btn btn-outline-none rounded-2 mt-2 mt-md-4 ms-2 ${
+                              !isEditingAboutMe && "d-none"
+                            }`}
+                            onClick={handleEditAboutMe}
+                          >
                             取消
                           </button>
                         </div>
@@ -215,13 +286,22 @@ export default function TutorProfile() {
                   </div>
                   <div className="col-xxl-7">
                     {/* 工作經歷 */}
-                    <WorkExperienceSection userData={userData} setLoadingState={setLoadingState} />
+                    <WorkExperienceSection
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
 
                     {/* 學歷 */}
-                    <EducationSection userData={userData} setLoadingState={setLoadingState} />
+                    <EducationSection
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
 
                     {/* 證書 */}
-                    <CertificatesSection userData={userData} setLoadingState={setLoadingState} />
+                    <CertificatesSection
+                      userData={userData}
+                      setLoadingState={setLoadingState}
+                    />
                   </div>
                 </div>
               </div>

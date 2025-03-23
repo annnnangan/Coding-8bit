@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -18,34 +18,40 @@ export default function SubscriptionPaymentResult() {
   const [isPaid, setIsPaid] = useState(false);
   const [isPending, setIsPending] = useState(true);
 
-  const checkPaymentStatus = async (transactionId, subscriptionId) => {
-    setLoadingState(true);
-    try {
-      const response = await orderApi.checkPayResult(transactionId);
-      setPayResult(response);
-      const transaction = response;
+  const checkPaymentStatus = useCallback(
+    async (transactionId, subscriptionId) => {
+      setLoadingState(true);
+      try {
+        const response = await orderApi.checkPayResult(transactionId);
+        setPayResult(response);
+        const transaction = response;
 
-      if (transaction.status === "completed" || transaction.status === "paid") {
-        setIsPaid(true);
-        updateOrderStatus(subscriptionId);
-      } else {
+        if (
+          transaction.status === "completed" ||
+          transaction.status === "paid"
+        ) {
+          setIsPaid(true);
+          updateOrderStatus(subscriptionId);
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "付款未完成",
+            text: "請確認您的付款狀態",
+          });
+        }
+      } catch (error) {
         Swal.fire({
-          icon: "warning",
-          title: "付款未完成",
-          text: "請確認您的付款狀態",
+          icon: "error",
+          title: "查詢失敗",
+          text: error.response?.data?.message || "發生未知錯誤",
         });
+      } finally {
+        setIsPending(false);
+        setLoadingState(false);
       }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "查詢失敗",
-        text: error.response?.data?.message || "發生未知錯誤",
-      });
-    } finally {
-      setIsPending(false);
-      setLoadingState(false);
-    }
-  };
+    },
+    []
+  );
 
   // 更新訂單狀態
   const updateOrderStatus = async (subscriptionId) => {
@@ -87,7 +93,7 @@ export default function SubscriptionPaymentResult() {
       sessionStorage.getItem("transactionId"),
       sessionStorage.getItem("subscriptionId")
     );
-  }, []);
+  }, [checkPaymentStatus]);
 
   return (
     <>

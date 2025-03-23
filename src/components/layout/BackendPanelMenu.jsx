@@ -92,7 +92,7 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
         })
         .finally(() => setLoadingState(false));
     }
-  }, [isAuth]);
+  }, [isAuth, dispatch, navigate]);
 
   // 初始化 - 驗證身分
   useEffect(() => {
@@ -113,10 +113,10 @@ export default function BackendPanelMenu({ children, type, menuItems }) {
       Swal.fire({
         icon: "error",
         title: "請先確認是否登入或是否已經取得身分權限",
-      })
+      });
       navigate("/login");
     }
-  }, [token]);
+  }, [token, dispatch, navigate]);
 
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
