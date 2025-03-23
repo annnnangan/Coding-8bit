@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 
 import { DayPicker } from "react-day-picker";
@@ -24,7 +24,7 @@ export default function AvailableTimeSection() {
   const [newAddSpecificDateAvailability, setNewAddSpecificDateAvailability] = useState({});
 
   /* ------------------------------ Get Initial Availability Data ----------------------------- */
-  const getAllDayOfWeekAvailability = async () => {
+  const getAllDayOfWeekAvailability = useCallback(async () => {
     setLoadingDayOfWeekAvailability(true);
     try {
       const result = await tutorApi.getAllDayOfWeekAvailability(tutorId);
@@ -35,9 +35,9 @@ export default function AvailableTimeSection() {
     } finally {
       setLoadingDayOfWeekAvailability(false);
     }
-  };
+  }, [tutorId]);
 
-  const getAllSpecificDateAvailability = async () => {
+  const getAllSpecificDateAvailability = useCallback(async () => {
     setLoadingSpecificDateAvailability(true);
     try {
       const result = await tutorApi.getAllSpecificDateAvailability(tutorId);
@@ -67,17 +67,15 @@ export default function AvailableTimeSection() {
     } finally {
       setLoadingSpecificDateAvailability(false);
     }
-  };
+  }, [tutorId]);
 
   useEffect(() => {
     getAllDayOfWeekAvailability();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getAllDayOfWeekAvailability]);
 
   useEffect(() => {
     getAllSpecificDateAvailability();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getAllSpecificDateAvailability]);
 
   /* ------------------------------ Add New Specific Date Availability Click Handler ----------------------------- */
 

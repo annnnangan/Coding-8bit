@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
@@ -157,7 +157,7 @@ export default function TutorBooking() {
   }, [tutor_id, recommendTutor]);
 
   /* -------------------------------- Get Data From API -------------------------------- */
-  const checkIsValidTutor = async () => {
+  const checkIsValidTutor = useCallback(async () => {
     setLoadingBasicInfoState(true);
     try {
       await Promise.all([tutorApi.getTutorDetail(tutor_id)]);
@@ -170,9 +170,9 @@ export default function TutorBooking() {
     } finally {
       setLoadingBasicInfoState(false);
     }
-  };
+  }, [tutor_id, navigate]);
 
-  const getTutorBasicData = async () => {
+  const getTutorBasicData = useCallback(async () => {
     setLoadingBasicInfoState(true);
     try {
       const [basicInfoResult, experienceResult, educationResult, certificateResult, courseVideos, singleVideos] = await Promise.all([
@@ -202,18 +202,18 @@ export default function TutorBooking() {
     } finally {
       setLoadingBasicInfoState(false);
     }
-  };
+  }, [tutor_id]);
 
-  const getTutorBookmark = async () => {
+  const getTutorBookmark = useCallback(async () => {
     try {
       const result = await tutorApi.getTutorBookmark(tutor_id);
       setBookmark(result);
     } catch (error) {
       console.log("錯誤", error);
     }
-  };
+  }, [tutor_id]);
 
-  const getAvailabilityData = async () => {
+  const getAvailabilityData = useCallback(async () => {
     setLoadingAvailableTime(true);
     try {
       if (accumulateAvailableTime.tutorId !== tutor_id) {
@@ -224,24 +224,18 @@ export default function TutorBooking() {
         setAccumulateAvailableTime({ tutorId: tutor_id, baseDateList: [{ baseDate, timeSlots: result.data?.slice(7, 14) }] });
         setCurrentAvailableTime(result.data?.slice(7, 14));
       } else {
-        // 計算baseDate
         const today = new Date();
         const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
         const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
 
-        // 檢查資料是否已經儲在useState裡面
         const existingData = accumulateAvailableTime.baseDateList.find((data) => data.baseDate === baseDate);
 
-        // 如果資料已存在，我們直接拿，不用再fetch API
         if (existingData) {
           setCurrentAvailableTime(existingData.timeSlots);
         } else {
-          // 如果不存在，就可以fetch API
           const result = await tutorApi.getAvailability(tutor_id, baseDate);
-
-          // 把剛剛fetch的data存到useState裡面，避免過度fetch API
           const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
-          // setAccumulateAvailableTime((prev) => [...prev, newData]);
+
           setAccumulateAvailableTime({ ...accumulateAvailableTime, baseDateList: [...accumulateAvailableTime.baseDateList, newData] });
           setCurrentAvailableTime(result.data?.slice(7, 14));
         }
@@ -251,23 +245,23 @@ export default function TutorBooking() {
     } finally {
       setLoadingAvailableTime(false);
     }
-  };
+  }, [tutor_id, weekOffset, accumulateAvailableTime]);
 
-  const getRecommendTutor = async () => {
+  const getRecommendTutor = useCallback(async () => {
     setLoadingRecommendTutorState(true);
     try {
       const result = (await tutorApi.getAllTutor(1, "rating", "DESC", "", 20)).tutors;
       const resultWithoutCurrentTutor = result.filter((tutor) => tutor.id !== tutor_id);
-      // randomly pick 4 tutor
+
       setRecommendTutor(resultWithoutCurrentTutor.sort(() => Math.random() - 0.5).slice(0, 4));
     } catch (error) {
       console.log("錯誤", error);
     } finally {
       setLoadingRecommendTutorState(false);
     }
-  };
+  }, [tutor_id]);
 
-  const getRatingStats = async () => {
+  const getRatingStats = useCallback(async () => {
     setLoadingRatingStatsState(true);
     try {
       const result = await tutorApi.getTutorRatingStats(tutor_id);
@@ -277,85 +271,50 @@ export default function TutorBooking() {
     } finally {
       setLoadingRatingStatsState(false);
     }
-  };
+  }, [tutor_id]);
 
-  const getStudentComments = async (page = 1, limit = 3) => {
-    setLoadingCommentState(true); // Show loading state before fetching data
-    try {
-      const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
-      setComments(result.data);
-    } catch (error) {
-      console.error("錯誤", error);
-    } finally {
-      setLoadingCommentState(false);
-    }
-  };
-
-  const getModalStudentComments = async (page, limit) => {
-    if (isFetchingMore) return; // Prevent multiple calls
-    setIsFetchingMore(true);
-    try {
-      const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
-
-      if (result.data.length > 0) {
-        setModalComments((prevComments) => [...prevComments, ...result.data]); // Append new comments
-        setModalPage(page + 1);
-      } else {
-        setHasMoreComments(false); // No more data to load
+  const getStudentComments = useCallback(
+    async (page = 1, limit = 3) => {
+      setLoadingCommentState(true);
+      try {
+        const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
+        setComments(result.data);
+      } catch (error) {
+        console.error("錯誤", error);
+      } finally {
+        setLoadingCommentState(false);
       }
-    } catch (error) {
-      console.error("錯誤", error);
-    } finally {
-      setIsFetchingMore(false);
-    }
-  };
+    },
+    [tutor_id]
+  );
+
+  const getModalStudentComments = useCallback(
+    async (page, limit) => {
+      if (isFetchingMore) return; // Prevent multiple calls
+      setIsFetchingMore(true);
+      try {
+        const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
+
+        if (result.data.length > 0) {
+          setModalComments((prevComments) => [...prevComments, ...result.data]); // Append new comments
+          setModalPage(page + 1);
+        } else {
+          setHasMoreComments(false); // No more data to load
+        }
+      } catch (error) {
+        console.error("錯誤", error);
+      } finally {
+        setIsFetchingMore(false);
+      }
+    },
+    [isFetchingMore, tutor_id]
+  );
 
   useEffect(() => {
     (async () => {
-      /* ------------------ Reset Everything when tutor id changes ----------------- */
-      setTutorBasicInfo({
-        User: {
-          username: "",
-          avatar_url: "images/icon/user.png",
-        },
-        slogan: "",
-        about: "",
-        hourly_rate: 0,
-        expertise: "",
-        rating: "",
-        resume: { work_experience: [], education: [], certificates: [] },
-        statistics: { student_count: 0, class_count: 0, video_count: 0 },
-      });
-
-      setCourses([]);
-      setRecommendTutor([]);
-      setAccumulateAvailableTime({ tutorId: tutor_id, baseDateList: [] });
-      setCurrentAvailableTime([]);
-      setWeekOffset(0);
-      setBookingModalOpen(false);
-      setCurrentModalStep(1);
-      setSelectedServiceType(undefined);
-      setSelectedBookingTimeslots({ date: "", hours: [] });
-      setModalError(undefined);
-      setBookmark(false);
-      setComments([]);
-      setModalComments([]);
-      setRatingStats({
-        average_rating: 0,
-        total_comment_count: 0,
-        rating_distribute: {
-          5: 0,
-          4: 0,
-          3: 0,
-          2: 0,
-          1: 0,
-        },
-      });
-
       if (tutor_id) {
         /* ------------------ Check if Tutor Exists ----------------- */
         await checkIsValidTutor();
-
         /* ------------------ Fetch Data ----------------- */
         getTutorBasicData();
         getRecommendTutor();
@@ -364,13 +323,11 @@ export default function TutorBooking() {
         getStudentComments();
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutor_id]);
+  }, [tutor_id, checkIsValidTutor, getTutorBasicData, getRecommendTutor, getTutorBookmark, getRatingStats, getStudentComments]);
 
   useEffect(() => {
     getAvailabilityData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weekOffset, tutor_id]);
+  }, [weekOffset, tutor_id, getAvailabilityData]);
 
   /* -------------------------------- Click Function -------------------------------- */
 
@@ -488,10 +445,8 @@ export default function TutorBooking() {
 
   const openCommentModal = () => {
     if (commentModal.current) {
-      if (modalComments.length === 0) {
-        getModalStudentComments(1, 10);
-      }
-
+      setModalComments([]);
+      getModalStudentComments(1, 10); // Fetch comments for the current tutor
       commentModal.current.show();
     }
   };
@@ -499,29 +454,29 @@ export default function TutorBooking() {
   /* -------------------------------- Comment Modal Infinite Scroll -------------------------------- */
   const commentModalBodyRef = useRef(null);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!commentModalBodyRef.current || !hasMoreComments || isFetchingMore) return;
 
     const { scrollTop, scrollHeight, clientHeight } = commentModalBodyRef.current;
 
     if (scrollTop + clientHeight >= scrollHeight) {
-      console.log("modal page", modalPage);
       getModalStudentComments(modalPage, 10);
     }
-  };
+  }, [modalPage, hasMoreComments, isFetchingMore, getModalStudentComments]);
 
   useEffect(() => {
-    if (commentModalBodyRef.current) {
-      commentModalBodyRef.current.addEventListener("scroll", handleScroll);
+    const modalBody = commentModalBodyRef.current; // Store the ref value in a variable
+
+    if (modalBody) {
+      modalBody.addEventListener("scroll", handleScroll);
     }
+
     return () => {
-      if (commentModalBodyRef.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        commentModalBodyRef.current.removeEventListener("scroll", handleScroll);
+      if (modalBody) {
+        modalBody.removeEventListener("scroll", handleScroll);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modalPage, hasMoreComments]);
+  }, [modalPage, hasMoreComments, handleScroll]);
 
   return (
     <>

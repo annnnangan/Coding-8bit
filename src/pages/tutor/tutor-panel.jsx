@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 
@@ -19,7 +19,7 @@ export default function TutorPanel() {
   const [recentBookings, setRecentBookings] = useState([]);
   const [loadingRecentBookings, setLoadingRecentBookings] = useState(false);
 
-  const getBookingListData = async () => {
+  const getBookingListData = useCallback(async () => {
     setLoadingRecentBookings(true);
     try {
       const result = (await bookingApi.getTutorBookings({ tutorId, status: "in_progress", limit: 2 })).bookings;
@@ -38,14 +38,13 @@ export default function TutorPanel() {
     } finally {
       setLoadingRecentBookings(false);
     }
-  };
+  }, [tutorId]);
 
   useEffect(() => {
     if (tutorId) {
       getBookingListData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tutorId]);
+  }, [getBookingListData, tutorId]);
 
   // 初始化 - swiper
   useEffect(() => {
