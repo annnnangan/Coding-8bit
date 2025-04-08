@@ -17,7 +17,7 @@ export default function CourseCategoryPage() {
   const [searchParams] = useSearchParams();
   const video_type = searchParams.get("video_type");
   const { category } = useParams();
-  
+
   // 解析路由，避免某些參數被 "/" 影響
   const decodedCategory = decodeURIComponent(category);
 
@@ -77,16 +77,14 @@ export default function CourseCategoryPage() {
   );
 
   // title 判斷
-  let pageTitle = "Coding∞bit ｜ ";
-  if (video_type === "topicSeries") {
-    pageTitle += "主題式系列課程影片一覽";
-  } else if (video_type === "customLearning") {
-    pageTitle += "客製化學習需求影片一覽";
-  } else if (video_type === "freeTipShorts") {
-    pageTitle += "實用技術短影片一覽";
-  } else {
-    pageTitle += "課程影片一覽";
-  }
+  const videoTypeMap = {
+    topicSeries: "主題式系列課程影片一覽",
+    customLearning: "客製化學習需求影片一覽",
+    freeTipShorts: "實用技術短影片一覽",
+  };
+  let pageTitle = videoTypeMap[video_type]
+    ? `Coding∞bit ｜ ${videoTypeMap[video_type]}`
+    : "Coding∞bit ｜課程影片一覽";
 
   // 初始化取得資料
   useEffect(() => {

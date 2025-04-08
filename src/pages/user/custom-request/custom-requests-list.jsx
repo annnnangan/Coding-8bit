@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginCheck, getUserData } from "@/utils/slice/authSlice";
 import { Helmet } from "react-helmet-async";
 
-import * as bootstrap from "bootstrap";
+import { Modal } from "bootstrap";
 import Swal from "sweetalert2";
 
 import customRequestsApi from "@/api/customRequestsApi";
@@ -215,7 +215,7 @@ export default function CustomRequestsList() {
 
   // 初始化 - 啟用 modal
   useEffect(() => {
-    myModal.current = new bootstrap.Modal(cardModalRef.current);
+    myModal.current = new Modal(cardModalRef.current);
   }, []);
 
   // 初始化 - 背景圖片
@@ -236,17 +236,6 @@ export default function CustomRequestsList() {
       dispatch(getUserData());
     }
   }, [isAuth, dispatch]);
-
-  useEffect(() => {
-    const token =
-      document.cookie.replace(
-        /(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/,
-        "$1"
-      ) || null;
-    if (token) {
-      dispatch(loginCheck());
-    }
-  }, [dispatch]);
 
   useEffect(() => {
     const token =
