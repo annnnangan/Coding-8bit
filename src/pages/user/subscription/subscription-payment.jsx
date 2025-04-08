@@ -15,6 +15,7 @@ import PaymentStepSection1 from "@/components/subscription/PaymentStepSection1";
 import Loader from "@/components/common/Loader";
 
 import { PaymentSchema } from "@/utils/schema/payment-schema";
+import { formatDateToTaiwan } from "@/utils/timeFormatted-utils";
 
 const step2Fields = ["buyerEmail", "buyerName", "buyerTel"];
 
@@ -44,44 +45,22 @@ export default function SubscriptionPayment() {
       nextMonth.setMonth(nextMonth.getMonth() + 1);
 
       // 開始日期
-      const startDate = today
-        .toLocaleDateString("zh-TW", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\//g, "-");
-      setFormattedToday(startDate);
+      setFormattedToday(formatDateToTaiwan(today));
 
       // 下個月的日期
-      const endNextMonthDate = nextMonth
-        .toLocaleDateString("zh-TW", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\//g, "-");
-      setFormattedNextMonth(endNextMonthDate);
+      setFormattedNextMonth(formatDateToTaiwan(nextMonth));
 
       // 明年的日期
       const nextYear = new Date();
       nextYear.setFullYear(nextYear.getFullYear() + 1);
-      const endNextYearDate = nextYear
-        .toLocaleDateString("zh-TW", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .replace(/\//g, "-");
-
-      setFormattedNextYear(endNextYearDate);
+      setFormattedNextYear(formatDateToTaiwan(nextYear));
 
       addSubscription({
         plan_id: planId,
         billing_cycle: duration === "price_monthly" ? "monthly" : "annually",
-        start_date: startDate,
+        start_date: formatDateToTaiwan(today),
         end_date:
-          duration === "price_monthly" ? endNextMonthDate : endNextYearDate,
+          duration === "price_monthly" ? formatDateToTaiwan(nextMonth) : formatDateToTaiwan(nextYear),
       });
     }
     if (currentStep === 2) {
@@ -93,7 +72,7 @@ export default function SubscriptionPayment() {
         });
         return;
       }
-      await addOrder();
+      await createOrder();
     }
   };
 
@@ -154,7 +133,7 @@ export default function SubscriptionPayment() {
   };
 
   // 建立訂單函式
-  const addOrder = async () => {
+  const createOrder = async () => {
     setLoadingState(true);
     try {
       const orderData = {
@@ -163,7 +142,7 @@ export default function SubscriptionPayment() {
         amount: prices[subscriptionPlan]?.[duration],
       };
 
-      const res = await orderApi.addOrder({
+      const res = await orderApi.createOrder({
         user_id: userData.id,
         ...orderData,
       });

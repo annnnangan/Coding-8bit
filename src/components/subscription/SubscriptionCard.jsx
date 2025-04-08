@@ -1,10 +1,24 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 
 import subscriptionApi from "@/api/subscriptionApi";
+
+const planContents = {
+  free: [
+    "只需註冊帳號，即可享有服務",
+    "可觀看免費影片",
+    "可參與影片討論區，與其他使用者交流",
+  ],
+  basic: [
+    "不限次數、不限時長，觀看所有教學影片",
+    "可預約一對一教學、程式碼檢視",
+    "可成為老師，上傳教學影片，接受學生預約與客製化需求",
+  ],
+  premium: ["包含基本會員擁有的所有服務", "可發佈學習客製化需求"],
+};
 
 export default function SubscriptionCard({ duration, setLoadingState }) {
   // 傳遞訂閱方案(基本、高級)及繳費頻率(年繳、月繳)路由參數
@@ -17,49 +31,33 @@ export default function SubscriptionCard({ duration, setLoadingState }) {
     handleNavigate(subscriptionPlan, planId);
   };
 
-  const planContents = useMemo(
-    () => ({
-      free: [
-        "只需註冊帳號，即可享有服務",
-        "可觀看免費影片",
-        "可參與影片討論區，與其他使用者交流",
-      ],
-      basic: [
-        "不限次數、不限時長，觀看所有教學影片",
-        "可預約一對一教學、程式碼檢視",
-        "可成為老師，上傳教學影片，接受學生預約與客製化需求",
-      ],
-      premium: ["包含基本會員擁有的所有服務", "可發佈學習客製化需求"],
-    }),
-    []
-  );
-
   // 取得所有方案
   const [plans, setPlans] = useState([]);
-  const getPlans = useCallback(async () => {
-    setLoadingState(true);
-    try {
-      const res = await subscriptionApi.getPlans();
-      setPlans(res.data);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "取得訂閱方案失敗",
-        text: error.response?.data?.message || "發生未知錯誤",
-      });
-    } finally {
-      setLoadingState(false);
-    }
-  }, [setLoadingState]);
 
   useEffect(() => {
-    getPlans();
-  }, [getPlans]);
+    const fetchPlans = async () => {
+      setLoadingState(true);
+      try {
+        const res = await subscriptionApi.getPlans();
+        setPlans(res.data);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "取得訂閱方案失敗",
+          text: error.response?.data?.message || "發生未知錯誤",
+        });
+      } finally {
+        setLoadingState(false);
+      }
+    };
+
+    fetchPlans();
+  }, [setLoadingState]);
 
   return (
     <>
       {plans
-        .sort((a, b) => a[duration] - b[duration])
+        ?.sort((a, b) => a[duration] - b[duration])
         .map((plan) => (
           <div className="col-lg-4" key={plan.id}>
             <div

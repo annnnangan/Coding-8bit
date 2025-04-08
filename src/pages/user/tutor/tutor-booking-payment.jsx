@@ -113,7 +113,7 @@ export default function TutorBookingPayment() {
   };
 
   // 建立訂單函式
-  const addOrder = async (bookingId) => {
+  const createOrder = async (bookingId) => {
     try {
       const orderData = {
         order_type: "booking",
@@ -121,7 +121,7 @@ export default function TutorBookingPayment() {
         amount: price,
       };
 
-      const res = await orderApi.addOrder({
+      const res = await orderApi.createOrder({
         user_id: userData.id,
         ...orderData,
       });
@@ -210,7 +210,7 @@ export default function TutorBookingPayment() {
       const result = await bookingApi.addBooking(bookingData);
       const bookingId = result.id;
 
-      const orderId = await addOrder(bookingId);
+      const orderId = await createOrder(bookingId);
       await addPay(orderId, data);
     } catch (error) {
       console.dir(error);

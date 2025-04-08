@@ -60,6 +60,17 @@ export const removeYearFromDate = (isoString) => {
   return `${month}/${day}`;
 };
 
+// Date 轉 yyyy-mm-dd
+export const formatDateToTaiwan = (date) => {
+  return date
+    .toLocaleDateString("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+    .replace(/\//g, "-");
+};
+
 /* ------------------------------- Format Time ------------------------------ */
 
 // 從 數字(e.g. 9) 轉到 09:00
