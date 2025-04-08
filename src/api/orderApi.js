@@ -1,7 +1,7 @@
 import apiClient from './apiClient';
 
 // 建立訂單
-const addOrder = async (orderData) => {
+const createOrder = async (orderData) => {
   const response = await apiClient.post(`/orders/`, orderData);
   return response.data;
 };
@@ -27,7 +27,7 @@ const checkPayResult = async (transactionId) => {
 };
 
 export default {
-  addOrder,
+  createOrder,
   updateOrder,
   addPay,
   checkPayResult
