@@ -220,7 +220,9 @@ export default function CourseList() {
                     alt="icon-infinite"
                   />
                 </picture>
-                <h2 className="title ms-3 ms-lg-4">實用技術短影片</h2>
+                <h2 className="title fs-4 fs-lg-1 fs-xl-3 ms-3 ms-lg-4">
+                  實用技術短影片
+                </h2>
                 <picture>
                   <source
                     srcSet="images/icon/icon-infinite-sm.svg"
@@ -232,16 +234,6 @@ export default function CourseList() {
                     className="ms-3 ms-lg-4"
                   />
                 </picture>
-              </div>
-              <div className="swiper-switch-btn f-align-center gap-5 mt-6">
-                <button
-                  className="swiper-freeTipShorts-button-prev swiper-circle-btn-prev f-center rounded-circle border-0"
-                  style={{ width: "44px", height: "44px" }}
-                ></button>
-                <button
-                  className="swiper-freeTipShorts-button-next swiper-circle-btn-next f-center rounded-circle border-0"
-                  style={{ width: "44px", height: "44px" }}
-                ></button>
               </div>
             </div>
             <div className="col-lg-8 swiper freeTipShortsSwiper me-0">
@@ -305,6 +297,16 @@ export default function CourseList() {
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="swiper-switch-btn f-align-center gap-5 mt-lg-12">
+              <button
+                className="swiper-freeTipShorts-button-prev swiper-circle-btn-prev f-center rounded-circle border-0"
+                style={{ width: "44px", height: "44px" }}
+              ></button>
+              <button
+                className="swiper-freeTipShorts-button-next swiper-circle-btn-next f-center rounded-circle border-0"
+                style={{ width: "44px", height: "44px" }}
+              ></button>
             </div>
           </div>
         </div>
