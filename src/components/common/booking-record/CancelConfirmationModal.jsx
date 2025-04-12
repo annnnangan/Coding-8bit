@@ -4,7 +4,12 @@ import PropTypes from "prop-types";
 
 import { utils } from "@/custom-request/utils";
 
-export default function CancelConfirmationModal({ booking, isOpen, setOpenModal, setOpenDetailsModal }) {
+export default function CancelConfirmationModal({
+  booking,
+  isOpen,
+  setOpenModal,
+  setOpenDetailsModal,
+}) {
   const modal = useRef(null);
   const modalRef = useRef(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -55,11 +60,20 @@ export default function CancelConfirmationModal({ booking, isOpen, setOpenModal,
           </div>
           <div className="modal-body">
             <p className="mb-3">
-              你確定要取消與 {booking.student} 於 {utils.formatDateWithYear(new Date(booking.start_time))} {utils.formatOnlyTime(new Date(booking.start_time))} -
+              你確定要取消與 {booking.student} 於{" "}
+              {utils.formatDateWithYear(new Date(booking.start_time))}{" "}
+              {utils.formatOnlyTime(new Date(booking.start_time))} -
               {utils.formatOnlyTime(new Date(booking.end_time))} 的預約嗎？
             </p>
             <p className="fs-7">取消原因：</p>
-            <textarea className="form-control" rows="3" value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="輸入取消原因..." style={{ fontSize: "14px" }}></textarea>
+            <textarea
+              className="form-control"
+              rows="3"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="輸入取消原因..."
+              style={{ fontSize: "14px" }}
+            ></textarea>
           </div>
           <div className="modal-footer border-top-0">
             <button className="btn btn-secondary" onClick={handleCloseModal}>

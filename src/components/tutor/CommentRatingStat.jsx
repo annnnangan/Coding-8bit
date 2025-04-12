@@ -26,13 +26,26 @@ export default function CommentRatingStat({ ratingStats, isLoading = false }) {
                 </div>
               )}
               {Array.from({ length: fullStars }, (_, i) => (
-                <img key={`filled-${i}`} className="text-brand-01" src="images/icon/kid_star.svg" alt="filled start" width="16" height="16" />
+                <img
+                  key={`filled-${i}`}
+                  className="text-brand-01"
+                  src="images/icon/kid_star.svg"
+                  alt="filled start"
+                  width="16"
+                  height="16"
+                />
               ))}
 
-              {hasHalfStar && <img src="images/icon/kid_star_half_purple.svg" alt="" width="16" height="16" />}
+              {hasHalfStar && (
+                <img src="images/icon/kid_star_half_purple.svg" alt="" width="16" height="16" />
+              )}
 
               {Array.from({ length: emptyStars }, (_, i) => (
-                <span key={`empty-${i}`} className="material-symbols-outlined fs-6 icon-fill" style={{ color: "#b6b4b4" }}>
+                <span
+                  key={`empty-${i}`}
+                  className="material-symbols-outlined fs-6 icon-fill"
+                  style={{ color: "#b6b4b4" }}
+                >
                   kid_star
                 </span>
               ))}
@@ -46,10 +59,29 @@ export default function CommentRatingStat({ ratingStats, isLoading = false }) {
                 .map((rate) => (
                   <li className="f-between-center" key={rate}>
                     <p className="fs-7 me-3">{rate} 星</p>
-                    <div className="progress flex-grow-1" style={{ height: "8px" }} role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                      <div className="progress-bar" style={{ width: `${(ratingStats.rating_distribute[rate] / ratingStats.total_comment_count) * 100}%` }}></div>
+                    <div
+                      className="progress flex-grow-1"
+                      style={{ height: "8px" }}
+                      role="progressbar"
+                      aria-label="Basic example"
+                      aria-valuenow="0"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      <div
+                        className="progress-bar"
+                        style={{
+                          width: `${
+                            (ratingStats.rating_distribute[rate] /
+                              ratingStats.total_comment_count) *
+                            100
+                          }%`,
+                        }}
+                      ></div>
                     </div>
-                    <p className="className=fs-7 text-gray-03">{ratingStats.rating_distribute[rate]}</p>
+                    <p className="className=fs-7 text-gray-03">
+                      {ratingStats.rating_distribute[rate]}
+                    </p>
                   </li>
                 ))}
             </ol>

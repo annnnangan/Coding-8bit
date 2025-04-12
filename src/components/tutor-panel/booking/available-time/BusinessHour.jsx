@@ -14,7 +14,13 @@ import { generateTimeslots } from "@/utils/generate-timeslots-utils";
 import { BusinessHourSchema } from "@/schema/tutor-panel-schema";
 import { daysOfWeekInChinese, formatHour } from "@/utils/timeFormatted-utils";
 
-export default function BusinessHour({ type, day, defaultValue, revalidateAvailability, removeNewSpecificDate }) {
+export default function BusinessHour({
+  type,
+  day,
+  defaultValue,
+  revalidateAvailability,
+  removeNewSpecificDate,
+}) {
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
   const [isEdit, setEdit] = useState(false);
   const [isLoading, setLoadingState] = useState(false);
@@ -116,7 +122,9 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
       // Day of Week
       if (type === "week") {
         if (data.is_open && data.time_slots.length > 0) {
-          await tutorApi.updateDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day), { time_slots: data.time_slots });
+          await tutorApi.updateDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day), {
+            time_slots: data.time_slots,
+          });
         } else {
           await tutorApi.deleteDayOfWeekAvailability(tutorId, daysOfWeekInChinese.indexOf(day));
         }
@@ -181,14 +189,20 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
                     <div className="d-flex align-items-center">
                       <p className="fs-6 fs-md-5 me-4 me-lg-5 me-xxl-10"> {day}</p>
 
-                      {!isOpenWatch && type !== "newSpecific" && <p className="text-gray-03 fs-7">沒有可預約時間</p>}
+                      {!isOpenWatch && type !== "newSpecific" && (
+                        <p className="text-gray-03 fs-7">沒有可預約時間</p>
+                      )}
                     </div>
                   </div>
                 </button>
               </h2>
 
               {/* Accordion Body */}
-              <div id={`collapse${day}-${type}`} className={`accordion-collapse collapse ${type === "newSpecific" ? "show" : ""}`} data-bs-parent={`#accordion${day}-${type}`}>
+              <div
+                id={`collapse${day}-${type}`}
+                className={`accordion-collapse collapse ${type === "newSpecific" ? "show" : ""}`}
+                data-bs-parent={`#accordion${day}-${type}`}
+              >
                 <div className="accordion-body pt-0">
                   <Controller
                     name={`is_open`}
@@ -219,7 +233,11 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
                     )}
                   />
 
-                  {errors?.time_slots && <div className="text-danger mb-5 fs-7">{errors?.time_slots?.message || errors?.time_slots?.root?.message}</div>}
+                  {errors?.time_slots && (
+                    <div className="text-danger mb-5 fs-7">
+                      {errors?.time_slots?.message || errors?.time_slots?.root?.message}
+                    </div>
+                  )}
 
                   {/* Timeslots Pair */}
                   {timeslotsWatch.length > 0 &&
@@ -233,7 +251,9 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
                             render={({ field }) => (
                               <div className="form-floating" id="floatingSelect">
                                 <select
-                                  className={`form-select ps-3 pe-11 pt-4 fs-7 pb-0${errors?.time_slots?.[index]?.start_hour ? " is-invalid" : ""}`}
+                                  className={`form-select ps-3 pe-11 pt-4 fs-7 pb-0${
+                                    errors?.time_slots?.[index]?.start_hour ? " is-invalid" : ""
+                                  }`}
                                   value={field.value}
                                   onChange={(e) => {
                                     field.onChange(e);
@@ -263,7 +283,9 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
                             render={({ field }) => (
                               <div className="form-floating">
                                 <select
-                                  className={`form-select ps-3 pe-11 pt-4 fs-7 pb-0${errors?.time_slots?.[index]?.end_hour ? " is-invalid" : ""}`}
+                                  className={`form-select ps-3 pe-11 pt-4 fs-7 pb-0${
+                                    errors?.time_slots?.[index]?.end_hour ? " is-invalid" : ""
+                                  }`}
                                   value={field.value}
                                   onChange={(e) => {
                                     field.onChange(e);
@@ -285,13 +307,25 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
                           />
 
                           {isEdit && (
-                            <span className="material-symbols-outlined cursor-pointer" onClick={() => handleRemoveTimeslot(index)} disabled={isLoading}>
+                            <span
+                              className="material-symbols-outlined cursor-pointer"
+                              onClick={() => handleRemoveTimeslot(index)}
+                              disabled={isLoading}
+                            >
                               delete
                             </span>
                           )}
                         </div>
-                        {errors?.time_slots?.[index]?.start_hour && <div className="text-danger fs-8">{errors?.time_slots[index]?.start_hour?.message}</div>}
-                        {errors?.time_slots?.[index]?.end_hour && <div className="text-danger fs-8">{errors?.time_slots[index]?.end_hour?.message}</div>}
+                        {errors?.time_slots?.[index]?.start_hour && (
+                          <div className="text-danger fs-8">
+                            {errors?.time_slots[index]?.start_hour?.message}
+                          </div>
+                        )}
+                        {errors?.time_slots?.[index]?.end_hour && (
+                          <div className="text-danger fs-8">
+                            {errors?.time_slots[index]?.end_hour?.message}
+                          </div>
+                        )}
                       </div>
                     ))}
 
@@ -299,16 +333,33 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
                   <div className="w-full d-flex justify-content-between flex-wrap gap-2 mt-5">
                     <div className="d-flex gap-2">
                       {isOpenWatch && isEdit && (
-                        <button className="px-5 py-2 fs-8 btn btn-outline-brand-03 rounded-4 border-2" onClick={handleAddTimeslot} disabled={isLoading} type="button">
+                        <button
+                          className="px-5 py-2 fs-8 btn btn-outline-brand-03 rounded-4 border-2"
+                          onClick={handleAddTimeslot}
+                          disabled={isLoading}
+                          type="button"
+                        >
                           新增
                         </button>
                       )}
 
-                      {isEdit && <FormSubmitButton buttonStyle={"px-5 py-2 fs-8"} isLoading={isLoading} buttonText="儲存" loadingText="儲存中..." roundedRadius={4} />}
+                      {isEdit && (
+                        <FormSubmitButton
+                          buttonStyle={"px-5 py-2 fs-8"}
+                          isLoading={isLoading}
+                          buttonText="儲存"
+                          loadingText="儲存中..."
+                          roundedRadius={4}
+                        />
+                      )}
                     </div>
 
                     <div className="ms-auto">
-                      <button className="px-5 py-2 fs-8 btn btn-outline-brand-03 rounded-4 border-2" onClick={handleEditButtonClick} type="button">
+                      <button
+                        className="px-5 py-2 fs-8 btn btn-outline-brand-03 rounded-4 border-2"
+                        onClick={handleEditButtonClick}
+                        type="button"
+                      >
                         {isEdit ? "取消編輯" : "編輯"}
                       </button>
                     </div>
@@ -320,7 +371,10 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
         </div>
 
         {(type === "existingSpecific" || type === "newSpecific") && (
-          <span className="material-symbols-outlined cursor-pointer ms-auto" onClick={handleRemoveSpecificDate}>
+          <span
+            className="material-symbols-outlined cursor-pointer ms-auto"
+            onClick={handleRemoveSpecificDate}
+          >
             delete
           </span>
         )}

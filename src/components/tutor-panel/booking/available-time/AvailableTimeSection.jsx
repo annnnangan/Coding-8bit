@@ -117,18 +117,39 @@ export default function AvailableTimeSection() {
         <p className="fs-7 fs-md-6 text-gray-02 mb-6">在此設定每週恆常可預約時間。</p>
         <div className="d-flex flex-column gap-5">
           {isLoadingDayOfWeekAvailability ? (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "100vh" }}
+            >
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
           ) : (
             daysOfWeekInChinese.map((day, index) => {
-              const filterDayData = Array.isArray(dayOfWeekAvailability) ? dayOfWeekAvailability.filter((item) => item.day_of_week === index) : [];
+              const filterDayData = Array.isArray(dayOfWeekAvailability)
+                ? dayOfWeekAvailability.filter((item) => item.day_of_week === index)
+                : [];
               const defaultValue =
-                filterDayData.length > 0 ? { is_open: true, time_slots: filterDayData.map(({ start_hour, end_hour }) => ({ start_hour, end_hour })) } : { is_open: false, time_slots: [] };
+                filterDayData.length > 0
+                  ? {
+                      is_open: true,
+                      time_slots: filterDayData.map(({ start_hour, end_hour }) => ({
+                        start_hour,
+                        end_hour,
+                      })),
+                    }
+                  : { is_open: false, time_slots: [] };
 
-              return <BusinessHour type="week" day={day} key={day} defaultValue={defaultValue} revalidateAvailability={getAllDayOfWeekAvailability} />;
+              return (
+                <BusinessHour
+                  type="week"
+                  day={day}
+                  key={day}
+                  defaultValue={defaultValue}
+                  revalidateAvailability={getAllDayOfWeekAvailability}
+                />
+              );
             })
           )}
         </div>
@@ -153,14 +174,24 @@ export default function AvailableTimeSection() {
               <span className="material-symbols-outlined icon-fill text-brand-01 fs-2">add</span>
             </button>
             <ul className="dropdown-menu">
-              <DayPicker mode="single" selected={date} onSelect={handleDateSelect} showOutsideDays disabled={{ before: new Date() }} startMonth={new Date()} />
+              <DayPicker
+                mode="single"
+                selected={date}
+                onSelect={handleDateSelect}
+                showOutsideDays
+                disabled={{ before: new Date() }}
+                startMonth={new Date()}
+              />
             </ul>
           </div>
         </div>
 
         <div className="d-flex flex-column gap-5">
           {isLoadingSpecificDateAvailability ? (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "100vh" }}
+            >
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>
               </div>
@@ -168,11 +199,15 @@ export default function AvailableTimeSection() {
           ) : (
             <>
               {/* 尚未新增特定日期 */}
-              {Object.keys(specificDateAvailability)?.length === 0 && Object.keys(newAddSpecificDateAvailability)?.length === 0 && (
-                <div className="f-center mt-5">
-                  <SectionFallback materialIconName="calendar_clock" fallbackText="尚未新增特定日期" />
-                </div>
-              )}
+              {Object.keys(specificDateAvailability)?.length === 0 &&
+                Object.keys(newAddSpecificDateAvailability)?.length === 0 && (
+                  <div className="f-center mt-5">
+                    <SectionFallback
+                      materialIconName="calendar_clock"
+                      fallbackText="尚未新增特定日期"
+                    />
+                  </div>
+                )}
 
               {/* 正在新增 */}
               {Object.keys(newAddSpecificDateAvailability)?.length > 0 && (
@@ -203,7 +238,13 @@ export default function AvailableTimeSection() {
                   )}
 
                   {Object.entries(specificDateAvailability).map((item) => (
-                    <BusinessHour type="existingSpecific" day={item[0]} key={item[0]} defaultValue={item[1]} revalidateAvailability={getAllSpecificDateAvailability} />
+                    <BusinessHour
+                      type="existingSpecific"
+                      day={item[0]}
+                      key={item[0]}
+                      defaultValue={item[1]}
+                      revalidateAvailability={getAllSpecificDateAvailability}
+                    />
                   ))}
                 </div>
               )}

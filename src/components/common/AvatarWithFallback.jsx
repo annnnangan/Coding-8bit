@@ -5,7 +5,12 @@ export default function AvatarWithFallback({ image, name, fontSize = "fs-6", chi
     <div className="d-flex align-items-center mt-auto">
       <div className="flex-shrink-0">
         {image !== "" ? (
-          <img src={image} alt="profile" className="object-fit-cover rounded-circle me-4" style={{ height: "48px", width: "48px" }} />
+          <img
+            src={image}
+            alt="profile"
+            className="object-fit-cover rounded-circle me-4"
+            style={{ height: "48px", width: "48px" }}
+          />
         ) : (
           <span
             className="material-symbols-outlined rounded-circle bg-secondary d-flex justify-content-center align-items-center me-4"

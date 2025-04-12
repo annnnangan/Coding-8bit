@@ -8,7 +8,7 @@ import HourlyRateSection from "@/components/tutor-panel/booking/HourlyRateSectio
 export default function TutorManageBooking() {
   const [activeTab, setActiveTab] = useState("allBookings");
 
-  const handleTabClick = (tabName) => {
+  const handleActiveTabSwitch = (tabName) => {
     setActiveTab(tabName); // Update active tab based on clicked tab name
   };
 
@@ -22,19 +22,34 @@ export default function TutorManageBooking() {
         <h2 className="mb-6 ps-5 ps-lg-0">預約管理</h2>
         <ul className="nav nav-tabs">
           <li className="nav-item cursor-pointer">
-            <p className={`nav-link ${activeTab === "allBookings" ? "active bg-gray-04 rounded-top-3" : ""} border-bottom-0`} onClick={() => handleTabClick("allBookings")}>
+            <p
+              className={`nav-link ${
+                activeTab === "allBookings" ? "active bg-gray-04 rounded-top-3" : ""
+              } border-bottom-0`}
+              onClick={() => handleActiveTabSwitch("allBookings")}
+            >
               所有預約
             </p>
           </li>
 
           <li className="nav-item cursor-pointer">
-            <p className={`nav-link ${activeTab === "availableTime" ? "active bg-gray-04 rounded-top-3" : ""} border-bottom-0`} onClick={() => handleTabClick("availableTime")}>
+            <p
+              className={`nav-link ${
+                activeTab === "availableTime" ? "active bg-gray-04 rounded-top-3" : ""
+              } border-bottom-0`}
+              onClick={() => handleActiveTabSwitch("availableTime")}
+            >
               設定可預約時間
             </p>
           </li>
 
           <li className="nav-item cursor-pointer">
-            <p className={`nav-link ${activeTab === "hourlyRate" ? "active bg-gray-04 rounded-top-3" : ""} border-bottom-0`} onClick={() => handleTabClick("hourlyRate")}>
+            <p
+              className={`nav-link ${
+                activeTab === "hourlyRate" ? "active bg-gray-04 rounded-top-3" : ""
+              } border-bottom-0`}
+              onClick={() => handleActiveTabSwitch("hourlyRate")}
+            >
               設定預約費用
             </p>
           </li>

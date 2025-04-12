@@ -17,17 +17,36 @@ export default function TutorBookingResume({ resume }) {
           >
             工作經歷
           </a>
-          <a className="list-group-item list-group-item-action" id="list-education-list" data-bs-toggle="list" href="#list-education" role="tab" aria-controls="list-education">
+          <a
+            className="list-group-item list-group-item-action"
+            id="list-education-list"
+            data-bs-toggle="list"
+            href="#list-education"
+            role="tab"
+            aria-controls="list-education"
+          >
             學歷
           </a>
-          <a className="list-group-item list-group-item-action" id="list-certificate-list" data-bs-toggle="list" href="#list-certificate" role="tab" aria-controls="list-certificate">
+          <a
+            className="list-group-item list-group-item-action"
+            id="list-certificate-list"
+            data-bs-toggle="list"
+            href="#list-certificate"
+            role="tab"
+            aria-controls="list-certificate"
+          >
             證書
           </a>
         </div>
       </div>
       <div className="col-md-9 col-7">
         <div className="tab-content" id="nav-tabContent">
-          <div className="tab-pane fade show active" id="list-work-experience" role="tabpanel" aria-labelledby="list-work-experience-list">
+          <div
+            className="tab-pane fade show active"
+            id="list-work-experience"
+            role="tabpanel"
+            aria-labelledby="list-work-experience-list"
+          >
             {resume.work_experience.length === 0 && (
               <div className="my-8">
                 <SectionFallback materialIconName="work" fallbackText="講師暫無填寫工作經歷" />
@@ -36,7 +55,11 @@ export default function TutorBookingResume({ resume }) {
 
             {resume.work_experience.map((item) => (
               <div className="d-md-flex mb-5" key={item.id}>
-                <p className="date me-5 ">{item.end_year == "9999" ? `${item.start_year} - 現在` : `${item.start_year} - ${item.end_year}`}</p>
+                <p className="date me-5 ">
+                  {item.end_year == "9999"
+                    ? `${item.start_year} - 現在`
+                    : `${item.start_year} - ${item.end_year}`}
+                </p>
 
                 <div>
                   <p className="fw-bold ">{item.position}</p>
@@ -45,7 +68,12 @@ export default function TutorBookingResume({ resume }) {
               </div>
             ))}
           </div>
-          <div className="tab-pane fade" id="list-education" role="tabpanel" aria-labelledby="list-education-list">
+          <div
+            className="tab-pane fade"
+            id="list-education"
+            role="tabpanel"
+            aria-labelledby="list-education-list"
+          >
             {resume.education.length === 0 ? (
               <div className="my-8">
                 <SectionFallback materialIconName="school" fallbackText="講師暫無填寫學歷" />
@@ -67,7 +95,12 @@ export default function TutorBookingResume({ resume }) {
               ))
             )}
           </div>
-          <div className="tab-pane fade" id="list-certificate" role="tabpanel" aria-labelledby="list-certificate-list">
+          <div
+            className="tab-pane fade"
+            id="list-certificate"
+            role="tabpanel"
+            aria-labelledby="list-certificate-list"
+          >
             {resume.certificates.length === 0 && (
               <div className="my-8">
                 <SectionFallback materialIconName="license" fallbackText="講師暫無填寫證書" />

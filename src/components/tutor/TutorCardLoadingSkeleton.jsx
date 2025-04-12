@@ -1,10 +1,16 @@
 export default function TutorCardLoadingSkeleton() {
   return (
-    <div className="card p-lg-5 p-md-4 p-4 img-hover-enlarge h-100" style={{ boxShadow: "0px 25px 50px -12px #0000001F" }}>
+    <div
+      className="card p-lg-5 p-md-4 p-4 img-hover-enlarge h-100"
+      style={{ boxShadow: "0px 25px 50px -12px #0000001F" }}
+    >
       <div className="card-body p-0 d-flex flex-column">
         <div className="mb-5 d-flex">
           <div className="placeholder-glow">
-            <span className="placeholder rounded-circle bg-brand-02 me-4" style={{ width: "45px", height: "45px" }}></span>
+            <span
+              className="placeholder rounded-circle bg-brand-02 me-4"
+              style={{ width: "45px", height: "45px" }}
+            ></span>
           </div>
 
           <div className="placeholder-glow d-flex flex-column" style={{ width: "80%" }}>

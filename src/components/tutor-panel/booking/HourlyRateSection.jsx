@@ -75,7 +75,10 @@ export default function HourlyRateSection() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {loadingState ? (
-        <div className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ height: "50vh" }}
+        >
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
@@ -86,8 +89,22 @@ export default function HourlyRateSection() {
             <SectionFallback materialIconName="paid" fallbackText={getDataerror} />
           ) : (
             <>
-              <FormInput register={register} errors={errors} id="hourly_rate" labelText="預約價格 / 小時 (請輸入給學員預約時的金額 / 小時 ex. 50)" type="number" />
-              <FormSubmitButton buttonStyle={"mt-8"} isLoading={isSubmitting} buttonText={"更新價格"} loadingText={"更新中"} roundedRadius={2} withIcon={false} withSlideRightAnimation={false} />
+              <FormInput
+                register={register}
+                errors={errors}
+                id="hourly_rate"
+                labelText="預約價格 / 小時 (請輸入給學員預約時的金額 / 小時 ex. 50)"
+                type="number"
+              />
+              <FormSubmitButton
+                buttonStyle={"mt-8"}
+                isLoading={isSubmitting}
+                buttonText={"更新價格"}
+                loadingText={"更新中"}
+                roundedRadius={2}
+                withIcon={false}
+                withSlideRightAnimation={false}
+              />
             </>
           )}
         </>

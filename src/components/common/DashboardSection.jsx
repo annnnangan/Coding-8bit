@@ -1,7 +1,15 @@
 import PropTypes from "prop-types";
 import NavLinkButton from "./NavLinkButton";
 
-export default function DashboardSection({ title, children, description, className, withNavLink = false, navLinkText, navLinkHref }) {
+export default function DashboardSection({
+  title,
+  children,
+  description,
+  className,
+  withNavLink = false,
+  navLinkText,
+  navLinkHref,
+}) {
   return (
     <section className={`bg-gray-04 rounded-4 p-8 ${className}`}>
       {withNavLink && (

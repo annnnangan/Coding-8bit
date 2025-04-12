@@ -1,7 +1,14 @@
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 
-export default function NavLinkButton({ type = "text", text = "更多", href, withIcon = true, icon = "arrow_forward", buttonWidth = "w-100" }) {
+export default function NavLinkButton({
+  type = "text",
+  text = "更多",
+  href,
+  withIcon = true,
+  icon = "arrow_forward",
+  buttonWidth = "w-100",
+}) {
   return (
     <>
       {type === "text" && (
@@ -13,7 +20,9 @@ export default function NavLinkButton({ type = "text", text = "更多", href, wi
 
       {type === "button" && (
         <NavLink to={href} className="slide-right-hover">
-          <button className={`btn btn-brand-03 d-flex align-items-center justify-content-center ${buttonWidth}`}>
+          <button
+            className={`btn btn-brand-03 d-flex align-items-center justify-content-center ${buttonWidth}`}
+          >
             <p className="me-1">{text}</p>
             {withIcon && <span className="material-symbols-outlined icon-fill fs-5">{icon}</span>}
           </button>
