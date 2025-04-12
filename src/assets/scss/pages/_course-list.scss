@@ -1,13 +1,13 @@
 /* course-list-banner-section */
 .course-list-banner-section {
   background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/bg-8.png");
-  margin-top: -120px;
-  padding-top: 120px;
+  margin-top: -80px;
+  padding-top: 150px;
 
   @include xl-pc {
     background-image: none;
-    padding-top: 142px;
-    padding-bottom: 72px;
+    padding-top: 100px;
+    padding-bottom: 48px;
   }
 
   .row {
@@ -25,8 +25,11 @@
   }
 
   .title-wrap {
+    margin-right: -120px;
+
     @include lg-pc {
       margin-top: -48px;
+      margin-right: 0;
     }
     @include pad {
       margin-top: -8px;
@@ -40,6 +43,7 @@
     @include xl-pc {
       font-size: 32px;
       font-weight: 700;
+      margin-top: 32px;
     }
   }
 
@@ -70,6 +74,12 @@
 }
 /* course-list-category-section */
 .course-list-category-section {
+  margin-top: 80px;
+
+  @include xl-pc {
+    margin-top: 0;
+  }
+
   .category-card {
     background-color: $brand-05;
     text-align: center;

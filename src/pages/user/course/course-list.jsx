@@ -155,7 +155,7 @@ export default function CourseList() {
             </div>
             <div className="col text-center">
               <img
-                src="images/deco/Illustration-10.png"
+                src="images/deco/Illustration-14.svg"
                 alt="banner-illustration"
                 className="banner-illustration"
               />
