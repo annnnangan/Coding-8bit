@@ -251,7 +251,7 @@ export default function Home() {
             beforeTitle="會員限定，"
             afterTitle="學習影片客製化服務"
           />
-          <div className="info-wrap p-4 p-lg-10 mt-6 mt-lg-8">
+          <div className="info-wrap p-8 p-lg-10 mt-6 mt-lg-8">
             <div>
               <h3 className="fs-4 fs-lg-2">滿足您的學習需求</h3>
               <p className="mt-4 mt-lg-6">

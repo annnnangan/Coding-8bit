@@ -52,6 +52,12 @@
       background-image: url("https://raw.githubusercontent.com/ahmomoz/Coding-8bit/refs/heads/main/public/images/deco/unsplash-sm.png");
     }
   }
+
+  .col-md-6 {
+    @include pad {
+      width: 80%;
+    }
+  }
 }
 
 /* index-booking-steps-section */
@@ -87,6 +93,11 @@
 
 /* index-customized-info-section */
 .index-customized-info-section {
+  @include xl-pc {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
   .info-wrap {
     border-radius: 24px;
     border: 3px solid $brand-02;
