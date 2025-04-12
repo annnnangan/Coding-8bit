@@ -926,7 +926,7 @@ export default function TutorBooking() {
             <div className="modal-footer border-top-0 p-0">
               <div className="d-flex flex-column align-items-end">
                 {modalError && <p className="text-danger mb-3">{modalError}</p>}
-                <button type="button" className="btn btn-secondary fs-7 fs-md-6 py-2" onClick={toNextModalStep}>
+                <button type="button" className="btn btn-secondary next-btn fs-7 fs-md-6 py-2" onClick={toNextModalStep}>
                   下一步
                 </button>
               </div>

@@ -169,11 +169,11 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
               {/* Accordion Header */}
               <h2 className="accordion-header">
                 <button
-                  className="accordion-button collapsed ps-2"
+                  className={`accordion-button ${type === "newSpecific" ? "" : "collapsed"} ps-2`}
                   type="button"
                   data-bs-toggle="collapse"
                   data-bs-target={`#collapse${day}-${type}`}
-                  aria-expanded={"false"}
+                  aria-expanded={type === "newSpecific" ? "true" : "false"}
                   aria-controls={`collapse${day}-${type}`}
                   style={{ backgroundColor: "transparent", boxShadow: "none" }}
                 >
@@ -188,7 +188,7 @@ export default function BusinessHour({ type, day, defaultValue, revalidateAvaila
               </h2>
 
               {/* Accordion Body */}
-              <div id={`collapse${day}-${type}`} className={`accordion-collapse collapse`} data-bs-parent={`#accordion${day}-${type}`}>
+              <div id={`collapse${day}-${type}`} className={`accordion-collapse collapse ${type === "newSpecific" ? "show" : ""}`} data-bs-parent={`#accordion${day}-${type}`}>
                 <div className="accordion-body pt-0">
                   <Controller
                     name={`is_open`}

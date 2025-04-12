@@ -11,11 +11,7 @@ import { serviceTypeMap } from "@/utils/schema/booking-schema";
 import { formatDate, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BookingPaymentResult() {
-  // loading
   const [loadingState, setLoadingState] = useState(false);
-
-  // eslint-disable-next-line no-unused-vars
-  const [payResult, setPayResult] = useState([]);
   const [isPaid, setIsPaid] = useState(false);
   const [isPending, setIsPending] = useState(true);
 
@@ -23,12 +19,10 @@ export default function BookingPaymentResult() {
     setLoadingState(true);
     try {
       const response = await orderApi.checkPayResult(transactionId);
-      setPayResult(response);
       const transaction = response;
 
       if (transaction.status === "completed" || transaction.status === "paid") {
         setIsPaid(true);
-        // updateOrderStatus(subscriptionId);
       } else {
         Swal.fire({
           icon: "warning",
@@ -47,28 +41,6 @@ export default function BookingPaymentResult() {
       setLoadingState(false);
     }
   };
-
-  // 更新訂單狀態
-  //   const updateOrderStatus = async (subscriptionId) => {
-  //     setLoadingState(true);
-  //     try {
-  //       await subscriptionApi.updateSubscription(subscriptionId, {
-  //         status: "active",
-  //       }),
-  //         Swal.fire({
-  //           title: "付款成功",
-  //           icon: "success",
-  //         });
-  //     } catch (error) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "訂單狀態更新失敗",
-  //         text: error.response?.data?.message || "發生未知錯誤",
-  //       });
-  //     } finally {
-  //       setLoadingState(false);
-  //     }
-  //   };
 
   // 取用付款頁存下來的資料
   const [bookingSuccessResult, setBookingSuccessResult] = useState({
