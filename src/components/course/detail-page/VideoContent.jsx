@@ -42,10 +42,10 @@ export default function VideoContent({
   const modalRefMethod = useRef(null);
 
   // 確保開發環境時初始化只執行一次
-  const hasRun = useRef(false);
+  const isInitial = useRef(false);
 
   // 控制收藏課程
-  const handleFavorite = async (videoId) => {
+  const handleFavoriteCourseVideo = async (videoId) => {
     let response;
     try {
       if (favoriteVideo) {
@@ -73,12 +73,18 @@ export default function VideoContent({
         setFavoriteVideo(false);
       }
     } catch (error) {
-      console.error("handleFavorite error", error);
+      Swal.fire({
+        icon: "error",
+        title: "收藏失敗",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
+      });
     }
   };
 
   // 取得影片播放權限
-  const getTokenToPlay = async (videoUrl) => {
+  const getVideoToken = async (videoUrl) => {
     if (!videoUrl) return "";
 
     // 如果開頭為 "https://firebasestorage.googleapis.com/"，直接回傳網址
@@ -97,10 +103,11 @@ export default function VideoContent({
 
   // 取得影片播放 URL
   useEffect(() => {
-    if (!hasRun.current) {
-      hasRun.current = true;
+    if (!isInitial.current) {
+      isInitial.current = true;
 
-      const initialize = async () => {
+      const getInitialData = async () => {
+        
         // 判斷是否登入
         const isLogin = async () => {
           const isLoginStatus = await dispatch(loginCheck());
@@ -114,8 +121,8 @@ export default function VideoContent({
         if (!(await isLogin())) return;
 
         // 取得影片播放權限
-        const fetchVideoSrc = async () => {
-          const tokenUrl = await getTokenToPlay(videoUrl);
+        const videoToken = async () => {
+          const tokenUrl = await getVideoToken(videoUrl);
           loginCheck(tokenUrl);
           setVideoSrc(tokenUrl);
         };
@@ -151,14 +158,10 @@ export default function VideoContent({
             };
 
             const getCourseCommentsHandle = async () => {
-              try {
-                const commentsResult = await courseApi.getCourseComments(
-                  introductionVideoId || paramsVideoId
-                );
-                setComments(commentsResult);
-              } catch (error) {
-                console.error("getCourseCommentsHandle error", error);
-              }
+              const commentsResult = await courseApi.getCourseComments(
+                introductionVideoId || paramsVideoId
+              );
+              setComments(commentsResult);
             };
 
             getFavoriteVideoStatus();
@@ -167,11 +170,11 @@ export default function VideoContent({
           }
         };
 
-        fetchVideoSrc();
+        videoToken();
         localUser();
         getComment();
       };
-      initialize();
+      getInitialData();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,7 +249,7 @@ export default function VideoContent({
               type="button"
               className="favorite-button f-align-center btn btn-outline-none py-2 ps-3 px-4"
               onClick={() =>
-                handleFavorite(introductionVideoId || paramsVideoId)
+                handleFavoriteCourseVideo(introductionVideoId || paramsVideoId)
               }
             >
               <span

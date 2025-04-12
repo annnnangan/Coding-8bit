@@ -29,7 +29,13 @@ const StarRating = ({ videoId, hideModal, setStarRating }) => {
       }
       setRating(newRating);
     } catch (error) {
-      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "評分失敗",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
+      });
     } finally {
       setStarRating(true);
       hideModal();

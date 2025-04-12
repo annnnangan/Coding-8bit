@@ -29,7 +29,9 @@ function StudentFavorites() {
       Swal.fire({
         icon: "error",
         title: "取得資料失敗",
-        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
       });
     } finally {
       setIsGetData(false);
@@ -44,7 +46,13 @@ function StudentFavorites() {
       const { data } = response;
       setFavoriteTutor(data);
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "取得收藏老師失敗",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
+      });
     } finally {
       setIsGetData(false);
     }
@@ -59,7 +67,13 @@ function StudentFavorites() {
         getFavoriteTutor();
       }
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "刪除收藏老師失敗",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
+      });
     } finally {
       setIsGetData(false);
     }

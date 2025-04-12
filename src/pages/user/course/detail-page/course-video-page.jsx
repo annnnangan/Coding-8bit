@@ -96,7 +96,7 @@ export default function CourseVideoPage() {
       if (!errorLogged.current) {
         try {
           const userSubscriptionsPlan = await userApi.getUserData();
-          if (userSubscriptionsPlan.subscriptions.length === 0) {
+          if (userSubscriptionsPlan.subscriptions[0].plan_name === 'free') {
             const errObject = new Error();
             errObject.name = "SubscriptionError";
             throw errObject;

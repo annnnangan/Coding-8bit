@@ -108,7 +108,7 @@ export default function CourseVideoPage() {
     if (!videoData.id) return;
 
     // 在 videoData 更新後調用過濾函數
-    const fetchOtherVideos = async () => {
+    const filterOtherVideos = async () => {
       const otherCourseResult = await courseApi.getFrontTutorCourses({
         tutorId: videoData.tutor_id,
       });
@@ -116,7 +116,7 @@ export default function CourseVideoPage() {
     };
 
     // 在 videoData 更新後調用過濾函數
-    const fetchRelatedVideos = async () => {
+    const filterRelatedVideos = async () => {
       const relatedVideosResult = await courseApi.getFrontTutorVideos({
         category: videoData.category,
       });
@@ -124,8 +124,8 @@ export default function CourseVideoPage() {
       setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
     };
 
-    fetchOtherVideos();
-    fetchRelatedVideos();
+    filterOtherVideos();
+    filterRelatedVideos();
     isInitial.current = false;
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
