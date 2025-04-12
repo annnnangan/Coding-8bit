@@ -36,8 +36,8 @@ export default function TutorBookingPayment() {
   // 建立Dispatch 來修改 RTK的State
   const dispatch = useDispatch();
   const { isAuth, userData } = useSelector((state) => state.auth);
-  const bookingStep1FormData = useSelector((state) => state.booking);
-  const { tutor_id, tutor_name, booking_date, timeslots, service_type, price } = bookingStep1FormData;
+  const bookingFormData = useSelector((state) => state.booking);
+  const { tutor_id, tutor_name, booking_date, timeslots, service_type, price } = bookingFormData;
 
   useEffect(() => {
     if (!isAuth) {
