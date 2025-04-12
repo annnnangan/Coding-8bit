@@ -51,12 +51,18 @@
 
   .prev,
   .next {
+    transition: "background-color" 1s ease;
     background-color: $brand-02;
     color: $brand-01;
     &.disabled {
       background-color: rgb(236, 235, 235);
       color: rgb(216, 216, 216);
     }
+    &:hover {
+      transition: "background-color" 1s ease;
+      background-color: #ebe0ff;
+    }
+
     @include lg-pc {
       font-size: 18px;
     }
@@ -179,6 +185,15 @@
   .modal-dialog {
     @media (min-width: 576px) {
       max-width: 80vw;
+    }
+  }
+
+  .next-btn {
+    transition: "background-color" 1s ease;
+
+    &:hover {
+      transition: "background-color" 1s ease;
+      background-color: #ebe0ff;
     }
   }
 
