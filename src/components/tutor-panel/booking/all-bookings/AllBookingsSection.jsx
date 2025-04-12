@@ -1,11 +1,11 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 
-import { DayPicker } from "react-day-picker";
-import Swal from "sweetalert2";
-import "react-day-picker/dist/style.css";
 import debounce from "lodash/debounce";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import Swal from "sweetalert2";
 
 import BookingCard from "@/components/common/booking-record/BookingCard";
 import BookingDetailsModal from "@/components/common/booking-record/BookingDetailsModal";
@@ -36,19 +36,35 @@ export default function AllBookingsSection({ role }) {
 
   /* ---------------------------- Get Data From API --------------------------- */
 
-  const getBookingListData = useCallback(
-    async ({ activeTab, startDate, endDate, serviceType }) => {
+  useEffect(() => {
+    const fetchBookingListData = async ({ activeTab, startDate, endDate, serviceType }) => {
       setLoadingState(true);
 
       try {
         let result;
 
         if (role === "tutor") {
-          result = (await bookingApi.getTutorBookings({ tutorId, status: activeTab, startDate, endDate, serviceType })).bookings;
+          result = (
+            await bookingApi.getTutorBookings({
+              tutorId,
+              status: activeTab,
+              startDate,
+              endDate,
+              serviceType,
+            })
+          ).bookings;
         }
 
         if (role === "student") {
-          result = (await bookingApi.getStudentBookings({ studentId, status: activeTab, startDate, endDate, serviceType })).bookings;
+          result = (
+            await bookingApi.getStudentBookings({
+              studentId,
+              status: activeTab,
+              startDate,
+              endDate,
+              serviceType,
+            })
+          ).bookings;
         }
 
         // Group booking data from API by yyyy-mm
@@ -85,15 +101,17 @@ export default function AllBookingsSection({ role }) {
       } finally {
         setLoadingState(false);
       }
-    },
-    [role, studentId, tutorId]
-  );
+    };
 
-  useEffect(() => {
     if ((role === "tutor" && tutorId) || (role === "student" && studentId)) {
-      getBookingListData({ activeTab, startDate: debounceDateRange?.from, endDate: debounceDateRange?.to, serviceType });
+      fetchBookingListData({
+        activeTab,
+        startDate: debounceDateRange?.from,
+        endDate: debounceDateRange?.to,
+        serviceType,
+      });
     }
-  }, [activeTab, tutorId, serviceType, debounceDateRange, studentId, role, getBookingListData]);
+  }, [activeTab, tutorId, serviceType, debounceDateRange, studentId, role]);
 
   /* ---------------------------- Click Handler --------------------------- */
   // Set debounce for date range selection
@@ -110,7 +128,7 @@ export default function AllBookingsSection({ role }) {
     debouncedSetSelectedDateRange(selectedRange);
   };
 
-  const handleTabClick = (tabName) => {
+  const handleActiveTabSwitch = (tabName) => {
     setActiveTab(tabName);
   };
 
@@ -134,10 +152,17 @@ export default function AllBookingsSection({ role }) {
                 aria-expanded="false"
                 data-bs-config='{"autoClose": "outside"}'
               >
-                {dateRange?.from && dateRange?.to ? `${formatDateDash(dateRange.from)} - ${formatDateDash(dateRange.to)}` : "選擇日期範圍"}
+                {dateRange?.from && dateRange?.to
+                  ? `${formatDateDash(dateRange.from)} - ${formatDateDash(dateRange.to)}`
+                  : "選擇日期範圍"}
               </button>
               <ul className="dropdown-menu">
-                <DayPicker mode="range" selected={dateRange} onSelect={handleDateSelect} showOutsideDays />
+                <DayPicker
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={handleDateSelect}
+                  showOutsideDays
+                />
               </ul>
             </div>
           </div>
@@ -145,14 +170,25 @@ export default function AllBookingsSection({ role }) {
           <div className="col-12 col-xs-6 col-md-4">
             <label className="form-label">預約類別</label>
             <div className="dropdown">
-              <button type="button" className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4" data-bs-toggle="dropdown" aria-expanded="false">
-                {serviceType ? serviceTypeList.find((item) => item.value === serviceType)?.name : "請選擇類別"}
+              <button
+                type="button"
+                className="btn btn-outline-gray-03 border-1 dropdown-toggle d-block w-100 text-start px-4"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {serviceType
+                  ? serviceTypeList.find((item) => item.value === serviceType)?.name
+                  : "請選擇類別"}
               </button>
               <ul className="dropdown-menu w-100 mt-1">
                 <li></li>
                 {serviceTypeList.map((item) => (
                   <li key={item.value}>
-                    <button type="button" className="dropdown-item" onClick={() => setServiceType(item.value)}>
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => setServiceType(item.value)}
+                    >
                       {item.name}
                     </button>
                   </li>
@@ -165,19 +201,34 @@ export default function AllBookingsSection({ role }) {
         {/* Status Tabs */}
         <ul className="nav nav-tabs mt-8 border-bottom border-gray-03">
           <li className="nav-item cursor-pointer">
-            <p className={`nav-link ${activeTab === "in_progress" ? "active bg-gray-04 rounded-top-3" : ""}`} onClick={() => handleTabClick("in_progress")}>
+            <p
+              className={`nav-link ${
+                activeTab === "in_progress" ? "active bg-gray-04 rounded-top-3" : ""
+              }`}
+              onClick={() => handleActiveTabSwitch("in_progress")}
+            >
               未完成
             </p>
           </li>
 
           <li className="nav-item cursor-pointer">
-            <p className={`nav-link ${activeTab === "completed" ? "active bg-gray-04 rounded-top-3" : ""}`} onClick={() => handleTabClick("completed")}>
+            <p
+              className={`nav-link ${
+                activeTab === "completed" ? "active bg-gray-04 rounded-top-3" : ""
+              }`}
+              onClick={() => handleActiveTabSwitch("completed")}
+            >
               已完成
             </p>
           </li>
 
           <li className="nav-item cursor-pointer">
-            <p className={`nav-link ${activeTab === "canceled" ? "active bg-gray-04 rounded-top-3" : ""}`} onClick={() => handleTabClick("cancelled")}>
+            <p
+              className={`nav-link ${
+                activeTab === "canceled" ? "active bg-gray-04 rounded-top-3" : ""
+              }`}
+              onClick={() => handleActiveTabSwitch("cancelled")}
+            >
               已取消
             </p>
           </li>
@@ -186,7 +237,10 @@ export default function AllBookingsSection({ role }) {
         {/* Booking List based on the tab name*/}
         <div>
           {isLoading ? (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "50vh" }}
+            >
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>
               </div>
@@ -195,7 +249,10 @@ export default function AllBookingsSection({ role }) {
             <>
               {Object?.keys(bookingListData)?.length === 0 && (
                 <div className="mt-10">
-                  <SectionFallback materialIconName="calendar_clock" fallbackText={`未有此狀態之預約`} />
+                  <SectionFallback
+                    materialIconName="calendar_clock"
+                    fallbackText={`未有此狀態之預約`}
+                  />
                 </div>
               )}
 
@@ -205,7 +262,11 @@ export default function AllBookingsSection({ role }) {
                   <div className="row flex-wrap g-2 row">
                     {bookings.map((booking) => (
                       <div className="col-12 col-lg-6 col-xl-4" key={booking.id}>
-                        <BookingCard role={role} booking={booking} handleClick={() => handleDetailsModalOpen(booking)} />
+                        <BookingCard
+                          role={role}
+                          booking={booking}
+                          handleClick={() => handleDetailsModalOpen(booking)}
+                        />
                       </div>
                     ))}
                   </div>
@@ -216,7 +277,15 @@ export default function AllBookingsSection({ role }) {
         </div>
       </div>
 
-      {selectedBooking && <BookingDetailsModal role={role} isOpen={isOpenDetailsModal} setOpenModal={setOpenDetailsModal} booking={selectedBooking} setOpenDetailsModal={setOpenDetailsModal} />}
+      {selectedBooking && (
+        <BookingDetailsModal
+          role={role}
+          isOpen={isOpenDetailsModal}
+          setOpenModal={setOpenDetailsModal}
+          booking={selectedBooking}
+          setOpenDetailsModal={setOpenDetailsModal}
+        />
+      )}
     </>
   );
 }

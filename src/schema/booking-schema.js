@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { PaymentSchema } from "@/utils/schema/payment-schema";
+import { PaymentSchema } from "@/schema/payment-schema";
 
 export const serviceTypeMap = {
   courseSession: "一對一教學",

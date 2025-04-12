@@ -3,9 +3,24 @@ import PropTypes from "prop-types";
 
 import SectionFallback from "@/components/common/SectionFallback";
 
-import { getDayOfWeekFromStringDate, formatHour, formatDate, removeYearFromDate } from "@/utils/timeFormatted-utils";
+import {
+  getDayOfWeekFromStringDate,
+  formatHour,
+  formatDate,
+  removeYearFromDate,
+} from "@/utils/timeFormatted-utils";
 
-export default function Timetable({ availability, weekOffset, toNextWeek, toPrevWeek, isLoading, handleBookingTimeslotsSelect, selectedBookingTimeslots, isModal, openBookingModal }) {
+export default function Timetable({
+  availability,
+  weekOffset,
+  toNextWeek,
+  toPrevWeek,
+  isLoading,
+  handleBookingTimeslotsSelect,
+  selectedBookingTimeslots,
+  isModal,
+  openBookingModal,
+}) {
   const MAX_VISIBLE_TIMES = 7; // Default number of time slots to show
   const [showAll, setShowAll] = useState(false); // Single toggle for all dates
 
@@ -16,13 +31,16 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
     }
   };
 
-  const isWeekAvailable = availability.filter((date) => date.hours.length > 0).length > 0 ? true : false;
+  const isWeekAvailable =
+    availability.filter((date) => date.hours.length > 0).length > 0 ? true : false;
 
   return (
     <>
       <div className="f-between-center mb-5">
         <button
-          className={`border-0 prev material-symbols-outlined icon-fill rounded-circle p-2 align-middle ${(weekOffset === 0 || isLoading) && "disabled"}`}
+          className={`border-0 prev material-symbols-outlined icon-fill rounded-circle p-2 align-middle ${
+            (weekOffset === 0 || isLoading) && "disabled"
+          }`}
           disabled={weekOffset === 0}
           onClick={toPrevWeek}
         >
@@ -31,7 +49,12 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
         <h5 className="text-brand-03 week fw-medium">
           {formatDate(availability[0].date)} - {formatDate(availability[6].date)}
         </h5>
-        <button className={`border-0 next material-symbols-outlined icon-fill rounded-circle p-2 align-middle  ${isLoading && "disabled"}`} onClick={toNextWeek}>
+        <button
+          className={`border-0 next material-symbols-outlined icon-fill rounded-circle p-2 align-middle  ${
+            isLoading && "disabled"
+          }`}
+          onClick={toNextWeek}
+        >
           arrow_forward
         </button>
       </div>
@@ -39,7 +62,8 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
       <div className="overflow-x-auto position-relative">
         {isLoading && (
           <>
-            <div className="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-50 backdrop-blur"></div> {/* Blur effect */}
+            <div className="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-50 backdrop-blur"></div>{" "}
+            {/* Blur effect */}
             <div className="position-absolute top-50 start-50 translate-middle">
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Loading...</span>
@@ -53,41 +77,60 @@ export default function Timetable({ availability, weekOffset, toNextWeek, toPrev
 
             return (
               <div className="col" key={item.date}>
-                <div className={`date f-center flex-column${availableTimes.length === 0 ? " disabled" : ""}`}>
+                <div
+                  className={`date f-center flex-column${
+                    availableTimes.length === 0 ? " disabled" : ""
+                  }`}
+                >
                   <h6>{getDayOfWeekFromStringDate(item.date)}</h6>
                   <p>{removeYearFromDate(item.date)}</p>
                 </div>
 
                 <div>
                   <ul className="booking-times f-center flex-column">
-                    {availableTimes.slice(0, showAll ? availableTimes.length : MAX_VISIBLE_TIMES).map((time) => (
-                      <li
-                        className={`booking-time${time.isBooked ? " disabled" : ""}${
-                          selectedBookingTimeslots?.date === item.date && selectedBookingTimeslots?.hours?.includes(time.hour) ? " selected" : ""
-                        }`}
-                        key={`${item.date}-${time.hour}`}
-                        onClick={() => handleClick(item.date, time.hour)}
-                      >
-                        {formatHour(time.hour)}
-                      </li>
-                    ))}
+                    {availableTimes
+                      .slice(0, showAll ? availableTimes.length : MAX_VISIBLE_TIMES)
+                      .map((time) => (
+                        <li
+                          className={`booking-time${time.isBooked ? " disabled" : ""}${
+                            selectedBookingTimeslots?.date === item.date &&
+                            selectedBookingTimeslots?.hours?.includes(time.hour)
+                              ? " selected"
+                              : ""
+                          }`}
+                          key={`${item.date}-${time.hour}`}
+                          onClick={() => handleClick(item.date, time.hour)}
+                        >
+                          {formatHour(time.hour)}
+                        </li>
+                      ))}
                   </ul>
                 </div>
               </div>
             );
           })}
         </div>
-        {!isWeekAvailable && <SectionFallback materialIconName="event_busy" fallbackText="此星期暫無可預約時間" />}
+        {!isWeekAvailable && (
+          <SectionFallback materialIconName="event_busy" fallbackText="此星期暫無可預約時間" />
+        )}
       </div>
 
       {/* Show More Button */}
       <div className="position-relative">
-        {availability.some((item) => item.hours.filter((time) => time.available).length > MAX_VISIBLE_TIMES) && (
+        {availability.some(
+          (item) => item.hours.filter((time) => time.available).length > MAX_VISIBLE_TIMES
+        ) && (
           <div className="f-center">
             {!showAll && <div className="see-more"></div>}
-            <div className="d-flex align-items-center py-3 see-more-button" role="button" onClick={() => setShowAll(!showAll)}>
+            <div
+              className="d-flex align-items-center py-3 see-more-button"
+              role="button"
+              onClick={() => setShowAll(!showAll)}
+            >
               <p className="text-brand-03 fs-7 fs-md-6">{showAll ? "查看更少" : "查看更多"}</p>
-              <span className="material-symbols-outlined icon-fill text-brand-03 align-middle">{showAll ? "keyboard_arrow_up" : "expand_more"}</span>
+              <span className="material-symbols-outlined icon-fill text-brand-03 align-middle">
+                {showAll ? "keyboard_arrow_up" : "expand_more"}
+              </span>
             </div>
           </div>
         )}

@@ -9,7 +9,11 @@ export default function ShowMoreBtn({ text, initialShow = false, maxCharacter = 
     setIsShow((prevIsShow) => !prevIsShow);
   };
 
-  const displayedText = isShow ? text : text.length > maxCharacter ? text.slice(0, maxCharacter) + "..." : text;
+  const displayedText = isShow
+    ? text
+    : text.length > maxCharacter
+    ? text.slice(0, maxCharacter) + "..."
+    : text;
 
   return (
     <>
@@ -25,7 +29,9 @@ export default function ShowMoreBtn({ text, initialShow = false, maxCharacter = 
       {text.length > maxCharacter && (
         <div className="d-flex align-items-center py-3" role="button" onClick={handleClick}>
           <p className="text-brand-03">{isShow ? "更少" : "更多"}</p>
-          <span className="material-symbols-outlined icon-fill text-brand-03 align-middle">{isShow ? "keyboard_arrow_up" : "expand_more"}</span>
+          <span className="material-symbols-outlined icon-fill text-brand-03 align-middle">
+            {isShow ? "keyboard_arrow_up" : "expand_more"}
+          </span>
         </div>
       )}
     </>

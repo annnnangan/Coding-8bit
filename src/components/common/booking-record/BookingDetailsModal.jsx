@@ -14,7 +14,7 @@ import BookingStatusBadge from "./BookingStatusBadge";
 
 import bookingApi from "@/api/bookingApi";
 import { determineMeetingLinkMessage } from "@/utils/booking-record-utils";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
+import { serviceTypeMap } from "@/schema/booking-schema";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BookingDetailsModal({ role, booking, isOpen, setOpenModal }) {
@@ -27,13 +27,24 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
   const [tutorNotes, setTutorNotes] = useState("");
   const [isEditTutorNotes, setIsEditTutorNotes] = useState(false);
   const [hasStudentComment, setHasStudentComment] = useState();
-  const [studentComment, setStudentComment] = useState({ student_comment: "", rating: "", comment_at: "" });
+  const [studentComment, setStudentComment] = useState({
+    student_comment: "",
+    rating: "",
+    comment_at: "",
+  });
   const [isEditStudentComment, setIsEditStudentComment] = useState(false);
 
   // ReactQuill 文字編輯器
   const [tutorNotesInput, setTutorNotesInput] = useState("");
   const modules = {
-    toolbar: [["bold", "italic", "underline"], ["link"], [{ list: "ordered" }, { list: "bullet" }], [{ align: [] }], ["blockquote", "code-block"], ["clean"]],
+    toolbar: [
+      ["bold", "italic", "underline"],
+      ["link"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["blockquote", "code-block"],
+      ["clean"],
+    ],
   };
 
   /* ---------------------------------- Modal --------------------------------- */
@@ -45,7 +56,9 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
       if (bookingDetailsModal.current) {
         bookingDetailsModal.current.dispose(); // Destroy old modal instance
       }
-      bookingDetailsModal.current = new bootstrap.Modal(bookingDetailsModalRef.current, { backdrop: "static" });
+      bookingDetailsModal.current = new bootstrap.Modal(bookingDetailsModalRef.current, {
+        backdrop: "static",
+      });
     }
   }, [bookingDetailsModalRef]);
 
@@ -164,7 +177,10 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
     if (role === "tutor") return;
     setSubmittingState(true);
     try {
-      await bookingApi.saveStudentComment(booking.id, { ...studentComment, comment_at: new Date().toISOString() });
+      await bookingApi.saveStudentComment(booking.id, {
+        ...studentComment,
+        comment_at: new Date().toISOString(),
+      });
 
       Swal.fire({
         icon: "success",
@@ -196,7 +212,13 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                 />
                 <BookingStatusBadge status={booking.status} />
               </div>
-              <button type="button" className="d-flex btn-close" aria-label="Close" onClick={handleCloseModal} style={{ marginTop: "-50px" }}></button>
+              <button
+                type="button"
+                className="d-flex btn-close"
+                aria-label="Close"
+                onClick={handleCloseModal}
+                style={{ marginTop: "-50px" }}
+              ></button>
             </div>
 
             <div className="modal-body">
@@ -207,11 +229,21 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                 </li>
                 <li className="f-center gap-2">
                   <span className="text-brand-03 material-symbols-outlined">schedule</span>
-                  <p>{booking.timeslots.map((time) => `${formatHour(time)} - ${formatHour(time + 1)}`).join(" / ")}</p>
+                  <p>
+                    {booking.timeslots
+                      .map((time) => `${formatHour(time)} - ${formatHour(time + 1)}`)
+                      .join(" / ")}
+                  </p>
                 </li>
                 <li className="f-center gap-2">
                   <span className="text-brand-03 material-symbols-outlined">link</span>
-                  <p>{determineMeetingLinkMessage(booking.service_type, booking.status, booking.meeting_link)}</p>
+                  <p>
+                    {determineMeetingLinkMessage(
+                      booking.service_type,
+                      booking.status,
+                      booking.meeting_link
+                    )}
+                  </p>
                 </li>
 
                 <li className="f-center gap-2">
@@ -233,13 +265,23 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
               <ul className="nav nav-tabs border-bottom border-gray-03 mb-4 mt-2">
                 <li className="nav-item cursor-pointer">
-                  <p className={`nav-link${activeTab === "tutorNotes" ? " active rounded-top-3" : ""}`} onClick={() => setActiveTab("tutorNotes")}>
+                  <p
+                    className={`nav-link${
+                      activeTab === "tutorNotes" ? " active rounded-top-3" : ""
+                    }`}
+                    onClick={() => setActiveTab("tutorNotes")}
+                  >
                     導師筆記
                   </p>
                 </li>
 
                 <li className="nav-item cursor-pointer">
-                  <p className={`nav-link${activeTab === "studentComment" ? " active rounded-top-3" : ""}`} onClick={() => setActiveTab("studentComment")}>
+                  <p
+                    className={`nav-link${
+                      activeTab === "studentComment" ? " active rounded-top-3" : ""
+                    }`}
+                    onClick={() => setActiveTab("studentComment")}
+                  >
                     學生評價
                   </p>
                 </li>
@@ -251,7 +293,10 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     <>
                       {!loadingState && (
                         <div className="d-flex justify-content-end gap-2">
-                          <p className="d-flex d-inline-block justify-content-end text-brand-03 cursor-pointer fs-7 fw-medium mb-3" onClick={handleEditTutorNotes}>
+                          <p
+                            className="d-flex d-inline-block justify-content-end text-brand-03 cursor-pointer fs-7 fw-medium mb-3"
+                            onClick={handleEditTutorNotes}
+                          >
                             {!submittingState && (isEditTutorNotes ? "儲存筆記" : "修改筆記")}
                           </p>
 
@@ -271,7 +316,10 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
                       {submittingState && (
                         <div className="d-flex justify-content-end">
-                          <div className="text-primary spinner-border spinner-border-sm" role="status">
+                          <div
+                            className="text-primary spinner-border spinner-border-sm"
+                            role="status"
+                          >
                             <span className="visually-hidden">Loading...</span>
                           </div>
                         </div>
@@ -303,8 +351,15 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
                   {isEditTutorNotes && role === "tutor" && (
                     <>
-                      <ReactQuill value={tutorNotesInput} onChange={setTutorNotesInput} placeholder="輸入筆記" modules={modules} />
-                      {editError.tutorNotes && <p className="text-danger fs-7 mt-2">{editError.tutorNotes}</p>}
+                      <ReactQuill
+                        value={tutorNotesInput}
+                        onChange={setTutorNotesInput}
+                        placeholder="輸入筆記"
+                        modules={modules}
+                      />
+                      {editError.tutorNotes && (
+                        <p className="text-danger fs-7 mt-2">{editError.tutorNotes}</p>
+                      )}
                     </>
                   )}
                 </div>
@@ -314,7 +369,10 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                 <>
                   {booking.status !== "completed" && (
                     <div className="mt-10">
-                      <SectionFallback materialIconName="cards_star" fallbackText={`完成預約後，學生才能評價`} />
+                      <SectionFallback
+                        materialIconName="cards_star"
+                        fallbackText={`完成預約後，學生才能評價`}
+                      />
                     </div>
                   )}
 
@@ -329,14 +387,31 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
 
                       {!loadingState && hasStudentComment && (
                         <div>
-                          <ReactStars count={5} value={studentComment.rating} size={30} activeColor="#d0a2f7" edit={false} />
+                          <ReactStars
+                            count={5}
+                            value={studentComment.rating}
+                            size={30}
+                            activeColor="#d0a2f7"
+                            edit={false}
+                          />
                           <p>{studentComment.student_comment}</p>
                         </div>
                       )}
 
-                      {!loadingState && !hasStudentComment && !isEditStudentComment && booking.status === "completed" && role === "tutor" && (
-                        <div className="mt-10">{<SectionFallback materialIconName="cards_star" fallbackText={`未有評論`} />}</div>
-                      )}
+                      {!loadingState &&
+                        !hasStudentComment &&
+                        !isEditStudentComment &&
+                        booking.status === "completed" &&
+                        role === "tutor" && (
+                          <div className="mt-10">
+                            {
+                              <SectionFallback
+                                materialIconName="cards_star"
+                                fallbackText={`未有評論`}
+                              />
+                            }
+                          </div>
+                        )}
                     </>
                   )}
 
@@ -344,23 +419,43 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                     <>
                       {!hasStudentComment && (
                         <div className="d-flex justify-content-end gap-2">
-                          <p className="d-flex d-inline-block justify-content-end text-brand-03 cursor-pointer fs-7 fw-medium mb-3" onClick={handleEditStudentComment}>
+                          <p
+                            className="d-flex d-inline-block justify-content-end text-brand-03 cursor-pointer fs-7 fw-medium mb-3"
+                            onClick={handleEditStudentComment}
+                          >
                             {!submittingState && (isEditStudentComment ? "儲存評論" : "新增評論")}
                           </p>
 
                           {!submittingState && isEditStudentComment && (
-                            <p className="text-brand-03 cursor-pointer fs-7 fw-medium mb-3" onClick={() => setIsEditStudentComment(false)}>
+                            <p
+                              className="text-brand-03 cursor-pointer fs-7 fw-medium mb-3"
+                              onClick={() => setIsEditStudentComment(false)}
+                            >
                               取消評論
                             </p>
                           )}
                         </div>
                       )}
 
-                      {!loadingState && !hasStudentComment && !isEditStudentComment && <div className="mt-10">{<SectionFallback materialIconName="cards_star" fallbackText={`未有評論`} />}</div>}
+                      {!loadingState && !hasStudentComment && !isEditStudentComment && (
+                        <div className="mt-10">
+                          {
+                            <SectionFallback
+                              materialIconName="cards_star"
+                              fallbackText={`未有評論`}
+                            />
+                          }
+                        </div>
+                      )}
 
                       {!hasStudentComment && isEditStudentComment && (
                         <div>
-                          <ReactStars count={5} onChange={handleRating} size={30} activeColor="#d0a2f7" />
+                          <ReactStars
+                            count={5}
+                            onChange={handleRating}
+                            size={30}
+                            activeColor="#d0a2f7"
+                          />
 
                           <div className="my-3">
                             <label htmlFor="comment" className="form-label">
@@ -372,9 +467,16 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
                               rows="5"
                               placeholder="請輸入你對是次預約的評論。"
                               value={studentComment.student_comment}
-                              onChange={(e) => setStudentComment({ ...studentComment, student_comment: e.target.value })}
+                              onChange={(e) =>
+                                setStudentComment({
+                                  ...studentComment,
+                                  student_comment: e.target.value,
+                                })
+                              }
                             ></textarea>
-                            {editError.studentComment && <p className="text-danger fs-7 mt-2">{editError.studentComment}</p>}
+                            {editError.studentComment && (
+                              <p className="text-danger fs-7 mt-2">{editError.studentComment}</p>
+                            )}
                           </div>
                         </div>
                       )}

@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 
-import { BookingSchema, serviceTypeMap } from "@/utils/schema/booking-schema";
+import { BookingSchema, serviceTypeMap } from "@/schema/booking-schema";
 import { updateFormData } from "@/store/slice/bookingSlice";
 import { formatDate, formatHour } from "@/utils/timeFormatted-utils";
 
@@ -20,7 +20,15 @@ import orderApi from "@/api/orderApi";
 const stepFields = [
   {
     step: 1,
-    field: ["booking.booking_date", "booking.timeslots", "booking.service_type", "booking.tutor_name", "booking.tutor_id", "booking.source_code_url", "booking.instruction_details"],
+    field: [
+      "booking.booking_date",
+      "booking.timeslots",
+      "booking.service_type",
+      "booking.tutor_name",
+      "booking.tutor_id",
+      "booking.source_code_url",
+      "booking.instruction_details",
+    ],
   },
   {
     step: 2,
@@ -68,7 +76,17 @@ export default function TutorBookingPayment() {
       const redirectTo = tutor_id ? `/tutor/${tutor_id}` : "/tutor-list";
       navigate(redirectTo);
     }
-  }, [isAuth, userData, tutor_id, tutor_name, booking_date, timeslots, service_type, price, navigate]);
+  }, [
+    isAuth,
+    userData,
+    tutor_id,
+    tutor_name,
+    booking_date,
+    timeslots,
+    service_type,
+    price,
+    navigate,
+  ]);
 
   const methods = useForm({
     resolver: zodResolver(BookingSchema),
@@ -87,9 +105,6 @@ export default function TutorBookingPayment() {
 
   const toNextStep = async () => {
     const isValid = await methods.trigger(stepFields[currentStep - 1].field);
-
-    // console.log(methods.formState.errors);
-    // console.log("isValid", isValid);
 
     if (!isValid) return;
 
@@ -200,12 +215,19 @@ export default function TutorBookingPayment() {
     setLoading(true);
     try {
       // Correct the timeslot format from [1,2,3] to {0:false, 1: true, 2: true, 3: true, 4: false, 5: false,.......,23: false} in order to save in database
-      const convertArrayToObject = (arr, range = 24) => Object.fromEntries(Array.from({ length: range }, (_, i) => i).map((i) => [i, arr.includes(i)]));
+      const convertArrayToObject = (arr, range = 24) =>
+        Object.fromEntries(
+          Array.from({ length: range }, (_, i) => i).map((i) => [i, arr.includes(i)])
+        );
       const formatTimeslots = convertArrayToObject(data.booking.timeslots);
 
       // eslint-disable-next-line no-unused-vars
       const { timeslots, ...bookingWithoutTimeslots } = data.booking;
-      const bookingData = { ...bookingWithoutTimeslots, hourly_availability: formatTimeslots, student_id: userData.id };
+      const bookingData = {
+        ...bookingWithoutTimeslots,
+        hourly_availability: formatTimeslots,
+        student_id: userData.id,
+      };
 
       const result = await bookingApi.addBooking(bookingData);
       const bookingId = result.id;
@@ -213,7 +235,6 @@ export default function TutorBookingPayment() {
       const orderId = await createOrder(bookingId);
       await addPay(orderId, data);
     } catch (error) {
-      console.dir(error);
       const redirectUrl = tutor_id ? `/tutor/${tutor_id}` : "/";
       navigate(redirectUrl);
       Swal.fire({
@@ -238,9 +259,16 @@ export default function TutorBookingPayment() {
           <div className="tracking">
             <div className="g-5 row row-cols-3 row-cols-lg-5 justify-content-center">
               <div className={currentStep === 1 ? "text-brand-03" : "text-brand-02"}>
-                <div className={`d-flex border-bottom ${currentStep === 1 ? "border-brand-03" : "border-brand-02"} border-5 ps-0 rounded-1 pb-1`}>
+                <div
+                  className={`d-flex border-bottom ${
+                    currentStep === 1 ? "border-brand-03" : "border-brand-02"
+                  } border-5 ps-0 rounded-1 pb-1`}
+                >
                   <div className="d-flex align-items-center">
-                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2"> shopping_cart </span>
+                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2">
+                      {" "}
+                      shopping_cart{" "}
+                    </span>
                     <div>
                       <p className="fs-8">Step 1/3</p>
                       <p className="fs-8 fs-lg-6 fw-semibold">確認預約資訊</p>
@@ -249,9 +277,16 @@ export default function TutorBookingPayment() {
                 </div>
               </div>
               <div className={currentStep === 2 ? "text-brand-03" : "text-brand-02"}>
-                <div className={`d-flex border-bottom ${currentStep === 2 ? "border-brand-03" : "border-brand-02"} border-5 ps-0 rounded-1 pb-1`}>
+                <div
+                  className={`d-flex border-bottom ${
+                    currentStep === 2 ? "border-brand-03" : "border-brand-02"
+                  } border-5 ps-0 rounded-1 pb-1`}
+                >
                   <div className="d-flex align-items-center mb-auto">
-                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2"> credit_card </span>
+                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2">
+                      {" "}
+                      credit_card{" "}
+                    </span>
                     <div>
                       <p className="fs-8">Step 2/3</p>
                       <p className="fs-8 fs-lg-6 fw-semibold">確認付款</p>
@@ -260,9 +295,16 @@ export default function TutorBookingPayment() {
                 </div>
               </div>
               <div className={currentStep === 3 ? "text-brand-03" : "text-brand-02"}>
-                <div className={`d-flex border-bottom ${currentStep === 3 ? "border-brand-03" : "border-brand-02"} border-5 ps-0 rounded-1 pb-1`}>
+                <div
+                  className={`d-flex border-bottom ${
+                    currentStep === 3 ? "border-brand-03" : "border-brand-02"
+                  } border-5 ps-0 rounded-1 pb-1`}
+                >
                   <div className="d-flex align-items-center mb-auto">
-                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2"> check_circle </span>
+                    <span className="d-none d-sm-block fs-3 icon-fill material-symbols-outlined me-2">
+                      {" "}
+                      check_circle{" "}
+                    </span>
                     <div>
                       <p className="fs-8">Step 3/3</p>
                       <p className="fs-8 fs-lg-6 fw-semibold">付款結果</p>
@@ -288,19 +330,37 @@ export default function TutorBookingPayment() {
                             <label htmlFor="tutor" className="form-label">
                               <h3 className="fs-6 fw-medium">預約老師</h3>
                             </label>
-                            <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="tutor" value={tutor_name} disabled />
+                            <input
+                              type="text"
+                              className="form-control bg-white border-0 p-0 rounded-0 text-gray-02"
+                              id="tutor"
+                              value={tutor_name}
+                              disabled
+                            />
                           </div>
                           <div className="mb-6 mb-md-12">
                             <label htmlFor="service_type" className="form-label">
                               <h3 className="fs-6 fw-medium">預約類型</h3>
                             </label>
-                            <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="service_type" value={serviceTypeMap[service_type]} disabled />
+                            <input
+                              type="text"
+                              className="form-control bg-white border-0 p-0 rounded-0 text-gray-02"
+                              id="service_type"
+                              value={serviceTypeMap[service_type]}
+                              disabled
+                            />
                           </div>
                           <div className="mb-6 mb-md-5">
                             <label htmlFor="booking_date" className="form-label">
                               <h3 className="fs-6 fw-medium">預約日期</h3>
                             </label>
-                            <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="booking_date" value={formatDate(booking_date)} disabled />
+                            <input
+                              type="text"
+                              className="form-control bg-white border-0 p-0 rounded-0 text-gray-02"
+                              id="booking_date"
+                              value={formatDate(booking_date)}
+                              disabled
+                            />
                           </div>
                           <div className="mb-6 mb-md-5">
                             <label htmlFor="timeSlot" className="form-label">
@@ -330,12 +390,19 @@ export default function TutorBookingPayment() {
                                 <span className="text-danger ms-1">*</span>
                               </label>
                               <input
-                                className={`form-control rounded-1 ${methods?.formState?.errors?.booking?.source_code_url && "is-invalid"} `}
+                                className={`form-control rounded-1 ${
+                                  methods?.formState?.errors?.booking?.source_code_url &&
+                                  "is-invalid"
+                                } `}
                                 id="source_code_url"
                                 placeholder="https://github.com/testUser/todolist"
                                 {...methods.register("booking.source_code_url")}
                               />
-                              {methods?.formState?.errors?.booking?.source_code_url?.message && <div className="invalid-feedback">{methods?.formState?.errors?.booking?.source_code_url?.message}</div>}
+                              {methods?.formState?.errors?.booking?.source_code_url?.message && (
+                                <div className="invalid-feedback">
+                                  {methods?.formState?.errors?.booking?.source_code_url?.message}
+                                </div>
+                              )}
                             </div>
                           )}
 
@@ -346,7 +413,10 @@ export default function TutorBookingPayment() {
                             </label>
 
                             <textarea
-                              className={`form-control rounded-1 ${methods?.formState?.errors?.booking?.instruction_details && "is-invalid"} `}
+                              className={`form-control rounded-1 ${
+                                methods?.formState?.errors?.booking?.instruction_details &&
+                                "is-invalid"
+                              } `}
                               id="instruction_details"
                               rows="15"
                               style={{ resize: "none" }}
@@ -354,7 +424,9 @@ export default function TutorBookingPayment() {
                               {...methods.register("booking.instruction_details")}
                             ></textarea>
                             {methods?.formState?.errors?.booking?.instruction_details?.message && (
-                              <div className="invalid-feedback">{methods?.formState?.errors?.booking.instruction_details?.message} </div>
+                              <div className="invalid-feedback">
+                                {methods?.formState?.errors?.booking.instruction_details?.message}{" "}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -391,8 +463,17 @@ export default function TutorBookingPayment() {
                         </table>
 
                         <div className="d-flex justify-content-end">
-                          <input type="text" className="form-control border-0 border-bottom rounded-0" id="discountCode" placeholder="輸入折扣碼" style={{ width: "30%" }} />
-                          <button className="btn border-0 border-bottom p-0 rounded-0 text-gray-03" type="submit">
+                          <input
+                            type="text"
+                            className="form-control border-0 border-bottom rounded-0"
+                            id="discountCode"
+                            placeholder="輸入折扣碼"
+                            style={{ width: "30%" }}
+                          />
+                          <button
+                            className="btn border-0 border-bottom p-0 rounded-0 text-gray-03"
+                            type="submit"
+                          >
                             <span className="material-symbols-outlined"> near_me </span>
                           </button>
                         </div>
@@ -438,7 +519,13 @@ export default function TutorBookingPayment() {
                       <div className="card input-card p-6 p-lg-10 rounded-2 shadow mt-6">
                         <h2 className="fs-5 fs-lg-3">付款方式</h2>
                         <div className="form-check mt-6">
-                          <input className="form-check-input" type="radio" name="pay-with" id="creditCard" defaultChecked />
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="pay-with"
+                            id="creditCard"
+                            defaultChecked
+                          />
                           <label className="form-check-label" htmlFor="creditCard">
                             藍新金流
                           </label>
