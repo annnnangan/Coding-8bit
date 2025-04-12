@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
 import { DayPicker } from "react-day-picker";
+import Swal from "sweetalert2";
 import "react-day-picker/dist/style.css";
 import debounce from "lodash/debounce";
 
@@ -76,7 +77,11 @@ export default function AllBookingsSection({ role }) {
 
         setBookingListData(formatData);
       } catch (error) {
-        console.log("錯誤", error);
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        });
       } finally {
         setLoadingState(false);
       }

@@ -16,7 +16,7 @@ import Loader from "@/components/common/Loader";
 
 // 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
-import { loginCheck } from "@/utils/slice/authSlice";
+import { loginCheck } from "@/store/slice/authSlice";
 
 export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片
@@ -97,7 +97,11 @@ export default function CourseVideoPage() {
         const videoResult = await courseApi.getVideoDetail(videoId);
         setVideoData(videoResult);
       } catch (error) {
-        console.log("錯誤", error);
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        });
       } finally {
         setLoadingState(false);
       }

@@ -87,7 +87,11 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
         setStudentComment({ student_comment: result.student_comment, rating: result.rating });
       }
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingState(false);
     }
@@ -115,7 +119,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
       Swal.fire({
         icon: "error",
         title: "儲存失敗",
-        text: error.response.data.message,
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
       });
     } finally {
       setSubmittingState(false);
@@ -171,7 +175,7 @@ export default function BookingDetailsModal({ role, booking, isOpen, setOpenModa
       Swal.fire({
         icon: "error",
         title: "儲存失敗",
-        text: error.response.data.message,
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
       });
     } finally {
       setSubmittingState(false);

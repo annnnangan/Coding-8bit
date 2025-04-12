@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Link, NavLink, useParams, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
+import Swal from "sweetalert2";
+
 import courseApi from "@/api/courseApi";
 import CourseCardList from "@/components/course/CourseCardList";
 import Pagination from "@/components/layout/Pagination";
@@ -51,7 +53,11 @@ export default function CourseCategoryPage() {
           setCourseList(result.videos);
           setPageData(result.pagination);
         } catch (error) {
-          console.log("錯誤", error);
+          Swal.fire({
+            icon: "error",
+            title: "取得資料失敗",
+            text: error.response?.data?.message || "發生錯誤，請稍後再試",
+          });
         } finally {
           setLoadingState(false);
         }
@@ -67,7 +73,11 @@ export default function CourseCategoryPage() {
           setCourseList(result.courses);
           setPageData(result.pagination);
         } catch (error) {
-          console.log("錯誤", error);
+          Swal.fire({
+            icon: "error",
+            title: "取得資料失敗",
+            text: error.response?.data?.message || "發生錯誤，請稍後再試",
+          });
         } finally {
           setLoadingState(false);
         }

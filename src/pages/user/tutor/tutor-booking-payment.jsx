@@ -11,7 +11,7 @@ import FormSubmitButton from "@/components/common/FormSubmitButton";
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 
 import { BookingSchema, serviceTypeMap } from "@/utils/schema/booking-schema";
-import { updateFormData } from "@/utils/slice/bookingSlice";
+import { updateFormData } from "@/store/slice/bookingSlice";
 import { formatDate, formatHour } from "@/utils/timeFormatted-utils";
 
 import bookingApi from "@/api/bookingApi";

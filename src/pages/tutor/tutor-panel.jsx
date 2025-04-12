@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useSelector } from "react-redux";
 
 import { Swiper } from "swiper";
+import Swal from "sweetalert2";
 
 import bookingApi from "@/api/bookingApi";
 
@@ -22,7 +23,13 @@ export default function TutorPanel() {
   const getBookingListData = useCallback(async () => {
     setLoadingRecentBookings(true);
     try {
-      const result = (await bookingApi.getTutorBookings({ tutorId, status: "in_progress", limit: 2 })).bookings;
+      const result = (
+        await bookingApi.getTutorBookings({
+          tutorId,
+          status: "in_progress",
+          limit: 2,
+        })
+      ).bookings;
 
       const formattedResult = result.map((item) => {
         const timeslots = Object.keys(item.hourly_availability)
@@ -34,7 +41,11 @@ export default function TutorPanel() {
 
       setRecentBookings(formattedResult);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得列表失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingRecentBookings(false);
     }
@@ -84,7 +95,13 @@ export default function TutorPanel() {
         <div className="row">
           {/* Left */}
           <div className="col-xxl-8">
-            <DashboardSection title="即將到來的預約" withNavLink={true} navLinkText={"所有預約"} navLinkHref={"/tutor-panel/booking"} className="mb-2 mb-xxl-8">
+            <DashboardSection
+              title="即將到來的預約"
+              withNavLink={true}
+              navLinkText={"所有預約"}
+              navLinkHref={"/tutor-panel/booking"}
+              className="mb-2 mb-xxl-8"
+            >
               <div className="row flex-wrap g-2">
                 {loadingRecentBookings &&
                   Array.from({ length: 2 }, (_, i) => (
@@ -97,15 +114,30 @@ export default function TutorPanel() {
                   recentBookings.length > 0 &&
                   recentBookings.map((booking) => (
                     <div key={booking.id} className="col-12 col-md-6">
-                      <BookingCard role={"tutor"} booking={booking} type="dashboard" />
+                      <BookingCard
+                        role={"tutor"}
+                        booking={booking}
+                        type="dashboard"
+                      />
                     </div>
                   ))}
 
-                {!loadingRecentBookings && recentBookings.length === 0 && <SectionFallback materialIconName="calendar_clock" fallbackText={`暫無預約`} />}
+                {!loadingRecentBookings && recentBookings.length === 0 && (
+                  <SectionFallback
+                    materialIconName="calendar_clock"
+                    fallbackText={`暫無預約`}
+                  />
+                )}
               </div>
             </DashboardSection>
 
-            <DashboardSection title="以下課程有新留言" withNavLink={true} navLinkText={"所有課程"} navLinkHref={"/student-panel/learning"} className="mb-2 mb-xxl-0">
+            <DashboardSection
+              title="以下課程有新留言"
+              withNavLink={true}
+              navLinkText={"所有課程"}
+              navLinkHref={"/student-panel/learning"}
+              className="mb-2 mb-xxl-0"
+            >
               <div className="swiper">
                 <div className="swiper-wrapper">
                   {dashboardRecommendCourseList.map((course) => (
@@ -120,17 +152,33 @@ export default function TutorPanel() {
 
           {/* Right */}
           <div className="col-xxl-4">
-            <DashboardSection title="目前擁有" withNavLink={false} className="mb-2 mb-xxl-8">
+            <DashboardSection
+              title="目前擁有"
+              withNavLink={false}
+              className="mb-2 mb-xxl-8"
+            >
               <div className="f-center gap-5">
-                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
+                <div
+                  className="rounded-4 bg-white f-center flex-column"
+                  style={{ height: "180px", width: "180px" }}
+                >
                   <p className="fs-2 fw-bold text-brand-03 d-flex">
-                    3 <span className="fs-7 fw-medium align-self-center ms-1">個</span>
+                    3{" "}
+                    <span className="fs-7 fw-medium align-self-center ms-1">
+                      個
+                    </span>
                   </p>
                   <p>主題式系列課程</p>
                 </div>
-                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
+                <div
+                  className="rounded-4 bg-white f-center flex-column"
+                  style={{ height: "180px", width: "180px" }}
+                >
                   <p className="fs-2 fw-bold text-brand-03 d-flex">
-                    30 <span className="fs-7 fw-medium align-self-center ms-1">小時</span>
+                    30{" "}
+                    <span className="fs-7 fw-medium align-self-center ms-1">
+                      小時
+                    </span>
                   </p>
                   <p>教學影片</p>
                 </div>
@@ -139,11 +187,17 @@ export default function TutorPanel() {
 
             <DashboardSection title="講師資料" withNavLink={false}>
               <div className="f-center gap-5">
-                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
+                <div
+                  className="rounded-4 bg-white f-center flex-column"
+                  style={{ height: "180px", width: "180px" }}
+                >
                   <p className="fs-2 fw-bold text-brand-03 d-flex"> 4.0 </p>
                   <p>評分</p>
                 </div>
-                <div className="rounded-4 bg-white f-center flex-column" style={{ height: "180px", width: "180px" }}>
+                <div
+                  className="rounded-4 bg-white f-center flex-column"
+                  style={{ height: "180px", width: "180px" }}
+                >
                   <p className="fs-2 fw-bold text-brand-03 d-flex"> 26 </p>
                   <p>評價數</p>
                 </div>

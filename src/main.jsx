@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
-import { store } from "./utils/store.js";
+import { store } from "./store/store.js";
 import { Provider } from "react-redux";
 
 import App from "./App.jsx";

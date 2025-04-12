@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSelector, useDispatch } from "react-redux";
-import { loginCheck, getUserData } from "@/utils/slice/authSlice";
+import { loginCheck, getUserData } from "@/store/slice/authSlice";
 
 import PropTypes from "prop-types";
 import styled from "styled-components";
