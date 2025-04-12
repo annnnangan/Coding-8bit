@@ -198,7 +198,11 @@ export default function TutorBooking() {
 
       setCourses([...courseVideos.courses, ...singleVideos.videos]);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingBasicInfoState(false);
     }
@@ -209,7 +213,11 @@ export default function TutorBooking() {
       const result = await tutorApi.getTutorBookmark(tutor_id);
       setBookmark(result);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     }
   }, [tutor_id]);
 
@@ -241,7 +249,11 @@ export default function TutorBooking() {
         }
       }
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingAvailableTime(false);
     }
@@ -255,7 +267,11 @@ export default function TutorBooking() {
 
       setRecommendTutor(resultWithoutCurrentTutor.sort(() => Math.random() - 0.5).slice(0, 4));
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingRecommendTutorState(false);
     }
@@ -267,7 +283,11 @@ export default function TutorBooking() {
       const result = await tutorApi.getTutorRatingStats(tutor_id);
       setRatingStats(result);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingRatingStatsState(false);
     }
@@ -280,7 +300,11 @@ export default function TutorBooking() {
         const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
         setComments(result.data);
       } catch (error) {
-        console.error("錯誤", error);
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        });
       } finally {
         setLoadingCommentState(false);
       }
@@ -302,7 +326,11 @@ export default function TutorBooking() {
           setHasMoreComments(false); // No more data to load
         }
       } catch (error) {
-        console.error("錯誤", error);
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        });
       } finally {
         setIsFetchingMore(false);
       }

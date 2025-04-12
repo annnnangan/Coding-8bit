@@ -36,7 +36,11 @@ export default function TutorProfile() {
       setTutorId(userData.tutor_id);
       setTutorData(result.data);
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingState(false);
     }
@@ -74,7 +78,7 @@ export default function TutorProfile() {
       Swal.fire({
         icon: "error",
         title: "修改失敗",
-        text: error.response.data.message,
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
       });
     } finally {
       setLoadingState(false);

@@ -77,14 +77,18 @@ export default function ChatRoom({ username }) {
         { id: botResponses.length + 1, botResponse: response.response },
       ]);
     } catch (error) {
-      console.error("請求失敗:", error);
+      Swal.fire({
+        icon: "error",
+        title: "請求失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setPlaceLoadingState(false);
     }
   }, [answer, navigate, botResponses.length, userResponses.length]);
 
   // 輸入框狀態更新
-  const handleAnswer = (e) => {
+  const handleAnswerChange = (e) => {
     setAnswer(e.target.value);
   };
 
@@ -114,7 +118,7 @@ export default function ChatRoom({ username }) {
   const [hasExecuted, setHasExecuted] = useState(false);
   const offCanvasRef = useRef(null);
 
-  const handleOpen = useCallback(async () => {
+  const handleChatInit = useCallback(async () => {
     if (username) {
       await postAnswer();
       setHasExecuted(true);
@@ -126,7 +130,7 @@ export default function ChatRoom({ username }) {
 
     const handleShowEvent = async () => {
       if (!hasExecuted) {
-        await handleOpen();
+        await handleChatInit();
       }
     };
 
@@ -142,7 +146,7 @@ export default function ChatRoom({ username }) {
         );
       }
     };
-  }, [hasExecuted, handleOpen]);
+  }, [hasExecuted, handleChatInit]);
 
   return (
     <div
@@ -232,7 +236,7 @@ export default function ChatRoom({ username }) {
           id="answer"
           name="answer"
           value={answer}
-          onChange={handleAnswer}
+          onChange={handleAnswerChange}
           onKeyDown={handlePostAnswer}
         />
         <button

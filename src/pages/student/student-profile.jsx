@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 
 import axios from "axios";
+import Swal from "sweetalert2";
 
 import ResetPassword from "@/components/common/profile/ResetPassword";
 import ProfileContent from "@/components/common/profile/ProfileContent";
@@ -22,7 +23,11 @@ export default function StudentProfile() {
       );
       setUserData(res.data);
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingState(false);
     }

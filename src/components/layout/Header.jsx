@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
+import Swal from "sweetalert2";
+
 import Loader from "@/components/common/Loader";
 import {
   loginCheck,
@@ -59,7 +61,11 @@ export default function Header() {
     try {
       await dispatch(changeUserRole(userData));
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "切換切換失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingState(false);
     }

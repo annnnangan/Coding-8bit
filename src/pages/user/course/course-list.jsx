@@ -5,6 +5,7 @@ import DOMPurify from "dompurify";
 
 import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import Swal from "sweetalert2";
 
 import courseApi from "@/api/courseApi";
 
@@ -51,7 +52,11 @@ export default function CourseList() {
       setCustomLearningCourseList(customLearning.videos);
       setFreeTipShortsCourseList(freeTipShorts.videos);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingState(false);
     }

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 
 import { DayPicker } from "react-day-picker";
+import Swal from "sweetalert2";
 
 import SectionFallback from "@/components/common/SectionFallback";
 import BusinessHour from "./BusinessHour";
@@ -31,7 +32,11 @@ export default function AvailableTimeSection() {
 
       setDayOfWeekAvailability(result);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingDayOfWeekAvailability(false);
     }
@@ -63,7 +68,11 @@ export default function AvailableTimeSection() {
 
       setSpecificDateAvailability(transformData);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingSpecificDateAvailability(false);
     }

@@ -60,7 +60,7 @@ export default function ForgotPassword() {
     }
   }, [countdown]);
 
-  const handleEmail = (e) => {
+  const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
 
@@ -96,7 +96,7 @@ export default function ForgotPassword() {
                         id="addEmail"
                         aria-describedby="emailHelp"
                         placeholder="請輸入電子信箱"
-                        onChange={handleEmail}
+                        onChange={handleEmailChange}
                       />
                       <span className="material-symbols-outlined position-absolute top-0 text-gray-03 ms-1 mt-1">
                         mail

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Controller } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -27,37 +27,14 @@ export default function EditContent({
   type = "topicSeries",
   videoData,
 }) {
+  // 取得 id
+  const { id } = useParams();
+
   // 返回上一頁
   const navigate = useNavigate();
   const toPrevPage = () => {
     navigate(-1);
   };
-
-  // 取得資料函式
-  const { id } = useParams();
-  const getData = useCallback(async () => {
-    setLoadingState(true);
-    try {
-      const result = await courseApi.getCourseDetail(id);
-      if (result) {
-        setValue("title", result.title || "");
-        setValue("description", result.description || "");
-        setValue("is_public", result.is_public ?? false);
-        setValue("category", result.category || "");
-        setValue("tag", result.tag || "");
-        setTemData((prevData) => {
-          return {
-            ...prevData,
-            cover_image: result.cover_image || "",
-          };
-        });
-      }
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
-      setLoadingState(false);
-    }
-  }, [id, setLoadingState, setValue]);
 
   // 上傳圖片函式
   const [temData, setTemData] = useState({});
@@ -200,9 +177,37 @@ export default function EditContent({
 
   useEffect(() => {
     if (type === "topicSeries") {
-      getData();
+      const fetchData = async () => {
+        setLoadingState(true);
+        try {
+          const result = await courseApi.getCourseDetail(id);
+          if (result) {
+            setValue("title", result.title || "");
+            setValue("description", result.description || "");
+            setValue("is_public", result.is_public ?? false);
+            setValue("category", result.category || "");
+            setValue("tag", result.tag || "");
+            setTemData((prevData) => {
+              return {
+                ...prevData,
+                cover_image: result.cover_image || "",
+              };
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "取得資料失敗",
+            text: error.response?.data?.message || "發生錯誤，請稍後再試",
+          });
+        } finally {
+          setLoadingState(false);
+        }
+      };
+
+      fetchData();
     }
-  }, [getData, type]);
+  }, [id, setLoadingState, setValue, type]);
 
   useEffect(() => {
     setValue("title", videoData?.title || "");

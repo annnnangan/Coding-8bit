@@ -82,27 +82,31 @@ export default function CustomRequestsList() {
     }
   };
 
-  // 取得需求資料函式
+  // 初始化 - 取得資料
   const [customCourseList, setCustomCourseList] = useState([]);
-  const getData = useCallback(async () => {
-    setLoadingState(true);
-    try {
-      const result = await customRequestsApi.getAllCustomRequests(
-        sortBy,
-        order,
-        search,
-        limit
-      );
-      setCustomCourseList(result.requests);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "取得資料失敗",
-        text: error?.response?.data?.message,
-      });
-    } finally {
-      setLoadingState(false);
-    }
+  useEffect(() => {
+    const getData = async () => {
+      setLoadingState(true);
+      try {
+        const result = await customRequestsApi.getAllCustomRequests(
+          sortBy,
+          order,
+          search,
+          limit
+        );
+        setCustomCourseList(result.requests);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error?.response?.data?.message,
+        });
+      } finally {
+        setLoadingState(false);
+      }
+    };
+
+    getData();
   }, [sortBy, order, search, limit]);
 
   /* -------------------------------------- header & footer START ---------------------------------------- */
@@ -247,11 +251,6 @@ export default function CustomRequestsList() {
       dispatch(loginCheck());
     }
   }, [dispatch]);
-
-  // 初始化 - 取得資料
-  useEffect(() => {
-    getData();
-  }, [getData]);
 
   return (
     <>

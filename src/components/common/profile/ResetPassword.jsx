@@ -59,7 +59,7 @@ export default function ResetPassword({ userData, setLoadingState }) {
       Swal.fire({
         icon: "error",
         title: "密碼修改失敗",
-        text: error.response.data.message,
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
       });
     } finally {
       setLoadingState(false);
