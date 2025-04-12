@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import Swal from "sweetalert2";
 
-import authApi from "../../api/authApi";
-import userApi from "../../api/userApi";
+import authApi from "@/api/authApi";
+import userApi from "@/api/userApi";
 
 // 登入
 export const login = createAsyncThunk(

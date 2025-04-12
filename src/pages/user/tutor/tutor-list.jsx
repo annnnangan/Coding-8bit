@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import tutorApi from "@/api/tutorApi";
 
 import AOS from "aos";
+import Swal from "sweetalert2";
 
 import MainTitle from "@/components/MainTitle";
 import TutorsCard from "@/components/tutor/TutorsCard";
@@ -62,7 +63,11 @@ export default function TutorList() {
         setTutorsList(tutorResult.tutors);
         setPageData(tutorResult.pagination);
       } catch (error) {
-        console.log("錯誤", error);
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        });
       } finally {
         setLoadingState(false);
       }

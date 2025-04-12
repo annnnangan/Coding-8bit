@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -21,54 +21,6 @@ export default function TutorManageAddVideo() {
   const { type } = useParams();
   const { id } = useParams();
   const { courseId } = useParams();
-
-  // 取得影片資料 (主題式系列課程)
-  const [chapterVideoData, setChapterVideoData] = useState();
-  const [videoId, setVideoId] = useState("");
-  const getChapter = useCallback(async () => {
-    setLoadingState(true);
-    try {
-      const result = await courseApi.getCourseChapter(courseId);
-      const chapterVideoArray = result.filter((res) => res.id === id);
-      setChapterVideoData(chapterVideoArray[0].Videos[0]);
-      setTemVideoData((prevData) => {
-        return {
-          ...prevData,
-          video_url: chapterVideoArray[0]?.Videos[0]?.video_url,
-          video_duration: chapterVideoArray[0]?.Videos[0]?.duration,
-        };
-      });
-      setVideoId(chapterVideoArray[0]?.Videos[0]?.id);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: error.response?.data?.message,
-      });
-    } finally {
-      setLoadingState(false);
-    }
-  }, [courseId, id]);
-
-  // 取得影片資料 (客製化學習需求影片、實用技術短影片)
-  const [videoData, setVideoData] = useState();
-  const getData = useCallback(async () => {
-    setLoadingState(true);
-    try {
-      const result = await courseApi.getVideoDetail(id);
-      setVideoData(result);
-      setTemVideoData((prevData) => {
-        return {
-          ...prevData,
-          video_url: result?.video_url,
-          video_duration: result?.duration,
-        };
-      });
-    } catch (error) {
-      console.log("錯誤", error);
-    } finally {
-      setLoadingState(false);
-    }
-  }, [id]);
 
   // 影片上傳函式
   const [temVideoData, setTemVideoData] = useState("");
@@ -184,13 +136,60 @@ export default function TutorManageAddVideo() {
     }
   };
 
+  const [chapterVideoData, setChapterVideoData] = useState();
+  const [videoId, setVideoId] = useState("");
+  const [videoData, setVideoData] = useState();
   useEffect(() => {
+    const fetchChapterVideo = async () => {
+      setLoadingState(true);
+      try {
+        const result = await courseApi.getCourseChapter(courseId);
+        const chapterVideoArray = result.filter((res) => res.id === id);
+        const firstVideo = chapterVideoArray[0]?.Videos[0];
+        setChapterVideoData(firstVideo);
+        setTemVideoData((prevData) => ({
+          ...prevData,
+          video_url: firstVideo?.video_url,
+          video_duration: firstVideo?.duration,
+        }));
+        setVideoId(firstVideo?.id);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: error.response?.data?.message,
+        });
+      } finally {
+        setLoadingState(false);
+      }
+    };
+
+    const fetchVideoDetail = async () => {
+      setLoadingState(true);
+      try {
+        const result = await courseApi.getVideoDetail(id);
+        setVideoData(result);
+        setTemVideoData((prevData) => ({
+          ...prevData,
+          video_url: result?.video_url,
+          video_duration: result?.duration,
+        }));
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "取得資料失敗",
+          text: error.response?.data?.message || "發生錯誤，請稍後再試",
+        });
+      } finally {
+        setLoadingState(false);
+      }
+    };
+
     if (type === "topicSeries") {
-      getChapter();
+      fetchChapterVideo();
     } else {
-      getData();
+      fetchVideoDetail();
     }
-  }, [getChapter, getData, type]);
+  }, [type, courseId, id]);
 
   return (
     <>

@@ -2,9 +2,6 @@ import axios from 'axios';
 
 import apiClient from './apiClient';
 
-// import { store } from '../utils/store';
-// import { setUser } from '../utils/slice/userInfoSlice';
-
 // 驗證身分
 const loginCheck = async () => {
   await apiClient.get(`/auth/check`);

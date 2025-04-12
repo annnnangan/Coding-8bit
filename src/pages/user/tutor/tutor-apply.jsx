@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useSelector, useDispatch } from "react-redux";
-import { loginCheck, getUserData } from "@/utils/slice/authSlice";
+import { loginCheck, getUserData } from "@/store/slice/authSlice";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

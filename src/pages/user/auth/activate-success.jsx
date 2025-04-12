@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
@@ -9,41 +9,36 @@ import authApi from "@/api/authApi";
 import Loader from "@/components/common/Loader";
 
 export default function ActivateSuccess() {
-  // loading
   const [loadingState, setLoadingState] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
-  // 從路由找出 token
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-
   const navigate = useNavigate();
 
-  // 啟用帳號函式
-  const [isActive, setIsActive] = useState(false);
-  const activateAccount = useCallback(async () => {
-    setLoadingState(true);
-    try {
-      await authApi.activateAccount(token);
-      setIsActive(true);
-      Swal.fire({
-        icon: "success",
-        title: "啟用成功",
-      });
-      navigate("/login");
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "啟用失敗",
-        text: error.response.data.message,
-      });
-      navigate("/");
-    } finally {
-      setLoadingState(false);
-    }
-  }, [navigate, token]);
-
-  // 初始化 - 確認有無 token
   useEffect(() => {
+    const activateAccount = async () => {
+      setLoadingState(true);
+      try {
+        await authApi.activateAccount(token);
+        setIsActive(true);
+        Swal.fire({
+          icon: "success",
+          title: "啟用成功",
+        });
+        navigate("/login");
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "啟用失敗",
+          text: error.response?.data?.message || "請稍後再試",
+        });
+        navigate("/");
+      } finally {
+        setLoadingState(false);
+      }
+    };
+
     if (!token) {
       Swal.fire({
         icon: "error",
@@ -54,7 +49,7 @@ export default function ActivateSuccess() {
     } else {
       activateAccount();
     }
-  }, [activateAccount, navigate, token]);
+  }, [token, navigate]);
 
   return (
     <>

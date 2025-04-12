@@ -110,7 +110,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
   };
 
   // 更新個人資料狀態
-  const handleProfile = (e) => {
+  const handleProfileChange = (e) => {
     setTemProfile((prevData) => {
       return { ...prevData, username: e.target.value };
     });
@@ -231,7 +231,7 @@ export default function ProfileContent({ userData, setLoadingState }) {
                 className="form-control fw-bold"
                 defaultValue={temProfile.username}
                 placeholder="請輸入暱稱"
-                onChange={handleProfile}
+                onChange={handleProfileChange}
               />
             )}
           </div>

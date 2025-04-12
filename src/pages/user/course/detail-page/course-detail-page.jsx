@@ -18,7 +18,7 @@ import userApi from "@/api/userApi";
 
 // 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
-import { loginCheck } from "@/utils/slice/authSlice";
+import { loginCheck } from "@/store/slice/authSlice";
 
 export default function CourseDetailPage() {
   const [chapter, setChapter] = useState([]); // 章節

@@ -18,7 +18,7 @@ import CommentsSection from "./CommentsSection";
 import StarRating from "./StarRating";
 
 // 工具
-import { loginCheck } from "@/utils/slice/authSlice";
+import { loginCheck } from "@/store/slice/authSlice";
 
 export default function VideoContent({
   videoUrl,

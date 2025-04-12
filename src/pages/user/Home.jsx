@@ -7,6 +7,7 @@ import { Helmet } from "react-helmet-async";
 import { Swiper } from "swiper";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import AOS from "aos";
+import Swal from "sweetalert2";
 
 // Api
 import courseApi from "@/api/courseApi";
@@ -32,7 +33,11 @@ export default function Home() {
       const result = await courseApi.getAllCourses();
       setCourseList(result.courses);
     } catch (error) {
-      console.log("錯誤", error);
+      Swal.fire({
+        icon: "error",
+        title: "取得資料失敗",
+        text: error.response?.data?.message || "發生錯誤，請稍後再試",
+      });
     } finally {
       setLoadingState(false);
     }
@@ -128,7 +133,7 @@ export default function Home() {
         <div className="container">
           <MainTitle longTitle={false} beforeTitle="精選課程" afterTitle="" />
           <div className="row course-card-wrap mt-6 mt-lg-8 g-6">
-            <CourseCardList courseList={courseList.slice(0, 6)} />
+            <CourseCardList courseList={courseList?.slice(0, 6)} />
           </div>
           <div className="f-center">
             <NavLink
@@ -211,7 +216,9 @@ export default function Home() {
                       />
                     </div>
                     <div className="mt-4">
-                      <h4 className="text-gray-01 fs-5 fw-medium">{step.title}</h4>
+                      <h4 className="text-gray-01 fs-5 fw-medium">
+                        {step.title}
+                      </h4>
                       <p className="mt-2">{step.description}</p>
                     </div>
                   </div>

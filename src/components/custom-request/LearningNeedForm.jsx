@@ -1,6 +1,14 @@
-import { useState, useEffect, useRef, lazy, Suspense, useMemo } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
+
+// level data
+const levels = [
+  { id: 1, name: "Lv.0 - 什麼都不會的小萌新" },
+  { id: 2, name: "Lv.1 - 略懂略懂的小菜鳥" },
+  { id: 3, name: "Lv.2 - 可獨立學習的勇者" },
+  { id: 4, name: "Lv.3 - 有多年 coding 經驗的大神" },
+];
 
 const ReactQuill = lazy(() => import("react-quill-new"));
 import PropTypes from "prop-types";
@@ -30,17 +38,6 @@ export default function LearningNeedForm({ setLoadingState }) {
   useEffect(() => {
     setEditorLoaded(true);
   }, []);
-
-  // level data
-  const levels = useMemo(
-    () => [
-      { id: 1, name: "Lv.0 - 什麼都不會的小萌新" },
-      { id: 2, name: "Lv.1 - 略懂略懂的小菜鳥" },
-      { id: 3, name: "Lv.2 - 可獨立學習的勇者" },
-      { id: 4, name: "Lv.3 - 有多年 coding 經驗的大神" },
-    ],
-    []
-  );
 
   // 上傳圖片函式
   const [temImg, setTemImg] = useState([]);

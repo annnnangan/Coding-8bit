@@ -20,22 +20,14 @@ export default function Form() {
 
   const {
     register,
-    handleSubmit,
     formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(schema),
     mode: "onTouched",
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
-
   return (
-    <form
-      className="row g-3 bg-brand-05 p-3 px-sm-6 py-sm-8 mt-8"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <form className="row g-3 bg-brand-05 p-3 px-sm-6 py-sm-8 mt-8">
       <div className="col-md-6">
         <FormInput
           register={register}
