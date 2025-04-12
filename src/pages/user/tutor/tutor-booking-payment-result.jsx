@@ -71,7 +71,9 @@ export default function BookingPaymentResult() {
             <>
               <div className="f-center mt-8">
                 <h1 className="text-brand-03 f-align-center fs-2 fs-lg-1">
-                  <span className="display-3 text-brand-03 icon-fill material-symbols-outlined me-5">check_circle </span>
+                  <span className="display-3 text-brand-03 icon-fill material-symbols-outlined me-5">
+                    check_circle{" "}
+                  </span>
                   付款成功
                 </h1>
               </div>
@@ -87,7 +89,13 @@ export default function BookingPaymentResult() {
                           <label htmlFor="tutor" className="form-label">
                             <h3 className="fs-6 fw-medium">預約老師</h3>
                           </label>
-                          <input type="text" className="form-control bg-white border-0 p-0 rounded-0 text-gray-02" id="tutor" defaultValue={bookingSuccessResult.tutor_name} disabled />
+                          <input
+                            type="text"
+                            className="form-control bg-white border-0 p-0 rounded-0 text-gray-02"
+                            id="tutor"
+                            defaultValue={bookingSuccessResult.tutor_name}
+                            disabled
+                          />
                         </div>
                         <div className="mb-6 mb-md-12">
                           <label htmlFor="bookingType" className="form-label">
@@ -140,7 +148,12 @@ export default function BookingPaymentResult() {
                               <label htmlFor="source_code_url" className="form-label">
                                 希望接受檢視的程式碼儲存庫
                               </label>
-                              <input className="form-control bg-white border-0 h-100 p-0 rounded-0 text-gray-02" id="source_code_URL" defaultValue={bookingSuccessResult.source_code_url} disabled />
+                              <input
+                                className="form-control bg-white border-0 h-100 p-0 rounded-0 text-gray-02"
+                                id="source_code_URL"
+                                defaultValue={bookingSuccessResult.source_code_url}
+                                disabled
+                              />
                             </div>
                             <div>
                               <label htmlFor="userInput" className="form-label">
@@ -179,13 +192,21 @@ export default function BookingPaymentResult() {
                     {/* 提醒 */}
                     <div className="alert bg-brand-02 f-center mt-6" role="alert">
                       <span className="material-symbols-outlined me-2"> info </span>
-                      {bookingSuccessResult.service_type === "codeReview" ? "檢視結果將於預約時間結束時回覆。" : "會議連結將於預約時間前一天發送至您的電子信箱。"}
+                      {bookingSuccessResult.service_type === "codeReview"
+                        ? "檢視結果將於預約時間結束時回覆。"
+                        : "會議連結將於預約時間前一天發送至您的電子信箱。"}
                     </div>
 
                     {/* Button */}
-                    <NavLink to="/" className="btn btn-brand-03 rounded-2 w-100 f-center slide-right-hover">
+                    <NavLink
+                      to="/"
+                      className="btn btn-brand-03 rounded-2 w-100 f-center slide-right-hover"
+                    >
                       回到首頁
-                      <span className="fs-6 fs-md-5 icon-fill material-symbols-outlined ms-1 mt-1"> arrow_forward </span>
+                      <span className="fs-6 fs-md-5 icon-fill material-symbols-outlined ms-1 mt-1">
+                        {" "}
+                        arrow_forward{" "}
+                      </span>
                     </NavLink>
                   </div>
                 </div>
@@ -197,14 +218,21 @@ export default function BookingPaymentResult() {
                 <div className="f-center">
                   <div>
                     <h1 className="text-brand-03 f-align-center fs-2 fs-lg-1">
-                      <span className="display-3 text-brand-03 icon-fill material-symbols-outlined me-5">close</span>
+                      <span className="display-3 text-brand-03 icon-fill material-symbols-outlined me-5">
+                        close
+                      </span>
                       付款失敗
                     </h1>
                     <p>發生未知錯誤，請重新進行預約</p>
                     <div>
-                      <NavLink to="/" className="btn btn-brand-03 rounded-2 f-align-center mt-6 mt-lg-10 slide-right-hover">
+                      <NavLink
+                        to="/"
+                        className="btn btn-brand-03 rounded-2 f-align-center mt-6 mt-lg-10 slide-right-hover"
+                      >
                         回到首頁
-                        <span className="fs-6 fs-md-5 icon-fill material-symbols-outlined">arrow_forward</span>
+                        <span className="fs-6 fs-md-5 icon-fill material-symbols-outlined">
+                          arrow_forward
+                        </span>
                       </NavLink>
                     </div>
                   </div>

@@ -7,7 +7,10 @@ export const determineMeetingLinkMessage = (bookingType, bookingStatus, meetingL
     return "已過期";
   }
 
-  if (bookingType === "codeReview" || (bookingType === "courseSession" && bookingStatus === "cancelled")) {
+  if (
+    bookingType === "codeReview" ||
+    (bookingType === "courseSession" && bookingStatus === "cancelled")
+  ) {
     return "不適用";
   }
 };

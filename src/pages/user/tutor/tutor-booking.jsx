@@ -65,7 +65,10 @@ export default function TutorBooking() {
   const [loadingRecommendTutorState, setLoadingRecommendTutorState] = useState(true);
 
   // useState - 可預約時間
-  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState({ tutorId: "", baseDateList: [] }); //儲存已fetch過的時間
+  const [accumulateAvailableTime, setAccumulateAvailableTime] = useState({
+    tutorId: "",
+    baseDateList: [],
+  }); //儲存已fetch過的時間
   const [currentAvailableTime, setCurrentAvailableTime] = useState([]);
   const [weekOffset, setWeekOffset] = useState(0);
   const [isLoadingAvailableTime, setLoadingAvailableTime] = useState(false);
@@ -175,7 +178,14 @@ export default function TutorBooking() {
   const getTutorBasicData = useCallback(async () => {
     setLoadingBasicInfoState(true);
     try {
-      const [basicInfoResult, experienceResult, educationResult, certificateResult, courseVideos, singleVideos] = await Promise.all([
+      const [
+        basicInfoResult,
+        experienceResult,
+        educationResult,
+        certificateResult,
+        courseVideos,
+        singleVideos,
+      ] = await Promise.all([
         tutorApi.getTutorDetail(tutor_id),
         tutorApi.getExp(tutor_id),
         tutorApi.getEdu(tutor_id),
@@ -193,7 +203,11 @@ export default function TutorBooking() {
           education: educationResult.data,
           certificates: certificateResult.data,
         },
-        statistics: { student_count: basicInfoResult.data.studentCount, class_count: basicInfoResult.data.classCount, video_count: basicInfoResult.data.videoCount },
+        statistics: {
+          student_count: basicInfoResult.data.studentCount,
+          class_count: basicInfoResult.data.classCount,
+          video_count: basicInfoResult.data.videoCount,
+        },
       }));
 
       setCourses([...courseVideos.courses, ...singleVideos.videos]);
@@ -229,14 +243,19 @@ export default function TutorBooking() {
         const baseDate = formatDateDash(today);
         const result = await tutorApi.getAvailability(tutor_id, baseDate);
         setWeekOffset(0);
-        setAccumulateAvailableTime({ tutorId: tutor_id, baseDateList: [{ baseDate, timeSlots: result.data?.slice(7, 14) }] });
+        setAccumulateAvailableTime({
+          tutorId: tutor_id,
+          baseDateList: [{ baseDate, timeSlots: result.data?.slice(7, 14) }],
+        });
         setCurrentAvailableTime(result.data?.slice(7, 14));
       } else {
         const today = new Date();
         const dayOffset = weekOffset < 0 ? 0 : weekOffset * 7;
         const baseDate = formatDateDash(formatDateDash(today.setDate(today.getDate() + dayOffset)));
 
-        const existingData = accumulateAvailableTime.baseDateList.find((data) => data.baseDate === baseDate);
+        const existingData = accumulateAvailableTime.baseDateList.find(
+          (data) => data.baseDate === baseDate
+        );
 
         if (existingData) {
           setCurrentAvailableTime(existingData.timeSlots);
@@ -244,7 +263,10 @@ export default function TutorBooking() {
           const result = await tutorApi.getAvailability(tutor_id, baseDate);
           const newData = { baseDate, timeSlots: result.data?.slice(7, 14) };
 
-          setAccumulateAvailableTime({ ...accumulateAvailableTime, baseDateList: [...accumulateAvailableTime.baseDateList, newData] });
+          setAccumulateAvailableTime({
+            ...accumulateAvailableTime,
+            baseDateList: [...accumulateAvailableTime.baseDateList, newData],
+          });
           setCurrentAvailableTime(result.data?.slice(7, 14));
         }
       }
@@ -297,7 +319,11 @@ export default function TutorBooking() {
     async (page = 1, limit = 3) => {
       setLoadingCommentState(true);
       try {
-        const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
+        const result = await tutorApi.getTutorAllStudentComments({
+          tutorId: tutor_id,
+          page,
+          limit,
+        });
         setComments(result.data);
       } catch (error) {
         Swal.fire({
@@ -317,7 +343,11 @@ export default function TutorBooking() {
       if (isFetchingMore) return; // Prevent multiple calls
       setIsFetchingMore(true);
       try {
-        const result = await tutorApi.getTutorAllStudentComments({ tutorId: tutor_id, page, limit });
+        const result = await tutorApi.getTutorAllStudentComments({
+          tutorId: tutor_id,
+          page,
+          limit,
+        });
 
         if (result.data.length > 0) {
           setModalComments((prevComments) => [...prevComments, ...result.data]); // Append new comments
@@ -351,7 +381,15 @@ export default function TutorBooking() {
         getStudentComments();
       }
     })();
-  }, [tutor_id, checkIsValidTutor, getTutorBasicData, getRecommendTutor, getTutorBookmark, getRatingStats, getStudentComments]);
+  }, [
+    tutor_id,
+    checkIsValidTutor,
+    getTutorBasicData,
+    getRecommendTutor,
+    getTutorBookmark,
+    getRatingStats,
+    getStudentComments,
+  ]);
 
   useEffect(() => {
     getAvailabilityData();
@@ -437,12 +475,20 @@ export default function TutorBooking() {
 
     // 從選擇service type跳轉到付款頁面
     if (currentModalStep === 2) {
-      if (selectedServiceType && selectedBookingTimeslots.date && selectedBookingTimeslots.hours.length > 0) {
+      if (
+        selectedServiceType &&
+        selectedBookingTimeslots.date &&
+        selectedBookingTimeslots.hours.length > 0
+      ) {
         dispatch(updateFormData({ tutor_id: tutor_id }));
         dispatch(updateFormData({ tutor_name: tutorBasicInfo.User.username }));
         dispatch(updateFormData({ booking_date: selectedBookingTimeslots.date }));
         dispatch(updateFormData({ timeslots: selectedBookingTimeslots.hours }));
-        dispatch(updateFormData({ price: tutorBasicInfo.hourly_rate * selectedBookingTimeslots.hours.length }));
+        dispatch(
+          updateFormData({
+            price: tutorBasicInfo.hourly_rate * selectedBookingTimeslots.hours.length,
+          })
+        );
         dispatch(updateFormData({ service_type: selectedServiceType }));
         bookingModal.current.hide();
         navigate(`/tutor-booking-payment`);
@@ -509,7 +555,11 @@ export default function TutorBooking() {
   return (
     <>
       <Helmet>
-        <title>{tutorBasicInfo?.User.username ? `${tutorBasicInfo.User.username} ｜ 講師詳細` : "Coding∞bit ｜ 講師詳細"}</title>
+        <title>
+          {tutorBasicInfo?.User.username
+            ? `${tutorBasicInfo.User.username} ｜ 講師詳細`
+            : "Coding∞bit ｜ 講師詳細"}
+        </title>
       </Helmet>
       <div className="tutor-booking">
         {/*  Main Content */}
@@ -524,10 +574,17 @@ export default function TutorBooking() {
                   <div className="flex-shrink-0">
                     {loadingBasicInfoState ? (
                       <p className="placeholder-glow">
-                        <span className="bg-brand-02 rounded-circle me-4 placeholder" style={{ width: "64px", height: "64px" }}></span>
+                        <span
+                          className="bg-brand-02 rounded-circle me-4 placeholder"
+                          style={{ width: "64px", height: "64px" }}
+                        ></span>
                       </p>
                     ) : (
-                      <img src={tutorBasicInfo.User.avatar_url || "images/icon/user.png"} alt="profile" className="rounded-circle me-6 object-fit-cover" />
+                      <img
+                        src={tutorBasicInfo.User.avatar_url || "images/icon/user.png"}
+                        alt="profile"
+                        className="rounded-circle me-6 object-fit-cover"
+                      />
                     )}
                   </div>
                   <div className="flex-grow-1">
@@ -550,7 +607,9 @@ export default function TutorBooking() {
 
                   <p>
                     <span
-                      className={`position-absolute top-0 end-0 me-5 mt-5 material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle ${isBookmark ? "text-brand-01" : "text-gray-03"}`}
+                      className={`position-absolute top-0 end-0 me-5 mt-5 material-symbols-outlined icon-fill p-2 mb-2 rounded-circle align-middle ${
+                        isBookmark ? "text-brand-01" : "text-gray-03"
+                      }`}
                       role="button"
                       style={{ backgroundColor: "#1e1e1e66" }}
                       onClick={handleTutorBookmark}
@@ -575,7 +634,11 @@ export default function TutorBooking() {
                 </div>
                 {/*  tab  */}
                 <div className="section-component">
-                  <ul className="flex-nowrap list-x-scroll nav nav-tabs mb-6" id="myTab" role="tablist">
+                  <ul
+                    className="flex-nowrap list-x-scroll nav nav-tabs mb-6"
+                    id="myTab"
+                    role="tablist"
+                  >
                     <li className="nav-item" role="presentation">
                       <button
                         className="nav-link active"
@@ -607,7 +670,13 @@ export default function TutorBooking() {
                     </li>
                   </ul>
                   <div className="tab-content" id="myTabContent">
-                    <div className="active fade show tab-pane" id="about-me-tab-pane" role="tabpanel" aria-labelledby="about-me-tab" tabIndex="0">
+                    <div
+                      className="active fade show tab-pane"
+                      id="about-me-tab-pane"
+                      role="tabpanel"
+                      aria-labelledby="about-me-tab"
+                      tabIndex="0"
+                    >
                       {loadingBasicInfoState ? (
                         <p className="placeholder-glow">
                           <span className="col-12 bg-brand-02 placeholder"></span>
@@ -618,7 +687,13 @@ export default function TutorBooking() {
                         <ShowMoreButton text={tutorBasicInfo.about} />
                       )}
                     </div>
-                    <div className="fade tab-pane" id="resume-tab-pane" role="tabpanel" aria-labelledby="resume-tab" tabIndex="0">
+                    <div
+                      className="fade tab-pane"
+                      id="resume-tab-pane"
+                      role="tabpanel"
+                      aria-labelledby="resume-tab"
+                      tabIndex="0"
+                    >
                       <TutorBookingResume resume={tutorBasicInfo.resume} />
                     </div>
                   </div>
@@ -631,7 +706,9 @@ export default function TutorBooking() {
                             <span className="col-12 bg-brand-02 placeholder placeholder-lg"></span>
                           </p>
                         ) : (
-                          <h4 className="text-brand-03">{tutorBasicInfo.statistics.student_count}</h4>
+                          <h4 className="text-brand-03">
+                            {tutorBasicInfo.statistics.student_count}
+                          </h4>
                         )}
 
                         <p className="fs-7">學生</p>
@@ -671,7 +748,11 @@ export default function TutorBooking() {
                   <h4>講師影片</h4>
 
                   {!loadingBasicInfoState && courses.length > 0 && (
-                    <NavLink to={`/tutor-info/${tutor_id}`} className="d-flex text-brand-03 slide-right-hover" data-show="false">
+                    <NavLink
+                      to={`/tutor-info/${tutor_id}`}
+                      className="d-flex text-brand-03 slide-right-hover"
+                      data-show="false"
+                    >
                       <p>更多</p>
                       <span className="icon-fill material-symbols-outlined">arrow_forward</span>
                     </NavLink>
@@ -690,13 +771,24 @@ export default function TutorBooking() {
                     {!loadingBasicInfoState &&
                       courses.map((course) => (
                         <div className="swiper-slide" key={course.id}>
-                          {course.video_type === "topicSeries" ? <CourseCardList courseList={course} cardsNum={1} /> : <CourseCardList courseList={course} cardsNum={1} type="singleVideo" />}
+                          {course.video_type === "topicSeries" ? (
+                            <CourseCardList courseList={course} cardsNum={1} />
+                          ) : (
+                            <CourseCardList courseList={course} cardsNum={1} type="singleVideo" />
+                          )}
                         </div>
                       ))}
                   </div>
                 </div>
 
-                <div>{!loadingBasicInfoState && courses.length === 0 && <SectionFallback materialIconName="animated_images" fallbackText="講師暫無影片" />}</div>
+                <div>
+                  {!loadingBasicInfoState && courses.length === 0 && (
+                    <SectionFallback
+                      materialIconName="animated_images"
+                      fallbackText="講師暫無影片"
+                    />
+                  )}
+                </div>
               </section>
 
               {/* section 3 - timetable */}
@@ -717,7 +809,12 @@ export default function TutorBooking() {
                     handleBookingTimeslotsSelect={handleBookingTimeslotsSelect}
                   />
                 )}
-                {!isLoadingAvailableTime && currentAvailableTime.length === 0 && <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />}
+                {!isLoadingAvailableTime && currentAvailableTime.length === 0 && (
+                  <SectionFallback
+                    materialIconName="event_busy"
+                    fallbackText="講師暫無可預約時間"
+                  />
+                )}
               </section>
 
               {/* section 4 - student comment */}
@@ -727,7 +824,10 @@ export default function TutorBooking() {
                   <h4>學生評價</h4>
 
                   {!isLoadingComment && comments.length > 0 && (
-                    <p className="d-flex text-brand-03 cursor-pointer slide-right-hover" onClick={openCommentModal}>
+                    <p
+                      className="d-flex text-brand-03 cursor-pointer slide-right-hover"
+                      onClick={openCommentModal}
+                    >
                       更多
                       <span className="icon-fill material-symbols-outlined">arrow_forward</span>
                     </p>
@@ -735,12 +835,29 @@ export default function TutorBooking() {
                 </div>
 
                 <div className="g-2 g-lg-4 row row-cols-1 row-cols-lg-2">
-                  <div className="col">{isLoadingRatingStats ? <CommentRatingStat isLoading={true} /> : ratingStats.total_comment_count > 0 && <CommentRatingStat ratingStats={ratingStats} />}</div>
+                  <div className="col">
+                    {isLoadingRatingStats ? (
+                      <CommentRatingStat isLoading={true} />
+                    ) : (
+                      ratingStats.total_comment_count > 0 && (
+                        <CommentRatingStat ratingStats={ratingStats} />
+                      )
+                    )}
+                  </div>
 
-                  {isLoadingComment && Array.from({ length: 3 }, (_, i) => <CommentCard key={i} isLoading={isLoadingComment} />)}
-                  {!isLoadingComment && comments.length > 0 && comments.map((comment) => <CommentCard comment={comment} key={comment.commentId} />)}
+                  {isLoadingComment &&
+                    Array.from({ length: 3 }, (_, i) => (
+                      <CommentCard key={i} isLoading={isLoadingComment} />
+                    ))}
+                  {!isLoadingComment &&
+                    comments.length > 0 &&
+                    comments.map((comment) => (
+                      <CommentCard comment={comment} key={comment.commentId} />
+                    ))}
                 </div>
-                {!isLoadingComment && comments.length === 0 && <SectionFallback materialIconName="reviews" fallbackText={`講師暫無學生評價`} />}
+                {!isLoadingComment && comments.length === 0 && (
+                  <SectionFallback materialIconName="reviews" fallbackText={`講師暫無學生評價`} />
+                )}
               </section>
 
               {/* section 5 - tutor recommendation */}
@@ -802,7 +919,10 @@ export default function TutorBooking() {
                     </h2>
                   </div>
 
-                  <button className="btn btn-brand-03 w-100 slide-right-hover" onClick={openBookingModal}>
+                  <button
+                    className="btn btn-brand-03 w-100 slide-right-hover"
+                    onClick={openBookingModal}
+                  >
                     <p className="f-center me-1">
                       立即預約
                       <span className="material-symbols-outlined">arrow_forward</span>
@@ -816,7 +936,13 @@ export default function TutorBooking() {
       </div>
       {/* Modal */}
       {/* Modal - Booking Modal */}
-      <div className="modal booking-modal fade" id="bookingModal" tabIndex="-1" aria-labelledby="bookingModalLabel" ref={bookingModalRef}>
+      <div
+        className="modal booking-modal fade"
+        id="bookingModal"
+        tabIndex="-1"
+        aria-labelledby="bookingModalLabel"
+        ref={bookingModalRef}
+      >
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
           <div className="modal-content px-3 py-2">
             <div className="modal-header border-0 pb-0">
@@ -828,7 +954,8 @@ export default function TutorBooking() {
                     setModalError();
                   }}
                 >
-                  <span className="fs-7 icon-fill material-symbols-outlined">arrow_back_ios</span>返回
+                  <span className="fs-7 icon-fill material-symbols-outlined">arrow_back_ios</span>
+                  返回
                 </button>
               )}
 
@@ -868,7 +995,10 @@ export default function TutorBooking() {
                   )}
                   <div className="schedule">
                     {currentAvailableTime.length === 0 ? (
-                      <SectionFallback materialIconName="event_busy" fallbackText="講師暫無可預約時間" />
+                      <SectionFallback
+                        materialIconName="event_busy"
+                        fallbackText="講師暫無可預約時間"
+                      />
                     ) : (
                       <Timetable
                         availability={currentAvailableTime}
@@ -897,24 +1027,40 @@ export default function TutorBooking() {
                           setSelectedServiceType("courseSession");
                         }}
                       >
-                        <div className={`f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100${selectedServiceType === "courseSession" ? " selected" : ""}`}>
+                        <div
+                          className={`f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100${
+                            selectedServiceType === "courseSession" ? " selected" : ""
+                          }`}
+                        >
                           <h3 className="fs-4 fs-md-3">一對一教學</h3>
                           <img src="images/deco/Illustration-7.png" alt="one-on-one-illustration" />
-                          <p className="text-center mb-auto">以線上Google meeting的形式， 將於預約時間前一天發送會議連結， 講師會於預約時間內進行一對一單獨指導。</p>
+                          <p className="text-center mb-auto">
+                            以線上Google meeting的形式， 將於預約時間前一天發送會議連結，
+                            講師會於預約時間內進行一對一單獨指導。
+                          </p>
                         </div>
                       </div>
                     </div>
                     <div className="col service-card">
                       <div
-                        className={`f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100${selectedServiceType === "codeReview" ? " selected" : ""}`}
+                        className={`f-center flex-column bg-gray-04 py-8 px-5 rounded-2 slide-up-hover h-100${
+                          selectedServiceType === "codeReview" ? " selected" : ""
+                        }`}
                         onClick={() => {
                           setSelectedServiceType("codeReview");
                         }}
                       >
                         <div className="flex-column bg-gray-04 h-100 rounded-2 f-center px-5 py-8 slide-up-hover">
                           <h3 className="fs-4 fs-md-3">程式碼檢視</h3>
-                          <img src="images/deco/Illustration-8.png" alt="code-review-illustration" />
-                          <p className="text-center mb-auto">您需要於預約時繳交GitHub Repo， 提供想接受檢視的程式碼， 講師會於預約時間內進行程式碼檢視服務， 並且於時間結束時回覆檢視後的結果。</p>
+                          <img
+                            src="images/deco/Illustration-8.png"
+                            alt="code-review-illustration"
+                          />
+                          <p className="text-center mb-auto">
+                            您需要於預約時繳交GitHub Repo， 提供想接受檢視的程式碼，
+                            講師會於預約時間內進行程式碼檢視服務，
+                            並且於時間結束時回覆檢視後的結果。
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -926,7 +1072,11 @@ export default function TutorBooking() {
             <div className="modal-footer border-top-0 p-0">
               <div className="d-flex flex-column align-items-end">
                 {modalError && <p className="text-danger mb-3">{modalError}</p>}
-                <button type="button" className="btn btn-secondary next-btn fs-7 fs-md-6 py-2" onClick={toNextModalStep}>
+                <button
+                  type="button"
+                  className="btn btn-secondary next-btn fs-7 fs-md-6 py-2"
+                  onClick={toNextModalStep}
+                >
                   下一步
                 </button>
               </div>
@@ -936,7 +1086,12 @@ export default function TutorBooking() {
       </div>
 
       {/* Modal - Student Comment Modal */}
-      <div className="modal fade student-comment-modal" id="commentModal" tabIndex="-1" ref={commentModalRef}>
+      <div
+        className="modal fade student-comment-modal"
+        id="commentModal"
+        tabIndex="-1"
+        ref={commentModalRef}
+      >
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
           <div className="modal-content">
             <div className="modal-header border-0 pb-0">
@@ -977,7 +1132,10 @@ export default function TutorBooking() {
       </div>
 
       {/* Mobile sticky bottom CTA card */}
-      <div className="d-lg-none bg-white border border-2 border-brand-02 mobile-bottom-cta sticky-bottom" style={{ borderRadius: "16px 16px 0px 0px" }}>
+      <div
+        className="d-lg-none bg-white border border-2 border-brand-02 mobile-bottom-cta sticky-bottom"
+        style={{ borderRadius: "16px 16px 0px 0px" }}
+      >
         <div className="pb-6 pt-4 px-4">
           <div className="f-between-center">
             <div>
