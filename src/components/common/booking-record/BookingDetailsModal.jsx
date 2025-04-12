@@ -14,7 +14,7 @@ import BookingStatusBadge from "./BookingStatusBadge";
 
 import bookingApi from "@/api/bookingApi";
 import { determineMeetingLinkMessage } from "@/utils/booking-record-utils";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
+import { serviceTypeMap } from "@/schema/booking-schema";
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BookingDetailsModal({ role, booking, isOpen, setOpenModal }) {

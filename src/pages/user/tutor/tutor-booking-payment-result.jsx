@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import Loader from "@/components/common/Loader";
 
 import orderApi from "@/api/orderApi";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
+import { serviceTypeMap } from "@/schema/booking-schema";
 import { formatDate, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BookingPaymentResult() {

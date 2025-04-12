@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import BookingStatusBadge from "./BookingStatusBadge";
 
 import { determineMeetingLinkMessage } from "@/utils/booking-record-utils";
-import { serviceTypeMap } from "@/utils/schema/booking-schema";
+import { serviceTypeMap } from "@/schema/booking-schema";
 import { getDayOfWeekFromStringDate, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BookingCard({ role, booking, handleClick, type = "manage-booking" }) {

@@ -11,7 +11,7 @@ import tutorApi from "@/api/tutorApi";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
 
 import { generateTimeslots } from "@/utils/generate-timeslots-utils";
-import { BusinessHourSchema } from "@/utils/schema/tutor-panel-schema";
+import { BusinessHourSchema } from "@/schema/tutor-panel-schema";
 import { daysOfWeekInChinese, formatHour } from "@/utils/timeFormatted-utils";
 
 export default function BusinessHour({ type, day, defaultValue, revalidateAvailability, removeNewSpecificDate }) {

@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
 import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 
-import { BookingSchema, serviceTypeMap } from "@/utils/schema/booking-schema";
+import { BookingSchema, serviceTypeMap } from "@/schema/booking-schema";
 import { updateFormData } from "@/store/slice/bookingSlice";
 import { formatDate, formatHour } from "@/utils/timeFormatted-utils";
 

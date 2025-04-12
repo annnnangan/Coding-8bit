@@ -14,7 +14,7 @@ import { BuyerForm } from "@/components/common/payment-form/BuyerForm";
 import PaymentStepSection1 from "@/components/subscription/PaymentStepSection1";
 import Loader from "@/components/common/Loader";
 
-import { PaymentSchema } from "@/utils/schema/payment-schema";
+import { PaymentSchema } from "@/schema/payment-schema";
 import { formatDateToTaiwan } from "@/utils/timeFormatted-utils";
 
 const step2Fields = ["buyerEmail", "buyerName", "buyerTel"];
@@ -59,8 +59,7 @@ export default function SubscriptionPayment() {
         plan_id: planId,
         billing_cycle: duration === "price_monthly" ? "monthly" : "annually",
         start_date: formatDateToTaiwan(today),
-        end_date:
-          duration === "price_monthly" ? formatDateToTaiwan(nextMonth) : formatDateToTaiwan(nextYear),
+        end_date: duration === "price_monthly" ? formatDateToTaiwan(nextMonth) : formatDateToTaiwan(nextYear),
       });
     }
     if (currentStep === 2) {
@@ -148,7 +147,6 @@ export default function SubscriptionPayment() {
       });
 
       addPay(res.data.id);
-
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -165,10 +163,10 @@ export default function SubscriptionPayment() {
     try {
       // 設定前端跳轉的網址
       const returnUrl = `https://coding-8bit.site/#/subscription/subscription-paymentResult`;
-  
+
       // 呼叫 API 取得藍新金流參數
       const response = await orderApi.addPay(orderId, returnUrl);
-  
+
       // 取得必要的付款資訊
       const transactionId = response.transactionId;
 
@@ -180,13 +178,13 @@ export default function SubscriptionPayment() {
       sessionStorage.setItem("formattedToday", formattedToday);
       sessionStorage.setItem("formattedNextMonth", formattedNextMonth);
       sessionStorage.setItem("formattedNextYear", formattedNextYear);
-  
+
       // 創建表單並跳轉到藍新付款頁
       const form = document.createElement("form");
       form.method = "POST";
       form.action = response.PayGateWay;
       form.style.display = "none";
-  
+
       // 藍新金流參數
       const params = [
         { name: "MerchantID", value: response.MerchantID },
@@ -194,7 +192,7 @@ export default function SubscriptionPayment() {
         { name: "TradeSha", value: response.TradeSha },
         { name: "Version", value: response.Version },
       ];
-  
+
       params.forEach(({ name, value }) => {
         const input = document.createElement("input");
         input.type = "hidden";
@@ -202,10 +200,9 @@ export default function SubscriptionPayment() {
         input.value = value;
         form.appendChild(input);
       });
-  
+
       document.body.appendChild(form);
       form.submit(); // 跳轉到藍新金流
-  
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -233,14 +230,7 @@ export default function SubscriptionPayment() {
 
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
-          {currentStep === 1 && (
-            <PaymentStepSection1
-              prices={prices}
-              duration={duration}
-              subscriptionPlan={subscriptionPlan}
-              toNextStep={toNextStep}
-            />
-          )}
+          {currentStep === 1 && <PaymentStepSection1 prices={prices} duration={duration} subscriptionPlan={subscriptionPlan} toNextStep={toNextStep} />}
           {currentStep === 2 && (
             <>
               <main className="subscription-booking-section wrap-lg">
@@ -253,18 +243,11 @@ export default function SubscriptionPayment() {
                         </NavLink>
                       </li>
                       <li className="breadcrumb-item">
-                        <NavLink
-                          to="/subscription-list"
-                          className="underline-hover"
-                        >
+                        <NavLink to="/subscription-list" className="underline-hover">
                           訂閱方案
                         </NavLink>
                       </li>
-                      <li className="breadcrumb-item active fw-semibold">
-                        {subscriptionPlan === "basic"
-                          ? "基本會員 - 確認付款"
-                          : "高級會員 - 確認付款"}
-                      </li>
+                      <li className="breadcrumb-item active fw-semibold">{subscriptionPlan === "basic" ? "基本會員 - 確認付款" : "高級會員 - 確認付款"}</li>
                     </ol>
                   </nav>
                   <h1 className="fs-2 fs-lg-1 text-brand-03 mt-8">確認付款</h1>
@@ -277,17 +260,8 @@ export default function SubscriptionPayment() {
                       <div className="input-card card shadow rounded-2 p-6 p-lg-10 mt-6">
                         <h2 className="fs-5 fs-lg-3">付款方式</h2>
                         <div className="form-check mt-6">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            name="pay-with"
-                            id="creditCard"
-                            defaultChecked
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor="creditCard"
-                          >
+                          <input className="form-check-input" type="radio" name="pay-with" id="creditCard" defaultChecked />
+                          <label className="form-check-label" htmlFor="creditCard">
                             藍新金流
                           </label>
                         </div>
@@ -303,22 +277,13 @@ export default function SubscriptionPayment() {
                             <tr className="border-top border-bottom f-between-center">
                               <th scope="row" className="border-0">
                                 <h4 className="fs-6 fs-lg-5 fw-medium py-10">
-                                  {subscriptionPlan === "basic" &&
-                                    "基本會員方案"}
-                                  {subscriptionPlan === "premium" &&
-                                    "高級會員方案"}
-                                  {duration === "price_monthly"
-                                    ? " / 月"
-                                    : " / 年"}
+                                  {subscriptionPlan === "basic" && "基本會員方案"}
+                                  {subscriptionPlan === "premium" && "高級會員方案"}
+                                  {duration === "price_monthly" ? " / 月" : " / 年"}
                                 </h4>
                               </th>
                               <td className="border-0 text-end">
-                                <h4 className="fs-6 fs-lg-5 fw-medium py-10">
-                                  NT${" "}
-                                  {prices[subscriptionPlan]?.[
-                                    duration
-                                  ].toLocaleString() || ""}
-                                </h4>
+                                <h4 className="fs-6 fs-lg-5 fw-medium py-10">NT$ {prices[subscriptionPlan]?.[duration].toLocaleString() || ""}</h4>
                               </td>
                             </tr>
                           </tbody>
@@ -330,24 +295,14 @@ export default function SubscriptionPayment() {
                                 <h4 className="fs-6 fs-lg-5">總計</h4>
                               </th>
                               <td className="border-0 text-end">
-                                <h4 className="fs-2">
-                                  NT${" "}
-                                  {prices[subscriptionPlan]?.[
-                                    duration
-                                  ].toLocaleString() || ""}
-                                </h4>
+                                <h4 className="fs-2">NT$ {prices[subscriptionPlan]?.[duration].toLocaleString() || ""}</h4>
                               </td>
                             </tr>
                           </tbody>
                         </table>
-                        <button
-                          className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100 mt-8"
-                          onClick={toNextStep}
-                        >
+                        <button className="btn btn-brand-03 slide-right-hover f-center rounded-2 w-100 mt-8" onClick={toNextStep}>
                           前往付款
-                          <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
-                            arrow_forward
-                          </span>
+                          <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">arrow_forward</span>
                         </button>
                       </div>
                     </div>
@@ -364,18 +319,11 @@ export default function SubscriptionPayment() {
                       {subscriptionPlan === "premium" && "高級會員方案"}
                       {duration === "price_monthly" ? " / 月" : " / 年"}
                     </h4>
-                    <h4 className="text-brand-03 fs-lg-2 fs-3 mt-1">
-                      NT$ {prices[subscriptionPlan]?.[duration] || ""}
-                    </h4>
+                    <h4 className="text-brand-03 fs-lg-2 fs-3 mt-1">NT$ {prices[subscriptionPlan]?.[duration] || ""}</h4>
                   </div>
-                  <button
-                    className="btn btn-brand-03 slide-right-hover f-center rounded-2"
-                    onClick={toNextStep}
-                  >
+                  <button className="btn btn-brand-03 slide-right-hover f-center rounded-2" onClick={toNextStep}>
                     立即付款
-                    <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">
-                      arrow_forward
-                    </span>
+                    <span className="material-symbols-outlined icon-fill fs-6 fs-md-5 mt-1 ms-1">arrow_forward</span>
                   </button>
                 </div>
               </div>
