@@ -107,7 +107,6 @@ export default function VideoContent({
       isInitial.current = true;
 
       const getInitialData = async () => {
-        
         // 判斷是否登入
         const isLogin = async () => {
           const isLoginStatus = await dispatch(loginCheck());
@@ -175,10 +174,10 @@ export default function VideoContent({
         getComment();
       };
       getInitialData();
+    }else{
+      isInitial.current = false;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch, videoUrl, introductionVideoId, paramsVideoId]);
 
   // 先判斷訂閱方案，再判斷是否顯示評分/觀看 icon
   useEffect(() => {

@@ -1,5 +1,5 @@
 // react 相關套件
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -47,26 +47,9 @@ export default function CourseDetailPage() {
     },
   });
 
-  // 過濾同講師無章節or相同課程
-  const filterOtherCourse = (others) => {
-    return others.filter(
-      (other) =>
-        other.CourseChapters &&
-        other.CourseChapters.length > 0 &&
-        other.id !== id
-    );
-  };
-
-  // 過濾同課程的影片並取 6 支影片
-  const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo
-      .filter((related) => related.course_id !== id)
-      .slice(0, 6);
-  };
-
-  const getInitialData = async () => {
+  const getInitialData = useCallback(async () => {
     if (swalShown) return;
-
+    
     const isLoginStatus = await dispatch(loginCheck());
     if (isLoginStatus.meta.requestStatus === "rejected") {
       if (!errorLogged.current) {
@@ -93,7 +76,7 @@ export default function CourseDetailPage() {
       setLoadingState(true);
       try {
         const userSubscriptionsPlan = await userApi.getUserData();
-        if (userSubscriptionsPlan.subscriptions[0].plan_name === 'free') {
+        if (userSubscriptionsPlan.subscriptions[0].plan_name === "free") {
           const errObject = new Error();
           errObject.name = "SubscriptionError";
           throw errObject;
@@ -107,6 +90,24 @@ export default function CourseDetailPage() {
         const relatedVideosResult = await courseApi.getFrontTutorVideos({
           category: courseResult.category,
         });
+
+        // 過濾同講師無章節or相同課程
+        const filterOtherCourse = (others) => {
+          return others.filter(
+            (other) =>
+              other.CourseChapters &&
+              other.CourseChapters.length > 0 &&
+              other.id !== id
+          );
+        };
+
+        // 過濾同課程的影片並取 6 支影片
+        const filterRelatedVideo = (relatedVideo) => {
+          return relatedVideo
+            .filter((related) => related.course_id !== id)
+            .slice(0, 6);
+        };
+
         isInitial.current = true;
         setCourseList(courseResult);
         setChapter(chapterResult);
@@ -140,8 +141,7 @@ export default function CourseDetailPage() {
       }
     }
     isInitial.current = false;
-    setLoadingState(false);
-  };
+  }, [id, dispatch, navigate, swalShown]);
 
   // 初始化
   useEffect(() => {
@@ -149,13 +149,7 @@ export default function CourseDetailPage() {
       isInitial.current = true;
       getInitialData();
     }
-    
-    /*
-     * 由於使用 react 18 並已經確保只需要執行一次
-     * 所以下此註解讓 eslint 忽略
-     */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [getInitialData]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {

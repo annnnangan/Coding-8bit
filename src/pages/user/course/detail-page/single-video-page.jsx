@@ -26,6 +26,8 @@ export default function CourseVideoPage() {
   const { videoId } = useParams(); // 取得影片ID
   const navigate = useNavigate(); // 用於導頁
   const dispatch = useDispatch(); // redux dispatch
+  const dispatchRef = useRef(dispatch);
+  const navigateRef = useRef(navigate);
 
   // 只會記錄一次錯誤訊息，防止重覆彈出 modal
   const errorLogged = useRef(false);
@@ -40,79 +42,34 @@ export default function CourseVideoPage() {
     },
   });
 
-  // 過濾同講師無章節or相同課程
-  const filterOtherCourse = (others) => {
-    return others.filter(
-      (other) =>
-        other.CourseChapters &&
-        other.CourseChapters.length > 0 &&
-        other.id !== videoData.course_id
-    );
-  };
-
-  // 過濾同課程的影片並取 6 支影片
-  const filterRelatedVideo = (relatedVideo) => {
-    return relatedVideo
-      .filter((related) => {
-        return related.course_id !== videoData.course_id;
-      })
-      .slice(0, 6);
-  };
-
-  // 初始化取得資料
-  const getInitialData = async () => {
-    if (swalShown) return;
-
-    const isLoginStatus = await dispatch(loginCheck());
-    if (isLoginStatus.meta.requestStatus === "rejected") {
-      if (!errorLogged.current) {
-        setSwalShown(true);
-        Swal.fire({
-          title: "請先登入或註冊會員",
-          text: "趕緊加入觀賞優質課程吧",
-          icon: "error",
-          showCancelButton: true,
-          confirmButtonText: "註冊",
-          cancelButtonText: "登入",
-          allowOutsideClick: false,
-        }).then((result) => {
-          setSwalShown(false);
-          if (result.isConfirmed) {
-            navigate("/signup"); // 註冊
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            navigate("/login"); // 登入
-          }
-        });
-      }
-      errorLogged.current = true;
-      setLoadingState(false);
-    } else {
-      setLoadingState(true);
-      try {
-        const videoResult = await courseApi.getVideoDetail(videoId);
-        setVideoData(videoResult);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "取得資料失敗",
-          text: error.response?.data?.message || "發生錯誤，請稍後再試",
-        });
-      } finally {
-        setLoadingState(false);
-      }
-    }
-  };
-
   useEffect(() => {
-    // 確保 videoData.id 存在
     if (!videoData.id) return;
+
+    // 過濾同講師無章節or相同課程
+    const filterOtherCourse = (others) => {
+      return others.filter(
+        (other) =>
+          other.CourseChapters &&
+          other.CourseChapters.length > 0 &&
+          other.id !== videoData.course_id
+      );
+    };
+
+    // 過濾同課程的影片並取 6 支影片
+    const filterRelatedVideo = (relatedVideo) => {
+      return relatedVideo
+        .filter((related) => {
+          return related.course_id !== videoData.course_id;
+        })
+        .slice(0, 6);
+    };
 
     // 在 videoData 更新後調用過濾函數
     const filterOtherVideos = async () => {
       const otherCourseResult = await courseApi.getFrontTutorCourses({
         tutorId: videoData.tutor_id,
       });
-      setOtherVideos(filterOtherCourse(otherCourseResult.courses));
+      return filterOtherCourse(otherCourseResult.courses);
     };
 
     // 在 videoData 更新後調用過濾函數
@@ -120,26 +77,87 @@ export default function CourseVideoPage() {
       const relatedVideosResult = await courseApi.getFrontTutorVideos({
         category: videoData.category,
       });
-
-      setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
+      return filterRelatedVideo(relatedVideosResult.videos);
     };
 
-    filterOtherVideos();
-    filterRelatedVideos();
-    isInitial.current = false;
+    // 使用 Promise.all 確保兩個函數執行完畢後再執行 setLoadingState(false)
+    const executeFilters = async () => {
+      try {
+        const [otherVideosResult, relatedVideosResult] = await Promise.all([
+          filterOtherVideos(),
+          filterRelatedVideos(),
+        ]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoData.id]);
+        // 在 Promise.all 完成後執行 setState
+        setOtherVideos(otherVideosResult);
+        setRelatedVideos(relatedVideosResult);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "影片獲取失敗",
+          text:
+            error.response.data.status === "error" &&
+            "請稍後再試，若有問題請洽管理人員",
+        });
+      } finally {
+        setLoadingState(false);
+        isInitial.current = false;
+      }
+    };
+
+    executeFilters();
+  }, [videoData]);
 
   // 初始化
   useEffect(() => {
     if (!isInitial.current) {
       isInitial.current = true;
+
+      const getInitialData = async () => {
+        if (swalShown) return;
+
+        const isLoginStatus = await dispatchRef.current(loginCheck());
+        if (isLoginStatus.meta.requestStatus === "rejected") {
+          if (!errorLogged.current) {
+            setSwalShown(true);
+            Swal.fire({
+              title: "請先登入或註冊會員",
+              text: "趕緊加入觀賞優質課程吧",
+              icon: "error",
+              showCancelButton: true,
+              confirmButtonText: "註冊",
+              cancelButtonText: "登入",
+              allowOutsideClick: false,
+            }).then((result) => {
+              setSwalShown(false);
+              if (result.isConfirmed) {
+                navigateRef.current("/signup"); // 註冊
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+                navigateRef.current("/login"); // 登入
+              }
+            });
+          }
+          errorLogged.current = true;
+          setLoadingState(false);
+        } else {
+          setLoadingState(true);
+          try {
+            const videoResult = await courseApi.getVideoDetail(videoId);
+            setVideoData(videoResult);
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "取得資料失敗",
+              text: error.response?.data?.message || "發生錯誤，請稍後再試",
+            });
+          } finally {
+            setLoadingState(false);
+          }
+        }
+      };
       getInitialData();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoId]);
+  }, [videoId, swalShown]);
 
   return (
     <>
