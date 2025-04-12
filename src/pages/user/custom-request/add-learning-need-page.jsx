@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginCheck, getUserData } from "@/utils/slice/authSlice";
+import { loginCheck, getUserData } from "@/store/slice/authSlice";
 import { Helmet } from "react-helmet-async";
 
 import Swal from "sweetalert2";

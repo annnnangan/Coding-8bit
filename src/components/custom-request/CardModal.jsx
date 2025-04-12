@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserData } from "@/utils/slice/authSlice";
+import { getUserData } from "@/store/slice/authSlice";
 
 const ReactQuill = lazy(() => import("react-quill-new"));
 import PropTypes from "prop-types";

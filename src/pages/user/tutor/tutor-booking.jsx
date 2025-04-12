@@ -24,7 +24,7 @@ import CommentRatingStat from "@/components/tutor/CommentRatingStat";
 
 import { formatDateDash, formatHour } from "@/utils/timeFormatted-utils";
 import CourseCardLoadingSkeleton from "@/components/course/CourseCardLoadingSkeleton";
-import { updateFormData } from "@/utils/slice/bookingSlice";
+import { updateFormData } from "@/store/slice/bookingSlice";
 
 export default function TutorBooking() {
   const dispatch = useDispatch();

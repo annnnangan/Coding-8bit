@@ -16,7 +16,7 @@ import Loader from "@/components/common/Loader";
 
 // 工具
 import { convertSecondsToTime } from "@/utils/timeFormatted-utils";
-import { loginCheck } from "@/utils/slice/authSlice";
+import { loginCheck } from "@/store/slice/authSlice";
 
 export default function CourseVideoPage() {
   const [otherVideos, setOtherVideos] = useState([]); // 講師其他影片

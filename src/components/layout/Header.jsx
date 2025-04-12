@@ -8,7 +8,7 @@ import {
   getUserData,
   changeUserRole,
   logout,
-} from "@/utils/slice/authSlice";
+} from "@/store/slice/authSlice";
 import useScrollPosition from "@/hooks/use-scrollPosition";
 
 const navItems = [
