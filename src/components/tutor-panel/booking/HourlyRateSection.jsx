@@ -10,6 +10,7 @@ import tutorApi from "@/api/tutorApi";
 
 import FormInput from "@/components/common/FormInput";
 import FormSubmitButton from "@/components/common/FormSubmitButton";
+import SectionFallback from "@/components/common/SectionFallback";
 
 const schema = z.object({
   hourly_rate: z
@@ -22,14 +23,15 @@ export default function HourlyRateSection() {
   const tutorId = useSelector((state) => state.auth?.userData?.tutor_id);
   const [hourlyRate, setHourlyRate] = useState(0);
   const [loadingState, setLoadingState] = useState(false);
+  const [getDataerror, setGetDataError] = useState(undefined);
 
   const getTutorHourlyRate = useCallback(async () => {
     setLoadingState(true);
     try {
       const result = await tutorApi.getTutorDetail(tutorId);
       setHourlyRate(Number(result.data.hourly_rate));
-    } catch (error) {
-      console.log(error);
+    } catch {
+      setGetDataError("無法取得預約價格");
     } finally {
       setLoadingState(false);
     }
@@ -80,8 +82,14 @@ export default function HourlyRateSection() {
         </div>
       ) : (
         <>
-          <FormInput register={register} errors={errors} id="hourly_rate" labelText="預約價格 / 小時 (請輸入給學員預約時的金額 / 小時 ex. 50)" type="number" />
-          <FormSubmitButton buttonStyle={"mt-8"} isLoading={isSubmitting} buttonText={"更新價格"} loadingText={"更新中"} roundedRadius={2} withIcon={false} withSlideRightAnimation={false} />
+          {getDataerror ? (
+            <SectionFallback materialIconName="paid" fallbackText={getDataerror} />
+          ) : (
+            <>
+              <FormInput register={register} errors={errors} id="hourly_rate" labelText="預約價格 / 小時 (請輸入給學員預約時的金額 / 小時 ex. 50)" type="number" />
+              <FormSubmitButton buttonStyle={"mt-8"} isLoading={isSubmitting} buttonText={"更新價格"} loadingText={"更新中"} roundedRadius={2} withIcon={false} withSlideRightAnimation={false} />
+            </>
+          )}
         </>
       )}
     </form>

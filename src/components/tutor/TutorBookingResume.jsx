@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import SectionFallback from "@/components/common/SectionFallback";
 
 export default function TutorBookingResume({ resume }) {
-  console.log(resume.work_experience);
   return (
     <div className="row tutor-booking-resume">
       <div className="col-md-3 col-5">

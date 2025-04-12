@@ -88,9 +88,6 @@ export default function TutorBookingPayment() {
   const toNextStep = async () => {
     const isValid = await methods.trigger(stepFields[currentStep - 1].field);
 
-    // console.log(methods.formState.errors);
-    // console.log("isValid", isValid);
-
     if (!isValid) return;
 
     const formData = methods.getValues();
@@ -213,7 +210,6 @@ export default function TutorBookingPayment() {
       const orderId = await createOrder(bookingId);
       await addPay(orderId, data);
     } catch (error) {
-      console.dir(error);
       const redirectUrl = tutor_id ? `/tutor/${tutor_id}` : "/";
       navigate(redirectUrl);
       Swal.fire({

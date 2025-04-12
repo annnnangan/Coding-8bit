@@ -42,7 +42,6 @@ export default function CancelConfirmationModal({ booking, isOpen, setOpenModal,
   };
 
   const handleConfirmCancel = () => {
-    console.log("Cancel reason:", cancelReason);
     setOpenModal(false);
   };
 
