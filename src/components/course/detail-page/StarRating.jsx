@@ -15,10 +15,10 @@ const StarRating = ({ videoId, hideModal, setStarRating }) => {
   // 處理評分變更
   const onRatingChange = async (newRating) => {
     try {
-      const ratingReaponse = await courseApi.postRatingVideo(videoId, {
+      const ratingResponse = await courseApi.postRatingVideo(videoId, {
         rating: newRating,
       });
-      if (ratingReaponse.status === "success") {
+      if (ratingResponse.status === "success") {
         Swal.fire({
           position: "center",
           icon: "success",
@@ -29,7 +29,13 @@ const StarRating = ({ videoId, hideModal, setStarRating }) => {
       }
       setRating(newRating);
     } catch (error) {
-      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "評分失敗",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
+      });
     } finally {
       setStarRating(true);
       hideModal();

@@ -89,7 +89,13 @@ export default function CommentsSection({
         }
       })
       .catch((error) => {
-        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "刪除失敗",
+          text:
+            error.response.data.status === "error" &&
+            "請稍後再試，若有問題請洽管理人員",
+        });
       })
       .finally(async () => {
         const reloadComments = await courseApi.getCourseComments(videoId);
@@ -125,7 +131,13 @@ export default function CommentsSection({
         };
         await courseApi.postCourseComments(videoId, data);
       } catch (error) {
-        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "留言失敗",
+          text:
+            error.response.data.status === "error" &&
+            "請稍後再試，若有問題請洽管理人員",
+        });
       } finally {
         const reloadComments = await courseApi.getCourseComments(videoId);
         const { parentComments, childComments } =
@@ -141,7 +153,6 @@ export default function CommentsSection({
   // 回覆
   const replyComment = async (commentId) => {
     const replyContent = replyText[commentId];
-
     if (validateReply(replyContent) && replyContent.trim() !== "") {
       setIsReplying((prev) => ({ ...prev, [commentId]: true })); // 只設置當前留言為 "回覆中"
       try {
@@ -151,7 +162,13 @@ export default function CommentsSection({
         };
         await courseApi.postCourseComments(videoId, data);
       } catch (error) {
-        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "回覆失敗",
+          text:
+            error.response.data.status === "error" &&
+            "請稍後再試，若有問題請洽管理人員",
+        });
       } finally {
         const reloadComments = await courseApi.getCourseComments(videoId);
         const { parentComments, childComments } =

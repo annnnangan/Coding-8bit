@@ -1,5 +1,5 @@
 // react 相關套件
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
@@ -41,8 +41,11 @@ export default function VideoContent({
   const modalRef = useRef(null);
   const modalRefMethod = useRef(null);
 
+  // 確保開發環境時初始化只執行一次
+  const isInitial = useRef(false);
+
   // 控制收藏課程
-  const handleFavorite = async (videoId) => {
+  const handleFavoriteCourseVideo = async (videoId) => {
     let response;
     try {
       if (favoriteVideo) {
@@ -70,12 +73,18 @@ export default function VideoContent({
         setFavoriteVideo(false);
       }
     } catch (error) {
-      console.error("handleFavorite error", error);
+      Swal.fire({
+        icon: "error",
+        title: "收藏失敗",
+        text:
+          error.response.data.status === "error" &&
+          "請稍後再試，若有問題請洽管理人員",
+      });
     }
   };
 
   // 取得影片播放權限
-  const getTokenToPlay = async (videoUrl) => {
+  const getVideoToken = async (videoUrl) => {
     if (!videoUrl) return "";
 
     // 如果開頭為 "https://firebasestorage.googleapis.com/"，直接回傳網址
@@ -92,74 +101,84 @@ export default function VideoContent({
     return tokenUrl;
   };
 
-  // 取得留言、收藏、評分狀態
-  const getComment = useCallback(async () => {
-    videoUrl === ""
-      ? setDisableInputComment(true)
-      : setDisableInputComment(false);
-
-    if (introductionVideoId || paramsVideoId) {
-      const getFavoriteVideoStatus = async () => {
-        const resStatus = await courseApi.getFavoriteVideo(
-          introductionVideoId || paramsVideoId
-        );
-        resStatus.isFavorite ? setFavoriteVideo(true) : setFavoriteVideo(false);
-      };
-      const getStarRatingStatus = async () => {
-        const resRating = await courseApi.getStarRatingVideo(
-          introductionVideoId || paramsVideoId
-        );
-        resRating.isRated ? setStarRating(true) : setStarRating(false);
-      };
-
-      const getCourseCommentsHandle = async () => {
-        try {
-          const commentsResult = await courseApi.getCourseComments(
-            introductionVideoId || paramsVideoId
-          );
-          setComments(commentsResult);
-        } catch (error) {
-          console.error("getCourseCommentsHandle error", error);
-        }
-      };
-
-      getFavoriteVideoStatus();
-      getStarRatingStatus();
-      getCourseCommentsHandle();
-    }
-  }, [videoUrl, introductionVideoId, paramsVideoId]);
-
-  // 判斷是否登入
-  const isLogin = useCallback(async () => {
-    const isLoginStatus = await dispatch(loginCheck());
-    if (isLoginStatus.meta.requestStatus === "rejected") {
-      setShowIcon(false);
-      return false;
-    }
-    return true;
-  }, [dispatch]);
-
   // 取得影片播放 URL
   useEffect(() => {
-    const initialize = async () => {
-      if (!(await isLogin())) return;
-      const fetchVideoSrc = async () => {
-        const tokenUrl = await getTokenToPlay(videoUrl);
-        setVideoSrc(tokenUrl);
-      };
-      const localUser = async () => {
-        const userSubscription = await userApi.getUserData();
-        setUserSubscriptionsPlan(
-          userSubscription.subscriptions.length === 0 ? false : true
-        );
-      };
+    if (!isInitial.current) {
+      isInitial.current = true;
 
-      localUser();
-      getComment();
-      fetchVideoSrc();
-    };
-    initialize();
-  }, [videoUrl, isLogin, getComment]);
+      const getInitialData = async () => {
+        
+        // 判斷是否登入
+        const isLogin = async () => {
+          const isLoginStatus = await dispatch(loginCheck());
+          if (isLoginStatus.meta.requestStatus === "rejected") {
+            setShowIcon(false);
+            return false;
+          }
+          return true;
+        };
+
+        if (!(await isLogin())) return;
+
+        // 取得影片播放權限
+        const videoToken = async () => {
+          const tokenUrl = await getVideoToken(videoUrl);
+          loginCheck(tokenUrl);
+          setVideoSrc(tokenUrl);
+        };
+
+        // 取得使用者訂閱方案
+        const localUser = async () => {
+          const userSubscription = await userApi.getUserData();
+          setUserSubscriptionsPlan(
+            userSubscription.subscriptions.length === 0 ? false : true
+          );
+        };
+
+        // 取得留言、收藏、評分狀態
+        const getComment = async () => {
+          videoUrl === ""
+            ? setDisableInputComment(true)
+            : setDisableInputComment(false);
+
+          if (introductionVideoId || paramsVideoId) {
+            const getFavoriteVideoStatus = async () => {
+              const resStatus = await courseApi.getFavoriteVideo(
+                introductionVideoId || paramsVideoId
+              );
+              resStatus.isFavorite
+                ? setFavoriteVideo(true)
+                : setFavoriteVideo(false);
+            };
+            const getStarRatingStatus = async () => {
+              const resRating = await courseApi.getStarRatingVideo(
+                introductionVideoId || paramsVideoId
+              );
+              resRating.isRated ? setStarRating(true) : setStarRating(false);
+            };
+
+            const getCourseCommentsHandle = async () => {
+              const commentsResult = await courseApi.getCourseComments(
+                introductionVideoId || paramsVideoId
+              );
+              setComments(commentsResult);
+            };
+
+            getFavoriteVideoStatus();
+            getStarRatingStatus();
+            getCourseCommentsHandle();
+          }
+        };
+
+        videoToken();
+        localUser();
+        getComment();
+      };
+      getInitialData();
+    }else{
+      isInitial.current = false;
+    }
+  }, [dispatch, videoUrl, introductionVideoId, paramsVideoId]);
 
   // 先判斷訂閱方案，再判斷是否顯示評分/觀看 icon
   useEffect(() => {
@@ -230,7 +249,7 @@ export default function VideoContent({
               type="button"
               className="favorite-button f-align-center btn btn-outline-none py-2 ps-3 px-4"
               onClick={() =>
-                handleFavorite(introductionVideoId || paramsVideoId)
+                handleFavoriteCourseVideo(introductionVideoId || paramsVideoId)
               }
             >
               <span
