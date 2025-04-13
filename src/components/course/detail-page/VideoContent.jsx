@@ -107,6 +107,7 @@ export default function VideoContent({
       isInitial.current = true;
 
       const getInitialData = async () => {
+        
         // 判斷是否登入
         const isLogin = async () => {
           const isLoginStatus = await dispatch(loginCheck());

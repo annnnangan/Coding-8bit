@@ -1,5 +1,5 @@
 // react 相關套件
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -47,109 +47,113 @@ export default function CourseDetailPage() {
     },
   });
 
-  const getInitialData = useCallback(async () => {
-    if (swalShown) return;
-    
-    const isLoginStatus = await dispatch(loginCheck());
-    if (isLoginStatus.meta.requestStatus === "rejected") {
-      if (!errorLogged.current) {
-        setSwalShown(true);
-        Swal.fire({
-          title: "請先登入或註冊會員",
-          text: "趕緊加入觀賞優質課程吧",
-          icon: "error",
-          showCancelButton: true,
-          confirmButtonText: "註冊",
-          cancelButtonText: "登入",
-          allowOutsideClick: false,
-        }).then((result) => {
-          setSwalShown(false);
-          if (result.isConfirmed) {
-            navigate("/signup"); // 註冊
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            navigate("/login"); // 登入
-          }
-        });
-      }
-      errorLogged.current = true;
-    } else {
-      setLoadingState(true);
-      try {
-        const userSubscriptionsPlan = await userApi.getUserData();
-        if (userSubscriptionsPlan.subscriptions[0].plan_name === "free") {
-          const errObject = new Error();
-          errObject.name = "SubscriptionError";
-          throw errObject;
-        }
-
-        const courseResult = await courseApi.getCourseDetail(id);
-        const chapterResult = await courseApi.getCourseChapter(id);
-        const otherCourseResult = await courseApi.getFrontTutorCourses({
-          tutorId: courseResult.tutor_id,
-        });
-        const relatedVideosResult = await courseApi.getFrontTutorVideos({
-          category: courseResult.category,
-        });
-
-        // 過濾同講師無章節or相同課程
-        const filterOtherCourse = (others) => {
-          return others.filter(
-            (other) =>
-              other.CourseChapters &&
-              other.CourseChapters.length > 0 &&
-              other.id !== id
-          );
-        };
-
-        // 過濾同課程的影片並取 6 支影片
-        const filterRelatedVideo = (relatedVideo) => {
-          return relatedVideo
-            .filter((related) => related.course_id !== id)
-            .slice(0, 6);
-        };
-
-        isInitial.current = true;
-        setCourseList(courseResult);
-        setChapter(chapterResult);
-        setOtherVideos(filterOtherCourse(otherCourseResult.courses));
-        setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
-      } catch (error) {
-        if (!errorLogged.current) {
-          if (error.name === "SubscriptionError") {
-            setSwalShown(true);
-            Swal.fire({
-              title: "無法觀看課程",
-              text: "輕鬆升級，詳情請至訂閱了解",
-              icon: "error",
-              showCancelButton: true,
-              confirmButtonText: "手刀升級！",
-              cancelButtonText: "回首頁",
-              allowOutsideClick: false,
-            }).then((result) => {
-              setSwalShown(false);
-              if (result.isConfirmed) {
-                navigate("/subscription-list"); // 手刀升級
-              } else if (result.dismiss === Swal.DismissReason.cancel) {
-                navigate("/"); // 返回首頁
-              }
-            });
-          }
-          errorLogged.current = true;
-        }
-      } finally {
-        setLoadingState(false);
-      }
-    }
-    isInitial.current = false;
-  }, [id, dispatch, navigate, swalShown]);
-
   // 初始化
   useEffect(() => {
     if (!isInitial.current) {
       isInitial.current = true;
+
+      const getInitialData = async () => {
+        if (swalShown) return;
+
+        const isLoginStatus = await dispatch(loginCheck());
+        if (isLoginStatus.meta.requestStatus === "rejected") {
+          if (!errorLogged.current) {
+            setSwalShown(true);
+            
+            Swal.fire({
+              title: "請先登入或註冊會員",
+              text: "趕緊加入觀賞優質課程吧",
+              icon: "error",
+              showCancelButton: true,
+              confirmButtonText: "註冊",
+              cancelButtonText: "登入",
+              allowOutsideClick: false,
+            }).then((result) => {
+              setSwalShown(false);
+              if (result.isConfirmed) {
+                navigate("/signup"); // 註冊
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+                navigate("/login"); // 登入
+              }
+            });
+          }
+          
+          errorLogged.current = true;
+          setLoadingState(false);
+        } else {
+          setLoadingState(true);
+          try {
+            const userSubscriptionsPlan = await userApi.getUserData();
+            if (userSubscriptionsPlan.subscriptions[0].plan_name === "free") {
+              const errObject = new Error();
+              errObject.name = "SubscriptionError";
+              throw errObject;
+            }
+
+            const courseResult = await courseApi.getCourseDetail(id);
+            const chapterResult = await courseApi.getCourseChapter(id);
+            const otherCourseResult = await courseApi.getFrontTutorCourses({
+              tutorId: courseResult.tutor_id,
+            });
+            const relatedVideosResult = await courseApi.getFrontTutorVideos({
+              category: courseResult.category,
+            });
+
+            // 過濾同講師無章節or相同課程
+            const filterOtherCourse = (others) => {
+              return others.filter(
+                (other) =>
+                  other.CourseChapters &&
+                  other.CourseChapters.length > 0 &&
+                  other.id !== id
+              );
+            };
+
+            // 過濾同課程的影片並取 6 支影片
+            const filterRelatedVideo = (relatedVideo) => {
+              return relatedVideo
+                .filter((related) => related.course_id !== id)
+                .slice(0, 6);
+            };
+
+            isInitial.current = true;
+            setCourseList(courseResult);
+            setChapter(chapterResult);
+            setOtherVideos(filterOtherCourse(otherCourseResult.courses));
+            setRelatedVideos(filterRelatedVideo(relatedVideosResult.videos));
+          } catch (error) {
+            if (!errorLogged.current) {
+              if (error.name === "SubscriptionError") {
+                setSwalShown(true);
+                Swal.fire({
+                  title: "無法觀看課程",
+                  text: "輕鬆升級，詳情請至訂閱了解",
+                  icon: "error",
+                  showCancelButton: true,
+                  confirmButtonText: "手刀升級！",
+                  cancelButtonText: "回首頁",
+                  allowOutsideClick: false,
+                }).then((result) => {
+                  setSwalShown(false);
+                  if (result.isConfirmed) {
+                    navigate("/subscription-list"); // 手刀升級
+                  } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    navigate("/"); // 返回首頁
+                  }
+                });
+              }
+              errorLogged.current = true;
+            }
+          } finally {
+            setLoadingState(false);
+          }
+        }
+        isInitial.current = false;
+      };
+
       getInitialData();
     }
-  }, [getInitialData]);
+  }, [id, dispatch, navigate, swalShown]);
 
   // 確保 modal 隱藏時，焦點不會停留在 modal 上
   useEffect(() => {

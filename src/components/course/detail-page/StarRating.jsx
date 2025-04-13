@@ -15,10 +15,10 @@ const StarRating = ({ videoId, hideModal, setStarRating }) => {
   // 處理評分變更
   const onRatingChange = async (newRating) => {
     try {
-      const ratingReaponse = await courseApi.postRatingVideo(videoId, {
+      const ratingResponse = await courseApi.postRatingVideo(videoId, {
         rating: newRating,
       });
-      if (ratingReaponse.status === "success") {
+      if (ratingResponse.status === "success") {
         Swal.fire({
           position: "center",
           icon: "success",
