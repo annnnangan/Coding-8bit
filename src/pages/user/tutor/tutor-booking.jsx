@@ -226,12 +226,8 @@ export default function TutorBooking() {
     try {
       const result = await tutorApi.getTutorBookmark(tutor_id);
       setBookmark(result);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "取得資料失敗",
-        text: error.response?.data?.message || "發生錯誤，請稍後再試",
-      });
+    } catch {
+      setBookmark(false);
     }
   }, [tutor_id]);
 
